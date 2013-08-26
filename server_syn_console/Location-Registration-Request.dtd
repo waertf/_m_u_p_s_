@@ -1,0 +1,2 @@
+﻿<!ELEMENT Location-Registration-Request (application)>
+<!ELEMENT application (#PCDATA)>

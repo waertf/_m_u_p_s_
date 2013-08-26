@@ -1,0 +1,5 @@
+C:\Users\wavegis\Documents\Visual Studio 2008\Projects\int_to_hex_little_endian\Backup\int_to_hex_little_endian_v2\bin\Release\int_to_hex_little_endian_v2.exe
+C:\Users\wavegis\Documents\Visual Studio 2008\Projects\int_to_hex_little_endian\Backup\int_to_hex_little_endian_v2\bin\Release\int_to_hex_little_endian_v2.pdb
+C:\Users\wavegis\Documents\Visual Studio 2008\Projects\int_to_hex_little_endian\Backup\int_to_hex_little_endian_v2\obj\Release\ResolveAssemblyReference.cache
+C:\Users\wavegis\Documents\Visual Studio 2008\Projects\int_to_hex_little_endian\Backup\int_to_hex_little_endian_v2\obj\Release\int_to_hex_little_endian_v2.exe
+C:\Users\wavegis\Documents\Visual Studio 2008\Projects\int_to_hex_little_endian\Backup\int_to_hex_little_endian_v2\obj\Release\int_to_hex_little_endian_v2.pdb

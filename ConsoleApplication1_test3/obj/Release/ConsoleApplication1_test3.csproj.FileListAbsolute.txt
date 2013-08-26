@@ -1,0 +1,5 @@
+C:\Users\wavegis\Documents\Visual Studio 2008\Projects\int_to_hex_little_endian\Backup\ConsoleApplication1_test3\bin\Release\ConsoleApplication1_test3.exe
+C:\Users\wavegis\Documents\Visual Studio 2008\Projects\int_to_hex_little_endian\Backup\ConsoleApplication1_test3\bin\Release\ConsoleApplication1_test3.pdb
+C:\Users\wavegis\Documents\Visual Studio 2008\Projects\int_to_hex_little_endian\Backup\ConsoleApplication1_test3\obj\Release\ResolveAssemblyReference.cache
+C:\Users\wavegis\Documents\Visual Studio 2008\Projects\int_to_hex_little_endian\Backup\ConsoleApplication1_test3\obj\Release\ConsoleApplication1_test3.exe
+C:\Users\wavegis\Documents\Visual Studio 2008\Projects\int_to_hex_little_endian\Backup\ConsoleApplication1_test3\obj\Release\ConsoleApplication1_test3.pdb
