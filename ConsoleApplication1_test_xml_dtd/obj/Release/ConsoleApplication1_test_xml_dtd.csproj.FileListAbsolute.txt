@@ -5,3 +5,10 @@ C:\Users\wavegis\Documents\Visual Studio 2008\Projects\int_to_hex_little_endian\
 C:\Users\wavegis\Documents\Visual Studio 2008\Projects\int_to_hex_little_endian\Backup\ConsoleApplication1_test_xml_dtd\obj\Release\ResolveAssemblyReference.cache
 C:\Users\wavegis\Documents\Visual Studio 2008\Projects\int_to_hex_little_endian\Backup\ConsoleApplication1_test_xml_dtd\obj\Release\ConsoleApplication1_test_xml_dtd.exe
 C:\Users\wavegis\Documents\Visual Studio 2008\Projects\int_to_hex_little_endian\Backup\ConsoleApplication1_test_xml_dtd\obj\Release\ConsoleApplication1_test_xml_dtd.pdb
+C:\Users\wavegis\Documents\mups\ConsoleApplication1_test_xml_dtd\bin\Release\Location-Registration-Request.xml
+C:\Users\wavegis\Documents\mups\ConsoleApplication1_test_xml_dtd\bin\Release\Location-Registration-Request.dtd
+C:\Users\wavegis\Documents\mups\ConsoleApplication1_test_xml_dtd\bin\Release\ConsoleApplication1_test_xml_dtd.exe
+C:\Users\wavegis\Documents\mups\ConsoleApplication1_test_xml_dtd\bin\Release\ConsoleApplication1_test_xml_dtd.pdb
+C:\Users\wavegis\Documents\mups\ConsoleApplication1_test_xml_dtd\obj\Release\ResolveAssemblyReference.cache
+C:\Users\wavegis\Documents\mups\ConsoleApplication1_test_xml_dtd\obj\Release\ConsoleApplication1_test_xml_dtd.exe
+C:\Users\wavegis\Documents\mups\ConsoleApplication1_test_xml_dtd\obj\Release\ConsoleApplication1_test_xml_dtd.pdb

@@ -3,3 +3,8 @@ C:\Users\wavegis\Documents\Visual Studio 2008\Projects\int_to_hex_little_endian\
 C:\Users\wavegis\Documents\Visual Studio 2008\Projects\int_to_hex_little_endian\Backup\TimerExample\obj\Release\ResolveAssemblyReference.cache
 C:\Users\wavegis\Documents\Visual Studio 2008\Projects\int_to_hex_little_endian\Backup\TimerExample\obj\Release\TimerExample.exe
 C:\Users\wavegis\Documents\Visual Studio 2008\Projects\int_to_hex_little_endian\Backup\TimerExample\obj\Release\TimerExample.pdb
+C:\Users\wavegis\Documents\mups\TimerExample\bin\Release\TimerExample.exe
+C:\Users\wavegis\Documents\mups\TimerExample\bin\Release\TimerExample.pdb
+C:\Users\wavegis\Documents\mups\TimerExample\obj\Release\ResolveAssemblyReference.cache
+C:\Users\wavegis\Documents\mups\TimerExample\obj\Release\TimerExample.exe
+C:\Users\wavegis\Documents\mups\TimerExample\obj\Release\TimerExample.pdb

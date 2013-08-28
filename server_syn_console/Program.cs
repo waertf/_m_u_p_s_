@@ -584,7 +584,7 @@ Select 0-4 then press enter to send package
                 XDocument xml = XDocument.Parse(logMessage);
                 logMessage = send_receive + xml.ToString();
                 w.Write("\r\nLog Entry : ");
-                w.WriteLine("{0} {1}", DateTime.Now.ToLongTimeString(),
+                w.WriteLine("{0} {1}", DateTime.Now.ToString("H:mm:ss.fffffff"),
                     DateTime.Now.ToLongDateString());
                 w.WriteLine("  :");
                 w.WriteLine("  :{0}", logMessage);
