@@ -12,6 +12,8 @@ using Devart.Data.PostgreSql;
 using System.Collections;
 using System.Xml;        // for XmlTextReader and XmlValidatingReader
 using System.Xml.Schema; // for XmlSchemaCollection (which is used later)
+using log4net;
+using log4net.Config;
 
 
 namespace ConsoleApplication1_client_threading
@@ -21,7 +23,8 @@ namespace ConsoleApplication1_client_threading
         //static TcpClient tcpClient = null;
         //static NetworkStream netStream = null;
         const int LENGTH_TO_CUT = 4;
-        private static bool isValid = true; 
+        private static bool isValid = true;
+        private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
         static void Main(string[] args)
         {
             //string ipAddress = "127.0.0.1";
@@ -1054,6 +1057,7 @@ Select 1-6 then press enter to send package
             {
                 XDocument xml = XDocument.Parse(logMessage);
                 logMessage = send_receive + xml.ToString();
+                /*
                 w.Write("\r\nLog Entry : ");
                 w.WriteLine("{0} {1}", DateTime.Now.ToString("H:mm:ss.fffffff"),
                     DateTime.Now.ToLongDateString());
@@ -1062,6 +1066,8 @@ Select 1-6 then press enter to send package
                 w.WriteLine("-------------------------------");
                 // Update the underlying file.
                 w.Flush();
+                 * */
+                log.Info(logMessage);
             }
             catch (Exception ex)
             {

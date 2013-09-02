@@ -18,3 +18,6 @@ C:\Users\wavegis\Documents\mups\ConsoleApplication1_client_threading\bin\Release
 C:\Users\wavegis\Documents\mups\ConsoleApplication1_client_threading\bin\Release\Devart.Data.PostgreSql.dll
 C:\Users\wavegis\Documents\mups\ConsoleApplication1_client_threading\bin\Release\Devart.Data.PostgreSql.xml
 C:\Users\wavegis\Documents\mups\ConsoleApplication1_client_threading\obj\Release\ResolveAssemblyReference.cache
+C:\Users\wavegis\Documents\mups\ConsoleApplication1_client_threading\bin\Release\log4net.config
+C:\Users\wavegis\Documents\mups\ConsoleApplication1_client_threading\bin\Release\log4net.dll
+C:\Users\wavegis\Documents\mups\ConsoleApplication1_client_threading\bin\Release\log4net.xml
