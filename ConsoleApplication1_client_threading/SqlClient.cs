@@ -12,14 +12,19 @@ namespace ConsoleApplication1_client_threading
         PgSqlConnectionStringBuilder pgCSB = new PgSqlConnectionStringBuilder();
         PgSqlConnection pgSqlConnection;
         public bool IsConnected{get;set;}
-        public SqlClient(string ip,string port,string user_id,string password,string database)
+        public SqlClient(string ip, string port, string user_id, string password, string database, string Pooling, string MinPoolSize, string MaxPoolSize, string ConnectionLifetime)
         {
             pgCSB.Host = ip;
             pgCSB.Port = int.Parse(port);
             pgCSB.UserId = user_id;
             pgCSB.Password = password;
             pgCSB.Database = database;
-            pgCSB.MaxPoolSize = 150;
+
+            pgCSB.Pooling = bool.Parse(Pooling);
+            pgCSB.MinPoolSize = int.Parse(MinPoolSize);
+            pgCSB.MaxPoolSize = int.Parse(MaxPoolSize);
+            pgCSB.ConnectionLifetime = int.Parse(ConnectionLifetime); ;
+
             pgCSB.ConnectionTimeout = 30;
             pgCSB.Unicode = true;
             pgSqlConnection = new PgSqlConnection(pgCSB.ConnectionString);
