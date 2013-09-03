@@ -1,0 +1,7 @@
+2013-09-03 15:25:18,533
+send:
+<Triggered-Location-Stop-Request>
+  <request-id>2468ACE0</request-id>
+  <suaddr suaddr-type="APCO">1004</suaddr>
+</Triggered-Location-Stop-Request>
+=========================================

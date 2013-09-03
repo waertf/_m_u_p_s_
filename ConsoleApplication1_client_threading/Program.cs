@@ -336,27 +336,35 @@ Select 1-6 then press enter to send package
         private static string ReadLine(TcpClient tcpClient, NetworkStream netStream,
             string output)
         {
-            if (netStream.CanRead)
+            try
             {
-                byte[] bytes = new byte[tcpClient.ReceiveBufferSize];
+                if (netStream.CanRead)
+                {
+                    byte[] bytes = new byte[tcpClient.ReceiveBufferSize];
 
-                int numBytesRead = netStream.Read(bytes, 0,
-                    (int)tcpClient.ReceiveBufferSize);
+                    int numBytesRead = netStream.Read(bytes, 0,
+                        (int)tcpClient.ReceiveBufferSize);
 
-                byte[] bytesRead = new byte[numBytesRead];
-                Array.Copy(bytes, bytesRead, numBytesRead);
+                    byte[] bytesRead = new byte[numBytesRead];
+                    Array.Copy(bytes, bytesRead, numBytesRead);
 
-                string returndata = Encoding.ASCII.GetString(bytesRead);
+                    string returndata = Encoding.ASCII.GetString(bytesRead);
 
-                output = String.Format("Read: Length: {0}, Data: \r\n{1}",
-                    returndata.Length, returndata);
+                    output = String.Format("Read: Length: {0}, Data: \r\n{1}",
+                        returndata.Length, returndata);
+                }
+
+                Console.WriteLine("-------------------------");
+                Console.WriteLine("Read: " + output);
+                Console.WriteLine("-------------------------");
+
+                return output.Trim();
             }
-
-            Console.WriteLine("-------------------------");
-            Console.WriteLine("Read: " + output);
-            Console.WriteLine("-------------------------");
-
-            return output.Trim();
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                return "error";
+            }
         }
         static void read_thread_method(TcpClient tcpClient, NetworkStream netStream , SqlClient sql_client)
         {
@@ -364,7 +372,7 @@ Select 1-6 then press enter to send package
             while (true)
             {
                 Thread.Sleep(300);
-                if (netStream.CanRead && netStream.DataAvailable)
+                if (netStream.CanRead)// && netStream.DataAvailable)
                 {
                     //string xml_test = "<test></test>";
                     int receive_total_length = tcpClient.ReceiveBufferSize;

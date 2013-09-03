@@ -1,0 +1,7 @@
+2013-09-03 15:13:39,794
+send:
+<Immediate-Location-Request>
+  <request-id>2468ACE0</request-id>
+  <suaddr suaddr-type="APCO">1004</suaddr>
+</Immediate-Location-Request>
+=========================================
