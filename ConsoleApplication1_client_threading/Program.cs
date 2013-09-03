@@ -25,6 +25,66 @@ namespace ConsoleApplication1_client_threading
         const int LENGTH_TO_CUT = 4;
         private static bool isValid = true;
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+
+       
+
+        [System.Runtime.InteropServices.StructLayout(System.Runtime.InteropServices.LayoutKind.Explicit)]
+        struct TcpKeepAlive
+        {
+            [System.Runtime.InteropServices.FieldOffset(0)]
+            private unsafe fixed byte Bytes[12];
+
+            [System.Runtime.InteropServices.FieldOffset(0)]
+            public uint On_Off;
+            [System.Runtime.InteropServices.FieldOffset(4)]
+            public uint KeepALiveTime;
+            [System.Runtime.InteropServices.FieldOffset(8)]
+            public uint KeepALiveInterval;
+
+            public byte[] ToArray()
+            {
+                unsafe
+                {
+                    fixed (byte* ptr = Bytes)
+                    {
+                        IntPtr p = new IntPtr(ptr);
+                        byte[] BytesArray = new byte[12];
+
+                        System.Runtime.InteropServices.Marshal.Copy(p, BytesArray, 0, BytesArray.Length);
+                        return BytesArray;
+                    }
+                }
+            }
+        }
+        public static int SetKeepAliveValues
+    (
+        System.Net.Sockets.Socket Socket,
+        bool On_Off,
+        uint KeepaLiveTime,
+        uint KeepaLiveInterval
+    )
+        {
+            int Result = -1;
+
+            unsafe
+            {
+                TcpKeepAlive KeepAliveValues = new TcpKeepAlive();
+
+                KeepAliveValues.On_Off = Convert.ToUInt32(On_Off);
+                KeepAliveValues.KeepALiveTime = KeepaLiveTime;
+                KeepAliveValues.KeepALiveInterval = KeepaLiveInterval;
+
+                byte[] InValue = new byte[12];
+
+                //for (int I = 0; I < 12; I++)
+                    //InValue[I] = KeepAliveValues.Bytes[I];
+                Array.Copy(KeepAliveValues.ToArray(), InValue, InValue.Length);
+
+                Result = Socket.IOControl(IOControlCode.KeepAliveValues, InValue, null);
+            }
+
+            return Result;
+        }
         static void Main(string[] args)
         {
             //string ipAddress = "127.0.0.1";
@@ -37,6 +97,8 @@ namespace ConsoleApplication1_client_threading
             tcpClient.Connect(ipAddress, port);
 
             tcpClient.NoDelay = false;
+
+            SetKeepAliveValues(tcpClient.Client, true, 5000, 1000);
             
             NetworkStream netStream = tcpClient.GetStream();
 

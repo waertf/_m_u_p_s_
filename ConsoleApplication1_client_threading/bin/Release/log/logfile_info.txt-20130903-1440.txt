@@ -1,17 +1,17 @@
-2013-09-03 14:50:19,784
+2013-09-03 14:40:24,624
 send:
 <Location-Registration-Request>
   <application>12345</application>
 </Location-Registration-Request>
 =========================================
-2013-09-03 14:50:20,127
+2013-09-03 14:40:24,967
 receive:
 <Location-Registration-Answer>
   <application application-id="12345"></application>
   <result result-code="A">SYNTAX ERROR</result>
 </Location-Registration-Answer>
 =========================================
-2013-09-03 14:50:20,434
+2013-09-03 14:40:25,275
 receive:
 <Unsolicited-Location-Report>
   <suaddr suaddr-type="APCO">1004</suaddr>

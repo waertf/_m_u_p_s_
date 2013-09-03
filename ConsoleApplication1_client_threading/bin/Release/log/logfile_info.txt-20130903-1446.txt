@@ -1,0 +1,49 @@
+2013-09-03 14:46:38,919
+send:
+<Immediate-Location-Request>
+  <request-id>2468ACE0</request-id>
+  <suaddr suaddr-type="APCO">1004</suaddr>
+</Immediate-Location-Request>
+=========================================
+2013-09-03 14:46:39,196
+receive:
+<Immediate-Location-Answer>
+  <request-id></request-id>
+  <suaddr suaddr-type="APCO">1004</suaddr>
+  <result result-code="0"></result>
+</Immediate-Location-Answer>
+=========================================
+2013-09-03 14:46:39,505
+receive:
+<Immediate-Location-Report>
+  <suaddr suaddr-type="APCO">1004</suaddr>
+  <info-data>
+    <info-time>20030630073000</info-time>
+    <server-time>20030630073000</server-time>
+    <shape>
+      <circle-2d>
+        <lat>12.345345</lat>
+        <long>24.668866</long>
+        <radius>100</radius>
+      </circle-2d>
+    </shape>
+    <speed-hor>50</speed-hor>
+    <direction-hor>32</direction-hor>
+  </info-data>
+  <sensor-info>
+    <sensor>
+      <sensor-name>Ignition</sensor-name>
+      <sensor-value>off</sensor-value>
+      <sensor-type>Input</sensor-type>
+    </sensor>
+    <sensor>
+      <sensor-name>door</sensor-name>
+      <sensor-value>open</sensor-value>
+      <sensor-type>Input</sensor-type>
+    </sensor>
+  </sensor-info>
+  <vehicle-info>
+    <odometer>10,000</odometer>
+  </vehicle-info>
+</Immediate-Location-Report>
+=========================================
