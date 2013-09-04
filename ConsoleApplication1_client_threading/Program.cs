@@ -427,9 +427,12 @@ Select 1-6 then press enter to send package
         static void read_thread_method(TcpClient tcpClient, NetworkStream netStream , SqlClient sql_client)
         {
             Console.WriteLine("in read thread");
+            //asyn read
+            ReadLine(tcpClient, netStream, 2);
+            //syn read
             //while (true)
             {
-                Thread.Sleep(300);
+                //Thread.Sleep(300);
                 //if (netStream.CanRead)// && netStream.DataAvailable)
                 {
                     //string xml_test = "<test></test>";
@@ -440,8 +443,8 @@ Select 1-6 then press enter to send package
                     //byte[] data = new byte[data_length];
                     //netStream.Read(data, 0, data_length);
                     //string returndata = Encoding.ASCII.GetString(data);
-                    ReadLine(tcpClient, netStream, 2);
-                    Console.WriteLine("out ReadLine");
+                    
+                    //Console.WriteLine("out ReadLine");
                     /*
                     string returndata = Encoding.ASCII.GetString(fBuffer);
                     string output = String.Format("Read: Length: {0}, Data: {1}", returndata.Length, returndata);

@@ -92,16 +92,16 @@ namespace server_syn_console
                     handler.Shutdown(SocketShutdown.Both);
                     handler.Close();
                      * */
-
                         Console.WriteLine(
                             @"
-Select 1-4 then press enter to send package
+Select 0-4 then press enter to send package
+0.Triggered-Location-Report Message
 1.Unsolicited-Location-Report Event Message
 2.Unsolicited-Location-Report Emergency Message
 3.Unsolicited-Location-Report Presence Event Message
 4.Triggered-Location-Report with Invalid GPS Location Message
 ");
-                        Console.Write("Select[1-4]:");
+                        Console.Write("Select[0-4]:");
                 }
 
             }
@@ -331,6 +331,7 @@ Select 1-4 then press enter to send package
 
         private static void sendtest2_t(Socket handler)
         {
+            Console.WriteLine("+sendtest2_t");
             string Unsolicited_event = "<Unsolicited-Location-Report><event-info>Ignition Off</event-info><suaddr suaddr-type=\"APCO\">1004</suaddr><info-data><info-time>20030630073000</info-time><server-time>20030630073000</server-time><shape><circle-2d><lat>12.345345</lat><long>24.668866</long><radius>100</radius></circle-2d></shape><speed-hor>50</speed-hor><direction-hor>32</direction-hor></info-data><sensor-info><sensor><sensor-name>Ignition</sensor-name><sensor-value>off</sensor-value><sensor-type>Input</sensor-type></sensor><sensor><sensor-name>door</sensor-name><sensor-value>open</sensor-value><sensor-type>Input</sensor-type></sensor></sensor-info><vehicle-info><odometer>10,000</odometer></vehicle-info></Unsolicited-Location-Report>";
             //string Unsolicited_emer = "<Unsolicited-Location-Report><suaddr suaddr-type=\"APCO\">1004</suaddr><event-info>Emergency On</event-info><info-data><info-time>20081012185257</info-time><server-time>20081012165257</server-time><shape><point-3d><lat>40.697595</lat><long>-73.984557</long><altitude>0</altitude></point-3d></shape><speed-hor>0</speed-hor><direction-hor>184</direction-hor></info-data></Unsolicited-Location-Report>";
             string Unsolicited_emer = "<Unsolicited-Location-Report><suaddr suaddr-type=\"APCO\">1004</suaddr><event-info>Emergency On</event-info><info-data><info-time>20081012185257</info-time><server-time>20081012165257</server-time><shape><circle-2d><lat>40.697595</lat><long>-73.984557</long><radius>0</radius></circle-2d></shape><speed-hor>0</speed-hor><direction-hor>184</direction-hor></info-data></Unsolicited-Location-Report>";
@@ -355,7 +356,7 @@ Select 0-4 then press enter to send package
 3.Unsolicited-Location-Report Presence Event Message
 4.Triggered-Location-Report with Invalid GPS Location Message
 ");
-                Console.Write("Select[1-4]:");
+                Console.Write("Select[0-4]:");
                 string select_num=Console.ReadLine();
                 switch (select_num)
                 {
