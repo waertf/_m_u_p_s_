@@ -26,6 +26,11 @@ namespace ConsoleApplication1_client_threading
         private static bool isValid = true;
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
         static AutoResetEvent autoEvent = new AutoResetEvent(false);
+        private static byte[] myReadBuffer = null;
+        private static byte[] fBuffer = null;
+        private static int fBytesRead = 0;
+        private static TcpClient tcpClient;
+        private static SqlClient sql_client;
        
         static void Main(string[] args)
         {
@@ -34,7 +39,7 @@ namespace ConsoleApplication1_client_threading
             //int port = 23;
             int port = int.Parse(ConfigurationManager.AppSettings["MUPS_SERVER_PORT"]);
             
-            TcpClient tcpClient = new TcpClient();
+            tcpClient = new TcpClient();
 
             tcpClient.Connect(ipAddress, port);
 
@@ -43,7 +48,7 @@ namespace ConsoleApplication1_client_threading
             Keeplive.keep(tcpClient.Client);
             NetworkStream netStream = tcpClient.GetStream();
 
-            SqlClient sql_client = new SqlClient(ConfigurationManager.AppSettings["SQL_SERVER_IP"], ConfigurationManager.AppSettings["SQL_SERVER_PORT"], ConfigurationManager.AppSettings["SQL_SERVER_USER_ID"], ConfigurationManager.AppSettings["SQL_SERVER_PASSWORD"], ConfigurationManager.AppSettings["SQL_SERVER_DATABASE"], ConfigurationManager.AppSettings["Pooling"], ConfigurationManager.AppSettings["MinPoolSize"], ConfigurationManager.AppSettings["MaxPoolSize"], ConfigurationManager.AppSettings["ConnectionLifetime"]);
+            sql_client = new SqlClient(ConfigurationManager.AppSettings["SQL_SERVER_IP"], ConfigurationManager.AppSettings["SQL_SERVER_PORT"], ConfigurationManager.AppSettings["SQL_SERVER_USER_ID"], ConfigurationManager.AppSettings["SQL_SERVER_PASSWORD"], ConfigurationManager.AppSettings["SQL_SERVER_DATABASE"], ConfigurationManager.AppSettings["Pooling"], ConfigurationManager.AppSettings["MinPoolSize"], ConfigurationManager.AppSettings["MaxPoolSize"], ConfigurationManager.AppSettings["ConnectionLifetime"]);
 
             string registration_msg_error_test = "<Location-Registration-Request><application>" + ConfigurationManager.AppSettings["application_ID"] + "</application></Location-Registration-Request>";
             WriteLine(netStream, data_append_dataLength(registration_msg_error_test), registration_msg_error_test, sql_client);
@@ -273,9 +278,8 @@ Select 1-6 then press enter to send package
             NetworkStream myNetworkStream = (NetworkStream)ar.AsyncState;
             myNetworkStream.EndWrite(ar);
         }
-
-        private static string ReadLine(TcpClient tcpClient, NetworkStream netStream,int length,
-            string output)
+        
+        private static void ReadLine(TcpClient tcpClient, NetworkStream netStream,int prefix_length)
         {
             try
             {
@@ -283,9 +287,9 @@ Select 1-6 then press enter to send package
                 {
                     //byte[] bytes = new byte[tcpClient.ReceiveBufferSize];
 
-                    byte[] myReadBuffer = new byte[length];
+                    myReadBuffer = new byte[prefix_length];
                     netStream.BeginRead(myReadBuffer, 0, myReadBuffer.Length,
-                                                                 new AsyncCallback(myReadCallBack),
+                                                                 new AsyncCallback(myReadSizeCallBack),
                                                                  netStream);
 
                     autoEvent.WaitOne();
@@ -303,60 +307,143 @@ Select 1-6 then press enter to send package
                      * */
                 }
 
-                Console.WriteLine("-------------------------");
-                Console.WriteLine("Read: " + output);
-                Console.WriteLine("-------------------------");
+                //Console.WriteLine("-------------------------");
+                //Console.WriteLine("Read: " + output);
+                //Console.WriteLine("-------------------------");
 
-                return output.Trim();
+                //return output.Trim();
             }
             catch (Exception ex)
             {
                 Console.WriteLine(ex.Message);
-                return "error";
             }
         }
-        public static void myReadCallBack(IAsyncResult ar)
-        {
-
-            NetworkStream myNetworkStream = (NetworkStream)ar.AsyncState;
-            byte[] myReadBuffer = new byte[1024];
-            String myCompleteMessage = "";
-            int numberOfBytesRead;
-
-            numberOfBytesRead = myNetworkStream.EndRead(ar);
-            myCompleteMessage =
-                String.Concat(myCompleteMessage, Encoding.ASCII.GetString(myReadBuffer, 0, numberOfBytesRead));
-            
-            // message received may be larger than buffer size so loop through until you have it all.
-            while (myNetworkStream.DataAvailable)
+        public static void myReadSizeCallBack(IAsyncResult ar)
+        {          
+            try
             {
+                NetworkStream myNetworkStream = (NetworkStream)ar.AsyncState;
+                // Read precisely four bytes for the length of the following message
+                int numberOfBytesRead = myNetworkStream.EndRead(ar);
+                if (myReadBuffer.Length != numberOfBytesRead)
+                    throw new Exception();
+                int data_length = GetLittleEndianIntegerFromByteArray(myReadBuffer, 0);
+                //Array.Reverse(myReadBuffer);
+                //int size = BitConverter.ToInt16(myReadBuffer, 0);
 
-                myNetworkStream.BeginRead(myReadBuffer, 0, myReadBuffer.Length,
-                                                           new AsyncCallback(myReadCallBack),
-                                                           myNetworkStream);
-
+                // Create a buffer to hold the message and start reading it.
+                fBytesRead = 0;
+                fBuffer = new byte[data_length];
+                myNetworkStream.BeginRead(fBuffer, 0, fBuffer.Length, FinishRead, myNetworkStream);
             }
-            
-            // Print out the received message to the console.
-            Console.WriteLine("You received the following message : " +
-                                        myCompleteMessage);
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+        }
+        private static void FinishRead(IAsyncResult result)
+        {
+            try
+            {
+                // Finish reading from our stream. 0 bytes read means stream was closed
+                NetworkStream fStream = (NetworkStream)result.AsyncState;
+                int read = fStream.EndRead(result);
+                if (0 == read)
+                    throw new Exception();
+
+                // Increment the number of bytes we've read. If there's still more to get, get them
+                fBytesRead += read;
+                if (fBytesRead < fBuffer.Length)
+                {
+                    fStream.BeginRead(fBuffer, fBytesRead, fBuffer.Length - fBytesRead, FinishRead, null);
+                    return;
+                }
+
+                // Should be exactly the right number read now.
+                if (fBytesRead != fBuffer.Length)
+                    throw new Exception();
+
+                // Handle the message and go get the next one.
+                string returndata = Encoding.ASCII.GetString(fBuffer);
+                string output = String.Format("Read: Length: {0}, Data: {1}", returndata.Length, returndata);
+                XDocument xml_data = XDocument.Parse(returndata);
+                string xml_root_tag = xml_data.Root.Name.ToString();
+                Console.WriteLine();
+                string ouput2 = string.Empty;
+                try
+                {
+                    ouput2 = xml_data.ToString();
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine("ReadError:\r\n" + ex.Message);
+                }
+                Console.WriteLine("S############################################################################");
+                Console.WriteLine("Read:\r\n" + ouput2);
+                //Console.WriteLine("First node:[" + xml_root_tag + "]");
+                Console.WriteLine("E############################################################################");
+                xml_parse(tcpClient, fStream, xml_root_tag, xml_data, sql_client);
+                //Console.ReadLine();
+
+                //byte[] bytes = new byte[tcpClient.ReceiveBufferSize];
+
+                //int numBytesRead = netStream.Read(bytes, 0,
+                //(int)tcpClient.ReceiveBufferSize);
+
+                //byte[] bytesRead = new byte[numBytesRead];
+                //Array.Copy(bytes, bytesRead, numBytesRead);
+                /*
+                Array.Copy(bytes, 0, bytesRead, 0, numBytesRead);
+                string returndata = Encoding.ASCII.GetString(bytesRead);
+                string output = String.Format("Read: Length: {0}, Data: {1}", returndata.Length, returndata);
+                Console.WriteLine("============================================================================");
+                Console.WriteLine(output);
+                Console.WriteLine("############################################################################");
+                 * */
+
+                Console.WriteLine(
+                    @"
+Select 1-6 then press enter to send package
+1.Immediate-Location-Request Message
+2.Triggered-Location-Request for Change Cadence Message
+3.Triggered-Location-Request for Change Distance Message
+4.Digital-Output-Change-Request Message
+5.Location-Protocol-Request Message
+6.Triggered-Location-Stop-Request Message
+
+");
+                Console.Write("Select[1-6]:");
+                //OnMessageRead(fBuffer);
+                fStream.BeginRead(myReadBuffer, 0, myReadBuffer.Length,
+                                                                 new AsyncCallback(myReadSizeCallBack),
+                                                                 fStream);
+               // fStream.BeginRead(fSizeBuffer, 0, fSizeBuffer.Length, FinishReadSize, null);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
         }
         static void read_thread_method(TcpClient tcpClient, NetworkStream netStream , SqlClient sql_client)
         {
             Console.WriteLine("in read thread");
-            while (true)
+            //while (true)
             {
                 Thread.Sleep(300);
-                if (netStream.CanRead)// && netStream.DataAvailable)
+                //if (netStream.CanRead)// && netStream.DataAvailable)
                 {
                     //string xml_test = "<test></test>";
-                    int receive_total_length = tcpClient.ReceiveBufferSize;
-                    byte[] length = new byte[2];
-                    int numBytesRead = netStream.Read(length, 0, 2);
-                    int data_length = GetLittleEndianIntegerFromByteArray(length, 0);
-                    byte[] data = new byte[data_length];
-                    netStream.Read(data, 0, data_length);
-                    string returndata = Encoding.ASCII.GetString(data);
+                    //int receive_total_length = tcpClient.ReceiveBufferSize;
+                    //byte[] length = new byte[2];
+                    //int numBytesRead = netStream.Read(length, 0, 2);
+                    //int data_length = GetLittleEndianIntegerFromByteArray(length, 0);
+                    //byte[] data = new byte[data_length];
+                    //netStream.Read(data, 0, data_length);
+                    //string returndata = Encoding.ASCII.GetString(data);
+                    ReadLine(tcpClient, netStream, 2);
+                    Console.WriteLine("out ReadLine");
+                    /*
+                    string returndata = Encoding.ASCII.GetString(fBuffer);
                     string output = String.Format("Read: Length: {0}, Data: {1}", returndata.Length, returndata);
                     XDocument xml_data = XDocument.Parse(returndata);
                     string xml_root_tag = xml_data.Root.Name.ToString();
@@ -375,6 +462,7 @@ Select 1-6 then press enter to send package
                     //Console.WriteLine("First node:[" + xml_root_tag + "]");
                     Console.WriteLine("E############################################################################");
                     xml_parse(tcpClient, netStream, xml_root_tag, xml_data, sql_client);
+                    */
                     //Console.ReadLine();
                     
                     //byte[] bytes = new byte[tcpClient.ReceiveBufferSize];
@@ -392,7 +480,7 @@ Select 1-6 then press enter to send package
                     Console.WriteLine(output);
                     Console.WriteLine("############################################################################");
                      * */
-
+                    /*
                     Console.WriteLine(
                         @"
 Select 1-6 then press enter to send package
@@ -405,8 +493,10 @@ Select 1-6 then press enter to send package
 
 ");
                     Console.Write("Select[1-6]:");
+                     * */
                 }
             }
+            Console.WriteLine("out read thread");
         }
 
         private static void xml_parse(TcpClient tcpClient, NetworkStream netStream, string xml_root_tag, XDocument xml_data, SqlClient sql_client)

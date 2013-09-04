@@ -1,0 +1,15 @@
+2013-09-04 16:56:28,630
+send:
+<Triggered-Location-Stop-Request>
+  <request-id>2468ACE0</request-id>
+  <suaddr suaddr-type="APCO">1004</suaddr>
+</Triggered-Location-Stop-Request>
+=========================================
+2013-09-04 16:56:28,639
+receive:
+<Triggered-Location-Stop-Answer>
+  <request-id>2468ACE0</request-id>
+  <suaddr suaddr-type="APCO">1004</suaddr>
+  <result result-code="0"></result>
+</Triggered-Location-Stop-Answer>
+=========================================

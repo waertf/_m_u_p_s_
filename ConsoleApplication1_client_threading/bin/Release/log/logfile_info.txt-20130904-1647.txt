@@ -1,0 +1,12 @@
+2013-09-04 16:44:02,504
+send:
+<Location-Registration-Request>
+  <application>12345</application>
+</Location-Registration-Request>
+=========================================
+2013-09-04 16:44:54,005
+send:
+<Location-Registration-Request>
+  <application>12345</application>
+</Location-Registration-Request>
+=========================================

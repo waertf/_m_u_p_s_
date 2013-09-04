@@ -1,21 +1,88 @@
-2013-09-04 10:16:00,280
+2013-09-04 16:58:38,692
+send:
+<Location-Registration-Request>
+  <application>12345</application>
+</Location-Registration-Request>
+=========================================
+2013-09-04 16:58:39,029
 receive:
 <Location-Registration-Answer>
   <application application-id="12345"></application>
   <result result-code="A">SYNTAX ERROR</result>
 </Location-Registration-Answer>
 =========================================
-2013-09-04 10:16:00,590
+2013-09-04 16:58:39,036
 receive:
 <Unsolicited-Location-Report>
   <suaddr suaddr-type="APCO">1004</suaddr>
   <event-info>Unit Present</event-info>
 </Unsolicited-Location-Report>
 =========================================
-2013-09-04 10:16:18,287
+2013-09-04 16:58:43,165
 send:
 <Immediate-Location-Request>
   <request-id>2468ACE0</request-id>
   <suaddr suaddr-type="APCO">1004</suaddr>
 </Immediate-Location-Request>
+=========================================
+2013-09-04 16:58:43,171
+receive:
+<Immediate-Location-Answer>
+  <request-id></request-id>
+  <suaddr suaddr-type="APCO">1004</suaddr>
+  <result result-code="0"></result>
+</Immediate-Location-Answer>
+=========================================
+2013-09-04 16:58:43,222
+receive:
+<Immediate-Location-Report>
+  <suaddr suaddr-type="APCO">1004</suaddr>
+  <info-data>
+    <info-time>20030630073000</info-time>
+    <server-time>20030630073000</server-time>
+    <shape>
+      <circle-2d>
+        <lat>12.345345</lat>
+        <long>24.668866</long>
+        <radius>100</radius>
+      </circle-2d>
+    </shape>
+    <speed-hor>50</speed-hor>
+    <direction-hor>32</direction-hor>
+  </info-data>
+  <sensor-info>
+    <sensor>
+      <sensor-name>Ignition</sensor-name>
+      <sensor-value>off</sensor-value>
+      <sensor-type>Input</sensor-type>
+    </sensor>
+    <sensor>
+      <sensor-name>door</sensor-name>
+      <sensor-value>open</sensor-value>
+      <sensor-type>Input</sensor-type>
+    </sensor>
+  </sensor-info>
+  <vehicle-info>
+    <odometer>10,000</odometer>
+  </vehicle-info>
+</Immediate-Location-Report>
+=========================================
+2013-09-04 16:58:46,693
+send:
+<Digital-Output-Change-Request>
+  <request-id>2468ACE0</request-id>
+  <suaddr suaddr-type="APCO">1004</suaddr>
+  <output-info>
+    <output-name>Alarm</output-name>
+    <output-value>1</output-value>
+  </output-info>
+</Digital-Output-Change-Request>
+=========================================
+2013-09-04 16:58:46,703
+receive:
+<Digital-Output-Answer>
+  <request-id>2468ACE0</request-id>
+  <suaddr suaddr-type="APCO">1004</suaddr>
+  <result result-code="0"></result>
+</Digital-Output-Answer>
 =========================================
