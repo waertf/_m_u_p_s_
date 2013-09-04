@@ -25,7 +25,7 @@ namespace ConsoleApplication1_client_threading
         const int LENGTH_TO_CUT = 4;
         private static bool isValid = true;
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
-
+        static AutoResetEvent autoEvent = new AutoResetEvent(false);
        
         static void Main(string[] args)
         {
@@ -274,15 +274,22 @@ Select 1-6 then press enter to send package
             myNetworkStream.EndWrite(ar);
         }
 
-        private static string ReadLine(TcpClient tcpClient, NetworkStream netStream,
+        private static string ReadLine(TcpClient tcpClient, NetworkStream netStream,int length,
             string output)
         {
             try
             {
                 if (netStream.CanRead)
                 {
-                    byte[] bytes = new byte[tcpClient.ReceiveBufferSize];
+                    //byte[] bytes = new byte[tcpClient.ReceiveBufferSize];
 
+                    byte[] myReadBuffer = new byte[length];
+                    netStream.BeginRead(myReadBuffer, 0, myReadBuffer.Length,
+                                                                 new AsyncCallback(myReadCallBack),
+                                                                 netStream);
+
+                    autoEvent.WaitOne();
+                    /*
                     int numBytesRead = netStream.Read(bytes, 0,
                         (int)tcpClient.ReceiveBufferSize);
 
@@ -293,6 +300,7 @@ Select 1-6 then press enter to send package
 
                     output = String.Format("Read: Length: {0}, Data: \r\n{1}",
                         returndata.Length, returndata);
+                     * */
                 }
 
                 Console.WriteLine("-------------------------");
@@ -306,6 +314,32 @@ Select 1-6 then press enter to send package
                 Console.WriteLine(ex.Message);
                 return "error";
             }
+        }
+        public static void myReadCallBack(IAsyncResult ar)
+        {
+
+            NetworkStream myNetworkStream = (NetworkStream)ar.AsyncState;
+            byte[] myReadBuffer = new byte[1024];
+            String myCompleteMessage = "";
+            int numberOfBytesRead;
+
+            numberOfBytesRead = myNetworkStream.EndRead(ar);
+            myCompleteMessage =
+                String.Concat(myCompleteMessage, Encoding.ASCII.GetString(myReadBuffer, 0, numberOfBytesRead));
+            
+            // message received may be larger than buffer size so loop through until you have it all.
+            while (myNetworkStream.DataAvailable)
+            {
+
+                myNetworkStream.BeginRead(myReadBuffer, 0, myReadBuffer.Length,
+                                                           new AsyncCallback(myReadCallBack),
+                                                           myNetworkStream);
+
+            }
+            
+            // Print out the received message to the console.
+            Console.WriteLine("You received the following message : " +
+                                        myCompleteMessage);
         }
         static void read_thread_method(TcpClient tcpClient, NetworkStream netStream , SqlClient sql_client)
         {
