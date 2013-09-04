@@ -34,6 +34,10 @@
   <ItemGroup>
     <Reference Include="Devart.Data, Version=5.0.746.0, Culture=neutral, PublicKeyToken=09af7300eec23701, processorArchitecture=MSIL" />
     <Reference Include="Devart.Data.PostgreSql, Version=6.7.287.0, Culture=neutral, PublicKeyToken=09af7300eec23701, processorArchitecture=MSIL" />
+    <Reference Include="keeplive, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\Visual Studio 2008\Projects\keeplive\keeplive\bin\Release\keeplive_Secure\keeplive.dll</HintPath>
+    </Reference>
     <Reference Include="log4net, Version=1.2.11.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\Downloads\log4net-1.2.11-bin-newkey\log4net-1.2.11\bin\net\2.0\release\log4net.dll</HintPath>

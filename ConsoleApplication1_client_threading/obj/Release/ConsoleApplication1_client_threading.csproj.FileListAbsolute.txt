@@ -21,3 +21,5 @@ C:\Users\wavegis\Documents\mups\ConsoleApplication1_client_threading\obj\Release
 C:\Users\wavegis\Documents\mups\ConsoleApplication1_client_threading\bin\Release\log4net.config
 C:\Users\wavegis\Documents\mups\ConsoleApplication1_client_threading\bin\Release\log4net.dll
 C:\Users\wavegis\Documents\mups\ConsoleApplication1_client_threading\bin\Release\log4net.xml
+C:\Users\wavegis\Documents\mups\ConsoleApplication1_client_threading\bin\Release\keeplive.dll
+C:\Users\wavegis\Documents\mups\ConsoleApplication1_client_threading\bin\Release\keeplive.pdb
