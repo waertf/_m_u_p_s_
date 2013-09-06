@@ -1,6 +1,0 @@
-2013-09-04 16:48:24,306
-send:
-<Location-Registration-Request>
-  <application>12345</application>
-</Location-Registration-Request>
-=========================================
