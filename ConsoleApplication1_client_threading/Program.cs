@@ -532,15 +532,15 @@ Select 1-6 then press enter to send package
                         if (elements.Contains(new XElement("event-info").Name) && xml_root_tag == "Unsolicited-Location-Report")
                         {
                             htable.Add("event_info", XmlGetTagValue(xml_data, "event-info"));
-                            //Console.WriteLine("event_info:{0}", event_info);
+                            Console.WriteLine("event_info:{0}", htable["event_info"]);
                         }
                         if (elements.Contains(new XElement("operation-error").Name))
                         {
                              htable.Add("result_code",XmlGetTagAttributeValue(xml_data, "result", "result-code"));
                              //htable.Add("err_msg" , XmlGetTagValue(xml_data, "result"));
-                             htable.Add("result_msg", ConfigurationManager.AppSettings["RESULT_CODE_" + htable["result_code"]]); 
-                            //Console.WriteLine("result_code:{0}", result_code);
-                            //Console.WriteLine("err_msg:{0}", err_msg);
+                             htable.Add("result_msg", ConfigurationManager.AppSettings["RESULT_CODE_" + htable["result_code"]]);
+                             Console.WriteLine("result_code:{0}", htable["result_code"]);
+                             Console.WriteLine("result_msg:{0}", htable["result_msg"]);
                         }
                         if (elements.Contains(new XElement("info-data").Name))
                         {
@@ -763,6 +763,22 @@ Select 1-6 then press enter to send package
                     Console.WriteLine("ERROR:" + log);
                     break;
             }
+            
+            Console.WriteLine("::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::");
+            using (StreamWriter w = File.AppendText("log.txt"))
+            {
+                foreach (DictionaryEntry ht in htable)
+                {
+                    Console.WriteLine("Key = {0}, Value = {1}" + Environment.NewLine, ht.Key, ht.Value);
+                    Log("receive:\r\n", ht.Key+"="+ht.Value, w);
+                    // Close the writer and underlying file.
+                   
+
+                }
+                w.Close();
+            }
+            
+            Console.WriteLine("::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::");
         }
         public struct SQL_DATA
         {
@@ -1086,7 +1102,7 @@ Select 1-6 then press enter to send package
             catch (Exception e)
             {
                 Console.WriteLine("XmlGetTagAttributeValue:"+tag_name + ":" + tag_attribute_name+":"+e.Message);
-                result = "error";
+                result = "";
             }
 
                 return result;
@@ -1102,7 +1118,7 @@ Select 1-6 then press enter to send package
             catch (Exception e)
             {
                 Console.WriteLine("XmlGetTagValue:"+tag_name+":"+e.Message);
-                result = "error";
+                result = "";
             }
 
                 return result;
@@ -1124,7 +1140,7 @@ Select 1-6 then press enter to send package
             catch (Exception e)
             {
                 Console.WriteLine("XmlGetFirstChildTagName:"+parent_tag_name+":"+e.Message);
-                result = "error";
+                result = "";
             }
 
                 return result;
@@ -1209,7 +1225,8 @@ Select 1-6 then press enter to send package
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.Message);
+                //Console.WriteLine(ex.Message);
+                log.Info(logMessage);
             }
         }
         private static bool xml_validation_with_dtd(string xml, string xml_root_tag)
