@@ -31,6 +31,14 @@ namespace ConsoleApplication1_client_threading
         private static int fBytesRead = 0;
         private static TcpClient tcpClient;
         private static SqlClient sql_client;
+        // ManualResetEvent instances signal completion.
+        private static ManualResetEvent connectDone =
+            new ManualResetEvent(false);
+        private static ManualResetEvent sendDone =
+            new ManualResetEvent(false);
+        private static ManualResetEvent receiveDone =
+            new ManualResetEvent(false);
+
         public  struct AVLS_UNIT_Report_Packet
         {
             public string ID;
@@ -332,6 +340,8 @@ Select 1-6 then press enter to send package
 
             NetworkStream myNetworkStream = (NetworkStream)ar.AsyncState;
             myNetworkStream.EndWrite(ar);
+            sendDone.Set();
+
         }
         private static void ReadLine(TcpClient tcpClient, NetworkStream netStream,int prefix_length)
         {
@@ -931,8 +941,10 @@ Select 1-6 then press enter to send package
                 
                 
             send_string = "%%"+avls_package.ID+avls_package.GPS_Valid+avls_package.Date_Time+avls_package.Loc+avls_package.Speed+avls_package.Dir+avls_package.Temp+avls_package.Status+avls_package.Event+avls_package.Message+"\r\n";
-            netStream.Write(System.Text.Encoding.Default.GetBytes(send_string), 0, send_string.Length);
-            //avls_WriteLine(netStream, System.Text.Encoding.Default.GetBytes(send_string), send_string, sql_client);
+            //netStream.Write(System.Text.Encoding.Default.GetBytes(send_string), 0, send_string.Length);
+            avls_WriteLine(netStream, System.Text.Encoding.Default.GetBytes(send_string), send_string, sql_client);
+            sendDone.WaitOne();
+
             //ReadLine(avls_tcpClient, netStream, send_string.Length);
             avls_tcpClient.Close();
         }
