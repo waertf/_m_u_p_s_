@@ -800,8 +800,14 @@ Select 1-6 then press enter to send package
 
             Keeplive.keep(avls_tcpClient.Client);
             NetworkStream netStream = tcpClient.GetStream();
+            if (iEnumerable.Contains(new XElement("operation-error").Name))
+            {
+                avls_tcpClient.Close();
+                return;
+            }
 
             WriteLine(netStream, System.Text.Encoding.Default.GetBytes(send_string), send_string, sql_client);
+            avls_tcpClient.Close();
         }
         public struct SQL_DATA
         {
