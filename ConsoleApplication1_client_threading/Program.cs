@@ -31,6 +31,55 @@ namespace ConsoleApplication1_client_threading
         private static int fBytesRead = 0;
         private static TcpClient tcpClient;
         private static SqlClient sql_client;
+        public  struct AVLS_UNIT_Report_Packet
+        {
+            public string ID;
+            public string GPS_Valid;//only L or A (L->valid , A->not valid)
+            /*
+             * The format is: 
+            Year month day hour minute second 
+            For example, the string 040315131415 means: 
+            The date is “Year 2004, March, Day 15 “ 
+            and the time is “13:14:15 ” 
+             * */
+            public string Date_Time;
+            /*
+             * For example, the string N2446.5321E12120.4231 means
+“North 24 degrees 46.5321 minutes 
+“East 121 degrees 20.4231 minutes” 
+ Or S2446.5281W01234.5678 means 
+“South 24 degrees 46. 5281 minutes” = “South 24.7755 degrees” = “South 24 
+degrees 46 minutes 31.69 seconds” 
+“West 12 degrees 34.5678 minutes” = “West 12.57613 degrees” = “West 12 
+degrees 34 minutes 34.07 seconds”
+             * */
+            public string Loc;
+            /*
+             * from 0 to 999
+             * km/hr
+             */
+            public string Speed;
+            /*
+             the GPS direction in degrees. And this value is between 0 and 359 
+degree. (no decimal)*/
+            public string Dir;
+            /*
+             * The string provides the temperature in the format UNIT-sign-degrees. (Non-fixed 
+length 0 to 999 and no decimal. 
+For example, 
+the string F103 means “103 degree Fahrenheit” 
+the string C-12 means “-12 degree Celsius” 
+If the UNIT does not include a Temperature sensor, it will report ’NA’.
+             */
+            public string Temp;
+            /*
+             We use eight ASCII characters to represent 32 bit binary number. Each bit represents 
+a flag in the UNITs status register. The status string will be represented in HEX for 
+each set of the byte. To display a four-byte string, there will be 8 digits string */
+            public string Status;//17
+            public string Event;//150
+            public string Message;
+        }
        
         static void Main(string[] args)
         {
@@ -278,7 +327,12 @@ Select 1-6 then press enter to send package
             NetworkStream myNetworkStream = (NetworkStream)ar.AsyncState;
             myNetworkStream.EndWrite(ar);
         }
-        
+        public static void avls_myWriteCallBack(IAsyncResult ar)
+        {
+
+            NetworkStream myNetworkStream = (NetworkStream)ar.AsyncState;
+            myNetworkStream.EndWrite(ar);
+        }
         private static void ReadLine(TcpClient tcpClient, NetworkStream netStream,int prefix_length)
         {
             try
@@ -635,7 +689,7 @@ Select 1-6 then press enter to send package
                         if (bool.Parse(ConfigurationManager.AppSettings["SQL_ACCESS"]))
                             access_sql_server(sql_client, xml_root_tag, htable, sensor_name, sensor_type, sensor_value, XmlGetAllElementsXname(xml_data),log);
                         if (bool.Parse(ConfigurationManager.AppSettings["AVLS_ACCESS"]))
-                            access_avls_server(xml_root_tag, htable, sensor_name, sensor_type, sensor_value, XmlGetAllElementsXname(xml_data), log);
+                            access_avls_server(sql_client,xml_root_tag, htable, sensor_name, sensor_type, sensor_value, XmlGetAllElementsXname(xml_data), log);
                     }
                      
                     break;
@@ -783,31 +837,134 @@ Select 1-6 then press enter to send package
             Console.WriteLine("::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::");
         }
 
-        private static void access_avls_server(string xml_root_tag, Hashtable htable, List<string> sensor_name, List<string> sensor_type, List<string> sensor_value, IEnumerable<XName> iEnumerable, string log)
+        private static void access_avls_server(SqlClient sql_client,string xml_root_tag, Hashtable htable, List<string> sensor_name, List<string> sensor_type, List<string> sensor_value, IEnumerable<XName> iEnumerable, string log)
         {
             TcpClient avls_tcpClient;
             string send_string = string.Empty;
+            AVLS_UNIT_Report_Packet avls_package = new AVLS_UNIT_Report_Packet();
             //string ipAddress = "127.0.0.1";
             string ipAddress = ConfigurationManager.AppSettings["AVLS_SERVER_IP"];
             //int port = 23;
             int port = int.Parse(ConfigurationManager.AppSettings["AVLS_SERVER_PORT"]);
-
+            
             avls_tcpClient = new TcpClient();
 
             avls_tcpClient.Connect(ipAddress, port);
 
             avls_tcpClient.NoDelay = false;
 
-            Keeplive.keep(avls_tcpClient.Client);
-            NetworkStream netStream = tcpClient.GetStream();
+            //Keeplive.keep(avls_tcpClient.Client);
+            NetworkStream netStream = avls_tcpClient.GetStream();
             if (iEnumerable.Contains(new XElement("operation-error").Name))
             {
                 avls_tcpClient.Close();
                 return;
             }
+            else
+            {
+                
+                if (htable.ContainsKey("suaddr"))
+                {
+                    avls_package.ID = htable["suaddr"].ToString() + ",";
+                }
+                if (htable.ContainsKey("result_code"))
+                {
+                    if (htable["result_code"].ToString().Equals("1006"))
+                    {
+                        avls_package.GPS_Valid = "L,";
+                    }
+                    else
+                        avls_package.GPS_Valid = "A,";
+                }
+                else
+                    avls_package.GPS_Valid = "A,";
+                if (htable.ContainsKey("info_time"))
+                {
+                    avls_package.Date_Time = htable["info_time"].ToString().Substring(2) + ",";
+                }
+                if (htable.ContainsKey("lat_value") && htable.ContainsKey("long_value"))
+                {
+                    avls_package.Loc = "N" + htable["lat_value"].ToString() + "E" + htable["long_value"].ToString() + ",";
+                }
+                else
+                    return;
+                if (htable.ContainsKey("speed-hor"))
+                {
+                    avls_package.Speed = Convert.ToInt32((double.Parse(htable["speed-hor"].ToString()) * 1.609344)).ToString() + ",";
+                }
+                if (htable.ContainsKey("direction-hor"))
+                {
+                    avls_package.Dir = htable["direction-hor"].ToString() + ",";
+                }
+                avls_package.Temp = "NA,";
+                if (htable.ContainsKey("event_info"))
+                {
 
-            WriteLine(netStream, System.Text.Encoding.Default.GetBytes(send_string), send_string, sql_client);
+
+                    switch (htable["event_info"].ToString())
+                    {
+                        case "Emergency On":
+                            avls_package.Event = "150,";
+                            break;
+                        case "Emergency Off":
+                            avls_package.Event = "110,";
+                            break;
+                        case "Unit Present":
+                        case "Unit Absent":
+                            break;
+                        case "Ignition Off":
+                            avls_package.Status = "00000000,";
+                            break;
+                        case "Ignition On":
+                            avls_package.Status = "00020000,";
+                            break;
+
+                    }
+                }
+                else
+                {
+                    avls_package.Event = "110,";
+                    avls_package.Status = "00000000,";
+                }
+                avls_package.Message = "test";
+            }
+                
+                
+            send_string = "%%"+avls_package.ID+avls_package.GPS_Valid+avls_package.Date_Time+avls_package.Loc+avls_package.Speed+avls_package.Dir+avls_package.Temp+avls_package.Status+avls_package.Event+avls_package.Message+"\r\n";
+            netStream.Write(System.Text.Encoding.Default.GetBytes(send_string), 0, send_string.Length);
+            //avls_WriteLine(netStream, System.Text.Encoding.Default.GetBytes(send_string), send_string, sql_client);
+            //ReadLine(avls_tcpClient, netStream, send_string.Length);
             avls_tcpClient.Close();
+        }
+
+        private static void avls_WriteLine(NetworkStream netStream, byte[] writeData, string write, SqlClient sql_client)
+        {
+            if (netStream.CanWrite)
+            {
+                //byte[] writeData = Encoding.ASCII.GetBytes(write);
+                try
+                {
+                    
+                    Console.WriteLine("S----------------------------------------------------------------------------");
+                    Console.WriteLine("Write:\r\n" + write);
+                    Console.WriteLine("E----------------------------------------------------------------------------");
+
+                    //send method1
+                    //netStream.Write(writeData, 0, writeData.Length);
+                    // 需等待資料真的已寫入 NetworkStream
+                    //Thread.Sleep(3000);
+
+                    //send method2
+                    IAsyncResult result = netStream.BeginWrite(writeData, 0, writeData.Length, new AsyncCallback(avls_myWriteCallBack), netStream);
+                    result.AsyncWaitHandle.WaitOne();
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine("WriteError:\r\n" + ex.Message);
+                }
+
+
+            }
         }
         public struct SQL_DATA
         {
