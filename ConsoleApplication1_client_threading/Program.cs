@@ -633,7 +633,9 @@ Select 1-6 then press enter to send package
                             }
                         }
                         if (bool.Parse(ConfigurationManager.AppSettings["SQL_ACCESS"]))
-                            access_sql_server(sql_client, xml_root_tag, htable, sensor_name, sensor_type, sensor_value, XmlGetAllElementsXname(xml_data),log);   
+                            access_sql_server(sql_client, xml_root_tag, htable, sensor_name, sensor_type, sensor_value, XmlGetAllElementsXname(xml_data),log);
+                        if (bool.Parse(ConfigurationManager.AppSettings["AVLS_ACCESS"]))
+                            access_avls_server(xml_root_tag, htable, sensor_name, sensor_type, sensor_value, XmlGetAllElementsXname(xml_data), log);
                     }
                      
                     break;
@@ -779,6 +781,27 @@ Select 1-6 then press enter to send package
             }
             
             Console.WriteLine("::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::");
+        }
+
+        private static void access_avls_server(string xml_root_tag, Hashtable htable, List<string> sensor_name, List<string> sensor_type, List<string> sensor_value, IEnumerable<XName> iEnumerable, string log)
+        {
+            TcpClient avls_tcpClient;
+            string send_string = string.Empty;
+            //string ipAddress = "127.0.0.1";
+            string ipAddress = ConfigurationManager.AppSettings["AVLS_SERVER_IP"];
+            //int port = 23;
+            int port = int.Parse(ConfigurationManager.AppSettings["AVLS_SERVER_PORT"]);
+
+            avls_tcpClient = new TcpClient();
+
+            avls_tcpClient.Connect(ipAddress, port);
+
+            avls_tcpClient.NoDelay = false;
+
+            Keeplive.keep(avls_tcpClient.Client);
+            NetworkStream netStream = tcpClient.GetStream();
+
+            WriteLine(netStream, System.Text.Encoding.Default.GetBytes(send_string), send_string, sql_client);
         }
         public struct SQL_DATA
         {
