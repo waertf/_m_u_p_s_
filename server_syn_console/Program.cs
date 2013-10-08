@@ -25,6 +25,7 @@ namespace server_syn_console
         // If a validation error occurs,
         // set this flag to false in the
         // validation event handler.
+        private static Random random = new Random();
         public static void StartListening()
         {
             // Data buffer for incoming data.
@@ -331,22 +332,29 @@ Select 0-4 then press enter to send package
 
         private static void sendtest2_t(Socket handler)
         {
-            Console.WriteLine("+sendtest2_t");
-            string Unsolicited_event = "<Unsolicited-Location-Report><event-info>Ignition Off</event-info><suaddr suaddr-type=\"APCO\">1004</suaddr><info-data><info-time>20130630073000</info-time><server-time>20130630073000</server-time><shape><circle-2d><lat>12.345345</lat><long>24.668866</long><radius>100</radius></circle-2d></shape><speed-hor>50</speed-hor><direction-hor>32</direction-hor></info-data><sensor-info><sensor><sensor-name>Ignition</sensor-name><sensor-value>off</sensor-value><sensor-type>Input</sensor-type></sensor><sensor><sensor-name>door</sensor-name><sensor-value>open</sensor-value><sensor-type>Input</sensor-type></sensor></sensor-info><vehicle-info><odometer>10,000</odometer></vehicle-info></Unsolicited-Location-Report>";
-            //string Unsolicited_emer = "<Unsolicited-Location-Report><suaddr suaddr-type=\"APCO\">1004</suaddr><event-info>Emergency On</event-info><info-data><info-time>20081012185257</info-time><server-time>20081012165257</server-time><shape><point-3d><lat>40.697595</lat><long>-73.984557</long><altitude>0</altitude></point-3d></shape><speed-hor>0</speed-hor><direction-hor>184</direction-hor></info-data></Unsolicited-Location-Report>";
-            string Unsolicited_emer = "<Unsolicited-Location-Report><suaddr suaddr-type=\"APCO\">1004</suaddr><event-info>Emergency On</event-info><info-data><info-time>20081012185257</info-time><server-time>20081012165257</server-time><shape><circle-2d><lat>40.697595</lat><long>-73.984557</long><radius>0</radius></circle-2d></shape><speed-hor>0</speed-hor><direction-hor>184</direction-hor></info-data></Unsolicited-Location-Report>";
 
-            string Unsolicited_pres = "<Unsolicited-Location-Report><suaddr suaddr-type=\"APCO\">1004</suaddr><event-info>Unit Present</event-info></Unsolicited-Location-Report>";
-            string Triggered_loc = "<Triggered-Location-Report><suaddr suaddr-type=\"APCO\">1004</suaddr><info-data><info-time>20130630073000</info-time><server-time>20130630073000</server-time><shape><circle-2d><lat>12.345345</lat><long>24.668866</long><radius>100</radius></circle-2d></shape><speed-hor>50</speed-hor><direction-hor>32</direction-hor></info-data><sensor-info><sensor><sensor-name>Ignition</sensor-name><sensor-value>off</sensor-value><sensor-type>Input</sensor-type></sensor><sensor><sensor-name>door</sensor-name><sensor-value>open</sensor-value><sensor-type>Input</sensor-type></sensor></sensor-info><vehicle-info><odometer>10,000</odometer></vehicle-info></Triggered-Location-Report>";
-            string Triggered_loc_invalid_gps = "<Triggered-Location-Report><suaddr suaddr-type=\"APCO\">1004</suaddr><operation-error><result result-code=\"1006\">GPS INVALID</result></operation-error></Triggered-Location-Report>";
-            byte[] msg1 = (data_append_dataLength(Unsolicited_event));
-            byte[] msg2 = (data_append_dataLength(Unsolicited_emer));
-            byte[] msg3 = (data_append_dataLength(Unsolicited_pres));
-            byte[] msg4 = (data_append_dataLength(Triggered_loc));
-            byte[] msg5 = (data_append_dataLength(Triggered_loc_invalid_gps));
+            
 
             while (true)
             {
+                double lat = Convert.ToDouble("18." + random.Next(516400146, 630304598)); //18.51640014679267 - 18.630304598192915
+                double lon = Convert.ToDouble("-72." + random.Next(224464416, 341194152)); //-72.34119415283203 - -72.2244644165039
+
+                string today = DateTime.Now.ToString("yyyyMMddHHmmss");
+                Console.WriteLine("+sendtest2_t");
+                string Unsolicited_event = "<Unsolicited-Location-Report><event-info>Ignition Off</event-info><suaddr suaddr-type=\"APCO\">1004</suaddr><info-data><info-time>" + today + "</info-time><server-time>" + today + "</server-time><shape><circle-2d><lat>" + lat + "</lat><long>" + lon + "</long><radius>100</radius></circle-2d></shape><speed-hor>50</speed-hor><direction-hor>32</direction-hor></info-data><sensor-info><sensor><sensor-name>Ignition</sensor-name><sensor-value>off</sensor-value><sensor-type>Input</sensor-type></sensor><sensor><sensor-name>door</sensor-name><sensor-value>open</sensor-value><sensor-type>Input</sensor-type></sensor></sensor-info><vehicle-info><odometer>10,000</odometer></vehicle-info></Unsolicited-Location-Report>";
+                //string Unsolicited_emer = "<Unsolicited-Location-Report><suaddr suaddr-type=\"APCO\">1004</suaddr><event-info>Emergency On</event-info><info-data><info-time>20081012185257</info-time><server-time>20081012165257</server-time><shape><point-3d><lat>40.697595</lat><long>-73.984557</long><altitude>0</altitude></point-3d></shape><speed-hor>0</speed-hor><direction-hor>184</direction-hor></info-data></Unsolicited-Location-Report>";
+                string Unsolicited_emer = "<Unsolicited-Location-Report><suaddr suaddr-type=\"APCO\">1004</suaddr><event-info>Emergency On</event-info><info-data><info-time>" + today + "</info-time><server-time>" + today + "</server-time><shape><circle-2d><lat>" + lat + "</lat><long>" + lon + "</long><radius>0</radius></circle-2d></shape><speed-hor>0</speed-hor><direction-hor>184</direction-hor></info-data></Unsolicited-Location-Report>";
+
+                string Unsolicited_pres = "<Unsolicited-Location-Report><suaddr suaddr-type=\"APCO\">1004</suaddr><event-info>Unit Present</event-info></Unsolicited-Location-Report>";
+                string Triggered_loc = "<Triggered-Location-Report><suaddr suaddr-type=\"APCO\">1004</suaddr><info-data><info-time>" + today + "</info-time><server-time>" + today + "</server-time><shape><circle-2d><lat>" + lat + "</lat><long>" + lon + "</long><radius>100</radius></circle-2d></shape><speed-hor>50</speed-hor><direction-hor>32</direction-hor></info-data><sensor-info><sensor><sensor-name>Ignition</sensor-name><sensor-value>off</sensor-value><sensor-type>Input</sensor-type></sensor><sensor><sensor-name>door</sensor-name><sensor-value>open</sensor-value><sensor-type>Input</sensor-type></sensor></sensor-info><vehicle-info><odometer>10,000</odometer></vehicle-info></Triggered-Location-Report>";
+                string Triggered_loc_invalid_gps = "<Triggered-Location-Report><suaddr suaddr-type=\"APCO\">1004</suaddr><operation-error><result result-code=\"1006\">GPS INVALID</result></operation-error></Triggered-Location-Report>";
+                byte[] msg1 = (data_append_dataLength(Unsolicited_event));
+                byte[] msg2 = (data_append_dataLength(Unsolicited_emer));
+                byte[] msg3 = (data_append_dataLength(Unsolicited_pres));
+                byte[] msg4 = (data_append_dataLength(Triggered_loc));
+                byte[] msg5 = (data_append_dataLength(Triggered_loc_invalid_gps));
+
                 Console.WriteLine(
                     @"
 Select 0-4 then press enter to send package

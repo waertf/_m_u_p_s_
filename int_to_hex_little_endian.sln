@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsoleApplication1_client_
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsoleApplication1_access_kml_files", "ConsoleApplication1_access_kml_files\ConsoleApplication1_access_kml_files.csproj", "{BFC36EC7-CB38-47DF-840D-BB121C0ACDD6}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "random_ConsoleApplication1", "random_ConsoleApplication1\random_ConsoleApplication1.csproj", "{2FB1754A-4CA9-4076-B566-EE82FD29EB9F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -25,6 +27,10 @@ Global
 		{BFC36EC7-CB38-47DF-840D-BB121C0ACDD6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BFC36EC7-CB38-47DF-840D-BB121C0ACDD6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BFC36EC7-CB38-47DF-840D-BB121C0ACDD6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2FB1754A-4CA9-4076-B566-EE82FD29EB9F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2FB1754A-4CA9-4076-B566-EE82FD29EB9F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2FB1754A-4CA9-4076-B566-EE82FD29EB9F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2FB1754A-4CA9-4076-B566-EE82FD29EB9F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
