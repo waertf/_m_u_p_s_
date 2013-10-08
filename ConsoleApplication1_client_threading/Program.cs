@@ -894,7 +894,7 @@ Select 1-6 then press enter to send package
                 }
                 if (htable.ContainsKey("lat_value") && htable.ContainsKey("long_value"))
                 {
-                    avls_package.Loc = "N" + htable["lat_value"].ToString() + "E" + htable["long_value"].ToString() + ",";
+                    avls_package.Loc = "N" + (Convert.ToDouble(htable["lat_value"])*100).ToString() + "E" + (Convert.ToDouble(htable["long_value"])*100).ToString()+ ",";
                 }
                 else
                     return;
