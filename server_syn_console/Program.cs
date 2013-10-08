@@ -337,8 +337,30 @@ Select 0-4 then press enter to send package
 
             while (true)
             {
-                double lat = Convert.ToDouble("18." + random.Next(516400146, 630304598)); //18.51640014679267 - 18.630304598192915
-                double lon = Convert.ToDouble("-72." + random.Next(224464416, 341194152)); //-72.34119415283203 - -72.2244644165039
+                SqlClient sql_client = new SqlClient(ConfigurationManager.AppSettings["SQL_SERVER_IP"], ConfigurationManager.AppSettings["SQL_SERVER_PORT"], ConfigurationManager.AppSettings["SQL_SERVER_USER_ID"], ConfigurationManager.AppSettings["SQL_SERVER_PASSWORD"], ConfigurationManager.AppSettings["SQL_SERVER_DATABASE"]);
+                sql_client.connect();
+                string lat = string.Empty,lon = string.Empty,id = string.Empty,device=string.Empty,sql_command = @"SELECT 
+  public.epq_test_loc.longitude,
+  public.epq_test_loc.latitude,
+  public.epq_test_loc.device,
+  public.epq_test_loc.id
+FROM
+  public.epq_test_loc
+ORDER BY 
+  random()
+  Limit 1";
+                DataTable dt = sql_client.get_DataTable(sql_command);
+                foreach (DataRow row in dt.Rows)
+                {
+                     lon = row[0].ToString();
+                     lat = row[1].ToString();
+                     device = row[2].ToString();
+                     id = row[3].ToString();
+                }
+                sql_client.disconnect();
+
+                //double lat = Convert.ToDouble("18." + random.Next(516400146, 630304598)); //18.51640014679267 - 18.630304598192915
+                //double lon = Convert.ToDouble("-72." + random.Next(224464416, 341194152)); //-72.34119415283203 - -72.2244644165039
 
                 string today = DateTime.Now.ToString("yyyyMMddHHmmss");
                 Console.WriteLine("+sendtest2_t");
@@ -366,6 +388,18 @@ Select 0-4 then press enter to send package
 ");
                 Console.Write("Select[0-4]:");
                 string select_num=Console.ReadLine();
+                /*
+                if (select_num == "3" || select_num == "4")
+                {
+                    //sql_client.modify("DELETE FROM public.epq_test_loc WHERE public.epq_test_loc.id = \'" + id + "\'");
+                    sql_client.disconnect();
+                }
+                else
+                {
+                    //sql_client.modify("DELETE FROM public.epq_test_loc WHERE public.epq_test_loc.id = \'" + id + "\'");
+                    sql_client.disconnect();
+                }
+                 * */
                 switch (select_num)
                 {
                     case "0":
@@ -451,6 +485,7 @@ Select 0-4 then press enter to send package
                     w.Close();
                 }
                 */
+                
                 Thread.Sleep(100);
             }
         }
