@@ -347,7 +347,7 @@ Select 0-4 then press enter to send package
 FROM
   public.epq_test_loc
 ORDER BY 
-  random()
+  public.epq_test_loc.id
   Limit 1";
                 DataTable dt = sql_client.get_DataTable(sql_command);
                 foreach (DataRow row in dt.Rows)
@@ -357,7 +357,7 @@ ORDER BY
                      device = row[2].ToString();
                      id = row[3].ToString();
                 }
-                sql_client.disconnect();
+                //sql_client.disconnect();
 
                 //double lat = Convert.ToDouble("18." + random.Next(516400146, 630304598)); //18.51640014679267 - 18.630304598192915
                 //double lon = Convert.ToDouble("-72." + random.Next(224464416, 341194152)); //-72.34119415283203 - -72.2244644165039
@@ -388,7 +388,7 @@ Select 0-4 then press enter to send package
 ");
                 Console.Write("Select[0-4]:");
                 string select_num=Console.ReadLine();
-                /*
+                
                 if (select_num == "3" || select_num == "4")
                 {
                     //sql_client.modify("DELETE FROM public.epq_test_loc WHERE public.epq_test_loc.id = \'" + id + "\'");
@@ -396,10 +396,10 @@ Select 0-4 then press enter to send package
                 }
                 else
                 {
-                    //sql_client.modify("DELETE FROM public.epq_test_loc WHERE public.epq_test_loc.id = \'" + id + "\'");
+                    sql_client.modify("DELETE FROM public.epq_test_loc WHERE public.epq_test_loc.id = \'" + id + "\'");
                     sql_client.disconnect();
                 }
-                 * */
+                 
                 switch (select_num)
                 {
                     case "0":
