@@ -62,8 +62,8 @@ namespace ConsoleApplication1_access_kml_files
                 }
             }
             sql_client.disconnect();
-           
-            Console.ReadLine();
+            //Console.WriteLine("Press entry to continue...");
+            //Console.ReadLine();
         }
     }
 }

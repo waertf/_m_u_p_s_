@@ -11,6 +11,7 @@ using System.Xml;        // for XmlTextReader and XmlValidatingReader
 using System.Xml.Schema; // for XmlSchemaCollection (which is used later)
 using System.Configuration;
 using System.Data;
+using System.Diagnostics;
 
 
 namespace server_syn_console
@@ -350,12 +351,39 @@ ORDER BY
   public.epq_test_loc.id
   Limit 1";
                 DataTable dt = sql_client.get_DataTable(sql_command);
-                foreach (DataRow row in dt.Rows)
+                if (dt != null && dt.Rows.Count!=0)
                 {
-                     lon = row[0].ToString();
-                     lat = row[1].ToString();
-                     device = row[2].ToString();
-                     id = row[3].ToString();
+                    Console.WriteLine("+if");
+                    Console.WriteLine("dt:{0}",dt);
+                    Console.WriteLine("dt.Rows.Count:{0}", dt.Rows.Count);
+                    foreach (DataRow row in dt.Rows)
+                    {
+                        lon = row[0].ToString();
+                        lat = row[1].ToString();
+                        device = row[2].ToString();
+                        id = row[3].ToString();
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("+else");
+                    sql_client.disconnect();
+                    Console.WriteLine("Refill the table with kml data...");
+                    string kml_application = "ConsoleApplication1_access_kml_files.exe";
+
+                    Process SomeProgram = new Process();
+                    SomeProgram.StartInfo.FileName = kml_application;
+                    /*
+                    SomeProgram.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
+                    SomeProgram.StartInfo.UseShellExecute = false;
+                    SomeProgram.StartInfo.RedirectStandardOutput = true;
+                    SomeProgram.StartInfo.CreateNoWindow = true;
+                    */
+                    SomeProgram.Start();
+                    SomeProgram.WaitForExit();
+                    //string SomeProgramOutput = SomeProgram.StandardOutput.ReadToEnd();
+                    Console.WriteLine("Refill the table with kml data done...");
+                    continue;
                 }
                 //sql_client.disconnect();
 

@@ -41,7 +41,7 @@ namespace server_syn_console
             }
             catch (PgSqlException ex)
             {
-                Console.WriteLine("Exception occurs: {0}", ex.Error);
+                Console.WriteLine("connect Exception occurs: {0}", ex.Error);
                 return false;
             }
         }
@@ -62,7 +62,7 @@ namespace server_syn_console
             }
             catch (PgSqlException ex)
             {
-                Console.WriteLine("Exception occurs: {0}", ex.Error);
+                Console.WriteLine("disconnect Exception occurs: {0}", ex.Error);
                 return false;
             }
         }
@@ -100,7 +100,7 @@ namespace server_syn_console
             }
             catch (PgSqlException ex)
             {
-                Console.WriteLine("Exception occurs: {0}", ex.Error);
+                Console.WriteLine("modify Exception occurs: {0}", ex.Error);
                 return false;
             }
 
@@ -165,7 +165,7 @@ namespace server_syn_console
             }
             catch (PgSqlException ex)
             {
-                Console.WriteLine("Exception occurs: {0}", ex.Error);
+                Console.WriteLine("get_DataTable Exception occurs: {0}", ex.Error);
                 return null;
             }
         }
