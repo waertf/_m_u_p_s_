@@ -46,7 +46,7 @@ namespace ConsoleApplication1_access_kml_files
             SqlClient sql_client = new SqlClient(ConfigurationManager.AppSettings["SQL_SERVER_IP"], ConfigurationManager.AppSettings["SQL_SERVER_PORT"], ConfigurationManager.AppSettings["SQL_SERVER_USER_ID"], ConfigurationManager.AppSettings["SQL_SERVER_PASSWORD"], ConfigurationManager.AppSettings["SQL_SERVER_DATABASE"]);
             sql_client.connect();
             sql_client.modify("DELETE FROM public.epq_test_loc");
-
+            sql_client.disconnect();
             for (int j = 0; j < xml_load.Length; j++)
             {
                 string receive = XmlGetTagValue(xml_load[j], "coordinates");
@@ -57,11 +57,13 @@ namespace ConsoleApplication1_access_kml_files
                     {
                         Console.WriteLine(i + ":" + parts[i]);
                         Console.WriteLine(i + 1 + ":" + parts[i + 1]);
+                        sql_client.connect();
                         sql_client.modify("INSERT INTO public.epq_test_loc (longitude,latitude,device) VALUES (" + "\'" + parts[i] + "\'" + "," + "\'" + parts[i + 1] + "\'" +","+ "\'" + device[j]+"\'" + ")");
+                        sql_client.disconnect();
                     }
                 }
             }
-            sql_client.disconnect();
+           
             //Console.WriteLine("Press entry to continue...");
             //Console.ReadLine();
         }
