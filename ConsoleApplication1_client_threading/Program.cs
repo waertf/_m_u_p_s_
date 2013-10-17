@@ -988,6 +988,7 @@ Select 1-6 then press enter to send package
             public string _validity;
             public string _lat;
             public string _lon;
+            public string _altitude;
             public string _speed;
             public string _course;
             public string _distance;
@@ -1092,6 +1093,13 @@ Select 1-6 then press enter to send package
             }
             else
                 gps_log.j_5 = "0";
+
+            if (htable.ContainsKey("altitude_value"))
+            {
+                gps_log._altitude = htable["altitude_value"].ToString();
+            }
+            else
+                gps_log._altitude = "0";
             if (htable.ContainsKey("speed-hor"))
             {
                 gps_log._speed = htable["speed-hor"].ToString();
@@ -1257,6 +1265,7 @@ Select 1-6 then press enter to send package
                                                        gps_log._temperature + "," + gps_log._voltage + "," + gps_log._option3 + "," + gps_log.j_6 + "," + gps_log.j_7;
                                             //table_column_value = @"'1','1','1','20130808 13:13:13.133 PST','Y',0,0,0,0,0,'0','0','0',0,0,0,0,0";
                                             cmd = "INSERT INTO public._gps_log (" + table_columns + ") VALUES  (" + table_column_value + ")";
+                                            
                                         }
                                     }
                                 }
@@ -1270,6 +1279,37 @@ Select 1-6 then press enter to send package
                         break;
                     }
                     sql_client.modify(cmd);
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex.Message);
+                }
+                finally
+                {
+                    sql_client.disconnect();
+                }
+            }
+
+            //insert into custom.cga_event_log
+            sql_client.connect();
+            double id_count = Convert.ToDouble(sql_client.get_DataTable("SELECT COUNT(uid)   FROM custom.cga_event_log").Rows[0].ItemArray[0]);
+            sql_client.disconnect();
+
+            if(sql_client.connect())
+            {
+                try
+                {
+                    if (xml_root_tag == "Unsolicited-Location-Report" && htable.ContainsKey("event_info"))
+                    {
+                        string sn = "\'" + gps_log._uid + now + id_count.ToString("D12") + "\'";
+                        string table_columns = "serial_no ,uid ,status ,lat ,lon,altitude ,speed ,course ,radius ,info_time ,server_time ";
+                        string table_column_value = sn + "," + gps_log._uid + "," + gps_log._option3 + "," + gps_log._lat + "," + gps_log._lon + "," +
+                            gps_log._altitude + "," + gps_log._speed + "," + gps_log._course + "," + gps_log.j_5 + "," + gps_log._option0+","+gps_log._option1;
+                        string cmd = "INSERT INTO public._gps_log (" + table_columns + ") VALUES  (" + table_column_value + ")";
+                        sql_client.modify(cmd);
+                    }
+
+
                 }
                 catch (Exception ex)
                 {
