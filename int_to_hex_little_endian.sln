@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsoleApplication1_access_
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "random_ConsoleApplication1", "random_ConsoleApplication1\random_ConsoleApplication1.csproj", "{2FB1754A-4CA9-4076-B566-EE82FD29EB9F}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsoleApplication1_kml_generator", "ConsoleApplication1_kml_generator\ConsoleApplication1_kml_generator.csproj", "{92E5B17B-6256-4493-A5B5-8D1F535DEB98}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -31,6 +33,10 @@ Global
 		{2FB1754A-4CA9-4076-B566-EE82FD29EB9F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2FB1754A-4CA9-4076-B566-EE82FD29EB9F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2FB1754A-4CA9-4076-B566-EE82FD29EB9F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{92E5B17B-6256-4493-A5B5-8D1F535DEB98}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{92E5B17B-6256-4493-A5B5-8D1F535DEB98}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{92E5B17B-6256-4493-A5B5-8D1F535DEB98}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{92E5B17B-6256-4493-A5B5-8D1F535DEB98}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
