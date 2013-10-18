@@ -30,7 +30,7 @@ namespace ConsoleApplication1_access_kml_files
         static void Main(string[] args)
         {
             XDocument[] xml_load = new XDocument[5];
-            string[]  device= new string[5] { "90001", "90002", "90003", "90004", "90005" };
+            string[]  device= new string[5] { "900001", "900002", "900003", "900004", "900005" };
             for (int i = 0; i < xml_load.Length; i++)
             {
                 xml_load[i] = XDocument.Load("test0" + (i + 1) + ".kml");
