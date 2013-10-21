@@ -415,6 +415,8 @@ Select 0-4 then press enter to send package
 4.Triggered-Location-Report with Invalid GPS Location Message
 ");
                 ///TODO:auto send from fixed interval time
+                ///900001->10sec interval
+                ///900005->50sec interval
                 Console.Write("Select[0-4]:");
                 string select_num=string.Empty;
                 select_num = Console.ReadLine();
