@@ -414,8 +414,10 @@ Select 0-4 then press enter to send package
 3.Unsolicited-Location-Report Presence Event Message
 4.Triggered-Location-Report with Invalid GPS Location Message
 ");
+                ///TODO:auto send from fixed interval time
                 Console.Write("Select[0-4]:");
-                string select_num=Console.ReadLine();
+                string select_num=string.Empty;
+                select_num = Console.ReadLine();
                 
                 if (select_num == "3" || select_num == "4")
                 {
