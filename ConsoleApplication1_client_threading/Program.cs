@@ -95,10 +95,20 @@ each set of the byte. To display a four-byte string, there will be 8 digits stri
             string ipAddress = ConfigurationManager.AppSettings["MUPS_SERVER_IP"];
             //int port = 23;
             int port = int.Parse(ConfigurationManager.AppSettings["MUPS_SERVER_PORT"]);
-            
+            bool mups_connected = false;
             tcpClient = new TcpClient();
-
-            tcpClient.Connect(ipAddress, port);
+            while (!mups_connected)
+            {
+                try
+                {
+                    tcpClient.Connect(ipAddress, port);
+                    mups_connected = true;
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex.Message);
+                }
+            }
 
             tcpClient.NoDelay = false;
 
