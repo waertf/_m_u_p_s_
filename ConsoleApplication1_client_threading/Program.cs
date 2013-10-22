@@ -1291,6 +1291,7 @@ Select 1-6 then press enter to send package
             }
 
             //insert into custom.cga_event_log
+            /*
             sql_client.connect();
             double id_count = Convert.ToDouble(sql_client.get_DataTable("SELECT COUNT(uid)   FROM custom.cga_event_log").Rows[0].ItemArray[0]);
             sql_client.disconnect();
@@ -1320,6 +1321,7 @@ Select 1-6 then press enter to send package
                     sql_client.disconnect();
                 }
             }
+            */
         }
         /*
              * <result result-code="A">SYNTAX ERROR</result>

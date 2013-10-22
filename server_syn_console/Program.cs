@@ -27,6 +27,7 @@ namespace server_syn_console
         // set this flag to false in the
         // validation event handler.
         private static Random random = new Random();
+        Object thisLock = new Object();
         public static void StartListening()
         {
             // Data buffer for incoming data.
