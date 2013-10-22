@@ -107,6 +107,7 @@ each set of the byte. To display a four-byte string, there will be 8 digits stri
                 catch (Exception ex)
                 {
                     Console.WriteLine(ex.Message);
+                    log.Error(ex.Message);
                 }
             }
 
