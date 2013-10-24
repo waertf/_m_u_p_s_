@@ -17,9 +17,15 @@ namespace ConsoleApplication1_access_kml_files
         static void Main(string[] args)
         {
             int LENGTH  = Directory.GetFiles(Environment.CurrentDirectory, "*.kml", SearchOption.TopDirectoryOnly).Length;
+            int device_initial = 900001;
+            List<string> device = new List<string>();
             Console.WriteLine(LENGTH);
             XDocument[] xml_load = new XDocument[LENGTH];
-            string[]  device= new string[5] { "900001", "900002", "900003", "900004", "900005" };
+            for (int i = 0; i < LENGTH; i++)
+            {
+                device.Add((device_initial++).ToString());
+            }
+            //string[]  device= new string[5] { "900001", "900002", "900003", "900004", "900005" };
             for (int i = 0; i < xml_load.Length; i++)
             {
                 xml_load[i] = XDocument.Load("test" + (i + 1) + ".kml");
