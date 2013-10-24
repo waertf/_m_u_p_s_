@@ -334,7 +334,8 @@ Select 1-6 then press enter to send package
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine("WriteError:\r\n" + ex.Message);
+                    Console.WriteLine("WriteLineError:\r\n" + ex.Message);
+                    log.Error("WriteLineError:\r\n" + ex.Message);
                 }
 
                 
@@ -390,7 +391,8 @@ Select 1-6 then press enter to send package
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.Message);
+                Console.WriteLine("ReadLineError:\r\n" + ex.Message);
+                log.Error("ReadLineError:\r\n" + ex.Message);
             }
         }
         public static void myReadSizeCallBack(IAsyncResult ar)
@@ -413,7 +415,8 @@ Select 1-6 then press enter to send package
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.Message);
+                Console.WriteLine("myReadSizeCallBackError:"+Environment.NewLine+ex.Message);
+                log.Error("myReadSizeCallBackError:" + Environment.NewLine + ex.Message);
             }
         }
         private static void FinishRead(IAsyncResult result)
@@ -451,7 +454,8 @@ Select 1-6 then press enter to send package
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine("ReadError:\r\n" + ex.Message);
+                    Console.WriteLine("FinishReadError1:\r\n" + ex.Message);
+                    log.Error("FinishReadError1:\r\n" + ex.Message);
                 }
                 Console.WriteLine("S############################################################################");
                 Console.WriteLine("Read:\r\n" + ouput2);
@@ -496,7 +500,8 @@ Select 1-6 then press enter to send package
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.Message);
+                Console.WriteLine("FinishReadError2:\r\n" + ex.Message);
+                log.Error("FinishReadError2:\r\n" + ex.Message);
             }
         }
         static void read_thread_method(TcpClient tcpClient, NetworkStream netStream , SqlClient sql_client)
@@ -983,7 +988,8 @@ Select 1-6 then press enter to send package
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine("WriteError:\r\n" + ex.Message);
+                    Console.WriteLine("avls_WriteLineError:\r\n" + ex.Message);
+                    log.Error("avls_WriteLineError:\r\n" + ex.Message);
                 }
 
 
@@ -1024,7 +1030,7 @@ Select 1-6 then press enter to send package
         {
             MV,TK,EM,PE,UL
         }
-        private static void access_sql_server(SqlClient sql_client, string xml_root_tag, Hashtable htable, List<string> sensor_name, List<string> sensor_type, List<string> sensor_value, IEnumerable<XName> elements,string log)
+        private static void access_sql_server(SqlClient sql_client, string xml_root_tag, Hashtable htable, List<string> sensor_name, List<string> sensor_type, List<string> sensor_value, IEnumerable<XName> elements,string log1)
         {
             DateTime dt = DateTime.Now;
             SQL_DATA gps_log = new SQL_DATA();
@@ -1223,7 +1229,7 @@ Select 1-6 then press enter to send package
                         case "Unsolicited-Location-Report":
                             {
                                 gps_log._status = ((int)device_status.UL).ToString();
-                                if (xml_validation_with_dtd(log, xml_root_tag))
+                                if (xml_validation_with_dtd(log1, xml_root_tag))
                                 {
                                     gps_log._validity = "\'Y\'";
                                     table_columns = "_id,_uid,_status,_validity,_or_lon,_or_lat,_satellites,_temperature,,_voltage,_option3,j_6,j_7";
@@ -1293,7 +1299,8 @@ Select 1-6 then press enter to send package
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine(ex.Message);
+                    Console.WriteLine("access_sql_serverError:"+Environment.NewLine+ex.Message);
+                    log.Error("access_sql_serverError:" + Environment.NewLine + ex.Message);
                 }
                 finally
                 {
@@ -1369,6 +1376,7 @@ Select 1-6 then press enter to send package
             catch (Exception e)
             {
                 Console.WriteLine("XmlGetTagValue:"+tag_name+":"+e.Message);
+                log.Error("XmlGetTagValue:" + tag_name + ":" + e.Message);
                 result = "";
             }
 
@@ -1391,6 +1399,7 @@ Select 1-6 then press enter to send package
             catch (Exception e)
             {
                 Console.WriteLine("XmlGetFirstChildTagName:"+parent_tag_name+":"+e.Message);
+                log.Error("XmlGetFirstChildTagName:" + parent_tag_name + ":" + e.Message);
                 result = "";
             }
 
