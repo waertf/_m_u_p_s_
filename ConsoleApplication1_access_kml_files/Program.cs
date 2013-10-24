@@ -5,12 +5,14 @@ using System.Text;
 using System.Xml.Linq;
 using System.Configuration;
 using System.Text.RegularExpressions;
+using System.IO;
 
 
 namespace ConsoleApplication1_access_kml_files
 {
     class Program
     {
+         
         static string XmlGetTagValue(XDocument xml_data, string tag_name)
         {
             string result = string.Empty;
@@ -29,11 +31,13 @@ namespace ConsoleApplication1_access_kml_files
         }
         static void Main(string[] args)
         {
-            XDocument[] xml_load = new XDocument[5];
+            int LENGTH  = Directory.GetFiles(Environment.CurrentDirectory, "*.kml", SearchOption.TopDirectoryOnly).Length;
+            Console.WriteLine(LENGTH);
+            XDocument[] xml_load = new XDocument[LENGTH];
             string[]  device= new string[5] { "900001", "900002", "900003", "900004", "900005" };
             for (int i = 0; i < xml_load.Length; i++)
             {
-                xml_load[i] = XDocument.Load("test0" + (i + 1) + ".kml");
+                xml_load[i] = XDocument.Load("test" + (i + 1) + ".kml");
             }
             /*
             XDocument xml_load1 = XDocument.Load(@"test01.kml");
@@ -49,7 +53,17 @@ namespace ConsoleApplication1_access_kml_files
             sql_client.disconnect();
             for (int j = 0; j < xml_load.Length; j++)
             {
-                string receive = XmlGetTagValue(xml_load[j], "coordinates");
+                string receive = string.Empty;
+                //XDocument xdoc = XDocument.Load("test2.kml");
+                XNamespace KmlNamespace = "http://earth.google.com/kml/2.2";
+                var result = (from el in xml_load[j].Descendants(KmlNamespace + "coordinates") select el);
+                foreach (string cc in result)
+                {
+                    receive += cc + Environment.NewLine;
+                }
+                Console.WriteLine(receive);
+
+                //string receive = XmlGetTagValue(xml_load[j], "coordinates");
                 string[] parts = receive.Split(new char[] { '\r', '\n', ',', ' ' }, StringSplitOptions.RemoveEmptyEntries);
                 for (int i = 0; i < parts.Length; i = i + 3)
                 {
@@ -65,7 +79,7 @@ namespace ConsoleApplication1_access_kml_files
             }
            
             //Console.WriteLine("Press entry to continue...");
-            //Console.ReadLine();
+            Console.ReadLine();
         }
     }
 }

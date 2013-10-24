@@ -12,11 +12,6 @@ C:\Users\wavegis\Documents\Visual Studio 2008\Projects\int_to_hex_little_endian\
 C:\Users\wavegis\Documents\Visual Studio 2008\Projects\int_to_hex_little_endian\Backup\ConsoleApplication1_access_kml_files\obj\Release\ResolveAssemblyReference.cache
 C:\Users\wavegis\Documents\Visual Studio 2008\Projects\int_to_hex_little_endian\Backup\ConsoleApplication1_access_kml_files\obj\Release\ConsoleApplication1_access_kml_files.exe
 C:\Users\wavegis\Documents\Visual Studio 2008\Projects\int_to_hex_little_endian\Backup\ConsoleApplication1_access_kml_files\obj\Release\ConsoleApplication1_access_kml_files.pdb
-C:\Users\wavegis\Documents\mups\ConsoleApplication1_access_kml_files\bin\Release\test01.kml
-C:\Users\wavegis\Documents\mups\ConsoleApplication1_access_kml_files\bin\Release\test02.kml
-C:\Users\wavegis\Documents\mups\ConsoleApplication1_access_kml_files\bin\Release\test03.kml
-C:\Users\wavegis\Documents\mups\ConsoleApplication1_access_kml_files\bin\Release\test04.kml
-C:\Users\wavegis\Documents\mups\ConsoleApplication1_access_kml_files\bin\Release\test05.kml
 C:\Users\wavegis\Documents\mups\ConsoleApplication1_access_kml_files\bin\Release\ConsoleApplication1_access_kml_files.exe.config
 C:\Users\wavegis\Documents\mups\ConsoleApplication1_access_kml_files\bin\Release\ConsoleApplication1_access_kml_files.exe
 C:\Users\wavegis\Documents\mups\ConsoleApplication1_access_kml_files\bin\Release\ConsoleApplication1_access_kml_files.pdb
@@ -26,3 +21,5 @@ C:\Users\wavegis\Documents\mups\ConsoleApplication1_access_kml_files\bin\Release
 C:\Users\wavegis\Documents\mups\ConsoleApplication1_access_kml_files\obj\Release\ResolveAssemblyReference.cache
 C:\Users\wavegis\Documents\mups\ConsoleApplication1_access_kml_files\obj\Release\ConsoleApplication1_access_kml_files.exe
 C:\Users\wavegis\Documents\mups\ConsoleApplication1_access_kml_files\obj\Release\ConsoleApplication1_access_kml_files.pdb
+C:\Users\wavegis\Documents\mups\ConsoleApplication1_access_kml_files\bin\Release\test1.kml
+C:\Users\wavegis\Documents\mups\ConsoleApplication1_access_kml_files\bin\Release\test2.kml
