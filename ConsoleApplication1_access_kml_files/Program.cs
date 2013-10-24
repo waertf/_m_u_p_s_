@@ -13,22 +13,7 @@ namespace ConsoleApplication1_access_kml_files
     class Program
     {
          
-        static string XmlGetTagValue(XDocument xml_data, string tag_name)
-        {
-            string result = string.Empty;
-            try
-            {
-                result = (string)(from el in xml_data.Descendants(tag_name) select el).First();
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine("XmlGetTagValue:" + tag_name + ":" + e.Message);
-                result = "error";
-            }
-
-            return result;
-
-        }
+        
         static void Main(string[] args)
         {
             int LENGTH  = Directory.GetFiles(Environment.CurrentDirectory, "*.kml", SearchOption.TopDirectoryOnly).Length;
@@ -79,7 +64,7 @@ namespace ConsoleApplication1_access_kml_files
             }
            
             //Console.WriteLine("Press entry to continue...");
-            Console.ReadLine();
+            //Console.ReadLine();
         }
     }
 }
