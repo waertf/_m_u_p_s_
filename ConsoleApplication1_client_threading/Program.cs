@@ -119,7 +119,7 @@ each set of the byte. To display a four-byte string, there will be 8 digits stri
             sql_client = new SqlClient(ConfigurationManager.AppSettings["SQL_SERVER_IP"], ConfigurationManager.AppSettings["SQL_SERVER_PORT"], ConfigurationManager.AppSettings["SQL_SERVER_USER_ID"], ConfigurationManager.AppSettings["SQL_SERVER_PASSWORD"], ConfigurationManager.AppSettings["SQL_SERVER_DATABASE"], ConfigurationManager.AppSettings["Pooling"], ConfigurationManager.AppSettings["MinPoolSize"], ConfigurationManager.AppSettings["MaxPoolSize"], ConfigurationManager.AppSettings["ConnectionLifetime"]);
 
             string registration_msg_error_test = "<Location-Registration-Request><application>" + ConfigurationManager.AppSettings["application_ID"] + "</application></Location-Registration-Request>";
-            WriteLine(netStream, data_append_dataLength(registration_msg_error_test), registration_msg_error_test, sql_client);
+            WriteLine(netStream, data_append_dataLength(registration_msg_error_test), registration_msg_error_test);
             using (StreamWriter w = File.AppendText("log.txt"))
             {
                 Log("send:\r\n" , registration_msg_error_test, w);
@@ -147,7 +147,7 @@ each set of the byte. To display a four-byte string, there will be 8 digits stri
         private static void sendtest(NetworkStream netStream , SqlClient sql_client)
         {
             string Immediate_Location_Request = "<Immediate-Location-Request><request-id>2468ACE0</request-id><suaddr suaddr-type=\"APCO\">1004</suaddr></Immediate-Location-Request>";
-            WriteLine(netStream, data_append_dataLength(Immediate_Location_Request), Immediate_Location_Request, sql_client);
+            WriteLine(netStream, data_append_dataLength(Immediate_Location_Request), Immediate_Location_Request);
             using (StreamWriter w = File.AppendText("log.txt"))
             {
                 Log("send:\r\n" , Immediate_Location_Request, w);
@@ -156,7 +156,7 @@ each set of the byte. To display a four-byte string, there will be 8 digits stri
             }
 
             string Location_Protocol_Request = "<Location-Protocol-Request><request-id>4356A</request-id><request-protocol-version>2</request-protocol-version></Location-Protocol-Request>";
-            WriteLine(netStream, data_append_dataLength(Location_Protocol_Request), Location_Protocol_Request, sql_client);
+            WriteLine(netStream, data_append_dataLength(Location_Protocol_Request), Location_Protocol_Request);
             using (StreamWriter w = File.AppendText("log.txt"))
             {
                 Log("send:\r\n" , Location_Protocol_Request, w);
@@ -165,7 +165,7 @@ each set of the byte. To display a four-byte string, there will be 8 digits stri
             }
 
             string Triggered_Location_Stop_Request = "<Triggered-Location-Stop-Request><request-id>2468ACE0</request-id><suaddr suaddr-type=\"APCO\">1004</suaddr></Triggered-Location-Stop-Request>";
-            WriteLine(netStream, data_append_dataLength(Triggered_Location_Stop_Request), Triggered_Location_Stop_Request, sql_client);
+            WriteLine(netStream, data_append_dataLength(Triggered_Location_Stop_Request), Triggered_Location_Stop_Request);
             using (StreamWriter w = File.AppendText("log.txt"))
             {
                 Log("send:\r\n" , Triggered_Location_Stop_Request, w);
@@ -174,7 +174,7 @@ each set of the byte. To display a four-byte string, there will be 8 digits stri
             }
 
             string Triggered_Location_Request_Cadence = "<Triggered-Location-Request><request-id>2468ACE0</request-id><suaddr suaddr-type=\"APCO\">1004</suaddr><periodic-trigger><interval>60</interval></periodic-trigger></Triggered-Location-Request>";
-            WriteLine(netStream, data_append_dataLength(Triggered_Location_Request_Cadence), Triggered_Location_Request_Cadence, sql_client);
+            WriteLine(netStream, data_append_dataLength(Triggered_Location_Request_Cadence), Triggered_Location_Request_Cadence);
             using (StreamWriter w = File.AppendText("log.txt"))
             {
                 Log("send:\r\n" , Triggered_Location_Request_Cadence, w);
@@ -183,7 +183,7 @@ each set of the byte. To display a four-byte string, there will be 8 digits stri
             }
 
             string Triggered_Location_Request_Distance = "<Triggered-Location-Request><request-id>2468ACE0</request-id><suaddr suaddr-type=\"APCO\">1004</suaddr><periodic-trigger><trg-distance>100</trg-distance></periodic-trigger></Triggered-Location-Request>";
-            WriteLine(netStream, data_append_dataLength(Triggered_Location_Request_Distance), Triggered_Location_Request_Distance, sql_client);
+            WriteLine(netStream, data_append_dataLength(Triggered_Location_Request_Distance), Triggered_Location_Request_Distance);
             using (StreamWriter w = File.AppendText("log.txt"))
             {
                 Log("send:\r\n" , Triggered_Location_Request_Distance, w);
@@ -192,7 +192,7 @@ each set of the byte. To display a four-byte string, there will be 8 digits stri
             }
 
             string Digital_Output_Change_Request = "<Digital-Output-Change-Request><request-id>2468ACE0</request-id><suaddr suaddr-type=\"APCO\">1234568</suaddr><output-info><output-name>Alarm</output-name><output-value>1</output-value></output-info></Digital-Output-Change-Request>";
-            WriteLine(netStream, data_append_dataLength(Digital_Output_Change_Request), Digital_Output_Change_Request, sql_client);
+            WriteLine(netStream, data_append_dataLength(Digital_Output_Change_Request), Digital_Output_Change_Request);
             using (StreamWriter w = File.AppendText("log.txt"))
             {
                 Log("send:\r\n" ,Digital_Output_Change_Request, w);
@@ -200,7 +200,7 @@ each set of the byte. To display a four-byte string, there will be 8 digits stri
                 w.Close();
             }
             string error = "<error></error>";
-            WriteLine(netStream, data_append_dataLength(error), error, sql_client);
+            WriteLine(netStream, data_append_dataLength(error), error);
             using (StreamWriter w = File.AppendText("log.txt"))
             {
                 Log("send:\r\n" , error, w);
@@ -237,7 +237,7 @@ Select 1-6 then press enter to send package
                             // Close the writer and underlying file.
                             w.Close();
                         }
-                        WriteLine(netStream, data_append_dataLength(Immediate_Location_Request), Immediate_Location_Request, sql_client);
+                        WriteLine(netStream, data_append_dataLength(Immediate_Location_Request), Immediate_Location_Request);
                         
                         break;
                     case "5":
@@ -249,7 +249,7 @@ Select 1-6 then press enter to send package
                             // Close the writer and underlying file.
                             w.Close();
                         }
-                        WriteLine(netStream, data_append_dataLength(Location_Protocol_Request), Location_Protocol_Request, sql_client);
+                        WriteLine(netStream, data_append_dataLength(Location_Protocol_Request), Location_Protocol_Request);
                         break;
                     case "6":
                         string Triggered_Location_Stop_Request = "<Triggered-Location-Stop-Request><request-id>" + ConfigurationManager.AppSettings["request-id"] + "</request-id><suaddr suaddr-type=\"" + ConfigurationManager.AppSettings["suaddr-type"] + "\">" + ConfigurationManager.AppSettings["suaddr"] + "</suaddr></Triggered-Location-Stop-Request>";
@@ -260,7 +260,7 @@ Select 1-6 then press enter to send package
                             // Close the writer and underlying file.
                             w.Close();
                         }
-                        WriteLine(netStream, data_append_dataLength(Triggered_Location_Stop_Request), Triggered_Location_Stop_Request, sql_client);
+                        WriteLine(netStream, data_append_dataLength(Triggered_Location_Stop_Request), Triggered_Location_Stop_Request);
                         break;
                     case "2":
                         string Triggered_Location_Request_Cadence = "<Triggered-Location-Request><request-id>" + ConfigurationManager.AppSettings["request-id"] + "</request-id><suaddr suaddr-type=\"" + ConfigurationManager.AppSettings["suaddr-type"] + "\">" + ConfigurationManager.AppSettings["suaddr"] + "</suaddr><periodic-trigger><interval>" + ConfigurationManager.AppSettings["interval"] + "</interval></periodic-trigger></Triggered-Location-Request>";
@@ -271,7 +271,7 @@ Select 1-6 then press enter to send package
                             // Close the writer and underlying file.
                             w.Close();
                         }
-                        WriteLine(netStream, data_append_dataLength(Triggered_Location_Request_Cadence), Triggered_Location_Request_Cadence, sql_client);
+                        WriteLine(netStream, data_append_dataLength(Triggered_Location_Request_Cadence), Triggered_Location_Request_Cadence);
                         break;
                     case "3":
                         string Triggered_Location_Request_Distance = "<Triggered-Location-Request><request-id>" + ConfigurationManager.AppSettings["request-id"] + "</request-id><suaddr suaddr-type=\"" + ConfigurationManager.AppSettings["suaddr-type"] + "\">" + ConfigurationManager.AppSettings["suaddr"] + "</suaddr><periodic-trigger><trg-distance>" + ConfigurationManager.AppSettings["trg-distance"] + "</trg-distance></periodic-trigger></Triggered-Location-Request>";
@@ -282,7 +282,7 @@ Select 1-6 then press enter to send package
                             // Close the writer and underlying file.
                             w.Close();
                         }
-                        WriteLine(netStream, data_append_dataLength(Triggered_Location_Request_Distance), Triggered_Location_Request_Distance, sql_client);
+                        WriteLine(netStream, data_append_dataLength(Triggered_Location_Request_Distance), Triggered_Location_Request_Distance);
                         break;
                     case "4":
                         string Digital_Output_Change_Request = "<Digital-Output-Change-Request><request-id>" + ConfigurationManager.AppSettings["request-id"] + "</request-id><suaddr suaddr-type=\"" + ConfigurationManager.AppSettings["suaddr-type"] + "\">" + ConfigurationManager.AppSettings["suaddr"] + "</suaddr><output-info><output-name>" + ConfigurationManager.AppSettings["output-name"] + "</output-name><output-value>" + ConfigurationManager.AppSettings["output-value"] + "</output-value></output-info></Digital-Output-Change-Request>";
@@ -293,7 +293,7 @@ Select 1-6 then press enter to send package
                             // Close the writer and underlying file.
                             w.Close();
                         }
-                        WriteLine(netStream, data_append_dataLength(Digital_Output_Change_Request), Digital_Output_Change_Request, sql_client);
+                        WriteLine(netStream, data_append_dataLength(Digital_Output_Change_Request), Digital_Output_Change_Request);
                         break;
                 }
                 Thread.Sleep(100);
@@ -310,7 +310,7 @@ Select 1-6 then press enter to send package
             */
         }
 
-        private static void WriteLine(NetworkStream netStream, byte[] writeData,string write , SqlClient sql_client)
+        private static void WriteLine(NetworkStream netStream, byte[] writeData,string write )
         {
             if (netStream.CanWrite)
             {
