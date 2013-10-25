@@ -142,7 +142,12 @@ namespace server_syn_console
                             }
                             datatable.Rows.Add(dr);
                             Console.Write(Environment.NewLine);
-                            Console.WriteLine(myReader.GetInt32(0) + "\t" + myReader.GetString(1) + "\t");
+                            /*
+                            if(myReader.FieldCount>1)
+                                Console.WriteLine(myReader.GetInt32(0) + "\t" + myReader.GetString(1) + "\t");
+                            else
+                                Console.WriteLine(myReader.GetInt32(0) + "\t");
+                             * */
                         }
                     }
                     finally

@@ -1485,7 +1485,7 @@ Select 1-6 then press enter to send package
             }
             catch (Exception ex)
             {
-                //Console.WriteLine(ex.Message);
+                Console.WriteLine(ex.Message);
                 log.Info(logMessage);
             }
         }

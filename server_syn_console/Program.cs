@@ -220,8 +220,41 @@ Select 0-4 then press enter to send package
                             // Close the writer and underlying file.
                             w.Close();
                         }
-                        Thread send_test_thread = new Thread(() => sendtest2_t(handler));
-                        send_test_thread.Start();
+                        if (!bool.Parse(ConfigurationManager.AppSettings["auto_send"]))
+                        {
+                            Thread send_test_thread = new Thread(() => sendtest2_t(handler));
+                            send_test_thread.Start();
+                        }
+                        else
+                        {
+                            ///TODO:implement auto send
+                            ///
+                            /*
+                             * SELECT count(DISTINCT
+                                  public.epq_test_loc.device)
+                                FROM
+                                  public.epq_test_loc
+                             */
+                            int device_count=0;
+                            int device_initial = 900001;
+                            SqlClient sql_client = new SqlClient(ConfigurationManager.AppSettings["SQL_SERVER_IP"], ConfigurationManager.AppSettings["SQL_SERVER_PORT"], ConfigurationManager.AppSettings["SQL_SERVER_USER_ID"], ConfigurationManager.AppSettings["SQL_SERVER_PASSWORD"], ConfigurationManager.AppSettings["SQL_SERVER_DATABASE"]);
+                            sql_client.connect();
+                            string sql_command = @"SELECT count(DISTINCT
+                                  public.epq_test_loc.device)
+                                FROM
+                                  public.epq_test_loc";
+                            DataTable dt = sql_client.get_DataTable(sql_command);
+                            foreach (DataRow row in dt.Rows)
+                            {
+                                device_count = Convert.ToInt16(row[0]);
+                            }
+                            sql_client.disconnect();
+                            for (int i = 0; i < device_count; i++)
+                            {
+                                ThreadPool.QueueUserWorkItem(state => autosent_test((device_initial++).ToString(), handler));
+                            }
+
+                        }
                         //sendtest(handler);
                     }
                     break;
@@ -329,6 +362,66 @@ Select 0-4 then press enter to send package
                         }
                     }
                     break;
+            }
+        }
+
+        private static void autosent_test(string device, Socket handler)
+        {
+            //throw new NotImplementedException();
+            while (true)
+            {
+                try
+                {
+                    SqlClient sql_client = new SqlClient(ConfigurationManager.AppSettings["SQL_SERVER_IP"], ConfigurationManager.AppSettings["SQL_SERVER_PORT"], ConfigurationManager.AppSettings["SQL_SERVER_USER_ID"], ConfigurationManager.AppSettings["SQL_SERVER_PASSWORD"], ConfigurationManager.AppSettings["SQL_SERVER_DATABASE"]);
+                
+                    sql_client.connect();
+                    string lat = string.Empty, lon = string.Empty, id = string.Empty, sql_command = @"SELECT 
+  public.epq_test_loc.longitude,
+  public.epq_test_loc.latitude,
+  public.epq_test_loc.device,
+  public.epq_test_loc.id
+FROM
+  public.epq_test_loc
+WHERE
+    public.epq_test_loc.device = '" + device + @"' 
+ORDER BY 
+  public.epq_test_loc.id
+  Limit 1";
+                    DataTable dt = sql_client.get_DataTable(sql_command);
+                    if (dt != null && dt.Rows.Count != 0)
+                    {
+                        Console.WriteLine("+if");
+                        Console.WriteLine("dt:{0}", dt);
+                        Console.WriteLine("dt.Rows.Count:{0}", dt.Rows.Count);
+                        foreach (DataRow row in dt.Rows)
+                        {
+                            lon = row[0].ToString();
+                            lat = row[1].ToString();
+                            device = row[2].ToString();
+                            id = row[3].ToString();
+                        }
+                    }
+                    else
+                        break;
+                    sql_client.modify("DELETE FROM public.epq_test_loc WHERE public.epq_test_loc.id = \'" + id + "\'");
+                    sql_client.disconnect();
+
+                    string today = DateTime.Now.ToString("yyyyMMddHHmmss");
+                    string Triggered_loc = "<Triggered-Location-Report><suaddr suaddr-type=\"APCO\">" + device + "</suaddr><info-data><info-time>" + today + "</info-time><server-time>" + today + "</server-time><shape><circle-2d><lat>" + lat + "</lat><long>" + lon + "</long><radius>100</radius></circle-2d></shape><speed-hor>50</speed-hor><direction-hor>32</direction-hor></info-data><sensor-info><sensor><sensor-name>Ignition</sensor-name><sensor-value>off</sensor-value><sensor-type>Input</sensor-type></sensor><sensor><sensor-name>door</sensor-name><sensor-value>open</sensor-value><sensor-type>Input</sensor-type></sensor></sensor-info><vehicle-info><odometer>10,000</odometer></vehicle-info></Triggered-Location-Report>";
+                    byte[] msg4 = (data_append_dataLength(Triggered_loc));
+                    handler.Send(msg4);
+                    using (StreamWriter w = File.AppendText("log.txt"))
+                    {
+                        Log("send:\r\n", Triggered_loc, w);
+                        // Close the writer and underlying file.
+                        w.Close();
+                    }
+                    Thread.Sleep(int.Parse(ConfigurationManager.AppSettings["auto_send_sec_interval"]) * 1000);
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex.Message);
+                }
             }
         }
 
@@ -759,6 +852,26 @@ Select 0-4 then press enter to send package
         }
         static void Main(string[] args)
         {
+            
+
+            if (bool.Parse(ConfigurationManager.AppSettings["auto_send"]))
+            {
+                Console.WriteLine("Refill the table with kml data...");
+                string kml_application = "ConsoleApplication1_access_kml_files.exe";
+
+                Process SomeProgram = new Process();
+                SomeProgram.StartInfo.FileName = kml_application;
+                /*
+                SomeProgram.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
+                SomeProgram.StartInfo.UseShellExecute = false;
+                SomeProgram.StartInfo.RedirectStandardOutput = true;
+                SomeProgram.StartInfo.CreateNoWindow = true;
+                */
+                SomeProgram.Start();
+                SomeProgram.WaitForExit();
+                //string SomeProgramOutput = SomeProgram.StandardOutput.ReadToEnd();
+                Console.WriteLine("Refill the table with kml data done...");
+            }
             
             Thread read_thread = new Thread(new ThreadStart(StartListening));
             read_thread.Start();
