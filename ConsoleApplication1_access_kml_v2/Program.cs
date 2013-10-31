@@ -21,6 +21,7 @@ namespace ConsoleApplication1_access_kml_v2
                     get += cc + Environment.NewLine;
                 }
                 Console.WriteLine(get);
+                Console.WriteLine(XmlGetTagValue(xdoc,(KmlNamespace+"name").ToString()));
             }
             catch (Exception ex)
             {
@@ -30,6 +31,23 @@ namespace ConsoleApplication1_access_kml_v2
             {
                 Console.ReadLine();
             }
+        }
+        static string XmlGetTagValue(XDocument xml_data, string tag_name)
+        {
+            string result = string.Empty;
+            try
+            {
+                result = (string)(from el in xml_data.Descendants(tag_name) select el).First();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("XmlGetTagValue:" + tag_name + ":" + e.Message);
+                //log.Error("XmlGetTagValue:" + tag_name + ":" + e.Message);
+                result = "";
+            }
+
+            return result;
+
         }
     }
 }

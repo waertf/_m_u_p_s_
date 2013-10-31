@@ -12,23 +12,43 @@ namespace ConsoleApplication1_access_kml_files
 {
     class Program
     {
-         
+        static string XmlGetTagValue(XDocument xml_data, string tag_name)
+        {
+            string result = string.Empty;
+            try
+            {
+                result = (string)(from el in xml_data.Descendants(tag_name) select el).First();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("XmlGetTagValue:" + tag_name + ":" + e.Message);
+                //log.Error("XmlGetTagValue:" + tag_name + ":" + e.Message);
+                result = "";
+            }
+
+            return result;
+
+        }
         
         static void Main(string[] args)
         {
             int LENGTH  = Directory.GetFiles(Environment.CurrentDirectory, "*.kml", SearchOption.TopDirectoryOnly).Length;
-            int device_initial = 900001;
+            string[] file_list = Directory.GetFiles(Environment.CurrentDirectory, "*.kml", SearchOption.TopDirectoryOnly);
+            //int device_initial = 900001;
             List<string> device = new List<string>();
             Console.WriteLine(LENGTH);
             XDocument[] xml_load = new XDocument[LENGTH];
-            for (int i = 0; i < LENGTH; i++)
+            //for (int i = 0; i < LENGTH; i++)
+            foreach(string a in file_list)
             {
-                device.Add((device_initial++).ToString());
+                //device.Add((device_initial++).ToString());
+                device.Add((a).ToString());
             }
             //string[]  device= new string[5] { "900001", "900002", "900003", "900004", "900005" };
             for (int i = 0; i < xml_load.Length; i++)
             {
-                xml_load[i] = XDocument.Load("test" + (i + 1) + ".kml");
+                //xml_load[i] = XDocument.Load("test" + (i + 1) + ".kml");
+                xml_load[i] = XDocument.Load(device[i]);
             }
             /*
             XDocument xml_load1 = XDocument.Load(@"test01.kml");
@@ -48,6 +68,7 @@ namespace ConsoleApplication1_access_kml_files
                 //XDocument xdoc = XDocument.Load("test2.kml");
                 XNamespace KmlNamespace = "http://earth.google.com/kml/2.2";
                 var result = (from el in xml_load[j].Descendants(KmlNamespace + "coordinates") select el);
+                string device_name = XmlGetTagValue(xml_load[j], (KmlNamespace + "name").ToString());
                 foreach (string cc in result)
                 {
                     receive += cc + Environment.NewLine;
@@ -63,7 +84,7 @@ namespace ConsoleApplication1_access_kml_files
                         Console.WriteLine(i + ":" + parts[i]);
                         Console.WriteLine(i + 1 + ":" + parts[i + 1]);
                         sql_client.connect();
-                        sql_client.modify("INSERT INTO public.epq_test_loc (longitude,latitude,device) VALUES (" + "\'" + parts[i] + "\'" + "," + "\'" + parts[i + 1] + "\'" +","+ "\'" + device[j]+"\'" + ")");
+                        sql_client.modify("INSERT INTO public.epq_test_loc (longitude,latitude,device) VALUES (" + "\'" + parts[i] + "\'" + "," + "\'" + parts[i + 1] + "\'" + "," + "\'" + device_name + "\'" + ")");
                         sql_client.disconnect();
                     }
                 }
