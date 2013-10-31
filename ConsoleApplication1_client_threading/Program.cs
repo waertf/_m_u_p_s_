@@ -1323,12 +1323,30 @@ Select 1-6 then press enter to send package
                 {
                     if (xml_root_tag == "Unsolicited-Location-Report" && htable.ContainsKey("event_info"))
                     {
-                        string sn = "\'" + gps_log._uid + now + id_count.ToString("D12") + "\'";
-                        string table_columns = "serial_no ,uid ,status ,lat ,lon,altitude ,speed ,course ,radius ,info_time ,server_time ";
-                        string table_column_value = sn + "," + gps_log._uid + "," + gps_log._option3 + "," + gps_log._lat + "," + gps_log._lon + "," +
-                            gps_log._altitude + "," + gps_log._speed + "," + gps_log._course + "," + gps_log.j_5 + "," + gps_log._option0+","+gps_log._option1;
-                        string cmd = "INSERT INTO public._gps_log (" + table_columns + ") VALUES  (" + table_column_value + ")";
-                        sql_client.modify(cmd);
+                        switch (htable["event_info"].ToString())
+                        {
+                            case "Emergency On":
+                            case "Emergency Off":
+                                string sn = "\'" + gps_log._uid + now + id_count.ToString("D12") + "\'";
+                                string table_columns = "serial_no ,uid ,event_type ,lat ,lon,altitude ,speed ,course ,radius ,info_time ,server_time ,create_user ,create_ip";
+                                string table_column_value = sn + "," + gps_log._uid + "," + //gps_log._option3
+                                    @"'0400'" + "," + gps_log._lat + "," + gps_log._lon + "," +
+                                    gps_log._altitude + "," + gps_log._speed + "," + gps_log._course + "," + gps_log.j_5 + "," + gps_log._option0 + "," + gps_log._option1+
+                                    ","+@"'System'"+","+@"'"+LocalIPAddress().ToString()+@"'";
+                                string cmd = "INSERT INTO public._gps_log (" + table_columns + ") VALUES  (" + table_column_value + ")";
+                                sql_client.modify(cmd);
+                                break;
+                            case "Unit Present":
+                            case "Unit Absent":
+                                
+                                break;
+                            case "Ignition Off":
+                            case "Ignition On":
+                                
+                                break;
+
+                        }
+                        
                     }
 
 
