@@ -936,7 +936,7 @@ Select 1-6 then press enter to send package
                             avls_package.Event = "150,";
                             break;
                         case "Emergency Off":
-                            avls_package.Event = "110,";
+                            avls_package.Event = "000,";
                             break;
                         case "Unit Present":
                         case "Unit Absent":
@@ -952,8 +952,12 @@ Select 1-6 then press enter to send package
                 }
                 else
                 {
-                    avls_package.Event = "110,";
+                    avls_package.Event = "000,";
                     avls_package.Status = "00000000,";
+                }
+                if (xml_root_tag.Equals("Immediate-Location-Report"))
+                {
+                    avls_package.Event = "175,";
                 }
                 avls_package.Message = "test";
             }
