@@ -15,6 +15,7 @@ using System.Xml.Schema; // for XmlSchemaCollection (which is used later)
 using log4net;
 using log4net.Config;
 using keeplive;
+using System.Net;
 
 namespace ConsoleApplication1_client_threading
 {
@@ -91,6 +92,8 @@ each set of the byte. To display a four-byte string, there will be 8 digits stri
        
         static void Main(string[] args)
         {
+            Console.WriteLine(LocalIPAddress());//current ip address
+            Console.WriteLine(System.Environment.UserName);//current username
             //string ipAddress = "127.0.0.1";
             string ipAddress = ConfigurationManager.AppSettings["MUPS_SERVER_IP"];
             //int port = 23;
@@ -1536,6 +1539,19 @@ Select 1-6 then press enter to send package
             Console.WriteLine("Validation Error: {0}", e.Message);
         }
 
+        private static IPAddress LocalIPAddress()
+        {
+            if (!System.Net.NetworkInformation.NetworkInterface.GetIsNetworkAvailable())
+            {
+                return null;
+            }
+
+            IPHostEntry host = Dns.GetHostEntry(Dns.GetHostName());
+
+            return host
+                .AddressList
+                .FirstOrDefault(ip => ip.AddressFamily == AddressFamily.InterNetwork);
+        }
     }
 
 }
