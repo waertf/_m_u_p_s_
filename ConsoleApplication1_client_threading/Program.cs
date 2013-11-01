@@ -939,17 +939,23 @@ Select 1-6 then press enter to send package
                     {
                         case "Emergency On":
                             avls_package.Event = "150,";
+                            avls_package.Status = "00000000,";
                             break;
                         case "Emergency Off":
                             avls_package.Event = "000,";
+                            avls_package.Status = "00000000,";
                             break;
                         case "Unit Present":
                         case "Unit Absent":
+                            avls_package.Event = "000,";
+                            avls_package.Status = "00000000,";
                             break;
                         case "Ignition Off":
+                            avls_package.Event = "000,";
                             avls_package.Status = "00000000,";
                             break;
                         case "Ignition On":
+                            avls_package.Event = "000,";
                             avls_package.Status = "00020000,";
                             break;
 

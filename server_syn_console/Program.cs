@@ -174,6 +174,7 @@ Select 0-4 then press enter to send package
         private static void xml_parse(Socket handler, string xml_root_tag, XDocument xml_data)
         {
             string log = xml_data.ToString();
+            string now =  DateTime.Now.ToString("yyyyMMddHHmmss");
             using (StreamWriter w = File.AppendText("log.txt"))
             {
                 Log("receive:\r\n" , log, w);
@@ -331,7 +332,7 @@ ORDER BY
                 case "Immediate-Location-Request":
                     {
                         string Immediate_Location_Answer = "<Immediate-Location-Answer><request-id></request-id><suaddr suaddr-type=\"APCO\">" + device + "</suaddr><result result-code=\"0\"></result></Immediate-Location-Answer>";
-                        string Immediate_Location_Report = "<Immediate-Location-Report><suaddr suaddr-type=\"APCO\">"+device+"</suaddr><info-data><info-time>20130630073000</info-time><server-time>20130630073000</server-time><shape><circle-2d><lat>12.345345</lat><long>24.668866</long><radius>100</radius></circle-2d></shape><speed-hor>50</speed-hor><direction-hor>32</direction-hor></info-data><sensor-info><sensor><sensor-name>Ignition</sensor-name><sensor-value>off</sensor-value><sensor-type>Input</sensor-type></sensor><sensor><sensor-name>door</sensor-name><sensor-value>open</sensor-value><sensor-type>Input</sensor-type></sensor></sensor-info><vehicle-info><odometer>10,000</odometer></vehicle-info></Immediate-Location-Report>";
+                        string Immediate_Location_Report = "<Immediate-Location-Report><suaddr suaddr-type=\"APCO\">" + device + "</suaddr><info-data><info-time>" + now + "</info-time><server-time>" + now + "</server-time><shape><circle-2d><lat>12.345345</lat><long>24.668866</long><radius>100</radius></circle-2d></shape><speed-hor>50</speed-hor><direction-hor>32</direction-hor></info-data><sensor-info><sensor><sensor-name>Ignition</sensor-name><sensor-value>off</sensor-value><sensor-type>Input</sensor-type></sensor><sensor><sensor-name>door</sensor-name><sensor-value>open</sensor-value><sensor-type>Input</sensor-type></sensor></sensor-info><vehicle-info><odometer>10,000</odometer></vehicle-info></Immediate-Location-Report>";
                         byte[] msg1 = (data_append_dataLength(Immediate_Location_Answer));
                         byte[] msg3 = (data_append_dataLength(Immediate_Location_Report));
 
@@ -354,7 +355,7 @@ ORDER BY
                 case "Triggered-Location-Request":
                     {
                         string Triggered_Location_Answer = "<Triggered-Location-Answer><request-id>2468ACE0</request-id><suaddr suaddr-type=\"APC0\">" + device + "</suaddr><result result-code=\"0\"></result></Triggered-Location-Answer>";
-                        string Triggered_Location_Report = "<Triggered-Location-Report><suaddr suaddr-type=\"APCO\">" + device + "</suaddr><info-data><info-time>20130630073000</info-time><server-time>20130630073000</server-time><shape><circle-2d><lat>12.345345</lat><long>24.668866</long><radius>100</radius></circle-2d></shape><speed-hor>50</speed-hor><direction-hor>32</direction-hor></info-data><sensor-info><sensor><sensor-name>Ignition</sensor-name><sensor-value>off</sensor-value><sensor-type>Input</sensor-type></sensor><sensor><sensor-name>door</sensor-name><sensor-value>open</sensor-value><sensor-type>Input</sensor-type></sensor></sensor-info><vehicle-info><odometer>10,000</odometer></vehicle-info></Triggered-Location-Report>";
+                        string Triggered_Location_Report = "<Triggered-Location-Report><suaddr suaddr-type=\"APCO\">" + device + "</suaddr><info-data><info-time>" + now + "</info-time><server-time>" + now + "</server-time><shape><circle-2d><lat>12.345345</lat><long>24.668866</long><radius>100</radius></circle-2d></shape><speed-hor>50</speed-hor><direction-hor>32</direction-hor></info-data><sensor-info><sensor><sensor-name>Ignition</sensor-name><sensor-value>off</sensor-value><sensor-type>Input</sensor-type></sensor><sensor><sensor-name>door</sensor-name><sensor-value>open</sensor-value><sensor-type>Input</sensor-type></sensor></sensor-info><vehicle-info><odometer>10,000</odometer></vehicle-info></Triggered-Location-Report>";
                         byte[] msg1 = (data_append_dataLength(Triggered_Location_Answer));
                         byte[] msg3 = (data_append_dataLength(Triggered_Location_Report));
 
