@@ -180,6 +180,58 @@ Select 0-4 then press enter to send package
                 // Close the writer and underlying file.
                 w.Close();
             }
+
+            string device = string.Empty;
+            while (true)
+            {
+                SqlClient sql_client = new SqlClient(ConfigurationManager.AppSettings["SQL_SERVER_IP"], ConfigurationManager.AppSettings["SQL_SERVER_PORT"], ConfigurationManager.AppSettings["SQL_SERVER_USER_ID"], ConfigurationManager.AppSettings["SQL_SERVER_PASSWORD"], ConfigurationManager.AppSettings["SQL_SERVER_DATABASE"]);
+                sql_client.connect();
+                string sql_command = @"SELECT 
+public.epq_test_loc.device
+FROM
+  public.epq_test_loc
+ORDER BY 
+  public.epq_test_loc.id
+  Limit 1";
+                DataTable dt = sql_client.get_DataTable(sql_command);
+                sql_client.disconnect();
+                if (dt != null && dt.Rows.Count != 0)
+                {
+                    Console.WriteLine("+if");
+                    Console.WriteLine("dt:{0}", dt);
+                    Console.WriteLine("dt.Rows.Count:{0}", dt.Rows.Count);
+                    foreach (DataRow row in dt.Rows)
+                    {
+
+                        device = row[0].ToString();
+
+                    }
+                    break;
+                }
+                else
+                {
+                    Console.WriteLine("+else");
+                    sql_client.disconnect();
+                    Console.WriteLine("Refill the table with kml data...");
+                    string kml_application = "ConsoleApplication1_access_kml_files.exe";
+
+                    Process SomeProgram = new Process();
+                    SomeProgram.StartInfo.FileName = kml_application;
+                    /*
+                    SomeProgram.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
+                    SomeProgram.StartInfo.UseShellExecute = false;
+                    SomeProgram.StartInfo.RedirectStandardOutput = true;
+                    SomeProgram.StartInfo.CreateNoWindow = true;
+                    */
+                    SomeProgram.Start();
+                    SomeProgram.WaitForExit();
+                    //string SomeProgramOutput = SomeProgram.StandardOutput.ReadToEnd();
+                    Console.WriteLine("Refill the table with kml data done...");
+                    continue;
+                }
+
+            }
+
             switch (xml_root_tag)
             {
                 case "Location-Registration-Request":
@@ -200,56 +252,7 @@ Select 0-4 then press enter to send package
                         }
                         string application_id = XmlGetTagValue(xml_data, "application");
                         Console.WriteLine("application_id : {0}", application_id);
-                        string device = string.Empty;
-                        while (true)
-                        {
-                            SqlClient sql_client = new SqlClient(ConfigurationManager.AppSettings["SQL_SERVER_IP"], ConfigurationManager.AppSettings["SQL_SERVER_PORT"], ConfigurationManager.AppSettings["SQL_SERVER_USER_ID"], ConfigurationManager.AppSettings["SQL_SERVER_PASSWORD"], ConfigurationManager.AppSettings["SQL_SERVER_DATABASE"]);
-                            sql_client.connect();
-                            string  sql_command = @"SELECT 
-public.epq_test_loc.device
-FROM
-  public.epq_test_loc
-ORDER BY 
-  public.epq_test_loc.id
-  Limit 1";
-                            DataTable dt = sql_client.get_DataTable(sql_command);
-                            sql_client.disconnect();
-                            if (dt != null && dt.Rows.Count != 0)
-                            {
-                                Console.WriteLine("+if");
-                                Console.WriteLine("dt:{0}", dt);
-                                Console.WriteLine("dt.Rows.Count:{0}", dt.Rows.Count);
-                                foreach (DataRow row in dt.Rows)
-                                {
-
-                                    device = row[0].ToString();
-
-                                }
-                                break;
-                            }
-                            else
-                            {
-                                Console.WriteLine("+else");
-                                sql_client.disconnect();
-                                Console.WriteLine("Refill the table with kml data...");
-                                string kml_application = "ConsoleApplication1_access_kml_files.exe";
-
-                                Process SomeProgram = new Process();
-                                SomeProgram.StartInfo.FileName = kml_application;
-                                /*
-                                SomeProgram.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
-                                SomeProgram.StartInfo.UseShellExecute = false;
-                                SomeProgram.StartInfo.RedirectStandardOutput = true;
-                                SomeProgram.StartInfo.CreateNoWindow = true;
-                                */
-                                SomeProgram.Start();
-                                SomeProgram.WaitForExit();
-                                //string SomeProgramOutput = SomeProgram.StandardOutput.ReadToEnd();
-                                Console.WriteLine("Refill the table with kml data done...");
-                                continue;
-                            }
-                            
-                        }
+                        
 
                         string msg_send_back_LRA = "<Location-Registration-Answer><application application-id=\"" + application_id + "\"></application><result result-code=\"0\"></result></Location-Registration-Answer>";
                         string msg_send_back_ULRFP = "<Unsolicited-Location-Report><suaddr suaddr-type=\"APCO\">" + device + "</suaddr><event-info>Unit Present</event-info></Unsolicited-Location-Report>";
@@ -327,8 +330,8 @@ ORDER BY
                     break;
                 case "Immediate-Location-Request":
                     {
-                        string Immediate_Location_Answer = "<Immediate-Location-Answer><request-id></request-id><suaddr suaddr-type=\"APCO\">1004</suaddr><result result-code=\"0\"></result></Immediate-Location-Answer>";
-                        string Immediate_Location_Report = "<Immediate-Location-Report><suaddr suaddr-type=\"APCO\">1004</suaddr><info-data><info-time>20130630073000</info-time><server-time>20130630073000</server-time><shape><circle-2d><lat>12.345345</lat><long>24.668866</long><radius>100</radius></circle-2d></shape><speed-hor>50</speed-hor><direction-hor>32</direction-hor></info-data><sensor-info><sensor><sensor-name>Ignition</sensor-name><sensor-value>off</sensor-value><sensor-type>Input</sensor-type></sensor><sensor><sensor-name>door</sensor-name><sensor-value>open</sensor-value><sensor-type>Input</sensor-type></sensor></sensor-info><vehicle-info><odometer>10,000</odometer></vehicle-info></Immediate-Location-Report>";
+                        string Immediate_Location_Answer = "<Immediate-Location-Answer><request-id></request-id><suaddr suaddr-type=\"APCO\">" + device + "</suaddr><result result-code=\"0\"></result></Immediate-Location-Answer>";
+                        string Immediate_Location_Report = "<Immediate-Location-Report><suaddr suaddr-type=\"APCO\">"+device+"</suaddr><info-data><info-time>20130630073000</info-time><server-time>20130630073000</server-time><shape><circle-2d><lat>12.345345</lat><long>24.668866</long><radius>100</radius></circle-2d></shape><speed-hor>50</speed-hor><direction-hor>32</direction-hor></info-data><sensor-info><sensor><sensor-name>Ignition</sensor-name><sensor-value>off</sensor-value><sensor-type>Input</sensor-type></sensor><sensor><sensor-name>door</sensor-name><sensor-value>open</sensor-value><sensor-type>Input</sensor-type></sensor></sensor-info><vehicle-info><odometer>10,000</odometer></vehicle-info></Immediate-Location-Report>";
                         byte[] msg1 = (data_append_dataLength(Immediate_Location_Answer));
                         byte[] msg3 = (data_append_dataLength(Immediate_Location_Report));
 
@@ -350,8 +353,8 @@ ORDER BY
                     break;
                 case "Triggered-Location-Request":
                     {
-                        string Triggered_Location_Answer = "<Triggered-Location-Answer><request-id>2468ACE0</request-id><suaddr suaddr-type=\"APC0\">1004</suaddr><result result-code=\"0\"></result></Triggered-Location-Answer>";
-                        string Triggered_Location_Report = "<Triggered-Location-Report><suaddr suaddr-type=\"APCO\">1004</suaddr><info-data><info-time>20130630073000</info-time><server-time>20130630073000</server-time><shape><circle-2d><lat>12.345345</lat><long>24.668866</long><radius>100</radius></circle-2d></shape><speed-hor>50</speed-hor><direction-hor>32</direction-hor></info-data><sensor-info><sensor><sensor-name>Ignition</sensor-name><sensor-value>off</sensor-value><sensor-type>Input</sensor-type></sensor><sensor><sensor-name>door</sensor-name><sensor-value>open</sensor-value><sensor-type>Input</sensor-type></sensor></sensor-info><vehicle-info><odometer>10,000</odometer></vehicle-info></Triggered-Location-Report>";
+                        string Triggered_Location_Answer = "<Triggered-Location-Answer><request-id>2468ACE0</request-id><suaddr suaddr-type=\"APC0\">" + device + "</suaddr><result result-code=\"0\"></result></Triggered-Location-Answer>";
+                        string Triggered_Location_Report = "<Triggered-Location-Report><suaddr suaddr-type=\"APCO\">" + device + "</suaddr><info-data><info-time>20130630073000</info-time><server-time>20130630073000</server-time><shape><circle-2d><lat>12.345345</lat><long>24.668866</long><radius>100</radius></circle-2d></shape><speed-hor>50</speed-hor><direction-hor>32</direction-hor></info-data><sensor-info><sensor><sensor-name>Ignition</sensor-name><sensor-value>off</sensor-value><sensor-type>Input</sensor-type></sensor><sensor><sensor-name>door</sensor-name><sensor-value>open</sensor-value><sensor-type>Input</sensor-type></sensor></sensor-info><vehicle-info><odometer>10,000</odometer></vehicle-info></Triggered-Location-Report>";
                         byte[] msg1 = (data_append_dataLength(Triggered_Location_Answer));
                         byte[] msg3 = (data_append_dataLength(Triggered_Location_Report));
 
@@ -373,7 +376,7 @@ ORDER BY
                     break;
                 case "Digital-Output-Change-Request":
                     {
-                        string Digital_Output_Answer = "<Digital-Output-Answer><request-id>2468ACE0</request-id><suaddr suaddr-type=\"APCO\">1004</suaddr><result result-code=\"0\"></result></Digital-Output-Answer>";
+                        string Digital_Output_Answer = "<Digital-Output-Answer><request-id>2468ACE0</request-id><suaddr suaddr-type=\"APCO\">" + device + "</suaddr><result result-code=\"0\"></result></Digital-Output-Answer>";
                         byte[] msg1 = (data_append_dataLength(Digital_Output_Answer));
 
                         handler.Send(msg1);
@@ -401,7 +404,7 @@ ORDER BY
                     break;
                 case "Triggered-Location-Stop-Request":
                     {
-                        string Triggered_Location_Stop_Answer = "<Triggered-Location-Stop-Answer><request-id>2468ACE0</request-id><suaddr suaddr-type=\"APCO\">1004</suaddr><result result-code=\"0\"></result></Triggered-Location-Stop-Answer>";
+                        string Triggered_Location_Stop_Answer = "<Triggered-Location-Stop-Answer><request-id>2468ACE0</request-id><suaddr suaddr-type=\"APCO\">" + device + "</suaddr><result result-code=\"0\"></result></Triggered-Location-Stop-Answer>";
                         byte[] msg1 = (data_append_dataLength(Triggered_Location_Stop_Answer));
 
                         handler.Send(msg1);
