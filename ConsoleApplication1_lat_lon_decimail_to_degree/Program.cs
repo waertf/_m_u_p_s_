@@ -9,9 +9,9 @@ namespace ConsoleApplication1_lat_lon_decimail_to_degree
     {
         static void Main(string[] args)
         {
-            Console.WriteLine(decimal_to_degree(25.227));
-            Console.WriteLine(GeoAngle.FromDouble(25.227).ToString("NS"));
-            GeoAngle result = GeoAngle.FromDouble(25.227);
+            Console.WriteLine(decimal_to_degree(25.139458));
+            Console.WriteLine(GeoAngle.FromDouble(25.139458).ToString("NS"));
+            GeoAngle result = GeoAngle.FromDouble(25.139458);
             Console.WriteLine("{0}.{1}.{2}.{3}", result.Degrees, result.Minutes, result.Seconds, result.Milliseconds);
             Console.ReadLine();
         }
