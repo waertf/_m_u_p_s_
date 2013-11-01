@@ -220,7 +220,7 @@ Select 0-4 then press enter to send package
                             // Close the writer and underlying file.
                             w.Close();
                         }
-                        if (!bool.Parse(ConfigurationManager.AppSettings["auto_send"]))
+                        if (!bool.Parse(ConfigurationManager.AppSettings["auto_send"]) || true)
                         {
                             Thread send_test_thread = new Thread(() => manual_send(handler));
                             send_test_thread.Start();
