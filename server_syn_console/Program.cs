@@ -223,7 +223,7 @@ Select 0-4 then press enter to send package
                         if (!bool.Parse(ConfigurationManager.AppSettings["auto_send"]))
                         {
                             Thread send_test_thread = new Thread(() => manual_send(handler));
-                            //send_test_thread.Start();
+                            send_test_thread.Start();
                         }
                         else
                         {
