@@ -913,8 +913,8 @@ Select 1-6 then press enter to send package
                 }
                 if (htable.ContainsKey("lat_value") && htable.ContainsKey("long_value"))
                 {
-                    GeoAngle lat_value = GeoAngle.FromDouble(Convert.ToDouble(htable["lat_value"]));
-                    GeoAngle long_value = GeoAngle.FromDouble(Convert.ToDouble(htable["long_value"]));
+                    GeoAngle lat_value = GeoAngle.FromDouble(Convert.ToDecimal(htable["lat_value"]));
+                    GeoAngle long_value = GeoAngle.FromDouble(Convert.ToDecimal(htable["long_value"]));
                     string lat_str = lat_value.Degrees.ToString() + lat_value.Minutes.ToString("D2") + "." + lat_value.Seconds.ToString("D2") + lat_value.Milliseconds.ToString("D3");
                     string long_str = long_value.Degrees.ToString() + long_value.Minutes.ToString("D2") + "." + long_value.Seconds.ToString("D2") + long_value.Milliseconds.ToString("D3");
                     //avls_package.Loc = "N" + (Convert.ToDouble(htable["lat_value"])*100).ToString() + "E" + (Convert.ToDouble(htable["long_value"])*100).ToString()+ ",";
@@ -1605,14 +1605,14 @@ Select 1-6 then press enter to send package
 
 
 
-        public static GeoAngle FromDouble(double angleInDegrees)
+        public static GeoAngle FromDouble(decimal angleInDegrees)
         {
             //ensure the value will fall within the primary range [-180.0..+180.0]
-            while (angleInDegrees < -180.0)
-                angleInDegrees += 360.0;
+            while (angleInDegrees < -180.0m)
+                angleInDegrees += 360.0m;
 
-            while (angleInDegrees > 180.0)
-                angleInDegrees -= 360.0;
+            while (angleInDegrees > 180.0m)
+                angleInDegrees -= 360.0m;
 
             var result = new GeoAngle();
 
@@ -1625,13 +1625,13 @@ Select 1-6 then press enter to send package
             var delta = angleInDegrees - result.Degrees;
 
             //gets minutes and seconds
-            var seconds = (int)Math.Floor(3600.0 * delta);
+            var seconds = (int)Math.Floor(3600.0m * delta);
             result.Seconds = seconds % 60;
             result.Minutes = (int)Math.Floor(seconds / 60.0);
-            delta = delta * 3600.0 - seconds;
+            delta = delta * 3600.0m - seconds;
 
             //gets fractions
-            result.Milliseconds = (int)(1000.0 * delta);
+            result.Milliseconds = (int)(1000.0m * delta);
 
             return result;
         }
