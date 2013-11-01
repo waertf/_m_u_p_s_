@@ -1126,7 +1126,8 @@ Select 1-6 then press enter to send package
                 gps_log._altitude = "0";
             if (htable.ContainsKey("speed-hor"))
             {
-                gps_log._speed = htable["speed-hor"].ToString();
+                //gps_log._speed = htable["speed-hor"].ToString();
+                gps_log._speed=Convert.ToInt32((double.Parse(htable["speed-hor"].ToString()) * 1.609344)).ToString();
             }
             else
                 gps_log._speed = "0";
