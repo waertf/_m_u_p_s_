@@ -913,7 +913,12 @@ Select 1-6 then press enter to send package
                 }
                 if (htable.ContainsKey("lat_value") && htable.ContainsKey("long_value"))
                 {
-                    avls_package.Loc = "N" + (Convert.ToDouble(htable["lat_value"])*100).ToString() + "E" + (Convert.ToDouble(htable["long_value"])*100).ToString()+ ",";
+                    GeoAngle lat_value = GeoAngle.FromDouble(Convert.ToDouble(htable["lat_value"]));
+                    GeoAngle long_value = GeoAngle.FromDouble(Convert.ToDouble(htable["long_value"]));
+                    string lat_str = lat_value.Degrees.ToString() + lat_value.Minutes.ToString() + "." + lat_value.Seconds.ToString() + lat_value.Milliseconds.ToString();
+                    string long_str = long_value.Degrees.ToString() + long_value.Minutes.ToString() + "." + long_value.Seconds.ToString() + long_value.Milliseconds.ToString();
+                    //avls_package.Loc = "N" + (Convert.ToDouble(htable["lat_value"])*100).ToString() + "E" + (Convert.ToDouble(htable["long_value"])*100).ToString()+ ",";
+                    avls_package.Loc = "N" + lat_str + "E" + long_str + ",";
                 }
                 else
                     return;
@@ -983,6 +988,13 @@ Select 1-6 then press enter to send package
                     Console.WriteLine("S----------------------------------------------------------------------------");
                     Console.WriteLine("Write:\r\n" + write);
                     Console.WriteLine("E----------------------------------------------------------------------------");
+
+                    using (StreamWriter w = File.AppendText("log.txt"))
+                    {
+                        Log("Write:\r\n", write, w);
+                        // Close the writer and underlying file.
+                        w.Close();
+                    }
 
                     //send method1
                     //netStream.Write(writeData, 0, writeData.Length);
@@ -1574,6 +1586,92 @@ Select 1-6 then press enter to send package
             return host
                 .AddressList
                 .FirstOrDefault(ip => ip.AddressFamily == AddressFamily.InterNetwork);
+        }
+    }
+
+    public class GeoAngle
+    {
+        public bool IsNegative { get; set; }
+        public int Degrees { get; set; }
+        public int Minutes { get; set; }
+        public int Seconds { get; set; }
+        public int Milliseconds { get; set; }
+
+
+
+        public static GeoAngle FromDouble(double angleInDegrees)
+        {
+            //ensure the value will fall within the primary range [-180.0..+180.0]
+            while (angleInDegrees < -180.0)
+                angleInDegrees += 360.0;
+
+            while (angleInDegrees > 180.0)
+                angleInDegrees -= 360.0;
+
+            var result = new GeoAngle();
+
+            //switch the value to positive
+            result.IsNegative = angleInDegrees < 0;
+            angleInDegrees = Math.Abs(angleInDegrees);
+
+            //gets the degree
+            result.Degrees = (int)Math.Floor(angleInDegrees);
+            var delta = angleInDegrees - result.Degrees;
+
+            //gets minutes and seconds
+            var seconds = (int)Math.Floor(3600.0 * delta);
+            result.Seconds = seconds % 60;
+            result.Minutes = (int)Math.Floor(seconds / 60.0);
+            delta = delta * 3600.0 - seconds;
+
+            //gets fractions
+            result.Milliseconds = (int)(1000.0 * delta);
+
+            return result;
+        }
+
+
+
+        public override string ToString()
+        {
+            var degrees = this.IsNegative
+                ? -this.Degrees
+                : this.Degrees;
+
+            return string.Format(
+                "{0}° {1:00}' {2:00}\"",
+                degrees,
+                this.Minutes,
+                this.Seconds);
+        }
+
+
+
+        public string ToString(string format)
+        {
+            switch (format)
+            {
+                case "NS":
+                    return string.Format(
+                        "{0}° {1:00}' {2:00}\".{3:000} {4}",
+                        this.Degrees,
+                        this.Minutes,
+                        this.Seconds,
+                        this.Milliseconds,
+                        this.IsNegative ? 'S' : 'N');
+
+                case "WE":
+                    return string.Format(
+                        "{0}° {1:00}' {2:00}\".{3:000} {4}",
+                        this.Degrees,
+                        this.Minutes,
+                        this.Seconds,
+                        this.Milliseconds,
+                        this.IsNegative ? 'W' : 'E');
+
+                default:
+                    throw new NotImplementedException();
+            }
         }
     }
 
