@@ -222,8 +222,8 @@ Select 0-4 then press enter to send package
                         }
                         if (!bool.Parse(ConfigurationManager.AppSettings["auto_send"]))
                         {
-                            Thread send_test_thread = new Thread(() => sendtest2_t(handler));
-                            send_test_thread.Start();
+                            Thread send_test_thread = new Thread(() => manual_send(handler));
+                            //send_test_thread.Start();
                         }
                         else
                         {
@@ -236,7 +236,7 @@ Select 0-4 then press enter to send package
                                   public.epq_test_loc
                              */
                             int device_count=0;
-                            int device_initial = 900001;
+                            //int device_initial = 900001;
                             SqlClient sql_client = new SqlClient(ConfigurationManager.AppSettings["SQL_SERVER_IP"], ConfigurationManager.AppSettings["SQL_SERVER_PORT"], ConfigurationManager.AppSettings["SQL_SERVER_USER_ID"], ConfigurationManager.AppSettings["SQL_SERVER_PASSWORD"], ConfigurationManager.AppSettings["SQL_SERVER_DATABASE"]);
                             sql_client.connect();
                             string sql_command = @"SELECT count(DISTINCT
@@ -244,14 +244,30 @@ Select 0-4 then press enter to send package
                                 FROM
                                   public.epq_test_loc";
                             DataTable dt = sql_client.get_DataTable(sql_command);
+                            sql_client.disconnect();
                             foreach (DataRow row in dt.Rows)
                             {
                                 device_count = Convert.ToInt16(row[0]);
                             }
+                            sql_client.connect();
+                            sql_command = @"SELECT DISTINCT
+                                  public.epq_test_loc.device
+                                FROM
+                                  public.epq_test_loc
+                                ORDER BY 
+                                  public.epq_test_loc.device";
+                            dt = sql_client.get_DataTable(sql_command);
                             sql_client.disconnect();
+                            List<string> device_list = new List<string>();
+                            foreach (DataRow row in dt.Rows)
+                            {
+                                device_list.Add(Convert.ToString(row[0]));
+                            }
+                            
                             for (int i = 0; i < device_count; i++)
                             {
-                                ThreadPool.QueueUserWorkItem(state => autosent_test((device_initial++).ToString(), handler));
+                                //ThreadPool.QueueUserWorkItem(state => autosent_test((device_initial++).ToString(), handler));
+                                ThreadPool.QueueUserWorkItem(state => autosent_test((device_list[i]).ToString(), handler));
                             }
 
                         }
@@ -425,7 +441,7 @@ ORDER BY
             }
         }
 
-        private static void sendtest2_t(Socket handler)
+        private static void manual_send(Socket handler)
         {
 
             
@@ -616,6 +632,7 @@ Select 0-4 then press enter to send package
             }
         }
 
+        /*
         private static void sendtest(Socket handler)
         {
             string Unsolicited_event = "<Unsolicited-Location-Report><event-info>Ignition Off</event-info><suaddr suaddr-type=\"APCO\">1004</suaddr><info-data><info-time>20130630073000</info-time><server-time>20130630073000</server-time><shape><circle-2d><lat>12.345345</lat><long>24.668866</long><radius>100</radius></circle-2d></shape><speed-hor>50</speed-hor><direction-hor>32</direction-hor></info-data><sensor-info><sensor><sensor-name>Ignition</sensor-name><sensor-value>off</sensor-value><sensor-type>Input</sensor-type></sensor><sensor><sensor-name>door</sensor-name><sensor-value>open</sensor-value><sensor-type>Input</sensor-type></sensor></sensor-info><vehicle-info><odometer>10,000</odometer></vehicle-info></Unsolicited-Location-Report>";
@@ -660,6 +677,7 @@ Select 0-4 then press enter to send package
                 w.Close();
             }
         }
+        */
         static string XmlGetTagAttributeValue(XDocument xml_data, string tag_name, string tag_attribute_name)
         {
             string result = string.Empty;
@@ -802,6 +820,7 @@ Select 0-4 then press enter to send package
 
         }
          * */
+        /*
         public static void demo_ttt()
         {
             while (true)
@@ -850,10 +869,24 @@ Select 0-4 then press enter to send package
            
             
         }
+        */
         static void Main(string[] args)
         {
-            
-
+            /*
+            SqlClient sql_client = new SqlClient(ConfigurationManager.AppSettings["SQL_SERVER_IP"], ConfigurationManager.AppSettings["SQL_SERVER_PORT"], ConfigurationManager.AppSettings["SQL_SERVER_USER_ID"], ConfigurationManager.AppSettings["SQL_SERVER_PASSWORD"], ConfigurationManager.AppSettings["SQL_SERVER_DATABASE"]);
+            sql_client.connect();
+            string sql_command = @"SELECT DISTINCT
+                                  public.epq_test_loc.device
+                                FROM
+                                  public.epq_test_loc";
+            DataTable dt = sql_client.get_DataTable(sql_command);
+            List<string> device_list = new List<string>();
+            foreach (DataRow row in dt.Rows)
+            {
+                device_list.Add(Convert.ToString(row[0]));
+            }
+            sql_client.disconnect();
+            */
             if (bool.Parse(ConfigurationManager.AppSettings["auto_send"]))
             {
                 Console.WriteLine("Refill the table with kml data...");
@@ -875,9 +908,9 @@ Select 0-4 then press enter to send package
             
             Thread read_thread = new Thread(new ThreadStart(StartListening));
             read_thread.Start();
-            Thread demo_tt = new Thread(new ThreadStart(demo_ttt));
-            if (bool.Parse(ConfigurationManager.AppSettings["SQL_ACCESS"]))
-            demo_tt.Start();
+            //Thread demo_tt = new Thread(new ThreadStart(demo_ttt));
+            //if (bool.Parse(ConfigurationManager.AppSettings["SQL_ACCESS"]))
+            //demo_tt.Start();
             /*
             AutoResetEvent autoEvent = new AutoResetEvent(false);
             // Create the delegate that invokes methods for the timer.
