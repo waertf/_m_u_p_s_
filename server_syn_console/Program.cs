@@ -200,8 +200,59 @@ Select 0-4 then press enter to send package
                         }
                         string application_id = XmlGetTagValue(xml_data, "application");
                         Console.WriteLine("application_id : {0}", application_id);
+                        string device = string.Empty;
+                        while (true)
+                        {
+                            SqlClient sql_client = new SqlClient(ConfigurationManager.AppSettings["SQL_SERVER_IP"], ConfigurationManager.AppSettings["SQL_SERVER_PORT"], ConfigurationManager.AppSettings["SQL_SERVER_USER_ID"], ConfigurationManager.AppSettings["SQL_SERVER_PASSWORD"], ConfigurationManager.AppSettings["SQL_SERVER_DATABASE"]);
+                            sql_client.connect();
+                            string  sql_command = @"SELECT 
+public.epq_test_loc.device
+FROM
+  public.epq_test_loc
+ORDER BY 
+  public.epq_test_loc.id
+  Limit 1";
+                            DataTable dt = sql_client.get_DataTable(sql_command);
+                            sql_client.disconnect();
+                            if (dt != null && dt.Rows.Count != 0)
+                            {
+                                Console.WriteLine("+if");
+                                Console.WriteLine("dt:{0}", dt);
+                                Console.WriteLine("dt.Rows.Count:{0}", dt.Rows.Count);
+                                foreach (DataRow row in dt.Rows)
+                                {
+
+                                    device = row[0].ToString();
+
+                                }
+                                break;
+                            }
+                            else
+                            {
+                                Console.WriteLine("+else");
+                                sql_client.disconnect();
+                                Console.WriteLine("Refill the table with kml data...");
+                                string kml_application = "ConsoleApplication1_access_kml_files.exe";
+
+                                Process SomeProgram = new Process();
+                                SomeProgram.StartInfo.FileName = kml_application;
+                                /*
+                                SomeProgram.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
+                                SomeProgram.StartInfo.UseShellExecute = false;
+                                SomeProgram.StartInfo.RedirectStandardOutput = true;
+                                SomeProgram.StartInfo.CreateNoWindow = true;
+                                */
+                                SomeProgram.Start();
+                                SomeProgram.WaitForExit();
+                                //string SomeProgramOutput = SomeProgram.StandardOutput.ReadToEnd();
+                                Console.WriteLine("Refill the table with kml data done...");
+                                continue;
+                            }
+                            
+                        }
+
                         string msg_send_back_LRA = "<Location-Registration-Answer><application application-id=\"" + application_id + "\"></application><result result-code=\"0\"></result></Location-Registration-Answer>";
-                        string msg_send_back_ULRFP = "<Unsolicited-Location-Report><suaddr suaddr-type=\"APCO\">1004</suaddr><event-info>Unit Present</event-info></Unsolicited-Location-Report>";
+                        string msg_send_back_ULRFP = "<Unsolicited-Location-Report><suaddr suaddr-type=\"APCO\">" + device + "</suaddr><event-info>Unit Present</event-info></Unsolicited-Location-Report>";
 
                         byte[] msg1 = (data_append_dataLength(msg_send_back_LRA));
                         byte[] msg3 = (data_append_dataLength(msg_send_back_ULRFP));
@@ -448,6 +499,22 @@ ORDER BY
 
             while (true)
             {
+                Console.WriteLine(
+                    @"
+Select 0-4 then press enter to send package
+0.Triggered-Location-Report Message
+1.Unsolicited-Location-Report Event Message
+2.Unsolicited-Location-Report Emergency Message
+3.Unsolicited-Location-Report Presence Event Message
+4.Triggered-Location-Report with Invalid GPS Location Message
+");
+                ///TODO:auto send from fixed interval time
+                ///900001->10sec interval
+                ///900005->50sec interval
+                Console.Write("Select[0-4]:");
+                string select_num = string.Empty;
+                select_num = Console.ReadLine();
+
                 SqlClient sql_client = new SqlClient(ConfigurationManager.AppSettings["SQL_SERVER_IP"], ConfigurationManager.AppSettings["SQL_SERVER_PORT"], ConfigurationManager.AppSettings["SQL_SERVER_USER_ID"], ConfigurationManager.AppSettings["SQL_SERVER_PASSWORD"], ConfigurationManager.AppSettings["SQL_SERVER_DATABASE"]);
                 sql_client.connect();
                 string lat = string.Empty,lon = string.Empty,id = string.Empty,device=string.Empty,sql_command = @"SELECT 
@@ -514,7 +581,7 @@ ORDER BY
                 byte[] msg3 = (data_append_dataLength(Unsolicited_pres));
                 byte[] msg4 = (data_append_dataLength(Triggered_loc));
                 byte[] msg5 = (data_append_dataLength(Triggered_loc_invalid_gps));
-
+                /*
                 Console.WriteLine(
                     @"
 Select 0-4 then press enter to send package
@@ -530,6 +597,7 @@ Select 0-4 then press enter to send package
                 Console.Write("Select[0-4]:");
                 string select_num=string.Empty;
                 select_num = Console.ReadLine();
+                */
                 
                 if (select_num == "3" || select_num == "4")
                 {

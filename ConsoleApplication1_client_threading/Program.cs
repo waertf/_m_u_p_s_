@@ -915,8 +915,8 @@ Select 1-6 then press enter to send package
                 {
                     GeoAngle lat_value = GeoAngle.FromDouble(Convert.ToDouble(htable["lat_value"]));
                     GeoAngle long_value = GeoAngle.FromDouble(Convert.ToDouble(htable["long_value"]));
-                    string lat_str = lat_value.Degrees.ToString() + lat_value.Minutes.ToString() + "." + lat_value.Seconds.ToString() + lat_value.Milliseconds.ToString();
-                    string long_str = long_value.Degrees.ToString() + long_value.Minutes.ToString() + "." + long_value.Seconds.ToString() + long_value.Milliseconds.ToString();
+                    string lat_str = lat_value.Degrees.ToString("D3") + lat_value.Minutes.ToString("D2") + "." + lat_value.Seconds.ToString("D2") + lat_value.Milliseconds.ToString();
+                    string long_str = long_value.Degrees.ToString("D3") + long_value.Minutes.ToString("D2") + "." + long_value.Seconds.ToString("D2") + long_value.Milliseconds.ToString();
                     //avls_package.Loc = "N" + (Convert.ToDouble(htable["lat_value"])*100).ToString() + "E" + (Convert.ToDouble(htable["long_value"])*100).ToString()+ ",";
                     avls_package.Loc = "N" + lat_str + "E" + long_str + ",";
                 }
