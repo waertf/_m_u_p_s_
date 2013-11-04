@@ -46,7 +46,9 @@ namespace ConsoleApplication1_client_threading
             }
             catch (PgSqlException ex)
             {
+                Console.ForegroundColor = ConsoleColor.Red;
                 Console.WriteLine("Exception occurs: {0}", ex.Error);
+                Console.ResetColor();
                 return false;
             }
         }
@@ -67,7 +69,9 @@ namespace ConsoleApplication1_client_threading
             }
             catch (PgSqlException ex)
             {
+                Console.ForegroundColor = ConsoleColor.Red;
                 Console.WriteLine("Exception occurs: {0}", ex.Error);
+                Console.ResetColor();
                 return false;
             }
         }
@@ -105,7 +109,9 @@ namespace ConsoleApplication1_client_threading
             }
             catch (PgSqlException ex)
             {
+                Console.ForegroundColor = ConsoleColor.Red;
                 Console.WriteLine("Exception occurs: {0}", ex.Error);
+                Console.ResetColor();
                 return false;
             }
 
@@ -170,7 +176,9 @@ namespace ConsoleApplication1_client_threading
             }
             catch (PgSqlException ex)
             {
+                Console.ForegroundColor = ConsoleColor.Red;
                 Console.WriteLine("Exception occurs: {0}", ex.Error);
+                Console.ResetColor();
                 return null;
             }
         }

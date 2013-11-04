@@ -1083,9 +1083,11 @@ Select 1-6 then press enter to send package
             }
             if (htable.ContainsKey("result_code"))
             {
-                gps_log._option2 = "\'"+htable["result_code"].ToString()+"\'";
+                gps_log._option2 = "\'" + htable["result_code"].ToString() + "\'";
                 gps_log._option3 = "\'" + ConfigurationManager.AppSettings["RESULT_CODE_" + htable["result_code"].ToString()] + "\'";
             }
+            else
+                gps_log._option2 = gps_log._option3 = "\'" + "null" + "\'";
             //if (htable.ContainsKey("result_msg"))
             //{
             //    gps_log._option3 = "\'"+htable["result_msg"].ToString()+"\'";
@@ -1114,9 +1116,14 @@ Select 1-6 then press enter to send package
                         gps_log.j_6 = "\'" + "null" + "\'";
                         gps_log.j_7 = "\'" + "null" + "\'";
                         break;
+                    default:
+                        gps_log.j_6 = gps_log.j_7 = gps_log.j_8 = "\'" + "null" + "\'";
+                        break;
 
                 }
             }
+            else
+                gps_log.j_6 = gps_log.j_7 = gps_log.j_8 = "\'" + "null" + "\'";
             if (htable.ContainsKey("lat_value"))
             {
                 gps_log._lat = htable["lat_value"].ToString();
@@ -1313,6 +1320,53 @@ Select 1-6 then press enter to send package
                                     }
                                 }
                                
+                        }
+                        break;
+                        case "Immediate-Location-Report":
+                        {
+                            if (elements.Contains(new XElement("operation-error").Name))
+                            {
+                                table_columns = "_id,_uid,_option2,_option3,_or_lon,_or_lat,_satellites,_temperature,_voltage";
+                            table_column_value = gps_log._id + "," + gps_log._uid + "," + gps_log._option2 + "," + gps_log._option3+","+
+                                gps_log._or_lon + "," + gps_log._or_lat + "," + gps_log._satellites + "," +
+                                           gps_log._temperature + "," + gps_log._voltage;
+                            cmd = "INSERT INTO public._gps_log ("+table_columns+") VALUES (" + table_column_value  + ")";
+                           
+                            }
+                            else
+                            {
+                                if (elements.Contains(new XElement("vehicle-info").Name))
+                                {
+                                    gps_log._status = ((int)device_status.EM).ToString();
+                                    gps_log._validity = "\'Y\'";
+                                    table_columns = "_id,_uid,_status,_time,_validity,_lat,_lon,_speed,_course,_distance,j_5,_option0,_option1," +
+                                                    "_or_lon,_or_lat,_satellites,_temperature,_voltage,_option3,j_6,j_7";
+                                    table_column_value = gps_log._id + "," + gps_log._uid + "," + gps_log._status + "," + gps_log._time +
+                                               "," + gps_log._validity + "," + gps_log._lat + "," + gps_log._lon + "," + gps_log._speed +
+                                               "," + gps_log._course + "," + gps_log._distance + "," + gps_log.j_5 + "," + gps_log._option0 +
+                                               "," + gps_log._option1 + "," +
+                                               gps_log._or_lon + "," + gps_log._or_lat + "," + gps_log._satellites + "," +
+                                               gps_log._temperature + "," + gps_log._voltage + "," + gps_log._option3 + "," + gps_log.j_6 + "," + gps_log.j_7;
+                                    //table_column_value = @"'1','1','1','20130808 13:13:13.133 PST','Y',0,0,0,0,0,'0','0','0',0,0,0,0,0";
+                                    cmd = "INSERT INTO public._gps_log (" + table_columns + ") VALUES  (" + table_column_value + ")";
+                                }
+                                else
+                                {
+                                    gps_log._status = ((int)device_status.EM).ToString();
+                                    gps_log._validity = "\'Y\'";
+                                    table_columns = "_id,_uid,_status,_time,_validity,_lat,_lon,_speed,_course,j_5,_option0,_option1," +
+                                                    "_or_lon,_or_lat,_satellites,_temperature,_voltage,_option3,j_6,j_7";
+                                    table_column_value = gps_log._id + "," + gps_log._uid + "," + gps_log._status + "," + gps_log._time +
+                                               "," + gps_log._validity + "," + gps_log._lat + "," + gps_log._lon + "," + gps_log._speed +
+                                               "," + gps_log._course + "," + gps_log.j_5 + "," + gps_log._option0 +
+                                               "," + gps_log._option1 + "," +
+                                               gps_log._or_lon + "," + gps_log._or_lat + "," + gps_log._satellites + "," +
+                                               gps_log._temperature + "," + gps_log._voltage + "," + gps_log._option3 + "," + gps_log.j_6 + "," + gps_log.j_7;
+                                    //table_column_value = @"'1','1','1','20130808 13:13:13.133 PST','Y',0,0,0,0,0,'0','0','0',0,0,0,0,0";
+                                    cmd = "INSERT INTO public._gps_log (" + table_columns + ") VALUES  (" + table_column_value + ")";
+                                    
+                                }
+                            }
                         }
                         break;
                         case "Location-Registration-Answer":
