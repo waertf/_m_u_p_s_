@@ -125,13 +125,30 @@ each set of the byte. To display a four-byte string, there will be 8 digits stri
             WriteLine(netStream, data_append_dataLength(registration_msg_error_test), registration_msg_error_test);
             using (StreamWriter w = File.AppendText("log.txt"))
             {
-                Log("send:\r\n" , registration_msg_error_test, w);
+                Log("send:\r\n", registration_msg_error_test, w);
                 // Close the writer and underlying file.
                 w.Close();
             }
-            
+            {//access sql
+                string now = string.Format("{0:yyyyMMdd}", DateTime.Now);
+                sql_client.connect();
+                string manual_id_serial_command = sql_client.get_DataTable("SELECT COUNT(_id)   FROM public.operation_log").Rows[0].ItemArray[0].ToString();
+                sql_client.disconnect();
+                MANUAL_SQL_DATA operation_log = new MANUAL_SQL_DATA();
+                operation_log._id = "\'" + "operation" + "_" + now + "_" + manual_id_serial_command + "\'";
+                operation_log.event_id = @"'null'";
+                operation_log.application_id = "\'" + ConfigurationManager.AppSettings["application_ID"] + "\'";
+                operation_log.create_user = @"'System'";
+                string table_columns, table_column_value,cmd;
+                table_column_value = operation_log._id + "," + operation_log.event_id + "," + operation_log.application_id + "," + operation_log.create_user;
+                table_columns = "_id,event_id,application_id,create_user";
+                cmd = "INSERT INTO public.operation_log (" + table_columns + ") VALUES  (" + table_column_value + ")";
+                sql_client.connect();
+                sql_client.modify(cmd);
+                sql_client.disconnect();
+            }
             //sendtest(netStream);
-            
+
             //alonso
             Thread read_thread = new Thread(() => read_thread_method(tcpClient, netStream, sql_client));
             read_thread.Start();
@@ -143,10 +160,10 @@ each set of the byte. To display a four-byte string, there will be 8 digits stri
             //output = ReadLine(tcpClient, netStream, output);
             //WriteLine(netStream, String.Join("\n", commands) + "\n");
 
-            
+
             //tcpClient.Close();
         }
-
+        /*
         private static void sendtest(NetworkStream netStream , SqlClient sql_client)
         {
             string Immediate_Location_Request = "<Immediate-Location-Request><request-id>2468ACE0</request-id><suaddr suaddr-type=\"APCO\">1004</suaddr></Immediate-Location-Request>";
@@ -211,6 +228,7 @@ each set of the byte. To display a four-byte string, there will be 8 digits stri
                 w.Close();
             }
         }
+         * */
         private static void sendtest2_t(NetworkStream netStream, SqlClient sql_client)
         {
             while (true)
@@ -1020,7 +1038,7 @@ Select 1-6 then press enter to send package
 
             }
         }
-        public struct SQL_DATA
+        public struct AUTO_SQL_DATA
         {
             
             public string _id;
@@ -1051,6 +1069,31 @@ Select 1-6 then press enter to send package
             public string _option3;//result_msg , event-info
 
         }
+        struct MANUAL_SQL_DATA
+        {
+            public string _id;
+            public string event_id;
+            public string application_id;
+            public string request_id;
+            public string result_code;
+            public string result_msg;
+            public string eqp_id;
+            public string eqp_lat;
+            public string eqp_lon;
+            public string eqp_speed;
+            public string eqp_course;
+            public string eqp_distance;
+            public string option1;
+            public string option2;
+            public string option3;
+            public string option4;
+            public string option5;
+            public string option6;
+            public string option7;
+            public string option8;
+            public string note;
+            public string create_user;
+        }
         enum device_status
         {
             MV,TK,EM,PE,UL
@@ -1058,36 +1101,54 @@ Select 1-6 then press enter to send package
         private static void access_sql_server(SqlClient sql_client, string xml_root_tag, Hashtable htable, List<string> sensor_name, List<string> sensor_type, List<string> sensor_value, IEnumerable<XName> elements,string log1)
         {
             DateTime dt = DateTime.Now;
-            SQL_DATA gps_log = new SQL_DATA();
+            AUTO_SQL_DATA gps_log = new AUTO_SQL_DATA();
+            MANUAL_SQL_DATA operation_log = new MANUAL_SQL_DATA();
             gps_log._or_lat = gps_log._or_lon = gps_log._satellites = gps_log._temperature = gps_log._voltage = "0";
             string now = string.Format("{0:yyyyMMdd}", dt);
             gps_log._time = "\'"+string.Format("{0:yyyyMMdd hh:mm:ss.fff}", dt)+"+08"+"\'";
 
             sql_client.connect();
-            string id_serial_command = sql_client.get_DataTable("SELECT COUNT(_uid)   FROM public._gps_log").Rows[0].ItemArray[0].ToString();
+            string auto_id_serial_command = sql_client.get_DataTable("SELECT COUNT(_uid)   FROM public._gps_log").Rows[0].ItemArray[0].ToString();
             sql_client.disconnect();
 
+            sql_client.connect();
+            string manual_id_serial_command = sql_client.get_DataTable("SELECT COUNT(_id)   FROM public.operation_log").Rows[0].ItemArray[0].ToString();
+            sql_client.disconnect();
+
+            sql_client.connect();
+            int id_count = int.Parse(sql_client.get_DataTable("SELECT COUNT(uid)   FROM custom.cga_event_log").Rows[0].ItemArray[0].ToString());
+            sql_client.disconnect();
+
+            operation_log.request_id = "\'" + ConfigurationManager.AppSettings["request-id"].ToString() + "\'";
+            if (htable.ContainsKey("protocol_version"))
+            {
+                operation_log.option3 = "\'" + htable["protocol_version"].ToString() + "\'";
+            }
             if (htable.ContainsKey("app_id"))
             {
- 
+                operation_log.application_id = "\'" + htable["app_id"].ToString() + "\'";
             }
+            else
+                operation_log.application_id = "\'" + "null" + "\'";
             if (htable.ContainsKey("suaddr"))
             {
-                gps_log._uid = "\'" + htable["suaddr"].ToString() + "\'";
-                gps_log._id = "\'" + htable["suaddr"].ToString() + "_" + now + "_" + id_serial_command + "\'";
+                gps_log._uid = operation_log.eqp_id= "\'" + htable["suaddr"].ToString() + "\'";
+                gps_log._id = "\'" + htable["suaddr"].ToString() + "_" + now + "_" + auto_id_serial_command + "\'";
+                operation_log._id = "\'" + "operation" + "_" + now + "_" + manual_id_serial_command + "\'";
             }
             else
             {
-                gps_log._uid = "\'" + "null" + "\'";
-                gps_log._id = "\'" + Convert.ToBase64String(System.Guid.NewGuid().ToByteArray())  + "_" + id_serial_command + "\'";
+                gps_log._uid =operation_log.eqp_id= "\'" + "null" + "\'";
+                gps_log._id = "\'" + Convert.ToBase64String(System.Guid.NewGuid().ToByteArray())  + "_" + auto_id_serial_command + "\'";
+                operation_log._id = "\'" + Convert.ToBase64String(System.Guid.NewGuid().ToByteArray()) + "_" + manual_id_serial_command + "\'";
             }
             if (htable.ContainsKey("result_code"))
             {
-                gps_log._option2 = "\'" + htable["result_code"].ToString() + "\'";
-                gps_log._option3 = "\'" + ConfigurationManager.AppSettings["RESULT_CODE_" + htable["result_code"].ToString()] + "\'";
+                gps_log._option2 =operation_log.result_code= "\'" + htable["result_code"].ToString() + "\'";
+                gps_log._option3 = operation_log.result_msg ="\'" + ConfigurationManager.AppSettings["RESULT_CODE_" + htable["result_code"].ToString()] + "\'";
             }
             else
-                gps_log._option2 = gps_log._option3 = "\'" + "null" + "\'";
+                gps_log._option2 = gps_log._option3 = operation_log.result_code=operation_log.result_msg= "\'" + "null" + "\'";
             //if (htable.ContainsKey("result_msg"))
             //{
             //    gps_log._option3 = "\'"+htable["result_msg"].ToString()+"\'";
@@ -1103,39 +1164,42 @@ Select 1-6 then press enter to send package
                         gps_log.j_6 = "\'" + htable["event_info"].ToString() + "\'";
                         gps_log.j_7 = "\'" + "null" + "\'";
                         gps_log.j_8 = "\'" + "null" + "\'";
+                        operation_log.event_id = "\'" + operation_log.eqp_id + now + id_count.ToString("D12") + "\'";
                         break;
                     case "Unit Present":
                     case "Unit Absent":
                         gps_log.j_7 = "\'" + htable["event_info"].ToString() + "\'";
                         gps_log.j_6 = "\'" + "null" + "\'";
                         gps_log.j_8 = "\'" + "null" + "\'";
+                        operation_log.event_id = "\'" + operation_log.eqp_id + now + id_count.ToString("D12") + "\'";
                         break;
                     case "Ignition Off":
                     case "Ignition On":
                         gps_log.j_8 = "\'" + htable["event_info"].ToString() + "\'";
                         gps_log.j_6 = "\'" + "null" + "\'";
                         gps_log.j_7 = "\'" + "null" + "\'";
+                        operation_log.event_id = "\'" + operation_log.eqp_id + now + id_count.ToString("D12") + "\'";
                         break;
                     default:
-                        gps_log.j_6 = gps_log.j_7 = gps_log.j_8 = "\'" + "null" + "\'";
+                        gps_log.j_6 = gps_log.j_7 = gps_log.j_8 =operation_log.event_id= "\'" + "null" + "\'";
                         break;
 
                 }
             }
             else
-                gps_log.j_6 = gps_log.j_7 = gps_log.j_8 = "\'" + "null" + "\'";
+                gps_log.j_6 = gps_log.j_7 = gps_log.j_8 =operation_log.event_id= "\'" + "null" + "\'";
             if (htable.ContainsKey("lat_value"))
             {
-                gps_log._lat = htable["lat_value"].ToString();
+                gps_log._lat = operation_log.eqp_lat=htable["lat_value"].ToString();
             }
             else
-                gps_log._lat = "0";
+                gps_log._lat = operation_log.eqp_lat="0";
             if (htable.ContainsKey("long_value"))
             {
-                gps_log._lon = htable["long_value"].ToString();
+                gps_log._lon = operation_log.eqp_lon=htable["long_value"].ToString();
             }
             else
-                gps_log._lon = "0";
+                gps_log._lon = operation_log.eqp_lon="0";
             if (htable.ContainsKey("radius_value"))
             {
                 gps_log.j_5 = htable["radius_value"].ToString();
@@ -1152,19 +1216,19 @@ Select 1-6 then press enter to send package
             if (htable.ContainsKey("speed-hor"))
             {
                 //gps_log._speed = htable["speed-hor"].ToString();
-                gps_log._speed=Convert.ToInt32((double.Parse(htable["speed-hor"].ToString()) * 1.609344)).ToString();
+                gps_log._speed=operation_log.eqp_speed=Convert.ToInt32((double.Parse(htable["speed-hor"].ToString()) * 1.609344)).ToString();
             }
             else
-                gps_log._speed = "0";
+                gps_log._speed = operation_log.eqp_speed="0";
             if (htable.ContainsKey("direction-hor"))
             {
-                gps_log._course = htable["direction-hor"].ToString();
+                gps_log._course =operation_log.eqp_course= htable["direction-hor"].ToString();
             }
             else
-                gps_log._course = "0";
+                gps_log._course =operation_log.eqp_course= "0";
             if (htable.ContainsKey("Odometer"))
             {
-                gps_log._distance = htable["Odometer"].ToString().Replace(",",".");
+                gps_log._distance =operation_log.eqp_distance= htable["Odometer"].ToString().Replace(",",".");
             }
             if (htable.ContainsKey("info_time"))
             {
@@ -1324,46 +1388,54 @@ Select 1-6 then press enter to send package
                         break;
                         case "Immediate-Location-Report":
                         {
+                            operation_log.create_user = @"'System'";
                             if (elements.Contains(new XElement("operation-error").Name))
                             {
-                                table_columns = "_id,_uid,_option2,_option3,_or_lon,_or_lat,_satellites,_temperature,_voltage";
-                            table_column_value = gps_log._id + "," + gps_log._uid + "," + gps_log._option2 + "," + gps_log._option3+","+
-                                gps_log._or_lon + "," + gps_log._or_lat + "," + gps_log._satellites + "," +
-                                           gps_log._temperature + "," + gps_log._voltage;
-                            cmd = "INSERT INTO public._gps_log ("+table_columns+") VALUES (" + table_column_value  + ")";
+                                table_columns = "_id,event_id,request_id,result_code,result_msg,create_user";
+                                table_column_value = operation_log._id + "," + operation_log.event_id + "," + operation_log.request_id + "," + operation_log.result_code +
+                                    "," + operation_log.result_msg + "," + operation_log.create_user;
+
+                                cmd = "INSERT INTO public.operation_log (" + table_columns + ") VALUES (" + table_column_value + ")";
                            
                             }
                             else
                             {
                                 if (elements.Contains(new XElement("vehicle-info").Name))
                                 {
-                                    gps_log._status = ((int)device_status.EM).ToString();
-                                    gps_log._validity = "\'Y\'";
-                                    table_columns = "_id,_uid,_status,_time,_validity,_lat,_lon,_speed,_course,_distance,j_5,_option0,_option1," +
-                                                    "_or_lon,_or_lat,_satellites,_temperature,_voltage,_option3,j_6,j_7";
-                                    table_column_value = gps_log._id + "," + gps_log._uid + "," + gps_log._status + "," + gps_log._time +
-                                               "," + gps_log._validity + "," + gps_log._lat + "," + gps_log._lon + "," + gps_log._speed +
-                                               "," + gps_log._course + "," + gps_log._distance + "," + gps_log.j_5 + "," + gps_log._option0 +
-                                               "," + gps_log._option1 + "," +
-                                               gps_log._or_lon + "," + gps_log._or_lat + "," + gps_log._satellites + "," +
-                                               gps_log._temperature + "," + gps_log._voltage + "," + gps_log._option3 + "," + gps_log.j_6 + "," + gps_log.j_7;
+                                    //gps_log._status = ((int)device_status.EM).ToString();
+                                    //gps_log._validity = "\'Y\'";
+                                    table_columns = "_id,event_id,request_id,eqp_id,eqp_lat,eqp_lon,eqp_speed,eqp_course,eqp_distance,create_user";
+                                    table_column_value = operation_log._id + "," +
+                                        operation_log.event_id + "," +
+                                        operation_log.request_id + "," +
+                                        operation_log.eqp_id + "," +
+                                        operation_log.eqp_lat + "," +
+                                        operation_log.eqp_lon + "," +
+                                        operation_log.eqp_speed + "," +
+                                        operation_log.eqp_course + "," +
+                                        operation_log.eqp_distance+","+
+                                        operation_log.create_user;
+
                                     //table_column_value = @"'1','1','1','20130808 13:13:13.133 PST','Y',0,0,0,0,0,'0','0','0',0,0,0,0,0";
-                                    cmd = "INSERT INTO public._gps_log (" + table_columns + ") VALUES  (" + table_column_value + ")";
+                                    cmd = "INSERT INTO public.operation_log (" + table_columns + ") VALUES  (" + table_column_value + ")";
                                 }
-                                else
+                                else //remove eqp_distance only
                                 {
-                                    gps_log._status = ((int)device_status.EM).ToString();
-                                    gps_log._validity = "\'Y\'";
-                                    table_columns = "_id,_uid,_status,_time,_validity,_lat,_lon,_speed,_course,j_5,_option0,_option1," +
-                                                    "_or_lon,_or_lat,_satellites,_temperature,_voltage,_option3,j_6,j_7";
-                                    table_column_value = gps_log._id + "," + gps_log._uid + "," + gps_log._status + "," + gps_log._time +
-                                               "," + gps_log._validity + "," + gps_log._lat + "," + gps_log._lon + "," + gps_log._speed +
-                                               "," + gps_log._course + "," + gps_log.j_5 + "," + gps_log._option0 +
-                                               "," + gps_log._option1 + "," +
-                                               gps_log._or_lon + "," + gps_log._or_lat + "," + gps_log._satellites + "," +
-                                               gps_log._temperature + "," + gps_log._voltage + "," + gps_log._option3 + "," + gps_log.j_6 + "," + gps_log.j_7;
+                                    //gps_log._status = ((int)device_status.EM).ToString();
+                                    //gps_log._validity = "\'Y\'";
+                                    table_columns = "_id,event_id,request_id,eqp_id,eqp_lat,eqp_lon,eqp_speed,eqp_course,create_user";
+                                    table_column_value = operation_log._id + "," +
+                                        operation_log.event_id + "," +
+                                        operation_log.request_id + "," +
+                                        operation_log.eqp_id + "," +
+                                        operation_log.eqp_lat + "," +
+                                        operation_log.eqp_lon + "," +
+                                        operation_log.eqp_speed + "," +
+                                        operation_log.eqp_course+","+
+                                        operation_log.create_user;
+
                                     //table_column_value = @"'1','1','1','20130808 13:13:13.133 PST','Y',0,0,0,0,0,'0','0','0',0,0,0,0,0";
-                                    cmd = "INSERT INTO public._gps_log (" + table_columns + ") VALUES  (" + table_column_value + ")";
+                                    cmd = "INSERT INTO public.operation_log (" + table_columns + ") VALUES  (" + table_column_value + ")";
                                     
                                 }
                             }
@@ -1390,9 +1462,9 @@ Select 1-6 then press enter to send package
 
             //insert into custom.cga_event_log
             /*
-            sql_client.connect();
-            double id_count = Convert.ToDouble(sql_client.get_DataTable("SELECT COUNT(uid)   FROM custom.cga_event_log").Rows[0].ItemArray[0]);
-            sql_client.disconnect();
+            //sql_client.connect();
+            //double id_count = Convert.ToDouble(sql_client.get_DataTable("SELECT COUNT(uid)   FROM custom.cga_event_log").Rows[0].ItemArray[0]);
+            //sql_client.disconnect();
 
             if(sql_client.connect())
             {
