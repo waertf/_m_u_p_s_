@@ -110,7 +110,7 @@ each set of the byte. To display a four-byte string, there will be 8 digits stri
                 catch (Exception ex)
                 {
                     Console.WriteLine(ex.Message);
-                    log.Error(ex.Message);
+                    log.Error("Connect to MUPS Server Error:"+Environment.NewLine+ex.Message);
                 }
             }
 
@@ -995,9 +995,20 @@ Select 1-6 then press enter to send package
                 
                 
             send_string = "%%"+avls_package.ID+avls_package.GPS_Valid+avls_package.Date_Time+avls_package.Loc+avls_package.Speed+avls_package.Dir+avls_package.Temp+avls_package.Status+avls_package.Event+avls_package.Message+"\r\n";
-            //netStream.Write(System.Text.Encoding.Default.GetBytes(send_string), 0, send_string.Length);
-            avls_WriteLine(netStream, System.Text.Encoding.Default.GetBytes(send_string), send_string, sql_client);
-            sendDone.WaitOne();
+            
+            netStream.Write(System.Text.Encoding.Default.GetBytes(send_string), 0, send_string.Length);
+            Console.WriteLine("S----------------------------------------------------------------------------");
+            Console.WriteLine("Write:\r\n" + send_string);
+            Console.WriteLine("E----------------------------------------------------------------------------");
+            using (StreamWriter w = File.AppendText("log.txt"))
+            {
+                Log("Write:\r\n", send_string, w);
+                // Close the writer and underlying file.
+                w.Close();
+            }
+
+            //avls_WriteLine(netStream, System.Text.Encoding.Default.GetBytes(send_string), send_string, sql_client);
+            //sendDone.WaitOne();
 
             //ReadLine(avls_tcpClient, netStream, send_string.Length);
             avls_tcpClient.Close();
