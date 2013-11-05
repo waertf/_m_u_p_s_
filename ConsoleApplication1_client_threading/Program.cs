@@ -806,6 +806,8 @@ Select 1-6 then press enter to send package
                              * */
                         }
                     }
+                    if (bool.Parse(ConfigurationManager.AppSettings["SQL_ACCESS"]))
+                        access_sql_server(sql_client, xml_root_tag, htable, sensor_name, sensor_type, sensor_value, XmlGetAllElementsXname(xml_data), log);
                     break;
                 case "Immediate-Location-Answer":
                 case "Triggered-Location-Stop-Answer":
@@ -1140,7 +1142,8 @@ Select 1-6 then press enter to send package
             {
                 gps_log._uid =operation_log.eqp_id= "\'" + "null" + "\'";
                 gps_log._id = "\'" + Convert.ToBase64String(System.Guid.NewGuid().ToByteArray())  + "_" + auto_id_serial_command + "\'";
-                operation_log._id = "\'" + Convert.ToBase64String(System.Guid.NewGuid().ToByteArray()) + "_" + manual_id_serial_command + "\'";
+                //operation_log._id = "\'" + Convert.ToBase64String(System.Guid.NewGuid().ToByteArray()) + "_" + manual_id_serial_command + "\'";
+                operation_log._id = "\'" + "operation" + "_" + now + "_" + manual_id_serial_command + "\'";
             }
             if (htable.ContainsKey("result_code"))
             {
@@ -1443,7 +1446,27 @@ Select 1-6 then press enter to send package
                         break;
                         case "Location-Registration-Answer":
                         {
- 
+                            operation_log.create_user = @"'System'";
+                            if (elements.Contains(new XElement("operation-error").Name))
+                            {
+                                table_columns = "_id,event_id,request_id,result_code,result_msg,create_user";
+                                table_column_value = operation_log._id + "," + operation_log.event_id + "," + operation_log.request_id + "," + operation_log.result_code +
+                                    "," + operation_log.result_msg + "," + operation_log.create_user;
+
+                                cmd = "INSERT INTO public.operation_log (" + table_columns + ") VALUES (" + table_column_value + ")";
+
+                            }
+                            else
+                            {
+                                table_column_value = operation_log._id + "," +
+                                    operation_log.event_id + "," +
+                                    operation_log.application_id + "," +
+                                    operation_log.result_code + "," +
+                                    operation_log.result_msg+","+
+                                    operation_log.create_user;
+                                table_columns = "_id,event_id,application_id,result_code,result_msg,create_user";
+                                cmd = "INSERT INTO public.operation_log (" + table_columns + ") VALUES (" + table_column_value + ")";
+                            }
                         }
                         break;
                     }
