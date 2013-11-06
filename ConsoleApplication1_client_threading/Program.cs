@@ -941,7 +941,10 @@ Select 1-6 then press enter to send package
                     avls_package.Loc = "N" + lat_str + "E" + long_str + ",";
                 }
                 else
+                {
+                    avls_tcpClient.Close();
                     return;
+                }
                 if (htable.ContainsKey("speed-hor"))
                 {
                     avls_package.Speed = Convert.ToInt32((double.Parse(htable["speed-hor"].ToString()) * 1.609344)).ToString() + ",";
@@ -995,7 +998,7 @@ Select 1-6 then press enter to send package
                 
                 
             send_string = "%%"+avls_package.ID+avls_package.GPS_Valid+avls_package.Date_Time+avls_package.Loc+avls_package.Speed+avls_package.Dir+avls_package.Temp+avls_package.Status+avls_package.Event+avls_package.Message+"\r\n";
-            
+            /*
             netStream.Write(System.Text.Encoding.Default.GetBytes(send_string), 0, send_string.Length);
             Console.WriteLine("S----------------------------------------------------------------------------");
             Console.WriteLine("Write:\r\n" + send_string);
@@ -1006,9 +1009,9 @@ Select 1-6 then press enter to send package
                 // Close the writer and underlying file.
                 w.Close();
             }
-
-            //avls_WriteLine(netStream, System.Text.Encoding.Default.GetBytes(send_string), send_string, sql_client);
-            //sendDone.WaitOne();
+            */
+            avls_WriteLine(netStream, System.Text.Encoding.Default.GetBytes(send_string), send_string, sql_client);
+            sendDone.WaitOne();
 
             //ReadLine(avls_tcpClient, netStream, send_string.Length);
             avls_tcpClient.Close();
