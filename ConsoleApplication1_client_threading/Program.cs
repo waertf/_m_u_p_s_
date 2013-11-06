@@ -89,7 +89,13 @@ each set of the byte. To display a four-byte string, there will be 8 digits stri
             public string Event;//150
             public string Message;
         }
-       
+
+        static void ConnectCallback(IAsyncResult ar)
+        {
+            connectDone.Set();
+            TcpClient t = (TcpClient)ar.AsyncState;
+            t.EndConnect(ar);
+        }
         static void Main(string[] args)
         {
             Console.WriteLine(LocalIPAddress());//current ip address
@@ -98,8 +104,9 @@ each set of the byte. To display a four-byte string, there will be 8 digits stri
             string ipAddress = ConfigurationManager.AppSettings["MUPS_SERVER_IP"];
             //int port = 23;
             int port = int.Parse(ConfigurationManager.AppSettings["MUPS_SERVER_PORT"]);
-            bool mups_connected = false;
+            //bool mups_connected = false;
             tcpClient = new TcpClient();
+            /*
             while (!mups_connected)
             {
                 try
@@ -113,9 +120,12 @@ each set of the byte. To display a four-byte string, there will be 8 digits stri
                     log.Error("Connect to MUPS Server Error:"+Environment.NewLine+ex.Message);
                 }
             }
+            */
+            //tcpClient.NoDelay = false;
 
-            tcpClient.NoDelay = false;
-
+            connectDone.Reset();
+            tcpClient.BeginConnect(ipAddress, port, new AsyncCallback(ConnectCallback), tcpClient);
+            connectDone.WaitOne();
             Keeplive.keep(tcpClient.Client);
             NetworkStream netStream = tcpClient.GetStream();
 
@@ -898,9 +908,12 @@ Select 1-6 then press enter to send package
             
             avls_tcpClient = new TcpClient();
 
-            avls_tcpClient.Connect(ipAddress, port);
+            //avls_tcpClient.Connect(ipAddress, port);
+            connectDone.Reset();
+            avls_tcpClient.BeginConnect(ipAddress, port, new AsyncCallback(ConnectCallback), avls_tcpClient);
+            connectDone.WaitOne();
 
-            avls_tcpClient.NoDelay = false;
+            //avls_tcpClient.NoDelay = false;
 
             //Keeplive.keep(avls_tcpClient.Client);
             NetworkStream netStream = avls_tcpClient.GetStream();
@@ -1010,6 +1023,7 @@ Select 1-6 then press enter to send package
                 w.Close();
             }
             */
+            sendDone.Reset();
             avls_WriteLine(netStream, System.Text.Encoding.Default.GetBytes(send_string), send_string, sql_client);
             sendDone.WaitOne();
 
