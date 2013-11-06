@@ -1014,6 +1014,7 @@ Select 1-6 then press enter to send package
             sendDone.WaitOne();
 
             //ReadLine(avls_tcpClient, netStream, send_string.Length);
+            netStream.Close();
             avls_tcpClient.Close();
         }
 
