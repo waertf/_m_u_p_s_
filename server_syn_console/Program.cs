@@ -28,6 +28,7 @@ namespace server_syn_console
         // validation event handler.
         private static Random random = new Random();
         Object thisLock = new Object();
+        private static string sectionName = "appSettings";
         public static void StartListening()
         {
             // Data buffer for incoming data.
@@ -961,6 +962,11 @@ Select 0-4 then press enter to send package
             }
             sql_client.disconnect();
             */
+
+            // Force a reload of the changed section. This 
+            // makes the new values available for reading.
+            ConfigurationManager.RefreshSection(sectionName);
+
             if (bool.Parse(ConfigurationManager.AppSettings["auto_send"]))
             {
                 Console.WriteLine("Refill the table with kml data...");

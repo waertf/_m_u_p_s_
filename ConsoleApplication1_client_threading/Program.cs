@@ -40,6 +40,8 @@ namespace ConsoleApplication1_client_threading
         private static ManualResetEvent receiveDone =
             new ManualResetEvent(false);
 
+        private static string sectionName = "appSettings";
+
         public  struct AVLS_UNIT_Report_Packet
         {
             public string ID;
@@ -98,6 +100,10 @@ each set of the byte. To display a four-byte string, there will be 8 digits stri
         }
         static void Main(string[] args)
         {
+            // Force a reload of the changed section. This 
+            // makes the new values available for reading.
+            ConfigurationManager.RefreshSection(sectionName);
+
             Console.WriteLine(LocalIPAddress());//current ip address
             Console.WriteLine(System.Environment.UserName);//current username
             //string ipAddress = "127.0.0.1";

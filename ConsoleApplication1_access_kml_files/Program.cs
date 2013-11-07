@@ -12,6 +12,8 @@ namespace ConsoleApplication1_access_kml_files
 {
     class Program
     {
+        private static string sectionName = "appSettings";
+
         static string XmlGetTagValue(XDocument xml_data, string tag_name)
         {
             string result = string.Empty;
@@ -32,6 +34,10 @@ namespace ConsoleApplication1_access_kml_files
         
         static void Main(string[] args)
         {
+            // Force a reload of the changed section. This 
+            // makes the new values available for reading.
+            ConfigurationManager.RefreshSection(sectionName);
+
             int LENGTH  = Directory.GetFiles(Environment.CurrentDirectory, "*.kml", SearchOption.TopDirectoryOnly).Length;
             string[] file_list = Directory.GetFiles(Environment.CurrentDirectory, "*.kml", SearchOption.TopDirectoryOnly);
             //int device_initial = 900001;
