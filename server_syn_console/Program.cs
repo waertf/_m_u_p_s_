@@ -966,8 +966,23 @@ Select 0-4 then press enter to send package
             // Force a reload of the changed section. This 
             // makes the new values available for reading.
             ConfigurationManager.RefreshSection(sectionName);
-
-            if (bool.Parse(ConfigurationManager.AppSettings["auto_send"]))
+            SqlClient sql_client = new SqlClient(ConfigurationManager.AppSettings["SQL_SERVER_IP"], ConfigurationManager.AppSettings["SQL_SERVER_PORT"], ConfigurationManager.AppSettings["SQL_SERVER_USER_ID"], ConfigurationManager.AppSettings["SQL_SERVER_PASSWORD"], ConfigurationManager.AppSettings["SQL_SERVER_DATABASE"]);
+            sql_client.connect();
+            string sql_command = @"SELECT 
+public.epq_test_loc.device
+FROM
+  public.epq_test_loc
+ORDER BY 
+  public.epq_test_loc.id
+  Limit 1";
+            DataTable dt = sql_client.get_DataTable(sql_command);
+            sql_client.disconnect();
+            if (dt != null && dt.Rows.Count != 0)
+            {
+                
+            }
+            else
+            //if (bool.Parse(ConfigurationManager.AppSettings["auto_send"]))
             {
                 Console.WriteLine("Refill the table with kml data...");
                 string kml_application = "ConsoleApplication1_access_kml_files.exe";

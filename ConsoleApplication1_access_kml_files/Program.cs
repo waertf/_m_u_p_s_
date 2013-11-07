@@ -66,7 +66,10 @@ namespace ConsoleApplication1_access_kml_files
 
             SqlClient sql_client = new SqlClient(ConfigurationManager.AppSettings["SQL_SERVER_IP"], ConfigurationManager.AppSettings["SQL_SERVER_PORT"], ConfigurationManager.AppSettings["SQL_SERVER_USER_ID"], ConfigurationManager.AppSettings["SQL_SERVER_PASSWORD"], ConfigurationManager.AppSettings["SQL_SERVER_DATABASE"]);
             sql_client.connect();
-            sql_client.modify("DELETE FROM public.epq_test_loc");
+            sql_client.modify("TRUNCATE TABLE public.epq_test_loc");
+            sql_client.disconnect();
+            sql_client.connect();
+            sql_client.modify("TRUNCATE TABLE public._gps_log");
             sql_client.disconnect();
             for (int j = 0; j < xml_load.Length; j++)
             {
