@@ -268,6 +268,7 @@ ORDER BY
                             // Close the writer and underlying file.
                             w.Close();
                         }
+                        /*
                         handler.Send(msg3);
                         using (StreamWriter w = File.AppendText("log.txt"))
                         {
@@ -275,6 +276,7 @@ ORDER BY
                             // Close the writer and underlying file.
                             w.Close();
                         }
+                        */
                         if (!bool.Parse(ConfigurationManager.AppSettings["auto_send"]) || true)
                         {
                             Thread send_test_thread = new Thread(() => manual_send(handler));
