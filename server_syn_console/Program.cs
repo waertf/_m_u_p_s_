@@ -278,7 +278,7 @@ ORDER BY
                             w.Close();
                         }
                         */
-                        if (!bool.Parse(ConfigurationManager.AppSettings["auto_send"]) || true)
+                        if (!bool.Parse(ConfigurationManager.AppSettings["auto_send"]))
                         {
                             Thread send_test_thread = new Thread(() => manual_send(handler));
                             send_test_thread.Start();
