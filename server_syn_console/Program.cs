@@ -285,8 +285,7 @@ ORDER BY
                         }
                         else
                         {
-                            ///TODO:implement auto send
-                            ///
+                            
                             /*
                              * SELECT count(DISTINCT
                                   public.epq_test_loc.device)
@@ -325,7 +324,47 @@ ORDER BY
                             for (int i = 0; i < device_count; i++)
                             {
                                 //ThreadPool.QueueUserWorkItem(state => autosent_test((device_initial++).ToString(), handler));
-                                ThreadPool.QueueUserWorkItem(state => autosent_test((device_list[i]).ToString(), handler));
+                                string min_count=string.Empty, max_count=string.Empty;
+
+                                sql_client.connect();
+                                sql_command = @"
+SELECT 
+  
+  public.epq_test_loc.id
+FROM
+  public.epq_test_loc
+WHERE
+    public.epq_test_loc.device = '" + device_list[i] + @"' 
+ORDER BY 
+  public.epq_test_loc.id ASC 
+  Limit 1";
+                                 dt = sql_client.get_DataTable(sql_command);
+                                 foreach (DataRow row in dt.Rows)
+                                 {
+                                     min_count = row[0].ToString();
+                                 }
+                                sql_client.disconnect();
+
+                                sql_client.connect();
+                                sql_command = @"
+SELECT 
+  
+  public.epq_test_loc.id
+FROM
+  public.epq_test_loc
+WHERE
+    public.epq_test_loc.device = '" + device_list[i] + @"' 
+ORDER BY 
+  public.epq_test_loc.id DESC 
+  Limit 1";
+                                dt = sql_client.get_DataTable(sql_command);
+                                foreach (DataRow row in dt.Rows)
+                                {
+                                    max_count = row[0].ToString();
+                                }
+                                sql_client.disconnect();
+
+                                ThreadPool.QueueUserWorkItem(state => autosent_test((device_list[i]).ToString(), handler, min_count,max_count));
                             }
 
                         }
@@ -439,15 +478,37 @@ ORDER BY
             }
         }
 
-        private static void autosent_test(string device, Socket handler)
+        private static void autosent_test(string device, Socket handler,string min_count,string max_count)
         {
+            string device_count = "device_" + device + "_count", current_count = string.Empty;
             //throw new NotImplementedException();
-            while (true)
+            if (ConfigurationManager.AppSettings.AllKeys.Contains(device_count))
+            {
+                // the config file contains the specific key 
+                ConfigurationManager.RefreshSection("appSettings");
+                current_count = ConfigurationManager.AppSettings[device_count].ToString();
+            }
+            else
+            {
+                ConfigurationManager.AppSettings.Add(device_count, min_count);
+                System.Configuration.Configuration config =
+                  ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
+                config.Save();
+                ConfigurationManager.RefreshSection("appSettings");
+                current_count = ConfigurationManager.AppSettings[device_count].ToString();
+            }
+            SqlClient sql_client = new SqlClient(ConfigurationManager.AppSettings["SQL_SERVER_IP"], ConfigurationManager.AppSettings["SQL_SERVER_PORT"], ConfigurationManager.AppSettings["SQL_SERVER_USER_ID"], ConfigurationManager.AppSettings["SQL_SERVER_PASSWORD"], ConfigurationManager.AppSettings["SQL_SERVER_DATABASE"]);
+            //CREATE SEQUENCE serial MINVALUE 34114 MAXVALUE 34981 START 34979 CYCLE 
+            sql_client.connect();
+            sql_client.modify("CREATE SEQUENCE " + device + "_counter MINVALUE "+min_count+" MAXVALUE "+max_count+" START "+current_count+" CYCLE ");
+            sql_client.disconnect();
+            while(true)
             {
                 try
                 {
-                    SqlClient sql_client = new SqlClient(ConfigurationManager.AppSettings["SQL_SERVER_IP"], ConfigurationManager.AppSettings["SQL_SERVER_PORT"], ConfigurationManager.AppSettings["SQL_SERVER_USER_ID"], ConfigurationManager.AppSettings["SQL_SERVER_PASSWORD"], ConfigurationManager.AppSettings["SQL_SERVER_DATABASE"]);
-                
+                    
+                ///TODO:modify current_count to auto increase
+                    ///SELECT nextval('device + "_counter"');
                     sql_client.connect();
                     string lat = string.Empty, lon = string.Empty, id = string.Empty, sql_command = @"SELECT 
   public.epq_test_loc.longitude,
@@ -457,10 +518,8 @@ ORDER BY
 FROM
   public.epq_test_loc
 WHERE
-    public.epq_test_loc.device = '" + device + @"' 
-ORDER BY 
-  public.epq_test_loc.id
-  Limit 1";
+    public.epq_test_loc.id = '" + current_count + @"' 
+";
                     DataTable dt = sql_client.get_DataTable(sql_command);
                     if (dt != null && dt.Rows.Count != 0)
                     {
@@ -477,7 +536,7 @@ ORDER BY
                     }
                     else
                         break;
-                    sql_client.modify("DELETE FROM public.epq_test_loc WHERE public.epq_test_loc.id = \'" + id + "\'");
+                    //sql_client.modify("DELETE FROM public.epq_test_loc WHERE public.epq_test_loc.id = \'" + id + "\'");
                     sql_client.disconnect();
 
                     string today = DateTime.Now.ToString("yyyyMMddHHmmss");
@@ -515,7 +574,7 @@ Select 0-4 then press enter to send package
 3.Unsolicited-Location-Report Presence Event Message
 4.Triggered-Location-Report with Invalid GPS Location Message
 ");
-                ///TODO:auto send from fixed interval time
+                ///auto send from fixed interval time
                 ///900001->10sec interval
                 ///900005->50sec interval
                 Console.Write("Select[0-4]:");
@@ -598,7 +657,7 @@ Select 0-4 then press enter to send package
 3.Unsolicited-Location-Report Presence Event Message
 4.Triggered-Location-Report with Invalid GPS Location Message
 ");
-                ///TODO:auto send from fixed interval time
+                ///auto send from fixed interval time
                 ///900001->10sec interval
                 ///900005->50sec interval
                 Console.Write("Select[0-4]:");
@@ -950,6 +1009,12 @@ Select 0-4 then press enter to send package
             /*
             SqlClient sql_client = new SqlClient(ConfigurationManager.AppSettings["SQL_SERVER_IP"], ConfigurationManager.AppSettings["SQL_SERVER_PORT"], ConfigurationManager.AppSettings["SQL_SERVER_USER_ID"], ConfigurationManager.AppSettings["SQL_SERVER_PASSWORD"], ConfigurationManager.AppSettings["SQL_SERVER_DATABASE"]);
             sql_client.connect();
+            sql_client.modify("CREATE SEQUENCE serial MINVALUE 34114 MAXVALUE 34981 START 34979 CYCLE ");
+            sql_client.disconnect();
+            */
+            /*
+            SqlClient sql_client = new SqlClient(ConfigurationManager.AppSettings["SQL_SERVER_IP"], ConfigurationManager.AppSettings["SQL_SERVER_PORT"], ConfigurationManager.AppSettings["SQL_SERVER_USER_ID"], ConfigurationManager.AppSettings["SQL_SERVER_PASSWORD"], ConfigurationManager.AppSettings["SQL_SERVER_DATABASE"]);
+            sql_client.connect();
             string sql_command = @"SELECT DISTINCT
                                   public.epq_test_loc.device
                                 FROM
@@ -966,6 +1031,7 @@ Select 0-4 then press enter to send package
             // Force a reload of the changed section. This 
             // makes the new values available for reading.
             ConfigurationManager.RefreshSection(sectionName);
+            /*
             SqlClient sql_client = new SqlClient(ConfigurationManager.AppSettings["SQL_SERVER_IP"], ConfigurationManager.AppSettings["SQL_SERVER_PORT"], ConfigurationManager.AppSettings["SQL_SERVER_USER_ID"], ConfigurationManager.AppSettings["SQL_SERVER_PASSWORD"], ConfigurationManager.AppSettings["SQL_SERVER_DATABASE"]);
             sql_client.connect();
             string sql_command = @"SELECT 
@@ -989,18 +1055,18 @@ ORDER BY
 
                 Process SomeProgram = new Process();
                 SomeProgram.StartInfo.FileName = kml_application;
-                /*
-                SomeProgram.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
-                SomeProgram.StartInfo.UseShellExecute = false;
-                SomeProgram.StartInfo.RedirectStandardOutput = true;
-                SomeProgram.StartInfo.CreateNoWindow = true;
-                */
+                
+                //SomeProgram.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
+                //SomeProgram.StartInfo.UseShellExecute = false;
+                //SomeProgram.StartInfo.RedirectStandardOutput = true;
+                //SomeProgram.StartInfo.CreateNoWindow = true;
+                
                 SomeProgram.Start();
                 SomeProgram.WaitForExit();
                 //string SomeProgramOutput = SomeProgram.StandardOutput.ReadToEnd();
                 Console.WriteLine("Refill the table with kml data done...");
             }
-            
+            */
             Thread read_thread = new Thread(new ThreadStart(StartListening));
             read_thread.Start();
             //Thread demo_tt = new Thread(new ThreadStart(demo_ttt));
