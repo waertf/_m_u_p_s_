@@ -274,7 +274,44 @@ ORDER BY
                         */
                         if (!bool.Parse(ConfigurationManager.AppSettings["auto_send"]))
                         {
-                            Thread send_test_thread = new Thread(() => manual_send(handler));
+                            SqlClient sql_client = new SqlClient(ConfigurationManager.AppSettings["SQL_SERVER_IP"], ConfigurationManager.AppSettings["SQL_SERVER_PORT"], ConfigurationManager.AppSettings["SQL_SERVER_USER_ID"], ConfigurationManager.AppSettings["SQL_SERVER_PASSWORD"], ConfigurationManager.AppSettings["SQL_SERVER_DATABASE"]);
+                            string min_count=string.Empty, max_count=string.Empty;
+                            sql_client.connect();
+                            string sql_command = @"
+SELECT 
+  
+  public.epq_test_loc.id
+FROM
+  public.epq_test_loc
+
+ORDER BY 
+  public.epq_test_loc.id ASC 
+  Limit 1";
+                           DataTable dt = sql_client.get_DataTable(sql_command);
+                            foreach (DataRow row in dt.Rows)
+                            {
+                                min_count = row[0].ToString();
+                            }
+                            sql_client.disconnect();
+
+                            sql_client.connect();
+                            sql_command = @"
+SELECT 
+  
+  public.epq_test_loc.id
+FROM
+  public.epq_test_loc
+ORDER BY 
+  public.epq_test_loc.id DESC 
+  Limit 1";
+                            dt = sql_client.get_DataTable(sql_command);
+                            foreach (DataRow row in dt.Rows)
+                            {
+                                max_count = row[0].ToString();
+                            }
+                            sql_client.disconnect();
+
+                            Thread send_test_thread = new Thread(() => manual_send(handler,min_count,max_count));
                             send_test_thread.Start();
                         }
                         else
@@ -592,13 +629,15 @@ WHERE
             }
         }
 
-        private static void manual_send(Socket handler)
+        private static void manual_send(Socket handler,string min_count,string max_count)
         {
 
             
 
             while (true)
             {
+                DataTable dt = new DataTable();
+                string current_count = string.Empty;
                 Console.WriteLine(
                     @"
 Select 0-4 then press enter to send package
@@ -616,6 +655,24 @@ Select 0-4 then press enter to send package
                 select_num = Console.ReadLine();
 
                 SqlClient sql_client = new SqlClient(ConfigurationManager.AppSettings["SQL_SERVER_IP"], ConfigurationManager.AppSettings["SQL_SERVER_PORT"], ConfigurationManager.AppSettings["SQL_SERVER_USER_ID"], ConfigurationManager.AppSettings["SQL_SERVER_PASSWORD"], ConfigurationManager.AppSettings["SQL_SERVER_DATABASE"]);
+
+                sql_client.connect();
+                sql_client.modify("CREATE SEQUENCE " + "manual_count" + " MINVALUE " + min_count + " MAXVALUE " + max_count + " START " + min_count + " CYCLE ");
+                sql_client.disconnect();
+
+                sql_client.connect();
+                dt = sql_client.get_DataTable(@"SELECT nextval('" + "manual_count" + @"');");
+                sql_client.disconnect();
+                foreach (DataRow row in dt.Rows)
+                {
+                    current_count = row[0].ToString();
+                    //ConfigurationManager.AppSettings[device_count] = current_count;
+                    //System.Configuration.Configuration config =
+                    //ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
+                    //config.Save();
+                    //ConfigurationManager.RefreshSection("appSettings");
+                }
+                
                 sql_client.connect();
                 string lat = string.Empty,lon = string.Empty,id = string.Empty,device=string.Empty,sql_command = @"SELECT 
   public.epq_test_loc.longitude,
@@ -624,10 +681,9 @@ Select 0-4 then press enter to send package
   public.epq_test_loc.id
 FROM
   public.epq_test_loc
-ORDER BY 
-  public.epq_test_loc.id
-  Limit 1";
-                DataTable dt = sql_client.get_DataTable(sql_command);
+WHERE
+  public.epq_test_loc.id=" + @"'" + current_count + @"'";
+                 dt = sql_client.get_DataTable(sql_command);
                 if (dt != null && dt.Rows.Count!=0)
                 {
                     Console.WriteLine("+if");
@@ -640,6 +696,7 @@ ORDER BY
                         device = row[2].ToString();
                         id = row[3].ToString();
                     }
+                    sql_client.disconnect();
                 }
                 else
                 {
@@ -685,6 +742,7 @@ Select 0-4 then press enter to send package
                 select_num = Console.ReadLine();
                 */
                 
+                /*
                 if (select_num == "3" || select_num == "4")
                 {
                     //sql_client.modify("DELETE FROM public.epq_test_loc WHERE public.epq_test_loc.id = \'" + id + "\'");
@@ -692,9 +750,10 @@ Select 0-4 then press enter to send package
                 }
                 else
                 {
-                    sql_client.modify("DELETE FROM public.epq_test_loc WHERE public.epq_test_loc.id = \'" + id + "\'");
+                    //sql_client.modify("DELETE FROM public.epq_test_loc WHERE public.epq_test_loc.id = \'" + id + "\'");
                     sql_client.disconnect();
                 }
+                */
                  
                 switch (select_num)
                 {
