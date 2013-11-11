@@ -552,7 +552,8 @@ ORDER BY
 
                 //CREATE SEQUENCE serial MINVALUE 34114 MAXVALUE 34981 START 34979 CYCLE 
                 sql_client.connect();
-                sql_client.modify("CREATE SEQUENCE " + device_count + " MINVALUE " + min_count + " MAXVALUE " + max_count + " START " + min_count + " CYCLE ");
+                //sql_client.modify("CREATE SEQUENCE " + device_count + " MINVALUE " + min_count + " MAXVALUE " + max_count + " START " + min_count + " CYCLE ");
+                sql_client.modify(@"SELECT create_seq('"+device_count+@"'"+@",'public'," + min_count + "," + max_count + ")");
                 sql_client.disconnect();
                 Console.WriteLine("CREATE SEQUENCE " + device_count + " MINVALUE " + min_count + " MAXVALUE " + max_count + " START " + min_count + " CYCLE ");
                 //Thread.Sleep(1000);
@@ -657,7 +658,8 @@ Select 0-4 then press enter to send package
                 SqlClient sql_client = new SqlClient(ConfigurationManager.AppSettings["SQL_SERVER_IP"], ConfigurationManager.AppSettings["SQL_SERVER_PORT"], ConfigurationManager.AppSettings["SQL_SERVER_USER_ID"], ConfigurationManager.AppSettings["SQL_SERVER_PASSWORD"], ConfigurationManager.AppSettings["SQL_SERVER_DATABASE"]);
 
                 sql_client.connect();
-                sql_client.modify("CREATE SEQUENCE " + "manual_count" + " MINVALUE " + min_count + " MAXVALUE " + max_count + " START " + min_count + " CYCLE ");
+                //sql_client.modify("CREATE SEQUENCE " + "manual_count" + " MINVALUE " + min_count + " MAXVALUE " + max_count + " START " + min_count + " CYCLE ");
+                sql_client.modify(@"SELECT create_seq('manual_count','public'," + min_count + "," + max_count + ")");
                 sql_client.disconnect();
 
                 sql_client.connect();
@@ -1107,12 +1109,51 @@ Select 0-4 then press enter to send package
         }
         static void Main(string[] args)
         {
-            /*
+            
             SqlClient sql_client = new SqlClient(ConfigurationManager.AppSettings["SQL_SERVER_IP"], ConfigurationManager.AppSettings["SQL_SERVER_PORT"], ConfigurationManager.AppSettings["SQL_SERVER_USER_ID"], ConfigurationManager.AppSettings["SQL_SERVER_PASSWORD"], ConfigurationManager.AppSettings["SQL_SERVER_DATABASE"]);
             sql_client.connect();
-            sql_client.modify("CREATE SEQUENCE serial MINVALUE 34114 MAXVALUE 34981 START 34979 CYCLE ");
+            sql_client.modify(@"
+CREATE OR REPLACE FUNCTION create_seq(_seq text, _schema text = 'public',_min INTEGER =0, _max INTEGER =100)
+  RETURNS void LANGUAGE plpgsql STRICT AS
+$func$
+DECLARE
+   _fullname text := _schema || '.' || _seq;
+
+BEGIN
+-- If an object of the name exists, the first RAISE EXCEPTION goes through
+-- with a meaningful message immediately.
+-- Else, the cast `::regclass` raises its own EXCEPTION ""undefined_table""
+-- which prevents RAISE from executing.
+-- This particular error triggers sequence creation further down.
+
+RAISE EXCEPTION 'Object >>%<< of type ""%"" already exists.'
+   ,_fullname
+   ,c.relkind FROM  pg_class c
+              WHERE c.oid = (_schema || '.' || _seq)::regclass;
+
+EXCEPTION
+   WHEN undefined_table THEN -- SQLSTATE '42P01'
+   EXECUTE 'CREATE SEQUENCE ' || quote_ident(_schema) || '.'
+                              || quote_ident(_seq) ||
+                              ' MINVALUE ' || _min ||
+                              ' MAXVALUE ' || _max ||
+                              ' START ' || _min ||
+                              ' CYCLE ';
+   RAISE NOTICE 'New sequence >>%<< created.', _fullname;
+END
+$func$;
+
+            ");
+            sql_client.modify(@"
+
+COMMENT ON FUNCTION create_seq(text, text,INTEGER,INTEGER) IS 'Create new seq if name is free.
+$1 _seq  .. name of sequence
+$2 _name .. name of schema (optional; default is ""public"")
+$3 _min  .. name of MINVALUE (optional; default is ""0"")
+$4 _max .. name of MAXVALUE (optional; default is ""100"")';
+");
             sql_client.disconnect();
-            */
+            
             /*
             SqlClient sql_client = new SqlClient(ConfigurationManager.AppSettings["SQL_SERVER_IP"], ConfigurationManager.AppSettings["SQL_SERVER_PORT"], ConfigurationManager.AppSettings["SQL_SERVER_USER_ID"], ConfigurationManager.AppSettings["SQL_SERVER_PASSWORD"], ConfigurationManager.AppSettings["SQL_SERVER_DATABASE"]);
             sql_client.connect();
