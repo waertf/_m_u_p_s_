@@ -78,6 +78,10 @@ namespace ConsoleApplication1_access_kml_files
                 XNamespace KmlNamespace = "http://earth.google.com/kml/2.2";
                 var result = (from el in xml_load[j].Descendants(KmlNamespace + "coordinates") select el);
                 string device_name = XmlGetTagValue(xml_load[j], (KmlNamespace + "name").ToString());
+                string device_count = "device_" + device_name + "_count";
+                sql_client.connect();
+                sql_client.modify("DROP SEQUENCE " + device_count);
+                sql_client.disconnect();
                 foreach (string cc in result)
                 {
                     receive += cc + Environment.NewLine;

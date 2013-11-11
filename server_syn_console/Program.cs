@@ -12,6 +12,8 @@ using System.Xml.Schema; // for XmlSchemaCollection (which is used later)
 using System.Configuration;
 using System.Data;
 using System.Diagnostics;
+using log4net;
+using log4net.Config;
 
 
 namespace server_syn_console
@@ -19,6 +21,7 @@ namespace server_syn_console
     class Program
     {
         // Incoming data from the client.
+        private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
         public static string data = null;
         const int LENGTH_TO_CUT = 4;
         private static bool isValid = true;
@@ -29,6 +32,7 @@ namespace server_syn_console
         private static Random random = new Random();
         Object thisLock = new Object();
         private static string sectionName = "appSettings";
+
         public static void StartListening()
         {
             // Data buffer for incoming data.
@@ -41,7 +45,10 @@ namespace server_syn_console
             IPHostEntry ipHostInfo = Dns.GetHostEntry(Dns.GetHostName());
             for (int i = 0; i < ipHostInfo.AddressList.Length; i++)
                 if (ipHostInfo.AddressList[i].AddressFamily == AddressFamily.InterNetwork)
+                {
                     ipAddress = ipHostInfo.AddressList[i];
+                    break;
+                }
 
             IPEndPoint localEndPoint = new IPEndPoint(ipAddress, int.Parse(ConfigurationManager.AppSettings["MUPS_SERVER_PORT"]));
 
@@ -61,7 +68,7 @@ namespace server_syn_console
                 // Start listening for connections.
                 while (true)
                 {
-                    Thread.Sleep(300);
+                    
                     //Console.WriteLine("Waiting for a connection...");
                     // Program is suspended while waiting for an incoming connection.
                     //Socket handler = listener.Accept();
@@ -106,6 +113,7 @@ Select 0-4 then press enter to send package
 4.Triggered-Location-Report with Invalid GPS Location Message
 ");
                         Console.Write("Select[0-4]:");
+                        Thread.Sleep(500);
                 }
 
             }
@@ -176,11 +184,11 @@ Select 0-4 then press enter to send package
         {
             string log = xml_data.ToString();
             string now =  DateTime.Now.ToString("yyyyMMddHHmmss");
-            using (StreamWriter w = File.AppendText("log.txt"))
+            
             {
-                Log("receive:\r\n" , log, w);
+                Log("receive:\r\n" , log);
                 // Close the writer and underlying file.
-                w.Close();
+               
             }
 
             string device = string.Empty;
@@ -214,21 +222,7 @@ ORDER BY
                 {
                     Console.WriteLine("+else");
                     sql_client.disconnect();
-                    Console.WriteLine("Refill the table with kml data...");
-                    string kml_application = "ConsoleApplication1_access_kml_files.exe";
-
-                    Process SomeProgram = new Process();
-                    SomeProgram.StartInfo.FileName = kml_application;
-                    /*
-                    SomeProgram.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
-                    SomeProgram.StartInfo.UseShellExecute = false;
-                    SomeProgram.StartInfo.RedirectStandardOutput = true;
-                    SomeProgram.StartInfo.CreateNoWindow = true;
-                    */
-                    SomeProgram.Start();
-                    SomeProgram.WaitForExit();
-                    //string SomeProgramOutput = SomeProgram.StandardOutput.ReadToEnd();
-                    Console.WriteLine("Refill the table with kml data done...");
+                    //reload_table();
                     continue;
                 }
 
@@ -238,6 +232,7 @@ ORDER BY
             {
                 case "Location-Registration-Request":
                     {
+                        /*
                         if (!xml_validation_with_dtd(log, xml_root_tag))
                         {
                             string error = "<" + "Unsolicited-Location-Report" + ">" + "<operation-error><result result-code=\"A\">SYNTAX ERROR</result></operation-error>" + "</" + "Unsolicited-Location-Report" + ">";
@@ -252,6 +247,7 @@ ORDER BY
                             }
                             break;
                         }
+                        */
                         string application_id = XmlGetTagValue(xml_data, "application");
                         Console.WriteLine("application_id : {0}", application_id);
                         
@@ -263,12 +259,10 @@ ORDER BY
                         byte[] msg3 = (data_append_dataLength(msg_send_back_ULRFP));
 
                         handler.Send(msg1);
-                        using (StreamWriter w = File.AppendText("log.txt"))
-                        {
-                            Log("send:\r\n" , msg_send_back_LRA, w);
+                        
+                            Log("send:\r\n" , msg_send_back_LRA);
                             // Close the writer and underlying file.
-                            w.Close();
-                        }
+                          
                         /*
                         handler.Send(msg3);
                         using (StreamWriter w = File.AppendText("log.txt"))
@@ -321,8 +315,9 @@ ORDER BY
                                 device_list.Add(Convert.ToString(row[0]));
                             }
                             
-                            for (int i = 0; i < device_count; i++)
+                            for (int x = 0; x < device_count; x++)
                             {
+                                int i=x;
                                 //ThreadPool.QueueUserWorkItem(state => autosent_test((device_initial++).ToString(), handler));
                                 string min_count=string.Empty, max_count=string.Empty;
 
@@ -363,8 +358,18 @@ ORDER BY
                                     max_count = row[0].ToString();
                                 }
                                 sql_client.disconnect();
-
-                                ThreadPool.QueueUserWorkItem(state => autosent_test((device_list[i]).ToString(), handler, min_count,max_count));
+                                //try
+                                //{
+                                    ThreadPool.QueueUserWorkItem(state => autosent_test((device_list[i]).ToString(), handler, min_count, max_count, true));
+                                //}
+                                //catch (Exception ex)
+                                //{
+                                //    Console.WriteLine(ex.Message);
+                                //    Thread.Sleep(5000);
+                                //}
+                                   
+                                
+                                
                             }
 
                         }
@@ -379,19 +384,19 @@ ORDER BY
                         byte[] msg3 = (data_append_dataLength(Immediate_Location_Report));
 
                         handler.Send(msg1);
-                        using (StreamWriter w = File.AppendText("log.txt"))
-                        {
-                            Log("send:\r\n" , Immediate_Location_Answer, w);
+                        //using (StreamWriter w = File.AppendText("log.txt"))
+                        //{
+                            Log("send:\r\n" , Immediate_Location_Answer);
                             // Close the writer and underlying file.
-                            w.Close();
-                        }
+                            //w.Close();
+                        //}
                         handler.Send(msg3);
-                        using (StreamWriter w = File.AppendText("log.txt"))
-                        {
-                            Log("send:\r\n" ,Immediate_Location_Report, w);
+                        //using (StreamWriter w = File.AppendText("log.txt"))
+                        //{
+                            Log("send:\r\n" ,Immediate_Location_Report);
                             // Close the writer and underlying file.
-                            w.Close();
-                        }
+                            //w.Close();
+                        //}
                     }
                     break;
                 case "Triggered-Location-Request":
@@ -402,19 +407,19 @@ ORDER BY
                         byte[] msg3 = (data_append_dataLength(Triggered_Location_Report));
 
                         handler.Send(msg1);
-                        using (StreamWriter w = File.AppendText("log.txt"))
-                        {
-                            Log("send:\r\n" , Triggered_Location_Answer, w);
+                        //using (StreamWriter w = File.AppendText("log.txt"))
+                        //{
+                            Log("send:\r\n" , Triggered_Location_Answer);
                             // Close the writer and underlying file.
-                            w.Close();
-                        }
+                            //w.Close();
+                        //}
                         handler.Send(msg3);
-                        using (StreamWriter w = File.AppendText("log.txt"))
-                        {
-                            Log("send:\r\n" ,Triggered_Location_Report, w);
+                        //using (StreamWriter w = File.AppendText("log.txt"))
+                        //{
+                            Log("send:\r\n" ,Triggered_Location_Report);
                             // Close the writer and underlying file.
-                            w.Close();
-                        }
+                           // w.Close();
+                        //}
                     }
                     break;
                 case "Digital-Output-Change-Request":
@@ -423,12 +428,12 @@ ORDER BY
                         byte[] msg1 = (data_append_dataLength(Digital_Output_Answer));
 
                         handler.Send(msg1);
-                        using (StreamWriter w = File.AppendText("log.txt"))
-                        {
-                            Log("send:\r\n" , Digital_Output_Answer, w);
+                        //using (StreamWriter w = File.AppendText("log.txt"))
+                        //{
+                            Log("send:\r\n" , Digital_Output_Answer);
                             // Close the writer and underlying file.
-                            w.Close();
-                        }
+                            //w.Close();
+                        //}
                     }
                     break;
                 case "Location-Protocol-Request":
@@ -437,12 +442,12 @@ ORDER BY
                         byte[] msg1 = (data_append_dataLength(Location_Protocol_Report));
 
                         handler.Send(msg1);
-                        using (StreamWriter w = File.AppendText("log.txt"))
-                        {
-                            Log("send:\r\n" , Location_Protocol_Report, w);
+                        //using (StreamWriter w = File.AppendText("log.txt"))
+                        //{
+                            Log("send:\r\n" , Location_Protocol_Report);
                             // Close the writer and underlying file.
-                            w.Close();
-                        }
+                            //w.Close();
+                        //}
                     }
                     break;
                 case "Triggered-Location-Stop-Request":
@@ -451,12 +456,12 @@ ORDER BY
                         byte[] msg1 = (data_append_dataLength(Triggered_Location_Stop_Answer));
 
                         handler.Send(msg1);
-                        using (StreamWriter w = File.AppendText("log.txt"))
-                        {
-                            Log("send:\r\n" , Triggered_Location_Stop_Answer, w);
+                        //using (StreamWriter w = File.AppendText("log.txt"))
+                        //{
+                            Log("send:\r\n" , Triggered_Location_Stop_Answer);
                             // Close the writer and underlying file.
-                            w.Close();
-                        }
+                            //w.Close();
+                        //}
                     }
                     break;
                 default:
@@ -467,41 +472,55 @@ ORDER BY
                         byte[] msg1 = (data_append_dataLength(error));
 
                         handler.Send(msg1);
-                        using (StreamWriter w = File.AppendText("log.txt"))
-                        {
-                            Log("send:\r\n" , error, w);
+                        //using (StreamWriter w = File.AppendText("log.txt"))
+                        //{
+                            Log("send:\r\n" , error);
                             // Close the writer and underlying file.
-                            w.Close();
-                        }
+                            //w.Close();
+                        //}
                     }
                     break;
             }
         }
 
-        private static void autosent_test(string device, Socket handler,string min_count,string max_count)
+        private static void autosent_test(string device, Socket handler,string min_count,string max_count,bool initial)
         {
-            string device_count = "device_" + device + "_count", current_count = string.Empty;
+            string device_count = "device_" + device + "_count";
+            string current_count = string.Empty;
+            SqlClient sql_client = new SqlClient(ConfigurationManager.AppSettings["SQL_SERVER_IP"], ConfigurationManager.AppSettings["SQL_SERVER_PORT"], ConfigurationManager.AppSettings["SQL_SERVER_USER_ID"], ConfigurationManager.AppSettings["SQL_SERVER_PASSWORD"], ConfigurationManager.AppSettings["SQL_SERVER_DATABASE"]);
+            DataTable dt = new DataTable(); 
             //throw new NotImplementedException();
-            if (ConfigurationManager.AppSettings.AllKeys.Contains(device_count))
+            //if (ConfigurationManager.AppSettings.AllKeys.Contains(device_count))
             {
                 // the config file contains the specific key 
-                ConfigurationManager.RefreshSection("appSettings");
-                current_count = ConfigurationManager.AppSettings[device_count].ToString();
+                //ConfigurationManager.RefreshSection("appSettings");
+                //current_count = ConfigurationManager.AppSettings[device_count].ToString();
             }
-            else
+            //else
+            /*
+            if (initial)
             {
-                ConfigurationManager.AppSettings.Add(device_count, min_count);
-                System.Configuration.Configuration config =
-                  ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
-                config.Save();
-                ConfigurationManager.RefreshSection("appSettings");
-                current_count = ConfigurationManager.AppSettings[device_count].ToString();
+                sql_client.connect();
+                sql_client.modify("DROP SEQUENCE " + device_count );
+                sql_client.disconnect();
+                initial = false;
             }
-            SqlClient sql_client = new SqlClient(ConfigurationManager.AppSettings["SQL_SERVER_IP"], ConfigurationManager.AppSettings["SQL_SERVER_PORT"], ConfigurationManager.AppSettings["SQL_SERVER_USER_ID"], ConfigurationManager.AppSettings["SQL_SERVER_PASSWORD"], ConfigurationManager.AppSettings["SQL_SERVER_DATABASE"]);
-            //CREATE SEQUENCE serial MINVALUE 34114 MAXVALUE 34981 START 34979 CYCLE 
-            sql_client.connect();
-            sql_client.modify("CREATE SEQUENCE " + device + "_counter MINVALUE "+min_count+" MAXVALUE "+max_count+" START "+current_count+" CYCLE ");
-            sql_client.disconnect();
+             * */
+               
+                //System.Configuration.Configuration config =ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
+                //config.AppSettings.Settings.Add(device_count, min_count);
+                //config.Save();
+                //ConfigurationManager.RefreshSection("appSettings");
+                //current_count = ConfigurationManager.AppSettings[device_count].ToString();
+
+                //CREATE SEQUENCE serial MINVALUE 34114 MAXVALUE 34981 START 34979 CYCLE 
+                sql_client.connect();
+                sql_client.modify("CREATE SEQUENCE " + device_count + " MINVALUE " + min_count + " MAXVALUE " + max_count + " START " + min_count + " CYCLE ");
+                sql_client.disconnect();
+                Console.WriteLine("CREATE SEQUENCE " + device_count + " MINVALUE " + min_count + " MAXVALUE " + max_count + " START " + min_count + " CYCLE ");
+                //Thread.Sleep(1000);
+            
+            
             while(true)
             {
                 try
@@ -509,6 +528,20 @@ ORDER BY
                     
                 ///TODO:modify current_count to auto increase
                     ///SELECT nextval('device + "_counter"');
+
+                    sql_client.connect();
+                    dt =sql_client.get_DataTable(@"SELECT nextval('"+device_count+@"');");
+                    sql_client.disconnect();
+                    foreach (DataRow row in dt.Rows)
+                    {
+                        current_count = row[0].ToString();
+                        //ConfigurationManager.AppSettings[device_count] = current_count;
+                        //System.Configuration.Configuration config =
+                  //ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
+                        //config.Save();
+                        //ConfigurationManager.RefreshSection("appSettings");
+                    }
+
                     sql_client.connect();
                     string lat = string.Empty, lon = string.Empty, id = string.Empty, sql_command = @"SELECT 
   public.epq_test_loc.longitude,
@@ -520,7 +553,8 @@ FROM
 WHERE
     public.epq_test_loc.id = '" + current_count + @"' 
 ";
-                    DataTable dt = sql_client.get_DataTable(sql_command);
+                    dt = sql_client.get_DataTable(sql_command);
+                    sql_client.disconnect();
                     if (dt != null && dt.Rows.Count != 0)
                     {
                         Console.WriteLine("+if");
@@ -537,18 +571,18 @@ WHERE
                     else
                         break;
                     //sql_client.modify("DELETE FROM public.epq_test_loc WHERE public.epq_test_loc.id = \'" + id + "\'");
-                    sql_client.disconnect();
+                    
 
                     string today = DateTime.Now.ToString("yyyyMMddHHmmss");
                     string Triggered_loc = "<Triggered-Location-Report><suaddr suaddr-type=\"APCO\">" + device + "</suaddr><info-data><info-time>" + today + "</info-time><server-time>" + today + "</server-time><shape><circle-2d><lat>" + lat + "</lat><long>" + lon + "</long><radius>100</radius></circle-2d></shape><speed-hor>50</speed-hor><direction-hor>32</direction-hor></info-data><sensor-info><sensor><sensor-name>Ignition</sensor-name><sensor-value>off</sensor-value><sensor-type>Input</sensor-type></sensor><sensor><sensor-name>door</sensor-name><sensor-value>open</sensor-value><sensor-type>Input</sensor-type></sensor></sensor-info><vehicle-info><odometer>10,000</odometer></vehicle-info></Triggered-Location-Report>";
                     byte[] msg4 = (data_append_dataLength(Triggered_loc));
                     handler.Send(msg4);
-                    using (StreamWriter w = File.AppendText("log.txt"))
-                    {
-                        Log("send:\r\n", Triggered_loc, w);
+                    //using (StreamWriter w = File.AppendText("log.txt"))
+                    //{
+                        Log("send:\r\n", Triggered_loc);
                         // Close the writer and underlying file.
-                        w.Close();
-                    }
+                        //w.Close();
+                    //}
                     Thread.Sleep(int.Parse(ConfigurationManager.AppSettings["auto_send_sec_interval"]) * 1000);
                 }
                 catch (Exception ex)
@@ -611,21 +645,7 @@ ORDER BY
                 {
                     Console.WriteLine("+else");
                     sql_client.disconnect();
-                    Console.WriteLine("Refill the table with kml data...");
-                    string kml_application = "ConsoleApplication1_access_kml_files.exe";
-
-                    Process SomeProgram = new Process();
-                    SomeProgram.StartInfo.FileName = kml_application;
-                    /*
-                    SomeProgram.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
-                    SomeProgram.StartInfo.UseShellExecute = false;
-                    SomeProgram.StartInfo.RedirectStandardOutput = true;
-                    SomeProgram.StartInfo.CreateNoWindow = true;
-                    */
-                    SomeProgram.Start();
-                    SomeProgram.WaitForExit();
-                    //string SomeProgramOutput = SomeProgram.StandardOutput.ReadToEnd();
-                    Console.WriteLine("Refill the table with kml data done...");
+                    
                     continue;
                 }
                 //sql_client.disconnect();
@@ -680,48 +700,48 @@ Select 0-4 then press enter to send package
                 {
                     case "0":
                         handler.Send(msg4);
-                        using (StreamWriter w = File.AppendText("log.txt"))
-                        {
-                            Log("send:\r\n", Triggered_loc, w);
+                        //using (StreamWriter w = File.AppendText("log.txt"))
+                        //{
+                            Log("send:\r\n", Triggered_loc);
                             // Close the writer and underlying file.
-                            w.Close();
-                        }
+                            //w.Close();
+                        //}
                         break;
                     case "1":
                         handler.Send(msg1);
-                        using (StreamWriter w = File.AppendText("log.txt"))
-                        {
-                            Log("send:\r\n", Unsolicited_event, w);
+                        //using (StreamWriter w = File.AppendText("log.txt"))
+                        //{
+                            Log("send:\r\n", Unsolicited_event);
                             // Close the writer and underlying file.
-                            w.Close();
-                        }
+                            //w.Close();
+                        //}
                         break;
                     case "2":
                         handler.Send(msg2);
-                        using (StreamWriter w = File.AppendText("log.txt"))
-                        {
-                            Log("send:\r\n", Unsolicited_emer, w);
+                        //using (StreamWriter w = File.AppendText("log.txt"))
+                        //{
+                            Log("send:\r\n", Unsolicited_emer);
                             // Close the writer and underlying file.
-                            w.Close();
-                        }
+                            //w.Close();
+                        //}
                         break;
                     case "3":
                         handler.Send(msg3);
-                        using (StreamWriter w = File.AppendText("log.txt"))
-                        {
-                            Log("send:\r\n", Unsolicited_pres, w);
+                        //using (StreamWriter w = File.AppendText("log.txt"))
+                        //{
+                            Log("send:\r\n", Unsolicited_pres);
                             // Close the writer and underlying file.
-                            w.Close();
-                        }
+                            //w.Close();
+                        //}
                         break;
                     case "4":
                         handler.Send(msg5);
-                        using (StreamWriter w = File.AppendText("log.txt"))
-                        {
-                            Log("send:\r\n", Triggered_loc_invalid_gps, w);
+                        //using (StreamWriter w = File.AppendText("log.txt"))
+                        //{
+                            Log("send:\r\n", Triggered_loc_invalid_gps);
                             // Close the writer and underlying file.
-                            w.Close();
-                        }
+                            //w.Close();
+                        //}
                         break;
                 }
                 /*
@@ -899,12 +919,13 @@ Select 0-4 then press enter to send package
                              .Select(x => Convert.ToByte(hex.Substring(x, 2), 16))
                              .ToArray();
         }
-        public static void Log(string send_receive, String logMessage, TextWriter w)
+        public static void Log(string send_receive, String logMessage)
         {
             try
             {
                 XDocument xml = XDocument.Parse(logMessage);
                 logMessage = send_receive + xml.ToString();
+                /*
                 w.Write("\r\nLog Entry : ");
                 w.WriteLine("{0} {1}", DateTime.Now.ToString("H:mm:ss.fffffff"),
                     DateTime.Now.ToLongDateString());
@@ -913,10 +934,13 @@ Select 0-4 then press enter to send package
                 w.WriteLine("-------------------------------");
                 // Update the underlying file.
                 w.Flush();
+                 * */
+                log.Info(logMessage);
             }
             catch (Exception ex)
             {
                 Console.WriteLine(ex.Message);
+                log.Info(logMessage);
             }
         }
         /*
@@ -1004,6 +1028,24 @@ Select 0-4 then press enter to send package
             
         }
         */
+        static void reload_table()
+        {
+            Console.WriteLine("Refill the table with kml data...");
+            string kml_application = "ConsoleApplication1_access_kml_files.exe";
+
+            Process SomeProgram = new Process();
+            SomeProgram.StartInfo.FileName = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location) + @"\" + kml_application;
+            /*
+            SomeProgram.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
+            SomeProgram.StartInfo.UseShellExecute = false;
+            SomeProgram.StartInfo.RedirectStandardOutput = true;
+            SomeProgram.StartInfo.CreateNoWindow = true;
+            */
+            SomeProgram.Start();
+            SomeProgram.WaitForExit();
+            //string SomeProgramOutput = SomeProgram.StandardOutput.ReadToEnd();
+            Console.WriteLine("Refill the table with kml data done...");
+        }
         static void Main(string[] args)
         {
             /*
@@ -1067,6 +1109,9 @@ ORDER BY
                 Console.WriteLine("Refill the table with kml data done...");
             }
             */
+            //Console.WriteLine(System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location));
+            
+
             Thread read_thread = new Thread(new ThreadStart(StartListening));
             read_thread.Start();
             //Thread demo_tt = new Thread(new ThreadStart(demo_ttt));
