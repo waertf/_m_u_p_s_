@@ -107,6 +107,7 @@ each set of the byte. To display a four-byte string, there will be 8 digits stri
 
             Console.WriteLine(LocalIPAddress());//current ip address
             Console.WriteLine(System.Environment.UserName);//current username
+            Console.WriteLine(string.Format("{0:yyMMddHHmmss}", DateTime.Now));
             //string ipAddress = "127.0.0.1";
             string ipAddress = ConfigurationManager.AppSettings["MUPS_SERVER_IP"];
             //int port = 23;
@@ -952,7 +953,7 @@ Select 1-6 then press enter to send package
                     avls_package.Date_Time = htable["info_time"].ToString().Substring(2) + ",";
                 }
                 else
-                    avls_package.Date_Time = string.Format("{0:yyMMddhhmmss}", DateTime.Now)+",";
+                    avls_package.Date_Time = string.Format("{0:yyMMddHHmmss}", DateTime.Now)+",";
                 if (htable.ContainsKey("lat_value") && htable.ContainsKey("long_value"))
                 {
                     GeoAngle lat_value = GeoAngle.FromDouble(Convert.ToDecimal(htable["lat_value"]));
@@ -1160,7 +1161,7 @@ Select 1-6 then press enter to send package
             MANUAL_SQL_DATA operation_log = new MANUAL_SQL_DATA();
             gps_log._or_lat = gps_log._or_lon = gps_log._satellites = gps_log._temperature = gps_log._voltage = "0";
             string now = string.Format("{0:yyyyMMdd}", dt);
-            gps_log._time = "\'"+string.Format("{0:yyyyMMdd hh:mm:ss.fff}", dt)+"+08"+"\'";
+            gps_log._time = "\'"+string.Format("{0:yyyyMMdd HH:mm:ss.fff}", dt)+"+08"+"\'";
 
             sql_client.connect();
             string auto_id_serial_command = sql_client.get_DataTable("SELECT COUNT(_uid)   FROM public._gps_log").Rows[0].ItemArray[0].ToString();
