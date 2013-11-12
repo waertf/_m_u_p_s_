@@ -14,12 +14,27 @@ using System.Data;
 using System.Diagnostics;
 using log4net;
 using log4net.Config;
+using System.Runtime.InteropServices;
 
 
 namespace server_syn_console
 {
     class Program
     {
+        [DllImport("kernel32.dll")]
+        static extern IntPtr GetConsoleWindow();
+
+        [DllImport("user32.dll")]
+        static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
+
+        [DllImport("user32.dll")]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        static extern bool SetForegroundWindow(IntPtr hWnd);
+
+        const int SW_HIDE = 0;
+        const int SW_SHOW = 5;
+        
+
         // Incoming data from the client.
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
         public static string data = null;
@@ -32,6 +47,8 @@ namespace server_syn_console
         private static Random random = new Random();
         Object thisLock = new Object();
         private static string sectionName = "appSettings";
+        static bool? manual_send_value = null;
+        static bool in_first_selection = true;
 
         public static void StartListening()
         {
@@ -273,7 +290,8 @@ ORDER BY
                             w.Close();
                         }
                         */
-                        if (!bool.Parse(ConfigurationManager.AppSettings["auto_send"]))
+                        //if (!bool.Parse(ConfigurationManager.AppSettings["auto_send"]))
+                        if(manual_send_value.Value)
                         {
                             SqlClient sql_client = new SqlClient(ConfigurationManager.AppSettings["SQL_SERVER_IP"], ConfigurationManager.AppSettings["SQL_SERVER_PORT"], ConfigurationManager.AppSettings["SQL_SERVER_USER_ID"], ConfigurationManager.AppSettings["SQL_SERVER_PASSWORD"], ConfigurationManager.AppSettings["SQL_SERVER_DATABASE"]);
                             string min_count=string.Empty, max_count=string.Empty;
@@ -1104,6 +1122,8 @@ Select 0-4 then press enter to send package
         */
         static void reload_table()
         {
+            var handle = GetConsoleWindow();
+            ShowWindow(handle, SW_HIDE);
             Console.WriteLine("Refill the table with kml data...");
             string kml_application = "ConsoleApplication1_access_kml_files.exe";
 
@@ -1119,9 +1139,40 @@ Select 0-4 then press enter to send package
             SomeProgram.WaitForExit();
             //string SomeProgramOutput = SomeProgram.StandardOutput.ReadToEnd();
             Console.WriteLine("Refill the table with kml data done...");
+            ShowWindow(handle, SW_SHOW);
+            SetForegroundWindow(handle);
         }
         static void Main(string[] args)
         {
+            while (in_first_selection)
+            {
+                Console.WriteLine(@"
+1.Auto send test
+2.Manual send test
+3.Reload All KML files
+4.Next");
+                Console.Write("Select[1-4]:");
+                string select_num = string.Empty;
+                select_num = Console.ReadLine();
+                switch (select_num)
+                {
+                    case "1":
+                        manual_send_value = false;
+                        break;
+                    case "2":
+                        manual_send_value = true;
+                        break;
+                    case "3":
+                        reload_table();
+                        break;
+                    case "4":
+                        if (manual_send_value.HasValue)
+                            in_first_selection = false;
+                        else
+                            Console.WriteLine("Necessary to select 1 or 2!!!");
+                        break;
+                }
+            }
             
             SqlClient sql_client = new SqlClient(ConfigurationManager.AppSettings["SQL_SERVER_IP"], ConfigurationManager.AppSettings["SQL_SERVER_PORT"], ConfigurationManager.AppSettings["SQL_SERVER_USER_ID"], ConfigurationManager.AppSettings["SQL_SERVER_PASSWORD"], ConfigurationManager.AppSettings["SQL_SERVER_DATABASE"]);
             sql_client.connect();

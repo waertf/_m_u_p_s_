@@ -71,6 +71,12 @@ namespace ConsoleApplication1_access_kml_files
             sql_client.connect();
             sql_client.modify("TRUNCATE TABLE public._gps_log");
             sql_client.disconnect();
+            sql_client.connect();
+            sql_client.modify("DROP SEQUENCE  manual_count");
+            sql_client.disconnect();
+            sql_client.connect();
+            sql_client.modify(@"DROP FUNCTION create_seq(text, text,INTEGER,INTEGER)");
+            sql_client.disconnect();
             for (int j = 0; j < xml_load.Length; j++)
             {
                 string receive = string.Empty;
@@ -81,7 +87,7 @@ namespace ConsoleApplication1_access_kml_files
                 string device_count = "device_" + device_name + "_count";
                 sql_client.connect();
                 sql_client.modify("DROP SEQUENCE " + device_count);
-                sql_client.modify("DROP SEQUENCE  manual_count");
+                
                 sql_client.disconnect();
                 foreach (string cc in result)
                 {
