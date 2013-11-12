@@ -103,6 +103,7 @@ Select 0-4 then press enter to send package
 2.Unsolicited-Location-Report Emergency Message
 3.Unsolicited-Location-Report Presence Event Message
 4.Triggered-Location-Report with Invalid GPS Location Message
+5.Unsolicited-Location-Report Absent Event Message
 ");
                         Console.Write("Select[0-4]:");
                 }
@@ -513,6 +514,7 @@ Select 0-4 then press enter to send package
 2.Unsolicited-Location-Report Emergency Message
 3.Unsolicited-Location-Report Presence Event Message
 4.Triggered-Location-Report with Invalid GPS Location Message
+5.Unsolicited-Location-Report Absent Event Message
 ");
                 ///TODO:auto send from fixed interval time
                 ///900001->10sec interval
@@ -582,11 +584,13 @@ ORDER BY
                 string Unsolicited_pres = "<Unsolicited-Location-Report><suaddr suaddr-type=\"APCO\">"+device+"</suaddr><event-info>Unit Present</event-info></Unsolicited-Location-Report>";
                 string Triggered_loc = "<Triggered-Location-Report><suaddr suaddr-type=\"APCO\">"+device+"</suaddr><info-data><info-time>" + today + "</info-time><server-time>" + today + "</server-time><shape><circle-2d><lat>" + lat + "</lat><long>" + lon + "</long><radius>100</radius></circle-2d></shape><speed-hor>50</speed-hor><direction-hor>32</direction-hor></info-data><sensor-info><sensor><sensor-name>Ignition</sensor-name><sensor-value>off</sensor-value><sensor-type>Input</sensor-type></sensor><sensor><sensor-name>door</sensor-name><sensor-value>open</sensor-value><sensor-type>Input</sensor-type></sensor></sensor-info><vehicle-info><odometer>10,000</odometer></vehicle-info></Triggered-Location-Report>";
                 string Triggered_loc_invalid_gps = "<Triggered-Location-Report><suaddr suaddr-type=\"APCO\">"+device+"</suaddr><operation-error><result result-code=\"1006\">GPS INVALID</result></operation-error></Triggered-Location-Report>";
+                string Unsolicited_Absent = "<Unsolicited-Location-Report><suaddr suaddr-type=\"APCO\">" + device + "</suaddr><event-info>Unit Absent</event-info></Unsolicited-Location-Report>";
                 byte[] msg1 = (data_append_dataLength(Unsolicited_event));
                 byte[] msg2 = (data_append_dataLength(Unsolicited_emer));
                 byte[] msg3 = (data_append_dataLength(Unsolicited_pres));
                 byte[] msg4 = (data_append_dataLength(Triggered_loc));
                 byte[] msg5 = (data_append_dataLength(Triggered_loc_invalid_gps));
+                byte[] msg6 = (data_append_dataLength(Unsolicited_Absent));
                 /*
                 Console.WriteLine(
                     @"
@@ -656,6 +660,15 @@ Select 0-4 then press enter to send package
                         break;
                     case "4":
                         handler.Send(msg5);
+                        using (StreamWriter w = File.AppendText("log.txt"))
+                        {
+                            Log("send:\r\n", Triggered_loc_invalid_gps, w);
+                            // Close the writer and underlying file.
+                            w.Close();
+                        }
+                        break;
+                    case "5":
+                        handler.Send(msg6);
                         using (StreamWriter w = File.AppendText("log.txt"))
                         {
                             Log("send:\r\n", Triggered_loc_invalid_gps, w);

@@ -982,8 +982,11 @@ Select 1-6 then press enter to send package
                             avls_package.Status = "00000000,";
                             break;
                         case "Unit Present":
+                            avls_package.Event = "181,";
+                            avls_package.Status = "00000000,";
+                            break;
                         case "Unit Absent":
-                            avls_package.Event = "000,";
+                            avls_package.Event = "182,";
                             avls_package.Status = "00000000,";
                             break;
                         case "Ignition Off":
