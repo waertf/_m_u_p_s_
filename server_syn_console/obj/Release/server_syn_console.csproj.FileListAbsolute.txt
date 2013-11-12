@@ -18,3 +18,5 @@ C:\Users\wavegis\Documents\mups\server_syn_console\bin\Release\Devart.Data.Postg
 C:\Users\wavegis\Documents\mups\server_syn_console\obj\Release\ResolveAssemblyReference.cache
 C:\Users\wavegis\Documents\mups\server_syn_console\obj\Release\Server.exe
 C:\Users\wavegis\Documents\mups\server_syn_console\obj\Release\Server.pdb
+C:\Users\wavegis\Documents\mups\server_syn_console\bin\Release\log4net.dll
+C:\Users\wavegis\Documents\mups\server_syn_console\bin\Release\log4net.xml

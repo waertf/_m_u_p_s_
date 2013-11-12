@@ -39,6 +39,7 @@ namespace ConsoleApplication1_client_threading
             new ManualResetEvent(false);
         private static ManualResetEvent receiveDone =
             new ManualResetEvent(false);
+        static string  last_avls_lon = string.Empty,last_avls_lat =string.Empty;
 
         public  struct AVLS_UNIT_Report_Packet
         {
@@ -944,6 +945,8 @@ Select 1-6 then press enter to send package
                 {
                     avls_package.Date_Time = htable["info_time"].ToString().Substring(2) + ",";
                 }
+                else
+                    avls_package.Date_Time = string.Format("{0:yyMMddhhmmss}", DateTime.Now)+",";
                 if (htable.ContainsKey("lat_value") && htable.ContainsKey("long_value"))
                 {
                     GeoAngle lat_value = GeoAngle.FromDouble(Convert.ToDecimal(htable["lat_value"]));
@@ -952,19 +955,31 @@ Select 1-6 then press enter to send package
                     string long_str = long_value.Degrees.ToString() + long_value.Minutes.ToString("D2") + "." + long_value.Seconds.ToString("D2") + long_value.Milliseconds.ToString("D3");
                     //avls_package.Loc = "N" + (Convert.ToDouble(htable["lat_value"])*100).ToString() + "E" + (Convert.ToDouble(htable["long_value"])*100).ToString()+ ",";
                     avls_package.Loc = "N" + lat_str + "E" + long_str + ",";
+                    last_avls_lat = lat_str;
+                    last_avls_lon = long_str;
                 }
                 else
                 {
-                    avls_tcpClient.Close();
-                    return;
+                    //avls_tcpClient.Close();
+                    //return;
+                    //avls_package.Loc = "N" + last_avls_lat + "E" + last_avls_lon + ",";
+                    avls_package.Loc = "N00000.0000E00000.0000,";
                 }
                 if (htable.ContainsKey("speed-hor"))
                 {
                     avls_package.Speed = Convert.ToInt32((double.Parse(htable["speed-hor"].ToString()) * 1.609344)).ToString() + ",";
                 }
+                else
+                {
+                    avls_package.Speed = "0,";
+                }
                 if (htable.ContainsKey("direction-hor"))
                 {
                     avls_package.Dir = htable["direction-hor"].ToString() + ",";
+                }
+                else
+                {
+                    avls_package.Dir = "0,";
                 }
                 avls_package.Temp = "NA,";
                 if (htable.ContainsKey("event_info"))
