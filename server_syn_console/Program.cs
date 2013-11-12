@@ -812,7 +812,7 @@ Select 0-4 then press enter to send package
                         handler.Send(msg6);
                         using (StreamWriter w = File.AppendText("log.txt"))
                         {
-                            Log("send:\r\n", Triggered_loc_invalid_gps, w);
+                            Log("send:\r\n", Triggered_loc_invalid_gps);
                             // Close the writer and underlying file.
                             w.Close();
                         }
