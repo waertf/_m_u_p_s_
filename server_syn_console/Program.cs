@@ -15,6 +15,7 @@ using System.Diagnostics;
 using log4net;
 using log4net.Config;
 using System.Runtime.InteropServices;
+using System.Net.NetworkInformation;
 
 
 namespace server_syn_console
@@ -50,6 +51,33 @@ namespace server_syn_console
         static bool? manual_send_value = null;
         static bool in_first_selection = true;
 
+        private static IPAddress GetLocalIPAddress()
+        {
+            foreach (NetworkInterface ni in NetworkInterface.GetAllNetworkInterfaces())
+            {
+                var addr = ni.GetIPProperties().GatewayAddresses.FirstOrDefault();
+                if (addr != null && !addr.Address.Equals(new IPAddress(0x00000000)))
+                {
+                    if (ni.NetworkInterfaceType == NetworkInterfaceType.Wireless80211 || ni.NetworkInterfaceType == NetworkInterfaceType.Ethernet)
+                    {
+                        //Console.WriteLine(ni.Name);
+                        //Console.WriteLine(addr.Address);
+                        foreach (UnicastIPAddressInformation ip in ni.GetIPProperties().UnicastAddresses)
+                        {
+                            if (ip.Address.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork)
+                            {
+                                //Console.WriteLine(ip.Address.ToString());
+                                return ip.Address;
+                            }
+
+                        }
+                    }
+
+                }
+            }
+            return null;
+        }
+
         public static void StartListening()
         {
             // Data buffer for incoming data.
@@ -59,6 +87,7 @@ namespace server_syn_console
             // Establish the local endpoint for the socket.
             // Dns.GetHostName returns the name of the 
             // host running the application.
+            /*
             IPHostEntry ipHostInfo = Dns.GetHostEntry(Dns.GetHostName());
             for (int i = 0; i < ipHostInfo.AddressList.Length; i++)
                 if (ipHostInfo.AddressList[i].AddressFamily == AddressFamily.InterNetwork)
@@ -66,7 +95,10 @@ namespace server_syn_console
                     ipAddress = ipHostInfo.AddressList[i];
                     break;
                 }
-
+            */
+            ipAddress = GetLocalIPAddress();
+            Console.WriteLine(ipAddress);
+            log.Info("ip address =" + ipAddress.ToString());
             IPEndPoint localEndPoint = new IPEndPoint(ipAddress, int.Parse(ConfigurationManager.AppSettings["MUPS_SERVER_PORT"]));
 
             // Create a TCP/IP socket.
