@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.NetworkInformation;
 using System.Text;
 using System.Net.Sockets;
 using System.Threading;
@@ -105,7 +106,7 @@ each set of the byte. To display a four-byte string, there will be 8 digits stri
             // makes the new values available for reading.
             ConfigurationManager.RefreshSection(sectionName);
 
-            Console.WriteLine(LocalIPAddress());//current ip address
+            Console.WriteLine(GetLocalIPAddress());//current ip address
             Console.WriteLine(System.Environment.UserName);//current username
             Console.WriteLine(string.Format("{0:yyMMddHHmmss}", DateTime.Now));
             //string ipAddress = "127.0.0.1";
@@ -1783,18 +1784,31 @@ Select 1-6 then press enter to send package
             Console.WriteLine("Validation Error: {0}", e.Message);
         }
 
-        private static IPAddress LocalIPAddress()
+        private static IPAddress GetLocalIPAddress()
         {
-            if (!System.Net.NetworkInformation.NetworkInterface.GetIsNetworkAvailable())
+            foreach (NetworkInterface ni in NetworkInterface.GetAllNetworkInterfaces())
             {
-                return null;
+                var addr = ni.GetIPProperties().GatewayAddresses.FirstOrDefault();
+                if (addr != null && !addr.Address.Equals(new IPAddress(0x00000000)))
+                {
+                    if (ni.NetworkInterfaceType == NetworkInterfaceType.Wireless80211 || ni.NetworkInterfaceType == NetworkInterfaceType.Ethernet)
+                    {
+                        //Console.WriteLine(ni.Name);
+                        //Console.WriteLine(addr.Address);
+                        foreach (UnicastIPAddressInformation ip in ni.GetIPProperties().UnicastAddresses)
+                        {
+                            if (ip.Address.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork)
+                            {
+                                //Console.WriteLine(ip.Address.ToString());
+                                return ip.Address;
+                            }
+
+                        }
+                    }
+
+                }
             }
-
-            IPHostEntry host = Dns.GetHostEntry(Dns.GetHostName());
-
-            return host
-                .AddressList
-                .FirstOrDefault(ip => ip.AddressFamily == AddressFamily.InterNetwork);
+            return null;
         }
     }
 
