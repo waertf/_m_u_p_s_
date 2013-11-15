@@ -31,7 +31,7 @@ namespace ConsoleApplication1_client_threading
         private static byte[] myReadBuffer = null;
         private static byte[] fBuffer = null;
         private static int fBytesRead = 0;
-        private static TcpClient tcpClient;
+        private static TcpClient tcpClient, avls_tcpClient;
         private static SqlClient sql_client;
         // ManualResetEvent instances signal completion.
         private static ManualResetEvent connectDone =
@@ -40,9 +40,28 @@ namespace ConsoleApplication1_client_threading
             new ManualResetEvent(false);
         private static ManualResetEvent receiveDone =
             new ManualResetEvent(false);
+
+        private static ManualResetEvent avls_connectDone =
+           new ManualResetEvent(false);
+        private static ManualResetEvent avls_sendDone =
+            new ManualResetEvent(false);
+        private static ManualResetEvent avls_receiveDone =
+            new ManualResetEvent(false);
+
         static string  last_avls_lon = string.Empty,last_avls_lat =string.Empty;
 
         private static string sectionName = "appSettings";
+
+        //string ipAddress = "127.0.0.1";
+        static string ipAddress = ConfigurationManager.AppSettings["MUPS_SERVER_IP"];
+        //int port = 23;
+        static int port = int.Parse(ConfigurationManager.AppSettings["MUPS_SERVER_PORT"]);
+        //bool mups_connected = false;
+
+        //string ipAddress = "127.0.0.1";
+        static string avls_ipaddress = ConfigurationManager.AppSettings["AVLS_SERVER_IP"];
+        //int port = 23;
+        static int avls_port = int.Parse(ConfigurationManager.AppSettings["AVLS_SERVER_PORT"]);
 
         public  struct AVLS_UNIT_Report_Packet
         {
@@ -96,9 +115,47 @@ each set of the byte. To display a four-byte string, there will be 8 digits stri
 
         static void ConnectCallback(IAsyncResult ar)
         {
-            connectDone.Set();
-            TcpClient t = (TcpClient)ar.AsyncState;
-            t.EndConnect(ar);
+            try
+            {
+                
+                TcpClient t = (TcpClient)ar.AsyncState;
+                t.EndConnect(ar);
+                connectDone.Set();
+            }
+            catch (Exception ex)
+            {
+                //tcpClient.GetStream().Close();
+                //tcpClient.Close();
+                Console.WriteLine(ex.Message);
+                tcpClient = new TcpClient();
+                connectDone.Reset();
+                tcpClient.BeginConnect(ipAddress, port, new AsyncCallback(ConnectCallback), tcpClient);
+                connectDone.WaitOne();
+                Keeplive.keep(tcpClient.Client);
+            }
+            
+        }
+        static void avls_ConnectCallback(IAsyncResult ar)
+        {
+            try
+            {
+
+                TcpClient t = (TcpClient)ar.AsyncState;
+                t.EndConnect(ar);
+                avls_connectDone.Set();
+            }
+            catch (Exception ex)
+            {
+                //tcpClient.GetStream().Close();
+                //tcpClient.Close();
+                Console.WriteLine(ex.Message);
+                avls_tcpClient = new TcpClient();
+                avls_connectDone.Reset();
+                avls_tcpClient.BeginConnect(avls_ipaddress, avls_port, new AsyncCallback(avls_ConnectCallback), avls_tcpClient);
+                avls_connectDone.WaitOne();
+                Keeplive.keep(avls_tcpClient.Client);
+            }
+
         }
         static void Main(string[] args)
         {
@@ -109,11 +166,7 @@ each set of the byte. To display a four-byte string, there will be 8 digits stri
             Console.WriteLine(GetLocalIPAddress());//current ip address
             Console.WriteLine(System.Environment.UserName);//current username
             Console.WriteLine(string.Format("{0:yyMMddHHmmss}", DateTime.Now));
-            //string ipAddress = "127.0.0.1";
-            string ipAddress = ConfigurationManager.AppSettings["MUPS_SERVER_IP"];
-            //int port = 23;
-            int port = int.Parse(ConfigurationManager.AppSettings["MUPS_SERVER_PORT"]);
-            //bool mups_connected = false;
+           
             tcpClient = new TcpClient();
             /*
             while (!mups_connected)
@@ -907,20 +960,17 @@ Select 1-6 then press enter to send package
 
         private static void access_avls_server(SqlClient sql_client,string xml_root_tag, Hashtable htable, List<string> sensor_name, List<string> sensor_type, List<string> sensor_value, IEnumerable<XName> iEnumerable, string log)
         {
-            TcpClient avls_tcpClient;
+            
             string send_string = string.Empty;
             AVLS_UNIT_Report_Packet avls_package = new AVLS_UNIT_Report_Packet();
-            //string ipAddress = "127.0.0.1";
-            string ipAddress = ConfigurationManager.AppSettings["AVLS_SERVER_IP"];
-            //int port = 23;
-            int port = int.Parse(ConfigurationManager.AppSettings["AVLS_SERVER_PORT"]);
+            
             
             avls_tcpClient = new TcpClient();
 
             //avls_tcpClient.Connect(ipAddress, port);
-            connectDone.Reset();
-            avls_tcpClient.BeginConnect(ipAddress, port, new AsyncCallback(ConnectCallback), avls_tcpClient);
-            connectDone.WaitOne();
+            avls_connectDone.Reset();
+            avls_tcpClient.BeginConnect(avls_ipaddress, avls_port, new AsyncCallback(avls_ConnectCallback), avls_tcpClient);
+            avls_connectDone.WaitOne();
 
             //avls_tcpClient.NoDelay = false;
 
