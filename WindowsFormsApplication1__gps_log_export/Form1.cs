@@ -13,6 +13,7 @@ namespace WindowsFormsApplication1__gps_log_export
     public partial class Form1 : Form
     {
         SqlClient _sqlClient = new SqlClient(ConfigurationManager.AppSettings["SQL_SERVER_IP"], ConfigurationManager.AppSettings["SQL_SERVER_PORT"], ConfigurationManager.AppSettings["SQL_SERVER_USER_ID"], ConfigurationManager.AppSettings["SQL_SERVER_PASSWORD"], ConfigurationManager.AppSettings["SQL_SERVER_DATABASE"]);
+        BackgroundWorker backgroundWorker1 = new BackgroundWorker();
         public Form1()
         {
             InitializeComponent();
