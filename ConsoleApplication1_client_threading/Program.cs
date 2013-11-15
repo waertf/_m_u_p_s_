@@ -127,7 +127,9 @@ each set of the byte. To display a four-byte string, there will be 8 digits stri
                 //tcpClient.GetStream().Close();
                 //tcpClient.Close();
                 Console.WriteLine(ex.Message);
+                log.Error(ex.Message);
                 tcpClient = new TcpClient();
+                
                 connectDone.Reset();
                 tcpClient.BeginConnect(ipAddress, port, new AsyncCallback(ConnectCallback), tcpClient);
                 connectDone.WaitOne();
@@ -149,6 +151,7 @@ each set of the byte. To display a four-byte string, there will be 8 digits stri
                 //tcpClient.GetStream().Close();
                 //tcpClient.Close();
                 Console.WriteLine(ex.Message);
+                log.Error(ex.Message);
                 avls_tcpClient = new TcpClient();
                 avls_connectDone.Reset();
                 avls_tcpClient.BeginConnect(avls_ipaddress, avls_port, new AsyncCallback(avls_ConnectCallback), avls_tcpClient);
@@ -489,10 +492,11 @@ Select 1-6 then press enter to send package
             }
         }
         public static void myReadSizeCallBack(IAsyncResult ar)
-        {          
+        {
+            NetworkStream myNetworkStream = (NetworkStream)ar.AsyncState;
             try
             {
-                NetworkStream myNetworkStream = (NetworkStream)ar.AsyncState;
+                
                 // Read precisely four bytes for the length of the following message
                 int numberOfBytesRead = myNetworkStream.EndRead(ar);
                 if (myReadBuffer.Length != numberOfBytesRead)
@@ -510,6 +514,48 @@ Select 1-6 then press enter to send package
             {
                 Console.WriteLine("myReadSizeCallBackError:"+Environment.NewLine+ex.Message);
                 log.Error("myReadSizeCallBackError:" + Environment.NewLine + ex.Message);
+                if(myNetworkStream!=null)
+                    myNetworkStream.Dispose();
+                tcpClient.Close();
+                tcpClient = new TcpClient();
+                connectDone.Reset();
+                tcpClient.BeginConnect(ipAddress, port, new AsyncCallback(ConnectCallback), tcpClient);
+                connectDone.WaitOne();
+                Keeplive.keep(tcpClient.Client);
+                myNetworkStream = tcpClient.GetStream();
+
+                sql_client = new SqlClient(ConfigurationManager.AppSettings["SQL_SERVER_IP"], ConfigurationManager.AppSettings["SQL_SERVER_PORT"], ConfigurationManager.AppSettings["SQL_SERVER_USER_ID"], ConfigurationManager.AppSettings["SQL_SERVER_PASSWORD"], ConfigurationManager.AppSettings["SQL_SERVER_DATABASE"], ConfigurationManager.AppSettings["Pooling"], ConfigurationManager.AppSettings["MinPoolSize"], ConfigurationManager.AppSettings["MaxPoolSize"], ConfigurationManager.AppSettings["ConnectionLifetime"]);
+
+                string registration_msg_error_test = "<Location-Registration-Request><application>" + ConfigurationManager.AppSettings["application_ID"] + "</application></Location-Registration-Request>";
+                WriteLine(myNetworkStream, data_append_dataLength(registration_msg_error_test), registration_msg_error_test);
+                using (StreamWriter w = File.AppendText("log.txt"))
+                {
+                    Log("send:\r\n", registration_msg_error_test, w);
+                    // Close the writer and underlying file.
+                    w.Close();
+                }
+                {//access sql
+                    string now = string.Format("{0:yyyyMMdd}", DateTime.Now);
+                    sql_client.connect();
+                    string manual_id_serial_command = sql_client.get_DataTable("SELECT COUNT(_id)   FROM public.operation_log").Rows[0].ItemArray[0].ToString();
+                    sql_client.disconnect();
+                    MANUAL_SQL_DATA operation_log = new MANUAL_SQL_DATA();
+                    operation_log._id = "\'" + "operation" + "_" + now + "_" + manual_id_serial_command + "\'";
+                    operation_log.event_id = @"'null'";
+                    operation_log.application_id = "\'" + ConfigurationManager.AppSettings["application_ID"] + "\'";
+                    operation_log.create_user = @"'System'";
+                    string table_columns, table_column_value, cmd;
+                    table_column_value = operation_log._id + "," + operation_log.event_id + "," + operation_log.application_id + "," + operation_log.create_user;
+                    table_columns = "_id,event_id,application_id,create_user";
+                    cmd = "INSERT INTO public.operation_log (" + table_columns + ") VALUES  (" + table_column_value + ")";
+                    sql_client.connect();
+                    sql_client.modify(cmd);
+                    sql_client.disconnect();
+                }
+
+                myNetworkStream.BeginRead(myReadBuffer, 0, myReadBuffer.Length,
+                                                                 new AsyncCallback(myReadSizeCallBack),
+                                                                 myNetworkStream);
             }
         }
         private static void FinishRead(IAsyncResult result)
