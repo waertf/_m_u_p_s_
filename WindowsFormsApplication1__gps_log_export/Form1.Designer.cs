@@ -37,10 +37,10 @@
             this.number_label = new System.Windows.Forms.Label();
             this.resulttextBox = new System.Windows.Forms.TextBox();
             this.label3 = new System.Windows.Forms.Label();
-            this.errortextBox = new System.Windows.Forms.TextBox();
             this.label4 = new System.Windows.Forms.Label();
             this.numbertextBox = new System.Windows.Forms.TextBox();
             this.label5 = new System.Windows.Forms.Label();
+            this.min_comboBox = new System.Windows.Forms.ComboBox();
             this.SuspendLayout();
             // 
             // FromDateTime
@@ -61,7 +61,7 @@
             this.SearchBtn.TabIndex = 1;
             this.SearchBtn.Text = "Search";
             this.SearchBtn.UseVisualStyleBackColor = true;
-            this.SearchBtn.Click += new System.EventHandler(this.button1_Click);
+            this.SearchBtn.Click += new System.EventHandler(this.SearchBtn_Click);
             // 
             // label1
             // 
@@ -128,13 +128,6 @@
             this.label3.TabIndex = 7;
             this.label3.Text = "誤差:";
             // 
-            // errortextBox
-            // 
-            this.errortextBox.Location = new System.Drawing.Point(307, 41);
-            this.errortextBox.Name = "errortextBox";
-            this.errortextBox.Size = new System.Drawing.Size(52, 22);
-            this.errortextBox.TabIndex = 8;
-            // 
             // label4
             // 
             this.label4.AutoSize = true;
@@ -148,6 +141,7 @@
             // 
             this.numbertextBox.Location = new System.Drawing.Point(308, 12);
             this.numbertextBox.Name = "numbertextBox";
+            this.numbertextBox.ReadOnly = true;
             this.numbertextBox.Size = new System.Drawing.Size(52, 22);
             this.numbertextBox.TabIndex = 10;
             // 
@@ -160,15 +154,24 @@
             this.label5.TabIndex = 11;
             this.label5.Text = "個";
             // 
+            // min_comboBox
+            // 
+            this.min_comboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.min_comboBox.FormattingEnabled = true;
+            this.min_comboBox.Location = new System.Drawing.Point(308, 41);
+            this.min_comboBox.Name = "min_comboBox";
+            this.min_comboBox.Size = new System.Drawing.Size(52, 20);
+            this.min_comboBox.TabIndex = 12;
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(399, 352);
+            this.Controls.Add(this.min_comboBox);
             this.Controls.Add(this.label5);
             this.Controls.Add(this.numbertextBox);
             this.Controls.Add(this.label4);
-            this.Controls.Add(this.errortextBox);
             this.Controls.Add(this.label3);
             this.Controls.Add(this.resulttextBox);
             this.Controls.Add(this.number_label);
@@ -196,10 +199,10 @@
         private System.Windows.Forms.Label number_label;
         private System.Windows.Forms.TextBox resulttextBox;
         private System.Windows.Forms.Label label3;
-        private System.Windows.Forms.TextBox errortextBox;
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.TextBox numbertextBox;
         private System.Windows.Forms.Label label5;
+        private System.Windows.Forms.ComboBox min_comboBox;
     }
 }
 
