@@ -41,6 +41,7 @@
             this.numbertextBox = new System.Windows.Forms.TextBox();
             this.label5 = new System.Windows.Forms.Label();
             this.min_comboBox = new System.Windows.Forms.ComboBox();
+            this.saveFileDialog1 = new System.Windows.Forms.SaveFileDialog();
             this.SuspendLayout();
             // 
             // FromDateTime
@@ -100,6 +101,7 @@
             this.ExportBtn.TabIndex = 5;
             this.ExportBtn.Text = "Export";
             this.ExportBtn.UseVisualStyleBackColor = true;
+            this.ExportBtn.Click += new System.EventHandler(this.ExportBtn_Click);
             // 
             // number_label
             // 
@@ -203,6 +205,7 @@
         private System.Windows.Forms.TextBox numbertextBox;
         private System.Windows.Forms.Label label5;
         private System.Windows.Forms.ComboBox min_comboBox;
+        private System.Windows.Forms.SaveFileDialog saveFileDialog1;
     }
 }
 

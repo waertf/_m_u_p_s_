@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Configuration;
@@ -14,6 +15,7 @@ namespace WindowsFormsApplication1__gps_log_export
     {
         SqlClient _sqlClient = new SqlClient(ConfigurationManager.AppSettings["SQL_SERVER_IP"], ConfigurationManager.AppSettings["SQL_SERVER_PORT"], ConfigurationManager.AppSettings["SQL_SERVER_USER_ID"], ConfigurationManager.AppSettings["SQL_SERVER_PASSWORD"], ConfigurationManager.AppSettings["SQL_SERVER_DATABASE"]);
         BackgroundWorker backgroundWorker1 = new BackgroundWorker();
+        private List<string> listResult;
         public Form1()
         {
             InitializeComponent();
@@ -45,7 +47,7 @@ AS temp
             {
                 try
                 {
-                    List<string> listResult = new List<string>();
+                    listResult = new List<string>();
                     DateTime error_count_datetime = ToDateTime.Value.AddMinutes(0-double.Parse(min_comboBox.Text));
                     string numberResultCmd = @"SELECT count(temp) FROM
 (
@@ -105,6 +107,23 @@ AS temp";
                 {
                     _sqlClient.disconnect();
                 }
+            }
+        }
+
+        private void ExportBtn_Click(object sender, EventArgs e)
+        {
+            if (saveFileDialog1.ShowDialog() == DialogResult.OK)
+            {
+                StreamWriter sw = new StreamWriter(saveFileDialog1.FileName);
+                sw.WriteLine(FromDateTime.Value.ToString("yyyy-MM-dd HH:mm") + " - " + ToDateTime.Value.ToString("yyyy-MM-dd HH:mm"));
+                sw.WriteLine("number:" + numbertextBox.Text);
+                sw.WriteLine("device list:");
+                for (int i = 0; i < listResult.Count;i++)
+                {
+                   sw.WriteLine(listResult[i]);
+                }
+                sw.WriteLine("================================================");
+                sw.Close();
             }
         }
     }
