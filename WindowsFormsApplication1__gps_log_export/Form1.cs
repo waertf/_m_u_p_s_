@@ -37,9 +37,59 @@ AS temp
 
         private void SearchBtn_Click(object sender, EventArgs e)
         {
-            MessageBox.Show(FromDateTime.Value.ToString("yyyy-MM-dd HH:mm"));
-            resulttextBox.AppendText("test1"+Environment.NewLine);
-            resulttextBox.AppendText("test2" + Environment.NewLine);
+            //MessageBox.Show(FromDateTime.Value.ToString("yyyy-MM-dd HH:mm"));
+            //resulttextBox.AppendText("test1"+Environment.NewLine);
+            //resulttextBox.AppendText("test2" + Environment.NewLine);
+            resulttextBox.Clear();
+            if (_sqlClient.connect())
+            {
+                try
+                {
+                    List<string> listResult = new List<string>();
+                    string numberResultCmd = @"SELECT count(temp) FROM
+(
+select DISTINCT public._gps_log._uid from public._gps_log
+where
+public._gps_log._time > '"+FromDateTime.Value.ToString("yyyy-MM-dd HH:mm")+@"'
+AND
+public._gps_log._time < '"+ToDateTime.Value.ToString("yyyy-MM-dd HH:mm")+@"'
+) 
+AS temp";
+                    string listResultCmd = @"SELECT (temp) FROM
+(
+select DISTINCT public._gps_log._uid from public._gps_log
+where
+public._gps_log._time > '" + FromDateTime.Value.ToString("yyyy-MM-dd HH:mm") + @"'
+AND
+public._gps_log._time < '" + ToDateTime.Value.ToString("yyyy-MM-dd HH:mm") + @"'
+) 
+AS temp";
+                    DataTable numberResult = _sqlClient.get_DataTable(numberResultCmd);
+                    DataTable listResultDataTable = _sqlClient.get_DataTable(listResultCmd);
+                    foreach (DataRow row in numberResult.Rows)
+                    {
+                        numberResultCmd = row[0].ToString();
+                    }
+                    foreach (DataRow VARIABLE in listResultDataTable.Rows)
+                    {
+                        listResult.Add(VARIABLE[0].ToString());
+                    }
+                    numbertextBox.Text = numberResultCmd;
+                    foreach (string s in listResult)
+                    {
+                        resulttextBox.AppendText(s + Environment.NewLine);
+                    }
+                }
+                catch (Exception ex)
+                {
+
+                    MessageBox.Show(ex.Message);
+                }
+                finally
+                {
+                    _sqlClient.disconnect();
+                }
+            }
         }
     }
 }
