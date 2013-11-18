@@ -46,6 +46,7 @@ AS temp
                 try
                 {
                     List<string> listResult = new List<string>();
+                    DateTime error_count_datetime = ToDateTime.Value.AddMinutes(0-double.Parse(min_comboBox.Text));
                     string numberResultCmd = @"SELECT count(temp) FROM
 (
 select DISTINCT public._gps_log._uid from public._gps_log
@@ -53,6 +54,15 @@ where
 public._gps_log._time > '"+FromDateTime.Value.ToString("yyyy-MM-dd HH:mm")+@"'
 AND
 public._gps_log._time < '"+ToDateTime.Value.ToString("yyyy-MM-dd HH:mm")+@"'
+) 
+AS temp";
+                    string errorNumberResultCmd = @"SELECT count(temp) FROM
+(
+select DISTINCT public._gps_log._uid from public._gps_log
+where
+public._gps_log._time > '" + FromDateTime.Value.ToString("yyyy-MM-dd HH:mm") + @"'
+AND
+public._gps_log._time < '" + error_count_datetime.ToString("yyyy-MM-dd HH:mm") + @"'
 ) 
 AS temp";
                     string listResultCmd = @"SELECT (temp) FROM
@@ -65,16 +75,22 @@ public._gps_log._time < '" + ToDateTime.Value.ToString("yyyy-MM-dd HH:mm") + @"'
 ) 
 AS temp";
                     DataTable numberResult = _sqlClient.get_DataTable(numberResultCmd);
+                    DataTable errorNumberResult = _sqlClient.get_DataTable(errorNumberResultCmd);
                     DataTable listResultDataTable = _sqlClient.get_DataTable(listResultCmd);
+                    int numberInitial=0, errorNumber=0;
                     foreach (DataRow row in numberResult.Rows)
                     {
-                        numberResultCmd = row[0].ToString();
+                        numberInitial = int.Parse(row[0].ToString());
+                    }
+                    foreach (DataRow row in errorNumberResult.Rows)
+                    {
+                        errorNumber = int.Parse(row[0].ToString());
                     }
                     foreach (DataRow VARIABLE in listResultDataTable.Rows)
                     {
                         listResult.Add(VARIABLE[0].ToString());
                     }
-                    numbertextBox.Text = numberResultCmd;
+                    numbertextBox.Text = numberResultCmd=(numberInitial-errorNumber).ToString();
                     foreach (string s in listResult)
                     {
                         resulttextBox.AppendText(s + Environment.NewLine);
