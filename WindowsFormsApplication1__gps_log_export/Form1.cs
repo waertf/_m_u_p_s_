@@ -95,7 +95,7 @@ AS temp";
                     numbertextBox.Text = numberResultCmd=(numberInitial-errorNumber).ToString();
                     foreach (string s in listResult)
                     {
-                        resulttextBox.AppendText(s + Environment.NewLine);
+                        resulttextBox.AppendText(s.Replace("(","").Replace(")","")+ Environment.NewLine);
                     }
                 }
                 catch (Exception ex)
@@ -120,7 +120,7 @@ AS temp";
                 sw.WriteLine("device list:");
                 for (int i = 0; i < listResult.Count;i++)
                 {
-                   sw.WriteLine(listResult[i]);
+                    sw.WriteLine(listResult[i].Replace("(", "").Replace(")", ""));
                 }
                 sw.WriteLine("================================================");
                 sw.Close();
