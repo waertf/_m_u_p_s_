@@ -6,6 +6,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
+using System.Timers;
 
 namespace ConsoleApplication1_asyn_tcp_client
 {
@@ -45,29 +46,31 @@ namespace ConsoleApplication1_asyn_tcp_client
             // The response from the remote device.
             private static String response = String.Empty;
 
-            private static void StartClient()
+            private static void StartClient(object sender, ElapsedEventArgs elapsedEventArgs)
             {
                 // Connect to a remote device.
                 try
                 {
-                    while (true)
-                    {
-                        // Establish the remote endpoint for the socket.
-                        // The name of the 
-                        // remote device is "host.contoso.com".
-                        //IPHostEntry ipHostInfo = Dns.Resolve("host.contoso.com");
-                        //IPAddress ipAddress = ipHostInfo.AddressList[0];
-                        //IPAddress ipAddress = IPAddress.Parse("");
-                        IPEndPoint remoteEP = new IPEndPoint(IpAddress, Port);
+                    
+                    
+                            // Establish the remote endpoint for the socket.
+                            // The name of the 
+                            // remote device is "host.contoso.com".
+                            //IPHostEntry ipHostInfo = Dns.Resolve("host.contoso.com");
+                            //IPAddress ipAddress = ipHostInfo.AddressList[0];
+                            //IPAddress ipAddress = IPAddress.Parse("");
+                            IPEndPoint remoteEP = new IPEndPoint(IpAddress, Port);
 
-                        // Create a TCP/IP socket.
-                        Socket client = new Socket(AddressFamily.InterNetwork,
-                            SocketType.Stream, ProtocolType.Tcp);
-
-                        // Connect to the remote endpoint.
-                        client.BeginConnect(remoteEP,
-                            new AsyncCallback(ConnectCallback), client);
-                        connectDone.WaitOne();
+                            // Create a TCP/IP socket.
+                            Socket client = new Socket(AddressFamily.InterNetwork,
+                               SocketType.Stream, ProtocolType.Tcp);
+                            // Connect to the remote endpoint
+                            client.BeginConnect(remoteEP,
+                                new AsyncCallback(ConnectCallback), client);
+                            connectDone.WaitOne();
+                        
+                        client.SendTimeout = client.ReceiveTimeout = 1000;
+                        
 
                         // Send test data to the remote device.
                         Send(client, "This is a test<EOF>");
@@ -83,9 +86,12 @@ namespace ConsoleApplication1_asyn_tcp_client
                         // Release the socket.
                         client.Shutdown(SocketShutdown.Both);
                         client.Close();
-                        Thread.Sleep(1000);
-                    }
-                    
+                    connectDone.Reset();
+                    sendDone.Reset();
+                    receiveDone.Reset();
+
+
+
 
                 }
                 catch (Exception e)
@@ -118,6 +124,7 @@ namespace ConsoleApplication1_asyn_tcp_client
 
             private static void Receive(Socket client)
             {
+                 
                 try
                 {
                     // Create the state object.
@@ -174,6 +181,7 @@ namespace ConsoleApplication1_asyn_tcp_client
 
             private static void Send(Socket client, String data)
             {
+  
                 // Convert the string data to byte data using ASCII encoding.
                 byte[] byteData = Encoding.ASCII.GetBytes(data);
 
@@ -201,10 +209,15 @@ namespace ConsoleApplication1_asyn_tcp_client
                     Console.WriteLine(e.ToString());
                 }
             }
-
+            private static System.Timers.Timer aTimer;
             public static int Main(String[] args)
             {
-                StartClient();
+                aTimer = new System.Timers.Timer(1*1000);
+                aTimer.Elapsed += new ElapsedEventHandler(StartClient);
+                aTimer.Enabled = true;
+                Console.WriteLine("Press the Enter key to exit the program.");
+                Console.ReadLine();
+                //StartClient();
                 return 0;
             }
 

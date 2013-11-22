@@ -227,8 +227,17 @@ each set of the byte. To display a four-byte string, there will be 8 digits stri
             //alonso
             Thread read_thread = new Thread(() => read_thread_method(tcpClient, netStream, sql_client));
             read_thread.Start();
-            Thread send_test_thread = new Thread(() => sendtest2_t(netStream, sql_client));
-            send_test_thread.Start();
+            if (bool.Parse(ConfigurationManager.AppSettings["sendtest2_t"]))
+            {
+                Thread send_test_thread = new Thread(() => sendtest2_t(netStream, sql_client));
+                send_test_thread.Start();
+            }
+            else
+            {
+                Thread autoSendFromSqlTableThread = new Thread(()=>Autosend(netStream));
+                autoSendFromSqlTableThread.Start();
+            }
+            
 
             //Thread send_test_thread = new Thread(() => sendtest(netStream, sql_client));
             //send_test_thread.Start();
@@ -237,6 +246,39 @@ each set of the byte. To display a four-byte string, there will be 8 digits stri
 
 
             //tcpClient.Close();
+        }
+
+        private static object Autosend(NetworkStream netStream)
+        {
+            
+            while (true)
+            {
+                {
+                 
+                    var sqlClient = new SqlClient(ConfigurationManager.AppSettings["SQL_SERVER_IP"], ConfigurationManager.AppSettings["SQL_SERVER_PORT"], ConfigurationManager.AppSettings["SQL_SERVER_USER_ID"], ConfigurationManager.AppSettings["SQL_SERVER_PASSWORD"], ConfigurationManager.AppSettings["SQL_SERVER_DATABASE"], ConfigurationManager.AppSettings["Pooling"], ConfigurationManager.AppSettings["MinPoolSize"], ConfigurationManager.AppSettings["MaxPoolSize"], ConfigurationManager.AppSettings["ConnectionLifetime"]);
+                
+                    sqlClient.connect();
+                    string sqlCmd = @"
+SELECT 
+  custom.equipment_request.serial_no,
+  custom.equipment_request.func_type,
+  custom.equipment_request.uid,
+  custom.equipment_request.send_value,
+  custom.equipment_request.time_interval,
+  custom.equipment_request.create_time
+FROM
+  custom.equipment_request
+WHERE
+  custom.equipment_request.send_value = 0
+ORDER BY
+  custom.equipment_request.create_time
+LIMIT
+1";
+                    sqlClient.disconnect();
+                    Thread.Sleep((int)uint.Parse(ConfigurationManager.AppSettings["autosend_interval"]) * 1000);
+                }
+                
+            }
         }
         /*
         private static void sendtest(NetworkStream netStream , SqlClient sql_client)
@@ -618,8 +660,9 @@ Select 1-6 then press enter to send package
                 Console.WriteLine(output);
                 Console.WriteLine("############################################################################");
                  * */
-
-                Console.WriteLine(
+                if (bool.Parse(ConfigurationManager.AppSettings["sendtest2_t"]))
+                {
+                    Console.WriteLine(
                     @"
 Select 1-6 then press enter to send package
 1.Immediate-Location-Request Message
@@ -630,7 +673,9 @@ Select 1-6 then press enter to send package
 6.Triggered-Location-Stop-Request Message
 
 ");
-                Console.Write("Select[1-6]:");
+                    Console.Write("Select[1-6]:");
+                }
+                
                 //OnMessageRead(fBuffer);
                 fStream.BeginRead(myReadBuffer, 0, myReadBuffer.Length,
                                                                  new AsyncCallback(myReadSizeCallBack),
