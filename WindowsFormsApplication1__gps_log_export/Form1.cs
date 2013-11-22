@@ -19,6 +19,7 @@ namespace WindowsFormsApplication1__gps_log_export
         public Form1()
         {
             InitializeComponent();
+            saveFileDialog1.Filter = "Text|*.txt";
             for (int i = 0; i < 60; i++)
             {
                 min_comboBox.Items.Add(i);
