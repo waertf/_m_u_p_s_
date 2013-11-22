@@ -7,17 +7,13 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsoleApplication1_client_
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsoleApplication1_access_kml_files", "ConsoleApplication1_access_kml_files\ConsoleApplication1_access_kml_files.csproj", "{BFC36EC7-CB38-47DF-840D-BB121C0ACDD6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "random_ConsoleApplication1", "random_ConsoleApplication1\random_ConsoleApplication1.csproj", "{2FB1754A-4CA9-4076-B566-EE82FD29EB9F}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsoleApplication1_kml_generator", "ConsoleApplication1_kml_generator\ConsoleApplication1_kml_generator.csproj", "{92E5B17B-6256-4493-A5B5-8D1F535DEB98}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsoleApplication1_access_kml_v2", "ConsoleApplication1_access_kml_v2\ConsoleApplication1_access_kml_v2.csproj", "{CF7EA434-1C17-441C-8167-4A26E13E942D}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsoleApplication1_lat_lon_decimail_to_degree", "ConsoleApplication1_lat_lon_decimail_to_degree\ConsoleApplication1_lat_lon_decimail_to_degree.csproj", "{DFF26776-A3CC-4447-B985-3B20CBFADD16}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "keeplive", "keeplive\keeplive.csproj", "{74AF2FDA-7AAE-445B-8741-3C08BFE4EED1}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WindowsFormsApplication1__gps_log_export", "WindowsFormsApplication1__gps_log_export\WindowsFormsApplication1__gps_log_export.csproj", "{438EFEC6-60FC-4A13-B2D6-581A7CAB0504}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsoleApplication1_asyn_tcp_client", "ConsoleApplication1_asyn_tcp_client\ConsoleApplication1_asyn_tcp_client.csproj", "{18D6D414-2068-4E31-898D-29BF140A5174}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsoleApplication1_asyn_tcp_server", "ConsoleApplication1_asyn_tcp_server\ConsoleApplication1_asyn_tcp_server.csproj", "{7596E900-49A6-404A-934B-F94AD8A1E128}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsoleApplication1LogEveryXMinuteTest", "ConsoleApplication1LogEveryXMinuteTest\ConsoleApplication1LogEveryXMinuteTest.csproj", "{9EDBAC78-4631-4BB7-B178-2412D9D2697B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -37,30 +33,22 @@ Global
 		{BFC36EC7-CB38-47DF-840D-BB121C0ACDD6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BFC36EC7-CB38-47DF-840D-BB121C0ACDD6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BFC36EC7-CB38-47DF-840D-BB121C0ACDD6}.Release|Any CPU.Build.0 = Release|Any CPU
-		{2FB1754A-4CA9-4076-B566-EE82FD29EB9F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{2FB1754A-4CA9-4076-B566-EE82FD29EB9F}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{2FB1754A-4CA9-4076-B566-EE82FD29EB9F}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{2FB1754A-4CA9-4076-B566-EE82FD29EB9F}.Release|Any CPU.Build.0 = Release|Any CPU
-		{92E5B17B-6256-4493-A5B5-8D1F535DEB98}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{92E5B17B-6256-4493-A5B5-8D1F535DEB98}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{92E5B17B-6256-4493-A5B5-8D1F535DEB98}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{92E5B17B-6256-4493-A5B5-8D1F535DEB98}.Release|Any CPU.Build.0 = Release|Any CPU
-		{CF7EA434-1C17-441C-8167-4A26E13E942D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{CF7EA434-1C17-441C-8167-4A26E13E942D}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{CF7EA434-1C17-441C-8167-4A26E13E942D}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{CF7EA434-1C17-441C-8167-4A26E13E942D}.Release|Any CPU.Build.0 = Release|Any CPU
-		{DFF26776-A3CC-4447-B985-3B20CBFADD16}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{DFF26776-A3CC-4447-B985-3B20CBFADD16}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{DFF26776-A3CC-4447-B985-3B20CBFADD16}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{DFF26776-A3CC-4447-B985-3B20CBFADD16}.Release|Any CPU.Build.0 = Release|Any CPU
-		{74AF2FDA-7AAE-445B-8741-3C08BFE4EED1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{74AF2FDA-7AAE-445B-8741-3C08BFE4EED1}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{74AF2FDA-7AAE-445B-8741-3C08BFE4EED1}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{74AF2FDA-7AAE-445B-8741-3C08BFE4EED1}.Release|Any CPU.Build.0 = Release|Any CPU
 		{438EFEC6-60FC-4A13-B2D6-581A7CAB0504}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{438EFEC6-60FC-4A13-B2D6-581A7CAB0504}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{438EFEC6-60FC-4A13-B2D6-581A7CAB0504}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{438EFEC6-60FC-4A13-B2D6-581A7CAB0504}.Release|Any CPU.Build.0 = Release|Any CPU
+		{18D6D414-2068-4E31-898D-29BF140A5174}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{18D6D414-2068-4E31-898D-29BF140A5174}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{18D6D414-2068-4E31-898D-29BF140A5174}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{18D6D414-2068-4E31-898D-29BF140A5174}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7596E900-49A6-404A-934B-F94AD8A1E128}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7596E900-49A6-404A-934B-F94AD8A1E128}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7596E900-49A6-404A-934B-F94AD8A1E128}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7596E900-49A6-404A-934B-F94AD8A1E128}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9EDBAC78-4631-4BB7-B178-2412D9D2697B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9EDBAC78-4631-4BB7-B178-2412D9D2697B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9EDBAC78-4631-4BB7-B178-2412D9D2697B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9EDBAC78-4631-4BB7-B178-2412D9D2697B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
