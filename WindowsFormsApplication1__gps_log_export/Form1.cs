@@ -61,11 +61,11 @@ public._gps_log._time < '"+ToDateTime.Value.ToString("yyyy-MM-dd HH:mm")+@"'
 AS temp";
                     string errorNumberResultCmd = @"SELECT count(temp) FROM
 (
-select DISTINCT public._gps_log._uid from public._gps_log
+select DISTINCT custom.turn_onoff_log.uid from custom.turn_onoff_log
 where
-public._gps_log._time > '" + FromDateTime.Value.ToString("yyyy-MM-dd HH:mm") + @"'
+custom.turn_onoff_log.create_time > '" + error_count_datetime.ToString("yyyy-MM-dd HH:mm") + @"'
 AND
-public._gps_log._time < '" + error_count_datetime.ToString("yyyy-MM-dd HH:mm") + @"'
+custom.turn_onoff_log.create_time < '" + ToDateTime.Value.ToString("yyyy-MM-dd HH:mm") + @"'
 ) 
 AS temp";
                     string listResultCmd = @"SELECT (temp) FROM
