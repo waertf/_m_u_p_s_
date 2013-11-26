@@ -7,11 +7,15 @@ using System.Net.Sockets;
 using System.Text;
 using System.Threading;
 using System.Timers;
+using log4net;
+using log4net.Config;
 
 namespace ConsoleApplication1_asyn_tcp_client
 {
     internal class Program
     {
+
+        private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
         // State object for receiving data from remote device.
         public class StateObject
         {
@@ -30,8 +34,10 @@ namespace ConsoleApplication1_asyn_tcp_client
             // The port number for the remote device.
             //private const int port = 11000;
             private static readonly IPAddress IpAddress = IPAddress.Parse(ConfigurationManager.AppSettings["THUNDER_SERVER_IP"]);
-            //int port = 23;
+
             private static readonly int Port = int.Parse(ConfigurationManager.AppSettings["THUNDE_SERVER_PORT"]);
+
+            private static readonly SqlClient sql_client = new SqlClient(ConfigurationManager.AppSettings["SQL_SERVER_IP"], ConfigurationManager.AppSettings["SQL_SERVER_PORT"], ConfigurationManager.AppSettings["SQL_SERVER_USER_ID"], ConfigurationManager.AppSettings["SQL_SERVER_PASSWORD"], ConfigurationManager.AppSettings["SQL_SERVER_DATABASE"], ConfigurationManager.AppSettings["Pooling"], ConfigurationManager.AppSettings["MinPoolSize"], ConfigurationManager.AppSettings["MaxPoolSize"], ConfigurationManager.AppSettings["ConnectionLifetime"]);
 
             // ManualResetEvent instances signal completion.
             private static ManualResetEvent connectDone =
@@ -51,8 +57,11 @@ namespace ConsoleApplication1_asyn_tcp_client
                 // Connect to a remote device.
                 try
                 {
-                    
-                    
+                    string timeNow = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+                    string prevNow = (DateTime.Parse(timeNow).AddSeconds(0 - double.Parse(ConfigurationManager.AppSettings["aTimer_interval_sec"]))).ToString("yyyy-MM-dd HH:mm:ss");
+
+                    Console.WriteLine(timeNow);
+                    Console.WriteLine(prevNow);
                             // Establish the remote endpoint for the socket.
                             // The name of the 
                             // remote device is "host.contoso.com".
@@ -71,6 +80,7 @@ namespace ConsoleApplication1_asyn_tcp_client
                         
                         client.SendTimeout = client.ReceiveTimeout = 1000;
                         
+                    //send package getting from sql command
 
                         // Send test data to the remote device.
                         Send(client, "This is a test<EOF>");
@@ -212,7 +222,7 @@ namespace ConsoleApplication1_asyn_tcp_client
             private static System.Timers.Timer aTimer;
             public static int Main(String[] args)
             {
-                aTimer = new System.Timers.Timer(1*1000);
+                aTimer = new System.Timers.Timer(int.Parse(ConfigurationManager.AppSettings["aTimer_interval_sec"]) * 1000);
                 aTimer.Elapsed += new ElapsedEventHandler(StartClient);
                 aTimer.Enabled = true;
                 Console.WriteLine("Press the Enter key to exit the program.");
