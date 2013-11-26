@@ -26,8 +26,8 @@ namespace ConsoleApplication1_asyn_tcp_client
             public string deviceType;//B:船、C:車、A:人
             public string unitID;
             public string deviceStatus;//N:Normal、E:Emergency
-            public string systemSendTime;
-            public string deviceSendTime;
+            public string systemSendTime;//server-time
+            public string deviceSendTime;//info-time
 
             public SendPackage()
             {
