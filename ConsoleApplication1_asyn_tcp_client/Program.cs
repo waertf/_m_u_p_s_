@@ -4,6 +4,7 @@ using System.Configuration;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
+using System.Reflection;
 using System.Text;
 using System.Threading;
 using System.Timers;
@@ -14,8 +15,33 @@ namespace ConsoleApplication1_asyn_tcp_client
 {
     internal class Program
     {
+        private class SendPackage
+        {
+            public string uid;
+            public string deviceID;
+            public string lat;
+            public string lon;
+            public string direction;
+            public string speed;
+            public string deviceType;//B:船、C:車、A:人
+            public string unitID;
+            public string deviceStatus;//N:Normal、E:Emergency
+            public string systemSendTime;
+            public string deviceSendTime;
 
+            public SendPackage()
+            {
+                uid =
+                    deviceID =
+                        lat =
+                            lon =
+                                direction =
+                                    speed =
+                                        deviceType = unitID = deviceStatus = systemSendTime = deviceSendTime = "null";
+            }
+        }
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+       
         // State object for receiving data from remote device.
         public class StateObject
         {
@@ -82,8 +108,19 @@ namespace ConsoleApplication1_asyn_tcp_client
                         
                     //send package getting from sql command
 
+                    SendPackage sendPackage = new SendPackage();
+                    string sendPackageStr = sendPackage.uid +
+                                            "," + sendPackage.deviceID +
+                                            "," + sendPackage.lat +
+                                            "," + sendPackage.lon +
+                                            "," + sendPackage.direction +
+                                            "," + sendPackage.speed +
+                                            "," + sendPackage.deviceType +
+                                            "," + sendPackage.deviceStatus +
+                                            "," + sendPackage.systemSendTime +
+                                            "," + sendPackage.deviceSendTime;                        
                         // Send test data to the remote device.
-                        Send(client, "This is a test<EOF>");
+                        Send(client,sendPackage + "<EOF>");
                         sendDone.WaitOne();
 
                         // Receive the response from the remote device.
@@ -99,7 +136,7 @@ namespace ConsoleApplication1_asyn_tcp_client
                     connectDone.Reset();
                     sendDone.Reset();
                     receiveDone.Reset();
-
+                    log.Info(sendPackageStr);
 
 
 
