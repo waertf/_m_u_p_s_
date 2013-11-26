@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Configuration;
 using System.Linq;
 using System.Net;
+using System.Net.NetworkInformation;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
@@ -30,8 +31,31 @@ namespace ConsoleApplication1_asyn_tcp_server
             public static ManualResetEvent allDone = new ManualResetEvent(false);
             private static readonly int Port = int.Parse(ConfigurationManager.AppSettings["THUNDE_SERVER_PORT"]);
 
-            public AsynchronousSocketListener()
+            private static IPAddress GetLocalIPAddress()
             {
+                foreach (NetworkInterface ni in NetworkInterface.GetAllNetworkInterfaces())
+                {
+                    var addr = ni.GetIPProperties().GatewayAddresses.FirstOrDefault();
+                    if (addr != null && !addr.Address.Equals(new IPAddress(0x00000000)))
+                    {
+                        if (ni.NetworkInterfaceType == NetworkInterfaceType.Wireless80211 || ni.NetworkInterfaceType == NetworkInterfaceType.Ethernet)
+                        {
+                            //Console.WriteLine(ni.Name);
+                            //Console.WriteLine(addr.Address);
+                            foreach (UnicastIPAddressInformation ip in ni.GetIPProperties().UnicastAddresses)
+                            {
+                                if (ip.Address.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork)
+                                {
+                                    //Console.WriteLine(ip.Address.ToString());
+                                    return ip.Address;
+                                }
+
+                            }
+                        }
+
+                    }
+                }
+                return null;
             }
 
             public static void StartListening()
@@ -42,8 +66,17 @@ namespace ConsoleApplication1_asyn_tcp_server
                 // Establish the local endpoint for the socket.
                 // The DNS name of the computer
                 // running the listener is "host.contoso.com".
-                IPHostEntry ipHostInfo = Dns.Resolve(Dns.GetHostName());
-                IPAddress ipAddress = ipHostInfo.AddressList[0];
+                //IPHostEntry ipHostInfo = Dns.Resolve(Dns.GetHostName());
+                IPAddress ipAddress;
+                if (bool.Parse(ConfigurationManager.AppSettings["set_local_ip_address"]))
+                {
+                    ipAddress = IPAddress.Parse(ConfigurationManager.AppSettings["THUNDER_SERVER_IP"]);
+                }
+                else
+                {
+                    ipAddress = GetLocalIPAddress();
+                }
+                
                 IPEndPoint localEndPoint = new IPEndPoint(ipAddress, Port);
 
                 // Create a TCP/IP socket.
