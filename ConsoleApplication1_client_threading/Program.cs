@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Net.NetworkInformation;
 using System.Text;
@@ -255,9 +256,9 @@ each set of the byte. To display a four-byte string, there will be 8 digits stri
             {
                 {
                  
-                    var sqlClient = new SqlClient(ConfigurationManager.AppSettings["SQL_SERVER_IP"], ConfigurationManager.AppSettings["SQL_SERVER_PORT"], ConfigurationManager.AppSettings["SQL_SERVER_USER_ID"], ConfigurationManager.AppSettings["SQL_SERVER_PASSWORD"], ConfigurationManager.AppSettings["SQL_SERVER_DATABASE"], ConfigurationManager.AppSettings["Pooling"], ConfigurationManager.AppSettings["MinPoolSize"], ConfigurationManager.AppSettings["MaxPoolSize"], ConfigurationManager.AppSettings["ConnectionLifetime"]);
+                    var AutosendsqlClient = new SqlClient(ConfigurationManager.AppSettings["SQL_SERVER_IP"], ConfigurationManager.AppSettings["SQL_SERVER_PORT"], ConfigurationManager.AppSettings["SQL_SERVER_USER_ID"], ConfigurationManager.AppSettings["SQL_SERVER_PASSWORD"], ConfigurationManager.AppSettings["SQL_SERVER_DATABASE"], ConfigurationManager.AppSettings["Pooling"], ConfigurationManager.AppSettings["MinPoolSize"], ConfigurationManager.AppSettings["MaxPoolSize"], ConfigurationManager.AppSettings["ConnectionLifetime"]);
                 
-                    sqlClient.connect();
+                    AutosendsqlClient.connect();
                     string sqlCmd = @"
 SELECT 
   custom.equipment_request.serial_no,
@@ -274,7 +275,149 @@ ORDER BY
   custom.equipment_request.create_time
 LIMIT
 1";
-                    sqlClient.disconnect();
+                    DataTable dt = AutosendsqlClient.get_DataTable(sqlCmd);
+                    AutosendsqlClient.disconnect();
+                    Hashtable requeseHashtable = new  Hashtable();
+                    foreach (DataRow row in dt.Rows)
+                    {
+                        requeseHashtable.Add("serial_no", row[0]);
+                        requeseHashtable.Add("func_type", row[1]);
+                        requeseHashtable.Add("uid", row[2]);
+                        requeseHashtable.Add("send_value", row[3]);
+                        requeseHashtable.Add("time_interval", row[4]);
+                        requeseHashtable.Add("create_time", row[5]);
+                    }
+                    /*
+                    Console.WriteLine(
+                    @"
+Select 1-6 then press enter to send package
+1.Immediate-Location-Request Message
+2.Triggered-Location-Request for Change Cadence Message
+3.Triggered-Location-Request for Change Distance Message
+4.Digital-Output-Change-Request Message
+5.Location-Protocol-Request Message
+6.Triggered-Location-Stop-Request Message
+                     * 
+                    func_type
+                     * 0: 回報載具定位資訊, 
+1:開啟載具定位資訊回報
+2: 關閉載具定位資訊回報 
+3: 設定載具定位資訊回傳時間
+
+");
+                     */
+                    {
+                        string select_num = (string) requeseHashtable["func_type"];
+
+                        switch (select_num)//ConfigurationManager.AppSettings["output-value"]
+                        {
+                            case "0":
+                                string Immediate_Location_Request = "<Immediate-Location-Request><request-id>" + 
+                                    ConfigurationManager.AppSettings["request-id"] + 
+                                    "</request-id><suaddr suaddr-type=\"" + 
+                                    ConfigurationManager.AppSettings["suaddr-type"] + 
+                                    "\">" +
+                                    requeseHashtable["uid"] +
+                                    "</suaddr></Immediate-Location-Request>";
+                                using (StreamWriter w = File.AppendText("log.txt"))
+                                {
+                                    Log("send:\r\n", Immediate_Location_Request, w);
+                                    // Close the writer and underlying file.
+                                    w.Close();
+                                }
+                                WriteLine(netStream, data_append_dataLength(Immediate_Location_Request), Immediate_Location_Request);
+
+                                break;
+                            case "-5":
+                                string Location_Protocol_Request = "<Location-Protocol-Request><request-id>" + ConfigurationManager.AppSettings["request-id"] + "</request-id><request-protocol-version>2</request-protocol-version></Location-Protocol-Request>";
+
+                                using (StreamWriter w = File.AppendText("log.txt"))
+                                {
+                                    Log("send:\r\n", Location_Protocol_Request, w);
+                                    // Close the writer and underlying file.
+                                    w.Close();
+                                }
+                                WriteLine(netStream, data_append_dataLength(Location_Protocol_Request), Location_Protocol_Request);
+                                break;
+                            case "2":
+                                string Triggered_Location_Stop_Request = "<Triggered-Location-Stop-Request><request-id>" + 
+                                    ConfigurationManager.AppSettings["request-id"] + 
+                                    "</request-id><suaddr suaddr-type=\"" + 
+                                    ConfigurationManager.AppSettings["suaddr-type"] + 
+                                    "\">" +
+                                    requeseHashtable["uid"] + 
+                                    "</suaddr></Triggered-Location-Stop-Request>";
+
+                                using (StreamWriter w = File.AppendText("log.txt"))
+                                {
+                                    Log("send:\r\n", Triggered_Location_Stop_Request, w);
+                                    // Close the writer and underlying file.
+                                    w.Close();
+                                }
+                                WriteLine(netStream, data_append_dataLength(Triggered_Location_Stop_Request), Triggered_Location_Stop_Request);
+                                break;
+                            case "1":
+                            case "3":
+                                string Triggered_Location_Request_Cadence = "<Triggered-Location-Request><request-id>" + 
+                                    ConfigurationManager.AppSettings["request-id"] + 
+                                    "</request-id><suaddr suaddr-type=\"" + 
+                                    ConfigurationManager.AppSettings["suaddr-type"] + 
+                                    "\">" +
+                                    requeseHashtable["uid"] + 
+                                    "</suaddr><periodic-trigger><interval>" +
+                                    requeseHashtable["time_interval"] + 
+                                    "</interval></periodic-trigger></Triggered-Location-Request>";
+
+                                using (StreamWriter w = File.AppendText("log.txt"))
+                                {
+                                    Log("send:\r\n", Triggered_Location_Request_Cadence, w);
+                                    // Close the writer and underlying file.
+                                    w.Close();
+                                }
+                                WriteLine(netStream, data_append_dataLength(Triggered_Location_Request_Cadence), Triggered_Location_Request_Cadence);
+                                break;
+                            case "-1":
+                                string Triggered_Location_Request_Distance = "<Triggered-Location-Request><request-id>" + ConfigurationManager.AppSettings["request-id"] + "</request-id><suaddr suaddr-type=\"" + ConfigurationManager.AppSettings["suaddr-type"] + "\">" + ConfigurationManager.AppSettings["suaddr"] + "</suaddr><periodic-trigger><trg-distance>" + ConfigurationManager.AppSettings["trg-distance"] + "</trg-distance></periodic-trigger></Triggered-Location-Request>";
+
+                                using (StreamWriter w = File.AppendText("log.txt"))
+                                {
+                                    Log("send:\r\n", Triggered_Location_Request_Distance, w);
+                                    // Close the writer and underlying file.
+                                    w.Close();
+                                }
+                                WriteLine(netStream, data_append_dataLength(Triggered_Location_Request_Distance), Triggered_Location_Request_Distance);
+                                break;
+                            case "-4":
+                                string Digital_Output_Change_Request = "<Digital-Output-Change-Request><request-id>" + ConfigurationManager.AppSettings["request-id"] + "</request-id><suaddr suaddr-type=\"" + ConfigurationManager.AppSettings["suaddr-type"] + "\">" + ConfigurationManager.AppSettings["suaddr"] + "</suaddr><output-info><output-name>" + ConfigurationManager.AppSettings["output-name"] + "</output-name><output-value>" + ConfigurationManager.AppSettings["output-value"] + "</output-value></output-info></Digital-Output-Change-Request>";
+
+                                using (StreamWriter w = File.AppendText("log.txt"))
+                                {
+                                    Log("send:\r\n", Digital_Output_Change_Request, w);
+                                    // Close the writer and underlying file.
+                                    w.Close();
+                                }
+                                WriteLine(netStream, data_append_dataLength(Digital_Output_Change_Request), Digital_Output_Change_Request);
+                                break;
+                        }
+                    }
+                   
+                    if (int.Parse((string) requeseHashtable["send_value"]).Equals(0))
+                    {
+                        
+                        sqlCmd = @"
+UPDATE 
+custom.equipment_request
+SET 
+custom.equipment_request.send_value = 1
+WHERE
+custom.equipment_request.serial_no = '
+" + requeseHashtable["serial_no"]
+ +@"'";
+                        AutosendsqlClient.connect();
+                        AutosendsqlClient.modify(sqlCmd);
+                        AutosendsqlClient.disconnect();
+                    }
+                    
                     Thread.Sleep((int)uint.Parse(ConfigurationManager.AppSettings["autosend_interval"]) * 1000);
                 }
                 
@@ -808,10 +951,14 @@ Select 1-6 then press enter to send package
                         }
                         if (elements.Contains(new XElement("info-data").Name))
                         {
+                            if(elements.Contains(new XElement("impl-spec-data").Name))
+                            {}
                             
                             //string shape_type = (string)(from e in xml_data.Descendants("shape") select e.Elements().First().Name.LocalName).First();
-                            htable.Add("info_time",  XmlGetTagValue(xml_data, "info-time"));//info-data scope
-                            htable.Add("server_time" , XmlGetTagValue(xml_data, "server-time"));//info-data scope
+                            if (elements.Contains(new XElement("info-time").Name))
+                                htable.Add("info_time",  XmlGetTagValue(xml_data, "info-time"));//info-data scope
+                            if (elements.Contains(new XElement("server-time").Name))
+                                htable.Add("server_time" , XmlGetTagValue(xml_data, "server-time"));//info-data scope
                             //Console.WriteLine("info_time:{0}", info_time);
                             //Console.WriteLine("server_time:{0}", server_time);
                             if (elements.Contains(new XElement("satellites-num").Name))
@@ -823,10 +970,12 @@ Select 1-6 then press enter to send package
                                 htable.Add("speed-hor" , XmlGetTagValue(xml_data, "speed-hor"));//info-data scope
                             if (elements.Contains(new XElement("direction-hor").Name))
                                 htable.Add("direction-hor" , XmlGetTagValue(xml_data, "direction-hor"));//info-data scope
-                            htable.Add("shape-type" , XmlGetFirstChildTagName(xml_data, "shape"));//info-data scope
+                            if (elements.Contains(new XElement("shape").Name))
+                                htable.Add("shape-type" , XmlGetFirstChildTagName(xml_data, "shape"));//info-data scope
                             //Console.WriteLine("shape_type :[{0}]", shape_type);
                             //Console.WriteLine("speed_hor:{0}", speed_hor);
                             //Console.WriteLine("Direction_hor:{0}", Direction_hor);
+                            if (elements.Contains(new XElement("shape").Name))
                             switch (Convert.ToString(htable["shape-type"]))//info-data scope
                             {
                                 case "point-2d":
@@ -897,9 +1046,17 @@ Select 1-6 then press enter to send package
                             }
                         }
                         if (bool.Parse(ConfigurationManager.AppSettings["SQL_ACCESS"]))
-                            access_sql_server(sql_client, xml_root_tag, htable, sensor_name, sensor_type, sensor_value, XmlGetAllElementsXname(xml_data),log);
+                        {
+                            access_sql_server(sql_client, xml_root_tag, htable, sensor_name, sensor_type, sensor_value, XmlGetAllElementsXname(xml_data), log);
+                            Console.WriteLine("SQL Access Enable");
+                        }
+
                         if (bool.Parse(ConfigurationManager.AppSettings["AVLS_ACCESS"]))
-                            access_avls_server(sql_client,xml_root_tag, htable, sensor_name, sensor_type, sensor_value, XmlGetAllElementsXname(xml_data), log);
+                        {
+                            access_avls_server(sql_client, xml_root_tag, htable, sensor_name, sensor_type, sensor_value, XmlGetAllElementsXname(xml_data), log);
+                            Console.WriteLine("AVLS Access Enable");
+                        }
+                           
                     }
                      
                     break;
@@ -1051,7 +1208,7 @@ Select 1-6 then press enter to send package
 
         private static void access_avls_server(SqlClient sql_client,string xml_root_tag, Hashtable htable, List<string> sensor_name, List<string> sensor_type, List<string> sensor_value, IEnumerable<XName> iEnumerable, string log)
         {
-            
+            Console.WriteLine("+access_avls_server");
             string send_string = string.Empty;
             AVLS_UNIT_Report_Packet avls_package = new AVLS_UNIT_Report_Packet();
             
@@ -1092,7 +1249,10 @@ Select 1-6 then press enter to send package
                     avls_package.GPS_Valid = "A,";
                 if (htable.ContainsKey("info_time"))
                 {
+                    Console.WriteLine(@"+if (htable.ContainsKey(""info_time""))");
+                    Console.WriteLine(htable["info_time"].ToString());
                     avls_package.Date_Time = htable["info_time"].ToString().Substring(2) + ",";
+                    Console.WriteLine(@"-if (htable.ContainsKey(""info_time""))");
                 }
                 else
                     avls_package.Date_Time = string.Format("{0:yyMMddHHmmss}", DateTime.Now)+",";
@@ -1197,6 +1357,7 @@ Select 1-6 then press enter to send package
             //ReadLine(avls_tcpClient, netStream, send_string.Length);
             netStream.Close();
             avls_tcpClient.Close();
+            Console.WriteLine("-access_avls_server");
         }
 
         private static void avls_WriteLine(NetworkStream netStream, byte[] writeData, string write, SqlClient sql_client)
@@ -1298,6 +1459,7 @@ Select 1-6 then press enter to send package
         }
         private static void access_sql_server(SqlClient sql_client, string xml_root_tag, Hashtable htable, List<string> sensor_name, List<string> sensor_type, List<string> sensor_value, IEnumerable<XName> elements,string log1)
         {
+            Console.WriteLine("+access_sql_server");
             DateTime dt = DateTime.Now;
             AUTO_SQL_DATA gps_log = new AUTO_SQL_DATA();
             MANUAL_SQL_DATA operation_log = new MANUAL_SQL_DATA();
@@ -1729,6 +1891,7 @@ Select 1-6 then press enter to send package
                 }
             }
             */
+            Console.WriteLine("-access_sql_server");
         }
         /*
              * <result result-code="A">SYNTAX ERROR</result>
@@ -1801,6 +1964,11 @@ Select 1-6 then press enter to send package
         }
         static int GetLittleEndianIntegerFromByteArray(byte[] data, int startIndex)
         {
+            Console.WriteLine("+GetLittleEndianIntegerFromByteArray");
+            Console.WriteLine("date="+data);
+            Console.WriteLine("date.length=" + data.Length);
+            Console.WriteLine("startIndex=" + startIndex);
+            Console.WriteLine("-GetLittleEndianIntegerFromByteArray");
             return (data[startIndex])
                  | (data[startIndex + 1] << 8);
             //| (data[startIndex + 2] << 8)
