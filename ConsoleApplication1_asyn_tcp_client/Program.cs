@@ -17,17 +17,17 @@ namespace ConsoleApplication1_asyn_tcp_client
     {
         private class SendPackage
         {
-            public string uid;
-            public string deviceID;
-            public string lat;
-            public string lon;
-            public string direction;
-            public string speed;
+            public string uid;//gps_log._id
+            public string deviceID;//gps_log._uid
+            public string lat;//gps_log._lat
+            public string lon;//gps_log._lon
+            public string direction;//gps_log._course
+            public string speed;//gps_log._speed
             public string deviceType;//B:船、C:車、A:人
             public string unitID;
-            public string deviceStatus;//N:Normal、E:Emergency
-            public string systemSendTime;//server-time
-            public string deviceSendTime;//info-time
+            public string deviceStatus;//N:Normal、E:Emergency//gps_log.j_6
+            public string systemSendTime;//server-time//gps_log._option1
+            public string deviceSendTime;//info-time//gps_log._option0
 
             public SendPackage()
             {
