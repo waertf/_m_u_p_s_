@@ -96,7 +96,7 @@ namespace server_syn_console
                     break;
                 }
             */
-            ipAddress = GetLocalIPAddress();
+            ipAddress = IPAddress.Parse(ConfigurationManager.AppSettings["MUPS_SERVER_IP"]);
             Console.WriteLine(ipAddress);
             log.Info("ip address =" + ipAddress.ToString());
             IPEndPoint localEndPoint = new IPEndPoint(ipAddress, int.Parse(ConfigurationManager.AppSettings["MUPS_SERVER_PORT"]));
