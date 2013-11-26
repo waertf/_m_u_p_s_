@@ -12,6 +12,7 @@ namespace ConsoleApplication1_asyn_tcp_server
 {
     class Program
     {
+        private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
         // State object for reading client data asynchronously
         public class StateObject
         {
@@ -158,6 +159,7 @@ namespace ConsoleApplication1_asyn_tcp_server
                         // client. Display it on the console.
                         Console.WriteLine("Read {0} bytes from socket. \n Data : {1}",
                             content.Length, content);
+                        log.Info(content.Replace("<EOF>",""));
                         // Echo the data back to the client.
                         Send(handler, content);
                     }
