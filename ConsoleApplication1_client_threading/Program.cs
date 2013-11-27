@@ -1599,7 +1599,7 @@ Select 1-6 then press enter to send package
                 gps_log._option0 = "\'" + "null" + "\'";
             if (htable.ContainsKey("server_time"))
             {
-                gps_log._option1 = "\'"+"0"+"\'";
+                gps_log._option1 = "\'" + htable["server_time"].ToString() + "\'";
             }
             else
                 gps_log._option1 = "\'" + "0" + "\'";
