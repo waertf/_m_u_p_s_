@@ -107,8 +107,30 @@ namespace ConsoleApplication1_asyn_tcp_client
                         client.SendTimeout = client.ReceiveTimeout = 1000;
                         
                     //send package getting from sql command
-
-                    SendPackage sendPackage = new SendPackage();
+                        /*
+                         * 
+                         * SELECT 
+      public._gps_log._id,
+      public._gps_log._uid,
+      public._gps_log._lat,
+      public._gps_log._lon,
+      public._gps_log._course,
+      public._gps_log._speed,
+      sd.code.code_name,
+      sd.unit.unit_name,
+      public._gps_log.j_6,
+      public._gps_log._option1,
+      public._gps_log._option0
+    FROM
+      public._gps_log
+      INNER JOIN sd.equipment ON (public._gps_log._uid = sd.equipment.uid)
+      INNER JOIN sd.unit ON (sd.equipment.unit = (sd.unit.unit_id) ::varchar)
+      INNER JOIN sd.code ON (sd.equipment.type = sd.code.code)
+    WHERE
+      public._gps_log._time > '2013-11-15 11:10:00' ::timestamp AND 
+      public._gps_log._time < '2013-11-15 11:20:00' ::timestamp
+                         */
+                        SendPackage sendPackage = new SendPackage();
                     string sendPackageStr = sendPackage.uid +
                                             "," + sendPackage.deviceID +
                                             "," + sendPackage.lat +
