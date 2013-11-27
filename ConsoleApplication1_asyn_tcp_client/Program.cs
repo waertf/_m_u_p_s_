@@ -10,6 +10,7 @@ using System.Threading;
 using System.Timers;
 using log4net;
 using log4net.Config;
+using System.Data;
 
 namespace ConsoleApplication1_asyn_tcp_client
 {
@@ -130,17 +131,74 @@ namespace ConsoleApplication1_asyn_tcp_client
       public._gps_log._time > '2013-11-15 11:10:00' ::timestamp AND 
       public._gps_log._time < '2013-11-15 11:20:00' ::timestamp
                          */
-                        SendPackage sendPackage = new SendPackage();
-                    string sendPackageStr = sendPackage.uid +
+                    string sqlCmd = @"
+SELECT 
+      public._gps_log._id,
+      public._gps_log._uid,
+      public._gps_log._lat,
+      public._gps_log._lon,
+      public._gps_log._course,
+      public._gps_log._speed,
+      sd.code.code_name,
+      sd.unit.unit_name,
+      public._gps_log.j_6,
+      public._gps_log._option1,
+      public._gps_log._option0
+    FROM
+      public._gps_log
+      INNER JOIN sd.equipment ON (public._gps_log._uid = sd.equipment.uid)
+      INNER JOIN sd.unit ON (sd.equipment.unit = (sd.unit.unit_id) ::varchar)
+      INNER JOIN sd.code ON (sd.equipment.type = sd.code.code)
+    WHERE
+      public._gps_log._time > '"+prevNow+@"' ::timestamp 
+    AND 
+      public._gps_log._time < '" +timeNow+ @"' ::timestamp
+";
+                    sql_client.connect();
+                    DataTable dt = sql_client.get_DataTable(sqlCmd);
+                    sql_client.disconnect();
+                    SendPackage sendPackage = new SendPackage();
+                    string sendPackageStr = string.Empty;
+                    if (dt != null && dt.Rows.Count != 0)
+                    {
+                        Console.WriteLine("+if");
+                        Console.WriteLine("dt:{0}", dt);
+                        Console.WriteLine("dt.Rows.Count:{0}", dt.Rows.Count);
+                        foreach (DataRow row in dt.Rows)
+                        {
+                            sendPackage.uid = row[0].ToString();
+                            sendPackage.deviceID = row[1].ToString();
+                            sendPackage.lat = row[2].ToString();
+                            sendPackage.lon = row[3].ToString();
+                            sendPackage.direction = row[4].ToString();
+                            sendPackage.speed = row[5].ToString();
+                            sendPackage.deviceType = row[6].ToString();
+                            sendPackage.unitID = row[7].ToString();
+                            if (row[8].ToString() == "Emergency On")
+                                sendPackage.deviceStatus = "Emergency";
+                            else
+                            {
+                                sendPackage.deviceStatus = "Normal";
+                            }
+                            sendPackage.systemSendTime = row[9].ToString();
+                            sendPackage.deviceSendTime = row[10].ToString();
+
+                            sendPackageStr += sendPackage.uid +
                                             "," + sendPackage.deviceID +
                                             "," + sendPackage.lat +
                                             "," + sendPackage.lon +
                                             "," + sendPackage.direction +
                                             "," + sendPackage.speed +
                                             "," + sendPackage.deviceType +
+                                            "," + sendPackage.unitID +
                                             "," + sendPackage.deviceStatus +
                                             "," + sendPackage.systemSendTime +
-                                            "," + sendPackage.deviceSendTime;                        
+                                            "," + sendPackage.deviceSendTime +
+                                            Environment.NewLine;       
+                        }
+                    }
+                        
+                                      
                         // Send test data to the remote device.
                         Send(client,sendPackage + "<EOF>");
                         sendDone.WaitOne();
