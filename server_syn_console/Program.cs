@@ -230,6 +230,10 @@ Select 0-4 then press enter to send package
             isValid = false;
             Console.WriteLine("Validation Error: {0}", e.Message);
         }
+        static IEnumerable<XName> XmlGetAllElementsXname(XDocument xml_data)
+        {
+            return (from e1 in xml_data.DescendantNodes().OfType<XElement>() select e1).Select(x => x.Name).Distinct();
+        }
         private static void xml_parse(Socket handler, string xml_root_tag, XDocument xml_data)
         {
             string log = xml_data.ToString();
@@ -242,41 +246,49 @@ Select 0-4 then press enter to send package
             }
 
             string device = string.Empty;
-            while (true)
+            IEnumerable<XName> elements = XmlGetAllElementsXname(xml_data);
+            if (elements.Contains(new XElement("suaddr").Name))
+                device = XmlGetTagValue(xml_data, "suaddr");
+            else
             {
-                SqlClient sql_client = new SqlClient(ConfigurationManager.AppSettings["SQL_SERVER_IP"], ConfigurationManager.AppSettings["SQL_SERVER_PORT"], ConfigurationManager.AppSettings["SQL_SERVER_USER_ID"], ConfigurationManager.AppSettings["SQL_SERVER_PASSWORD"], ConfigurationManager.AppSettings["SQL_SERVER_DATABASE"]);
-                sql_client.connect();
-                string sql_command = @"SELECT 
+                while (true)
+                {
+                    SqlClient sql_client = new SqlClient(ConfigurationManager.AppSettings["SQL_SERVER_IP"], ConfigurationManager.AppSettings["SQL_SERVER_PORT"], ConfigurationManager.AppSettings["SQL_SERVER_USER_ID"], ConfigurationManager.AppSettings["SQL_SERVER_PASSWORD"], ConfigurationManager.AppSettings["SQL_SERVER_DATABASE"]);
+                    sql_client.connect();
+                    string sql_command = @"SELECT 
 public.epq_test_loc.device
 FROM
   public.epq_test_loc
 ORDER BY 
   public.epq_test_loc.id
   Limit 1";
-                DataTable dt = sql_client.get_DataTable(sql_command);
-                sql_client.disconnect();
-                if (dt != null && dt.Rows.Count != 0)
-                {
-                    Console.WriteLine("+if");
-                    Console.WriteLine("dt:{0}", dt);
-                    Console.WriteLine("dt.Rows.Count:{0}", dt.Rows.Count);
-                    foreach (DataRow row in dt.Rows)
-                    {
-
-                        device = row[0].ToString();
-
-                    }
-                    break;
-                }
-                else
-                {
-                    Console.WriteLine("+else");
+                    DataTable dt = sql_client.get_DataTable(sql_command);
                     sql_client.disconnect();
-                    //reload_table();
-                    continue;
-                }
+                    if (dt != null && dt.Rows.Count != 0)
+                    {
+                        Console.WriteLine("+if");
+                        Console.WriteLine("dt:{0}", dt);
+                        Console.WriteLine("dt.Rows.Count:{0}", dt.Rows.Count);
+                        foreach (DataRow row in dt.Rows)
+                        {
 
+                            device = row[0].ToString();
+
+
+                        }
+                        break;
+                    }
+                    else
+                    {
+                        Console.WriteLine("+else");
+                        sql_client.disconnect();
+                        //reload_table();
+                        continue;
+                    }
+
+                }
             }
+            
 
             switch (xml_root_tag)
             {
