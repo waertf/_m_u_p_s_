@@ -1276,6 +1276,19 @@ Select 1-6 then press enter to send package
                     //avls_tcpClient.Close();
                     //return;
                     //avls_package.Loc = "N" + last_avls_lat + "E" + last_avls_lon + ",";
+                    /*
+                     * SELECT 
+  public._gps_log._lat,
+  public._gps_log._lon
+FROM
+  public._gps_log
+WHERE
+  public._gps_log._time < now() AND 
+  public._gps_log._uid = 'avls_package.ID'
+ORDER BY
+  public._gps_log._time DESC
+LIMIT 1
+                     */
                     avls_package.Loc = "N00000.0000E00000.0000,";
                 }
                 if (htable.ContainsKey("speed-hor"))
