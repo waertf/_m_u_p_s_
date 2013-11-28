@@ -1223,6 +1223,7 @@ Select 1-6 then press enter to send package
             NetworkStream netStream = avls_tcpClient.GetStream();
             if (iEnumerable.Contains(new XElement("operation-error").Name))
             {
+                netStream.Close();
                 avls_tcpClient.Close();
                 return;
             }
@@ -1232,6 +1233,12 @@ Select 1-6 then press enter to send package
                 if (htable.ContainsKey("suaddr"))
                 {
                     avls_package.ID = htable["suaddr"].ToString() + ",";
+                }
+                else
+                {
+                    netStream.Close();
+                    avls_tcpClient.Close();
+                    return;
                 }
                 if (htable.ContainsKey("result_code"))
                 {
