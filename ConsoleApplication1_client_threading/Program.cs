@@ -1050,7 +1050,7 @@ Select 1-6 then press enter to send package
 
                         if (bool.Parse(ConfigurationManager.AppSettings["AVLS_ACCESS"]))
                         {
-                            access_avls_server(sql_client, xml_root_tag, htable, sensor_name, sensor_type, sensor_value, XmlGetAllElementsXname(xml_data), log);
+                            access_avls_server( xml_root_tag, htable, sensor_name, sensor_type, sensor_value, XmlGetAllElementsXname(xml_data), log);
                             Console.WriteLine("AVLS Access Enable");
                         }
                            
@@ -1203,7 +1203,7 @@ Select 1-6 then press enter to send package
             Console.WriteLine("::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::");
         }
 
-        private static void access_avls_server(SqlClient sql_client,string xml_root_tag, Hashtable htable, List<string> sensor_name, List<string> sensor_type, List<string> sensor_value, IEnumerable<XName> iEnumerable, string log)
+        private static void access_avls_server(string xml_root_tag, Hashtable htable, List<string> sensor_name, List<string> sensor_type, List<string> sensor_value, IEnumerable<XName> iEnumerable, string log)
         {
             Console.WriteLine("+access_avls_server");
             string send_string = string.Empty;
@@ -1276,20 +1276,61 @@ Select 1-6 then press enter to send package
                     //avls_tcpClient.Close();
                     //return;
                     //avls_package.Loc = "N" + last_avls_lat + "E" + last_avls_lon + ",";
-                    /*
-                     * SELECT 
+                    if (bool.Parse(ConfigurationManager.AppSettings["avlsGetLastLocation"]))
+                    {
+                        var avlsSqlClient = new SqlClient(ConfigurationManager.AppSettings["SQL_SERVER_IP"], ConfigurationManager.AppSettings["SQL_SERVER_PORT"], ConfigurationManager.AppSettings["SQL_SERVER_USER_ID"], ConfigurationManager.AppSettings["SQL_SERVER_PASSWORD"], ConfigurationManager.AppSettings["SQL_SERVER_DATABASE"], ConfigurationManager.AppSettings["Pooling"], ConfigurationManager.AppSettings["MinPoolSize"], ConfigurationManager.AppSettings["MaxPoolSize"], ConfigurationManager.AppSettings["ConnectionLifetime"]);
+                        string avlsSqlCmd = @"SELECT 
   public._gps_log._lat,
   public._gps_log._lon
 FROM
   public._gps_log
 WHERE
   public._gps_log._time < now() AND 
-  public._gps_log._uid = 'avls_package.ID'
+  public._gps_log._uid = '" + avls_package.ID + @"'
 ORDER BY
   public._gps_log._time DESC
-LIMIT 1
-                     */
-                    avls_package.Loc = "N00000.0000E00000.0000,";
+LIMIT 1";
+                        avlsSqlClient.connect();
+                        var dt = avlsSqlClient.get_DataTable(avlsSqlCmd);
+                        avlsSqlClient.disconnect();
+                        if (dt != null && dt.Rows.Count != 0)
+                        {
+                            string avlsLat = string.Empty, avlsLon = string.Empty;
+                            foreach (DataRow row in dt.Rows)
+                            {
+                                avlsLat = row[0].ToString();
+                                avlsLon = row[1].ToString();
+                            }
+                            GeoAngle lat_value = GeoAngle.FromDouble(Convert.ToDecimal(avlsLat));
+                            GeoAngle long_value = GeoAngle.FromDouble(Convert.ToDecimal(avlsLon));
+                            string lat_str = lat_value.Degrees.ToString() + lat_value.Minutes.ToString("D2") + "." + lat_value.Seconds.ToString("D2") + lat_value.Milliseconds.ToString("D3");
+                            string long_str = long_value.Degrees.ToString() + long_value.Minutes.ToString("D2") + "." + long_value.Seconds.ToString("D2") + long_value.Milliseconds.ToString("D3");
+                            //avls_package.Loc = "N" + (Convert.ToDouble(htable["lat_value"])*100).ToString() + "E" + (Convert.ToDouble(htable["long_value"])*100).ToString()+ ",";
+                            avls_package.Loc = "N" + lat_str + "E" + long_str + ",";
+                        }
+                        else
+                        {
+                            avls_package.Loc = "N00000.0000E00000.0000,";
+                        }
+                        /*
+                         * SELECT 
+      public._gps_log._lat,
+      public._gps_log._lon
+    FROM
+      public._gps_log
+    WHERE
+      public._gps_log._time < now() AND 
+      public._gps_log._uid = 'avls_package.ID'
+    ORDER BY
+      public._gps_log._time DESC
+    LIMIT 1
+                         */
+                    }
+                    else
+                    {
+                        avls_package.Loc = "N00000.0000E00000.0000,";
+                    }
+                        
                 }
                 if (htable.ContainsKey("speed-hor"))
                 {
