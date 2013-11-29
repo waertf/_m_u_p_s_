@@ -228,14 +228,14 @@ each set of the byte. To display a four-byte string, there will be 8 digits stri
             //alonso
             Thread read_thread = new Thread(() => read_thread_method(tcpClient, netStream, sql_client));
             read_thread.Start();
-            if (bool.Parse(ConfigurationManager.AppSettings["sendtest2_t"]))
+            if (bool.Parse(ConfigurationManager.AppSettings["ManualSend"]))
             {
-                Thread send_test_thread = new Thread(() => sendtest2_t(netStream, sql_client));
+                Thread send_test_thread = new Thread(() => ManualSend(netStream, sql_client));
                 send_test_thread.Start();
             }
             else
             {
-                Thread autoSendFromSqlTableThread = new Thread(()=>Autosend(netStream));
+                Thread autoSendFromSqlTableThread = new Thread(()=>AutoSend(netStream));
                 autoSendFromSqlTableThread.Start();
             }
             
@@ -249,7 +249,7 @@ each set of the byte. To display a four-byte string, there will be 8 digits stri
             //tcpClient.Close();
         }
 
-        private static object Autosend(NetworkStream netStream)
+        private static object AutoSend(NetworkStream netStream)
         {
             
             while (true)
@@ -486,7 +486,7 @@ LIMIT
             }
         }
          * */
-        private static void sendtest2_t(NetworkStream netStream, SqlClient sql_client)
+        private static void ManualSend(NetworkStream netStream, SqlClient sql_client)
         {
             while (true)
             {
@@ -800,7 +800,7 @@ Select 1-6 then press enter to send package
                 Console.WriteLine(output);
                 Console.WriteLine("############################################################################");
                  * */
-                if (bool.Parse(ConfigurationManager.AppSettings["sendtest2_t"]))
+                if (bool.Parse(ConfigurationManager.AppSettings["ManualSend"]))
                 {
                     Console.WriteLine(
                     @"
