@@ -1232,7 +1232,7 @@ Select 1-6 then press enter to send package
                 
                 if (htable.ContainsKey("suaddr"))
                 {
-                    avls_package.ID = htable["suaddr"].ToString() + ",";
+                    avls_package.ID = htable["suaddr"].ToString() ;
                 }
                 else
                 {
@@ -1393,8 +1393,8 @@ LIMIT 1";
                 }
                 avls_package.Message = "test";
             }
-                
-                
+
+            avls_package.ID += ",";    
             send_string = "%%"+avls_package.ID+avls_package.GPS_Valid+avls_package.Date_Time+avls_package.Loc+avls_package.Speed+avls_package.Dir+avls_package.Temp+avls_package.Status+avls_package.Event+avls_package.Message+"\r\n";
             /*
             netStream.Write(System.Text.Encoding.Default.GetBytes(send_string), 0, send_string.Length);
