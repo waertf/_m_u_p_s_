@@ -1607,18 +1607,48 @@ LIMIT 1";
             }
             else
                 gps_log.j_6 = gps_log.j_7 = gps_log.j_8 =operation_log.event_id= "\'" + "null" + "\'";
-            if (htable.ContainsKey("lat_value"))
+            if (htable.ContainsKey("lat_value") && htable.ContainsKey("long_value"))
             {
-                gps_log._lat = operation_log.eqp_lat=htable["lat_value"].ToString();
+                gps_log._lat = operation_log.eqp_lat = htable["lat_value"].ToString();
+                gps_log._lon = operation_log.eqp_lon = htable["long_value"].ToString();
             }
             else
-                gps_log._lat = operation_log.eqp_lat="0";
-            if (htable.ContainsKey("long_value"))
             {
-                gps_log._lon = operation_log.eqp_lon=htable["long_value"].ToString();
+                if (htable.ContainsKey("suaddr"))
+                {
+                    string sqlCmd = @"SELECT 
+  public._gps_log._lat,
+  public._gps_log._lon
+FROM
+  public._gps_log
+WHERE
+  public._gps_log._time < now() AND 
+  public._gps_log._uid = '" + htable["suaddr"] + @"'
+ORDER BY
+  public._gps_log._time DESC
+LIMIT 1";
+                    sql_client.connect();
+                     var sqlDatetable = sql_client.get_DataTable(sqlCmd);
+                        sql_client.disconnect();
+                        if (sqlDatetable != null && sqlDatetable.Rows.Count != 0)
+                    {
+                        string avlsLat = string.Empty, avlsLon = string.Empty;
+                        foreach (DataRow row in sqlDatetable.Rows)
+                        {
+                            gps_log._lat = operation_log.eqp_lat = row[0].ToString();
+                            gps_log._lon = operation_log.eqp_lon = row[1].ToString();
+                        }
+                    }
+                }
+                else
+                {
+                    gps_log._lat = operation_log.eqp_lat = "0";
+                    gps_log._lon = operation_log.eqp_lon = "0";
+                }
+                
             }
-            else
-                gps_log._lon = operation_log.eqp_lon="0";
+                
+                
             if (htable.ContainsKey("radius_value"))
             {
                 gps_log.j_5 = htable["radius_value"].ToString();
