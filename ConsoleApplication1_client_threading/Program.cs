@@ -1259,7 +1259,12 @@ Select 1-6 then press enter to send package
                     Console.WriteLine(@"-if (htable.ContainsKey(""info_time""))");
                 }
                 else
-                    avls_package.Date_Time = string.Format("{0:yyMMddHHmmss}", DateTime.Now)+",";
+                {
+                    DateTime tempDatetime = DateTime.Now.ToUniversalTime();
+                    avls_package.Date_Time = tempDatetime.ToString("yyMMddHHmmss") + ",";
+                    //avls_package.Date_Time = string.Format("{0:yyMMddHHmmss}", DateTime.Now) + ",";
+                }
+                    
                 if (htable.ContainsKey("lat_value") && htable.ContainsKey("long_value"))
                 {
                     GeoAngle lat_value = GeoAngle.FromDouble(Convert.ToDecimal(htable["lat_value"]));
