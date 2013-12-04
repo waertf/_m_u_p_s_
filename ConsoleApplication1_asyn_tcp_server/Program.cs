@@ -166,9 +166,10 @@ namespace ConsoleApplication1_asyn_tcp_server
                         string firstFolder = DateTime.Now.ToString("yyyyMMdd");
                         string secondFolder = DateTime.Now.ToString("HH");
                         string fileName = outputDirectoryName + "\\" + firstFolder + "\\" + secondFolder + "\\" + DateTime.Now.ToString("HHmmss") + ".txt";
-                        System.IO.Directory.CreateDirectory(outputDirectoryName + "\\" + firstFolder + "\\" + secondFolder);
-                        if (!File.Exists(fileName))
+                        
+                        if (!File.Exists(fileName) && !content.Equals("<EOF>"))
                         {
+                            System.IO.Directory.CreateDirectory(outputDirectoryName + "\\" + firstFolder + "\\" + secondFolder);
                             // Create a file to write to.
                             using (StreamWriter sw = File.CreateText(fileName))
                             {

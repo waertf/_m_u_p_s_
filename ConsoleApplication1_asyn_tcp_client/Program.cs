@@ -216,7 +216,8 @@ SELECT
                     connectDone.Reset();
                     sendDone.Reset();
                     receiveDone.Reset();
-                    log.Info(sendPackageStr);
+                    if (!sendPackageStr.Equals("<EOF>"))
+                        log.Info(sendPackageStr.Replace("<EOF>",""));
 
 
 
