@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Configuration;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.NetworkInformation;
 using System.Net.Sockets;
+using System.Reflection;
 using System.Text;
 using System.Threading;
 
@@ -159,7 +161,22 @@ namespace ConsoleApplication1_asyn_tcp_server
                         // client. Display it on the console.
                         Console.WriteLine("Read {0} bytes from socket. \n Data : {1}",
                             content.Length, content);
-                        log.Info(content.Replace("<EOF>",""));
+
+                        string outputDirectoryName = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+                        string firstFolder = DateTime.Now.ToString("yyyyMMdd");
+                        string secondFolder = DateTime.Now.ToString("HH");
+                        string fileName = outputDirectoryName + "\\" + firstFolder + "\\" + secondFolder + "\\" + DateTime.Now.ToString("HHmmss") + ".txt";
+                        System.IO.Directory.CreateDirectory(outputDirectoryName + "\\" + firstFolder + "\\" + secondFolder);
+                        if (!File.Exists(fileName))
+                        {
+                            // Create a file to write to.
+                            using (StreamWriter sw = File.CreateText(fileName))
+                            {
+                                sw.WriteLine(content.Replace("<EOF>", ""));
+                            }
+                        }
+
+                        //log.Info(content.Replace("<EOF>",""));
                         // Echo the data back to the client.
                         Send(handler, content);
                     }
