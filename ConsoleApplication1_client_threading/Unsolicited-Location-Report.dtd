@@ -1,3 +1,6 @@
 ﻿<!ELEMENT Unsolicited-Location-Report (suaddr, event-info)>
 <!ELEMENT suaddr (#PCDATA)>
 <!ELEMENT event-info (#PCDATA)>
+<!ELEMENT info-data (impl-spec-data)>
+<!ELEMENT impl-spec-data (#PCDATA)>
+
