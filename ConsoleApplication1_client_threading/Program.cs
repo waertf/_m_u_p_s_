@@ -1633,9 +1633,9 @@ ORDER BY
   public._gps_log._time DESC
 LIMIT 1";
                     sql_client.connect();
-                     var sqlDatetable = sql_client.get_DataTable(sqlCmd);
-                        sql_client.disconnect();
-                        if (sqlDatetable != null && sqlDatetable.Rows.Count != 0)
+                    var sqlDatetable = sql_client.get_DataTable(sqlCmd);
+                    sql_client.disconnect();
+                    if (sqlDatetable != null && sqlDatetable.Rows.Count != 0)
                     {
                         string avlsLat = string.Empty, avlsLon = string.Empty;
                         foreach (DataRow row in sqlDatetable.Rows)
@@ -1643,6 +1643,11 @@ LIMIT 1";
                             gps_log._lat = operation_log.eqp_lat = row[0].ToString();
                             gps_log._lon = operation_log.eqp_lon = row[1].ToString();
                         }
+                    }
+                    else
+                    {
+                        gps_log._lat = operation_log.eqp_lat = "0";
+                        gps_log._lon = operation_log.eqp_lon = "0";
                     }
                 }
                 else
