@@ -1646,14 +1646,16 @@ LIMIT 1";
                     }
                     else
                     {
-                        gps_log._lat = operation_log.eqp_lat = "0";
-                        gps_log._lon = operation_log.eqp_lon = "0";
+                        string zero = "0";
+                        gps_log._lat = operation_log.eqp_lat = zero;
+                        gps_log._lon = operation_log.eqp_lon = zero;
                     }
                 }
                 else
                 {
-                    gps_log._lat = operation_log.eqp_lat = "0";
-                    gps_log._lon = operation_log.eqp_lon = "0";
+                    string zero = "0";
+                    gps_log._lat = operation_log.eqp_lat = zero;
+                    gps_log._lon = operation_log.eqp_lon = zero;
                 }
                 
             }
