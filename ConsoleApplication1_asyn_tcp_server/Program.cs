@@ -33,6 +33,7 @@ namespace ConsoleApplication1_asyn_tcp_server
             // Thread signal.
             public static ManualResetEvent allDone = new ManualResetEvent(false);
             private static readonly int Port = int.Parse(ConfigurationManager.AppSettings["THUNDE_SERVER_PORT"]);
+            private static Mutex mut = new Mutex();
 
             private static IPAddress GetLocalIPAddress()
             {
@@ -166,7 +167,8 @@ namespace ConsoleApplication1_asyn_tcp_server
                         string firstFolder = DateTime.Now.ToString("yyyyMMdd");
                         string secondFolder = DateTime.Now.ToString("HH");
                         string fileName = outputDirectoryName + "\\" + firstFolder + "\\" + secondFolder + "\\" + DateTime.Now.ToString("HHmmss") + ".txt";
-                        
+
+                        mut.WaitOne();
                         if (!File.Exists(fileName) && !content.Equals("<EOF>"))
                         {
                             System.IO.Directory.CreateDirectory(outputDirectoryName + "\\" + firstFolder + "\\" + secondFolder);
@@ -176,7 +178,7 @@ namespace ConsoleApplication1_asyn_tcp_server
                                 sw.WriteLine(content.Replace("<EOF>", ""));
                             }
                         }
-
+                        mut.ReleaseMutex();
                         //log.Info(content.Replace("<EOF>",""));
                         // Echo the data back to the client.
                         Send(handler, content);
