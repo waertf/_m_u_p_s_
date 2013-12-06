@@ -1697,13 +1697,13 @@ LIMIT 1";
                 gps_log._option0 = "\'"+htable["info_time"].ToString()+"\'";
             }
             else
-                gps_log._option0 = "\'" + "null" + "\'";
+                gps_log._option0 = "\'" + DateTime.Now.ToUniversalTime().ToString("yyyyMMddHHmmss") + "\'";
             if (htable.ContainsKey("server_time"))
             {
                 gps_log._option1 = "\'" + htable["server_time"].ToString() + "\'";
             }
             else
-                gps_log._option1 = "\'" + "0" + "\'";
+                gps_log._option1 = "\'" + DateTime.Now.ToUniversalTime().ToString("yyyyMMddHHmmss") + "\'";
             if (sql_client.connect())
             {
                 
@@ -1717,10 +1717,11 @@ LIMIT 1";
                         case "Triggered-Location-Report":
                             if (elements.Contains(new XElement("operation-error").Name))
                             {
-                                table_columns = "_id,_uid,_option2,_option3,_or_lon,_or_lat,_satellites,_temperature,_voltage";
+                                table_columns = "_id,_uid,_option2,_option3,_or_lon,_or_lat,_satellites,_temperature,_voltage,_option0,_option1";
                                 table_column_value = gps_log._id + "," + gps_log._uid + "," + gps_log._option2 + "," + gps_log._option3+","+
                                     gps_log._or_lon + "," + gps_log._or_lat + "," + gps_log._satellites + "," +
-                                               gps_log._temperature + "," + gps_log._voltage;
+                                               gps_log._temperature + "," + gps_log._voltage + "," + gps_log._option0 +
+                                               "," + gps_log._option1;
                                 cmd = "INSERT INTO public._gps_log ("+table_columns+") VALUES (" + table_column_value  + ")";
                             }
                             else
@@ -1803,10 +1804,11 @@ LIMIT 1";
                                 {
                                     if (elements.Contains(new XElement("operation-error").Name))
                                     {
-                                        table_columns = "_id,_uid,_option2,_option3,_or_lon,_or_lat,_satellites,_temperature,_voltage";
+                                        table_columns = "_id,_uid,_option2,_option3,_or_lon,_or_lat,_satellites,_temperature,_voltage,_option0,_option1";
                                     table_column_value = gps_log._id + "," + gps_log._uid + "," + gps_log._option2 + "," + gps_log._option3+","+
                                         gps_log._or_lon + "," + gps_log._or_lat + "," + gps_log._satellites + "," +
-                                                   gps_log._temperature + "," + gps_log._voltage;
+                                                   gps_log._temperature + "," + gps_log._voltage + "," + gps_log._option0 +
+                                               "," + gps_log._option1; 
                                     cmd = "INSERT INTO public._gps_log ("+table_columns+") VALUES (" + table_column_value  + ")";
                                    
                                     }
