@@ -4,6 +4,8 @@ using System.Linq;
 using System.Text;
 using Devart.Data.PostgreSql;
 using System.Data;
+using log4net;
+using log4net.Config;
 
 namespace server_syn_console
 {
@@ -11,15 +13,21 @@ namespace server_syn_console
     {
         PgSqlConnectionStringBuilder pgCSB = new PgSqlConnectionStringBuilder();
         PgSqlConnection pgSqlConnection;
-        public bool IsConnected { get; set; }
-        public SqlClient(string ip, string port, string user_id, string password, string database)
+        public bool IsConnected{get;set;}
+        private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+        public SqlClient(string ip, string port, string user_id, string password, string database, string Pooling, string MinPoolSize, string MaxPoolSize, string ConnectionLifetime)
         {
             pgCSB.Host = ip;
             pgCSB.Port = int.Parse(port);
             pgCSB.UserId = user_id;
             pgCSB.Password = password;
             pgCSB.Database = database;
-            pgCSB.MaxPoolSize = 150;
+
+            pgCSB.Pooling = bool.Parse(Pooling);
+            pgCSB.MinPoolSize = int.Parse(MinPoolSize);
+            pgCSB.MaxPoolSize = int.Parse(MaxPoolSize);
+            pgCSB.ConnectionLifetime = int.Parse(ConnectionLifetime); ;
+
             pgCSB.ConnectionTimeout = 30;
             pgCSB.Unicode = true;
             pgSqlConnection = new PgSqlConnection(pgCSB.ConnectionString);
@@ -41,7 +49,10 @@ namespace server_syn_console
             }
             catch (PgSqlException ex)
             {
-                Console.WriteLine("connect Exception occurs: {0}", ex.Error);
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine("Connect xception occurs: {0}", ex.Error);
+                log.Error("Connect xception occurs: "+ ex.Error);
+                Console.ResetColor();
                 return false;
             }
         }
@@ -62,7 +73,10 @@ namespace server_syn_console
             }
             catch (PgSqlException ex)
             {
-                Console.WriteLine("disconnect Exception occurs: {0}", ex.Error);
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine("Disconnect exception occurs: {0}", ex.Error);
+                log.Error("Disconnect exception occurs: "+ ex.Error);
+                Console.ResetColor();
                 return false;
             }
         }
@@ -100,7 +114,10 @@ namespace server_syn_console
             }
             catch (PgSqlException ex)
             {
-                Console.WriteLine("modify Exception occurs: {0}", ex.Error);
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine("Modify exception occurs: {0}" + Environment.NewLine + "{1}", ex.Error, cmd);
+                log.Error("Modify exception occurs: " + Environment.NewLine + ex.Error + Environment.NewLine + cmd);
+                Console.ResetColor();
                 return false;
             }
 
@@ -142,12 +159,7 @@ namespace server_syn_console
                             }
                             datatable.Rows.Add(dr);
                             Console.Write(Environment.NewLine);
-                            /*
-                            if(myReader.FieldCount>1)
-                                Console.WriteLine(myReader.GetInt32(0) + "\t" + myReader.GetString(1) + "\t");
-                            else
-                                Console.WriteLine(myReader.GetInt32(0) + "\t");
-                             * */
+                            //Console.WriteLine(myReader.GetInt32(0) + "\t" + myReader.GetString(1) + "\t");
                         }
                     }
                     finally
@@ -170,7 +182,10 @@ namespace server_syn_console
             }
             catch (PgSqlException ex)
             {
-                Console.WriteLine("get_DataTable Exception occurs: {0}", ex.Error);
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine("GetDataTable exception occurs: {0}"+Environment.NewLine+"{1}", ex.Error,cmd);
+                log.Error("GetDataTable exception occurs: " + Environment.NewLine + ex.Error+Environment.NewLine+ cmd);
+                Console.ResetColor();
                 return null;
             }
         }

@@ -4,6 +4,8 @@ using System.Linq;
 using System.Text;
 using Devart.Data.PostgreSql;
 using System.Data;
+using log4net;
+using log4net.Config;
 
 namespace ConsoleApplication1_asyn_tcp_client
 {
@@ -12,6 +14,7 @@ namespace ConsoleApplication1_asyn_tcp_client
         PgSqlConnectionStringBuilder pgCSB = new PgSqlConnectionStringBuilder();
         PgSqlConnection pgSqlConnection;
         public bool IsConnected{get;set;}
+        private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
         public SqlClient(string ip, string port, string user_id, string password, string database, string Pooling, string MinPoolSize, string MaxPoolSize, string ConnectionLifetime)
         {
             pgCSB.Host = ip;
@@ -47,7 +50,8 @@ namespace ConsoleApplication1_asyn_tcp_client
             catch (PgSqlException ex)
             {
                 Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine("Exception occurs: {0}", ex.Error);
+                Console.WriteLine("Connect xception occurs: {0}", ex.Error);
+                log.Error("Connect xception occurs: "+ ex.Error);
                 Console.ResetColor();
                 return false;
             }
@@ -70,7 +74,8 @@ namespace ConsoleApplication1_asyn_tcp_client
             catch (PgSqlException ex)
             {
                 Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine("Exception occurs: {0}", ex.Error);
+                Console.WriteLine("Disconnect exception occurs: {0}", ex.Error);
+                log.Error("Disconnect exception occurs: "+ ex.Error);
                 Console.ResetColor();
                 return false;
             }
@@ -110,7 +115,8 @@ namespace ConsoleApplication1_asyn_tcp_client
             catch (PgSqlException ex)
             {
                 Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine("Exception occurs: {0}", ex.Error);
+                Console.WriteLine("Modify exception occurs: {0}" + Environment.NewLine + "{1}", ex.Error, cmd);
+                log.Error("Modify exception occurs: " + Environment.NewLine + ex.Error + Environment.NewLine + cmd);
                 Console.ResetColor();
                 return false;
             }
@@ -177,7 +183,8 @@ namespace ConsoleApplication1_asyn_tcp_client
             catch (PgSqlException ex)
             {
                 Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine("Exception occurs: {0}", ex.Error);
+                Console.WriteLine("GetDataTable exception occurs: {0}"+Environment.NewLine+"{1}", ex.Error,cmd);
+                log.Error("GetDataTable exception occurs: " + Environment.NewLine + ex.Error+Environment.NewLine+ cmd);
                 Console.ResetColor();
                 return null;
             }
