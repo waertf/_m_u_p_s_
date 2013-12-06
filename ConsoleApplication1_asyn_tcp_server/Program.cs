@@ -14,7 +14,7 @@ namespace ConsoleApplication1_asyn_tcp_server
 {
     class Program
     {
-        private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+        //private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
         // State object for reading client data asynchronously
         public class StateObject
         {
