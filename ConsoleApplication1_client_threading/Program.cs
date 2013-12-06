@@ -1264,7 +1264,7 @@ Select 1-6 then press enter to send package
                     avls_package.Date_Time = tempDatetime.ToString("yyMMddHHmmss") + ",";
                     //avls_package.Date_Time = string.Format("{0:yyMMddHHmmss}", DateTime.Now) + ",";
                 }
-                    
+                ///TODO:implement set last lat lon value    
                 if (htable.ContainsKey("lat_value") && htable.ContainsKey("long_value"))
                 {
                     GeoAngle lat_value = GeoAngle.FromDouble(Convert.ToDecimal(htable["lat_value"]));
@@ -1612,6 +1612,7 @@ LIMIT 1";
             }
             else
                 gps_log.j_6 = gps_log.j_7 = gps_log.j_8 =operation_log.event_id= "\'" + "null" + "\'";
+            ///TODO:implement set last lat lon value
             if (htable.ContainsKey("lat_value") && htable.ContainsKey("long_value"))
             {
                 gps_log._lat = operation_log.eqp_lat = htable["lat_value"].ToString();
