@@ -1226,6 +1226,11 @@ WHERE
                     lon = row[1].ToString();
                 }
             }
+            else
+            {
+                lat = lon = "0";
+                log.Error("Cannot find lat lon of deviceID: " + id + "in sql table: sd.initial_location ");
+            }
         }
 
         private static void access_avls_server(string xml_root_tag, Hashtable htable, List<string> sensor_name, List<string> sensor_type, List<string> sensor_value, IEnumerable<XName> iEnumerable, string log)
