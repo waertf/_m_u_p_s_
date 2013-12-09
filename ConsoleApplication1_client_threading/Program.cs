@@ -1661,8 +1661,8 @@ LIMIT 1";
             ///TODO:implement set last lat lon value
             if (htable.ContainsKey("lat_value") && htable.ContainsKey("long_value"))
             {
-                gps_log._lat = operation_log.eqp_lat = htable["lat_value"].ToString();
-                gps_log._lon = operation_log.eqp_lon = htable["long_value"].ToString();
+                gps_log._lat=gps_log._or_lat = operation_log.eqp_lat = htable["lat_value"].ToString();
+                gps_log._lon = gps_log._or_lon=operation_log.eqp_lon = htable["long_value"].ToString();
             }
             else
             {
@@ -1687,8 +1687,8 @@ LIMIT 1";
                         string avlsLat = string.Empty, avlsLon = string.Empty;
                         foreach (DataRow row in sqlDatetable.Rows)
                         {
-                            gps_log._lat = operation_log.eqp_lat = row[0].ToString();
-                            gps_log._lon = operation_log.eqp_lon = row[1].ToString();
+                            gps_log._lat = gps_log._or_lat=operation_log.eqp_lat = row[0].ToString();
+                            gps_log._lon = gps_log._or_lon=operation_log.eqp_lon = row[1].ToString();
                         }
                     }
                     else
@@ -1699,8 +1699,8 @@ LIMIT 1";
 
                         string lat = string.Empty, lon = string.Empty;
                         GetInitialLocationFromSql(ref lat, ref lon, (string) htable["suaddr"]);
-                        gps_log._lat = operation_log.eqp_lat = lat;
-                        gps_log._lon = operation_log.eqp_lon = lon;
+                        gps_log._lat = gps_log._or_lat=operation_log.eqp_lat = lat;
+                        gps_log._lon = gps_log._or_lon=operation_log.eqp_lon = lon;
                     }
                 }
                 else
@@ -1711,8 +1711,8 @@ LIMIT 1";
 
                     string lat = string.Empty, lon = string.Empty;
                     GetInitialLocationFromSql(ref lat, ref lon, (string)htable["suaddr"]);
-                    gps_log._lat = operation_log.eqp_lat = lat;
-                    gps_log._lon = operation_log.eqp_lon = lon;
+                    gps_log._lat = gps_log._or_lat=operation_log.eqp_lat = lat;
+                    gps_log._lon = gps_log._or_lon=operation_log.eqp_lon = lon;
                 }
                 
             }
@@ -1773,11 +1773,15 @@ LIMIT 1";
                         case "Triggered-Location-Report":
                             if (elements.Contains(new XElement("operation-error").Name))
                             {
-                                table_columns = "_id,_uid,_option2,_option3,_or_lon,_or_lat,_satellites,_temperature,_voltage,_option0,_option1";
+                                table_columns = "_id,_uid,_option2,_option3,_or_lon,_or_lat,_satellites,_temperature,_voltage,_option0,_option1,_lat,_lon";
                                 table_column_value = gps_log._id + "," + gps_log._uid + "," + gps_log._option2 + "," + gps_log._option3+","+
                                     gps_log._or_lon + "," + gps_log._or_lat + "," + gps_log._satellites + "," +
                                                gps_log._temperature + "," + gps_log._voltage + "," + gps_log._option0 +
-                                               "," + gps_log._option1;
+                                               "," + gps_log._option1
+                                               +
+                                               "," + gps_log._lat
+                                               +
+                                               "," + gps_log._lon;
                                 cmd = "INSERT INTO public._gps_log ("+table_columns+") VALUES (" + table_column_value  + ")";
                             }
                             else
@@ -1848,11 +1852,11 @@ LIMIT 1";
                                 if (xml_validation_with_dtd(log1, xml_root_tag))
                                 {
                                     gps_log._validity = "\'Y\'";
-                                    table_columns = "_id,_uid,_status,_validity,_or_lon,_or_lat,_satellites,_temperature,,_voltage,_option3,j_6,j_7";
+                                    table_columns = "_id,_uid,_status,_validity,_or_lon,_or_lat,_satellites,_temperature,,_voltage,_option3,j_6,j_7,_lat,_lon";
                                     table_column_value = gps_log._id + "," + gps_log._uid + "," + gps_log._status + "," +
                                                          gps_log._validity + "," +
                                                gps_log._or_lon + "," + gps_log._or_lat + "," + gps_log._satellites + "," +
-                                               gps_log._temperature + "," + gps_log._voltage + "," + gps_log._option3+","+gps_log.j_6+","+gps_log.j_7;
+                                               gps_log._temperature + "," + gps_log._voltage + "," + gps_log._option3+","+gps_log.j_6+","+gps_log.j_7+","+gps_log._lat+","+gps_log._lon;
                                     //table_column_value = @"'1','1','1','20130808 13:13:13.133 PST','Y',0,0,0,0,0,'0','0','0',0,0,0,0,0";
                                     cmd = "INSERT INTO public._gps_log (" + table_columns + ") VALUES  (" + table_column_value + ")";
                                 }
@@ -1860,11 +1864,11 @@ LIMIT 1";
                                 {
                                     if (elements.Contains(new XElement("operation-error").Name))
                                     {
-                                        table_columns = "_id,_uid,_option2,_option3,_or_lon,_or_lat,_satellites,_temperature,_voltage,_option0,_option1";
+                                        table_columns = "_id,_uid,_option2,_option3,_or_lon,_or_lat,_satellites,_temperature,_voltage,_option0,_option1,_lat,_lon";
                                     table_column_value = gps_log._id + "," + gps_log._uid + "," + gps_log._option2 + "," + gps_log._option3+","+
                                         gps_log._or_lon + "," + gps_log._or_lat + "," + gps_log._satellites + "," +
                                                    gps_log._temperature + "," + gps_log._voltage + "," + gps_log._option0 +
-                                               "," + gps_log._option1; 
+                                               "," + gps_log._option1 + "," + gps_log._lat + "," + gps_log._lon; 
                                     cmd = "INSERT INTO public._gps_log ("+table_columns+") VALUES (" + table_column_value  + ")";
                                    
                                     }
@@ -1911,9 +1915,11 @@ LIMIT 1";
                             operation_log.create_user = @"'System'";
                             if (elements.Contains(new XElement("operation-error").Name))
                             {
-                                table_columns = "_id,event_id,request_id,result_code,result_msg,create_user";
+                                table_columns = "_id,event_id,request_id,result_code,result_msg,create_user,eqp_lat,eqp_lon";
                                 table_column_value = operation_log._id + "," + operation_log.event_id + "," + operation_log.request_id + "," + operation_log.result_code +
-                                    "," + operation_log.result_msg + "," + operation_log.create_user;
+                                    "," + operation_log.result_msg + "," + operation_log.create_user + "," +
+                                        operation_log.eqp_lat + "," +
+                                        operation_log.eqp_lon;
 
                                 cmd = "INSERT INTO public.operation_log (" + table_columns + ") VALUES (" + table_column_value + ")";
                            
@@ -1966,9 +1972,11 @@ LIMIT 1";
                             operation_log.create_user = @"'System'";
                             if (elements.Contains(new XElement("operation-error").Name))
                             {
-                                table_columns = "_id,event_id,request_id,result_code,result_msg,create_user";
+                                table_columns = "_id,event_id,request_id,result_code,result_msg,create_user,eqp_lat,eqp_lon";
                                 table_column_value = operation_log._id + "," + operation_log.event_id + "," + operation_log.request_id + "," + operation_log.result_code +
-                                    "," + operation_log.result_msg + "," + operation_log.create_user;
+                                    "," + operation_log.result_msg + "," + operation_log.create_user + "," +
+                                        operation_log.eqp_lat + "," +
+                                        operation_log.eqp_lon;
 
                                 cmd = "INSERT INTO public.operation_log (" + table_columns + ") VALUES (" + table_column_value + ")";
 
@@ -1980,8 +1988,10 @@ LIMIT 1";
                                     operation_log.application_id + "," +
                                     operation_log.result_code + "," +
                                     operation_log.result_msg+","+
-                                    operation_log.create_user;
-                                table_columns = "_id,event_id,application_id,result_code,result_msg,create_user";
+                                    operation_log.create_user + "," +
+                                        operation_log.eqp_lat + "," +
+                                        operation_log.eqp_lon; ;
+                                table_columns = "_id,event_id,application_id,result_code,result_msg,create_user,eqp_lat,eqp_lon";
                                 cmd = "INSERT INTO public.operation_log (" + table_columns + ") VALUES (" + table_column_value + ")";
                             }
                         }
