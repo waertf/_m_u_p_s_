@@ -1251,6 +1251,13 @@ WHERE
 
             //Keeplive.keep(avls_tcpClient.Client);
             NetworkStream netStream = avls_tcpClient.GetStream();
+            if (htable.ContainsKey("event_info"))
+                if (htable["event_info"].ToString().Equals("Unit Absent"))
+                {
+                    netStream.Close();
+                    avls_tcpClient.Close();
+                    return;
+                }
             if (iEnumerable.Contains(new XElement("operation-error").Name))
             {
                 netStream.Close();
