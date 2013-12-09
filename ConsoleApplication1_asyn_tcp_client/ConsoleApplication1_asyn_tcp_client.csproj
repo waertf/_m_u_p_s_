@@ -39,6 +39,10 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\ConsoleApplication1_client_threading\bin\client_Release - 複製\Devart.Data.PostgreSql.dll</HintPath>
     </Reference>
+    <Reference Include="keeplive, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\ConsoleApplication1_client_threading\bin\Release\keeplive.dll</HintPath>
+    </Reference>
     <Reference Include="log4net, Version=1.2.11.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\ConsoleApplication1_client_threading\bin\Release\log4net.dll</HintPath>

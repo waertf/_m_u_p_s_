@@ -11,6 +11,7 @@ using System.Timers;
 using log4net;
 using log4net.Config;
 using System.Data;
+using keeplive;
 
 namespace ConsoleApplication1_asyn_tcp_client
 {
@@ -106,7 +107,7 @@ namespace ConsoleApplication1_asyn_tcp_client
                             connectDone.WaitOne();
                         
                         client.SendTimeout = client.ReceiveTimeout = 1000;
-                        
+                        Keeplive.keep(client);
                     //send package getting from sql command
                         /*
                          * 
@@ -248,6 +249,20 @@ SELECT
                 catch (Exception e)
                 {
                     Console.WriteLine(e.ToString());
+                    log.Error(e.ToString());
+                    IPEndPoint remoteEP = new IPEndPoint(IpAddress, Port);
+
+                    // Create a TCP/IP socket.
+                    Socket client = new Socket(AddressFamily.InterNetwork,
+                       SocketType.Stream, ProtocolType.Tcp);
+                    // Connect to the remote endpoint
+                    connectDone.Reset();
+                    client.BeginConnect(remoteEP,
+                        new AsyncCallback(ConnectCallback), client);
+                    connectDone.WaitOne();
+
+                    client.SendTimeout = client.ReceiveTimeout = 1000;
+                    Keeplive.keep(client);
                 }
             }
 
