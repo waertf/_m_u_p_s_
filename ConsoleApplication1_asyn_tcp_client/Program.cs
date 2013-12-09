@@ -107,7 +107,7 @@ namespace ConsoleApplication1_asyn_tcp_client
                             connectDone.WaitOne();
                         
                         client.SendTimeout = client.ReceiveTimeout = 1000;
-                        Keeplive.keep(client);
+                        //Keeplive.keep(client);
                     //send package getting from sql command
                         /*
                          * 
@@ -262,7 +262,7 @@ SELECT
                     connectDone.WaitOne();
 
                     client.SendTimeout = client.ReceiveTimeout = 1000;
-                    Keeplive.keep(client);
+                    //Keeplive.keep(client);
                 }
             }
 
