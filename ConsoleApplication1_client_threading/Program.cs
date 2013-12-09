@@ -1336,6 +1336,11 @@ LIMIT 1";
                                 avlsLat = row[0].ToString();
                                 avlsLon = row[1].ToString();
                             }
+                            string zero = "0";
+                            if (avlsLat.Equals(zero) || avlsLon.Equals(zero))
+                            {
+                                GetInitialLocationFromSql(ref avlsLat, ref avlsLon, avls_package.ID);
+                            }
                             GeoAngle lat_value = GeoAngle.FromDouble(Convert.ToDecimal(avlsLat));
                             GeoAngle long_value = GeoAngle.FromDouble(Convert.ToDecimal(avlsLon));
                             string lat_str = lat_value.Degrees.ToString() + lat_value.Minutes.ToString("D2") + "." + lat_value.Seconds.ToString("D2") + lat_value.Milliseconds.ToString("D3");
@@ -1689,6 +1694,14 @@ LIMIT 1";
                         {
                             gps_log._lat = gps_log._or_lat=operation_log.eqp_lat = row[0].ToString();
                             gps_log._lon = gps_log._or_lon=operation_log.eqp_lon = row[1].ToString();
+                        }
+                        string zero = "0";
+                        if (gps_log._lat.Equals(zero) || gps_log._lon.Equals(zero))
+                        {
+                            string lat = string.Empty, lon = string.Empty;
+                            GetInitialLocationFromSql(ref lat, ref lon, (string)htable["suaddr"]);
+                            gps_log._lat = gps_log._or_lat = operation_log.eqp_lat = lat;
+                            gps_log._lon = gps_log._or_lon = operation_log.eqp_lon = lon;
                         }
                     }
                     else
