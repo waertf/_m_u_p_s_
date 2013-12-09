@@ -250,6 +250,7 @@ SELECT
                 {
                     Console.WriteLine(e.ToString());
                     log.Error(e.ToString());
+                    /*
                     IPEndPoint remoteEP = new IPEndPoint(IpAddress, Port);
 
                     // Create a TCP/IP socket.
@@ -262,6 +263,7 @@ SELECT
                     connectDone.WaitOne();
 
                     client.SendTimeout = client.ReceiveTimeout = 1000;
+                    */
                     //Keeplive.keep(client);
                 }
             }
