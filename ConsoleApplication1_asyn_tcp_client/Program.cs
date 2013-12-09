@@ -195,14 +195,14 @@ SELECT
                                             "," + sendPackage.deviceStatus +
                                             "," + sendPackage.systemSendTime +
                                             "," + sendPackage.deviceSendTime +
-                                            Environment.NewLine+
-                                            "<EOF>";       
+                                            Environment.NewLine;       
                         }
                     }
                         
                                       
                         // Send test data to the remote device.
-                    Send(client, sendPackageStr);
+                    Send(client, sendPackageStr +
+                                            "<EOF>");
                         sendDone.WaitOne();
 
                         // Receive the response from the remote device.
