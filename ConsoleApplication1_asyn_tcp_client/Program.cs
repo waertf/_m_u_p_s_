@@ -302,7 +302,7 @@ SELECT
                     if (bytesRead > 0)
                     {
                         // There might be more data, so store the data received so far.
-                        state.sb.Append(Encoding.UTF8.GetString(state.buffer, 0, bytesRead));
+                        state.sb.Append(Encoding.GetEncoding("big5").GetString(state.buffer, 0, bytesRead));
 
                         // Get the rest of the data.
                         client.BeginReceive(state.buffer, 0, StateObject.BufferSize, 0,
@@ -329,7 +329,7 @@ SELECT
             {
   
                 // Convert the string data to byte data using ASCII encoding.
-                byte[] byteData = Encoding.UTF8.GetBytes(data);
+                byte[] byteData = Encoding.GetEncoding("big5").GetBytes(data);
 
                 // Begin sending the data to the remote device.
                 client.BeginSend(byteData, 0, byteData.Length, 0,
