@@ -1550,10 +1550,16 @@ LIMIT 1";
                         case "Unit Present":
                             avls_package.Event = "181,";
                             avls_package.Status = "00000000,";
+                            netStream.Close();
+                            avls_tcpClient.Close();
+                            return;
                             break;
                         case "Unit Absent":
                             avls_package.Event = "182,";
                             avls_package.Status = "00000000,";
+                            netStream.Close();
+                            avls_tcpClient.Close();
+                            return;
                             break;
                         case "Ignition Off":
                             avls_package.Event = "000,";
@@ -1775,6 +1781,7 @@ LIMIT 1";
                         gps_log.j_6 = "\'" + "null" + "\'";
                         gps_log.j_8 = "\'" + "null" + "\'";
                         operation_log.event_id = "\'" + operation_log.eqp_id + now + id_count.ToString("D12") + "\'";
+                        return;
                         break;
                     case "Ignition Off":
                     case "Ignition On":
