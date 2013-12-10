@@ -170,6 +170,28 @@ each set of the byte. To display a four-byte string, there will be 8 digits stri
             }
 
         }
+        private static bool CheckIfUidExist(string uid)
+        {
+            SqlClient sql_client = new SqlClient(ConfigurationManager.AppSettings["SQL_SERVER_IP"], ConfigurationManager.AppSettings["SQL_SERVER_PORT"], ConfigurationManager.AppSettings["SQL_SERVER_USER_ID"], ConfigurationManager.AppSettings["SQL_SERVER_PASSWORD"], ConfigurationManager.AppSettings["SQL_SERVER_DATABASE"], ConfigurationManager.AppSettings["Pooling"], ConfigurationManager.AppSettings["MinPoolSize"], ConfigurationManager.AppSettings["MaxPoolSize"], ConfigurationManager.AppSettings["ConnectionLifetime"]);
+            string sqlCmd = @"SELECT 
+  sd.equipment.uid
+FROM
+  sd.equipment
+WHERE
+  sd.equipment.uid = '" + uid + @"'
+LIMIT 1";
+            sql_client.connect();
+            var dt = sql_client.get_DataTable(sqlCmd);
+            sql_client.disconnect();
+            if (dt != null && dt.Rows.Count != 0)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
         static void Main(string[] args)
         {
             // Force a reload of the changed section. This 
@@ -298,6 +320,13 @@ LIMIT
                             requeseHashtable.Add("send_value", row[3]);
                             requeseHashtable.Add("time_interval", row[4]);
                             requeseHashtable.Add("create_time", row[5]);
+                        }
+                        if (CheckIfUidExist(requeseHashtable["uid"].ToString()))
+                        {
+                        }
+                        else
+                        {
+                            continue;
                         }
                         /*
                         Console.WriteLine(
@@ -942,6 +971,12 @@ Select 1-6 then press enter to send package
                         {
                             htable.Add("suaddr", XmlGetTagValue(xml_data, "suaddr"));
                             Console.WriteLine("suaddr:{0}", htable["suaddr"]);
+                            if(CheckIfUidExist(htable["suaddr"].ToString()))
+                            {}
+                            else
+                            {
+                                return;
+                            }
                         }
                         if (elements.Contains(new XElement("event-info").Name) && xml_root_tag == "Unsolicited-Location-Report")
                         {
@@ -1146,6 +1181,12 @@ Select 1-6 then press enter to send package
                         {
                             htable.Add( "suaddr" , XmlGetTagValue(xml_data, "suaddr"));
                             //Console.WriteLine("suaddr:{0}", suaddr);
+                            if (CheckIfUidExist(htable["suaddr"].ToString()))
+                            { }
+                            else
+                            {
+                                return;
+                            }
                         }
                         if (elements.Contains(new XElement("request-id").Name))
                         {
@@ -1179,6 +1220,12 @@ Select 1-6 then press enter to send package
                         {
                             htable.Add("suaddr", XmlGetTagValue(xml_data, "suaddr"));
                             //Console.WriteLine("suaddr:{0}", suaddr);
+                            if (CheckIfUidExist(htable["suaddr"].ToString()))
+                            { }
+                            else
+                            {
+                                return;
+                            }
                         }
                         if (elements.Contains(new XElement("operation-error").Name))
                         {
