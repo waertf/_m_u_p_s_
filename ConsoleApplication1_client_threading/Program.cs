@@ -64,6 +64,15 @@ namespace ConsoleApplication1_client_threading
         //int port = 23;
         static int avls_port = int.Parse(ConfigurationManager.AppSettings["AVLS_SERVER_PORT"]);
 
+        public class Device_power_status
+        {
+            public string ID { get; set; }
+            public string SN { get; set; }
+            public string power_on_time { get; set; }
+            public string power_off_time { get; set; }
+
+        }
+
         public  struct AVLS_UNIT_Report_Packet
         {
             public string ID;
@@ -170,6 +179,7 @@ each set of the byte. To display a four-byte string, there will be 8 digits stri
             Console.WriteLine(GetLocalIPAddress());//current ip address
             Console.WriteLine(System.Environment.UserName);//current username
             Console.WriteLine(string.Format("{0:yyMMddHHmmss}", DateTime.Now));
+            Console.WriteLine(DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"));
            
             tcpClient = new TcpClient();
             /*
@@ -1260,6 +1270,7 @@ WHERE
                     return;
                 }
              */
+            #region operation error
             if (iEnumerable.Contains(new XElement("operation-error").Name))
             {
                 if (htable.ContainsKey("suaddr"))
@@ -1383,8 +1394,9 @@ LIMIT 1";
                     avls_tcpClient.Close();
                     return;
                 }
-                
+
             }
+            #endregion
             else
             {
                 
@@ -1708,12 +1720,12 @@ LIMIT 1";
         private static void access_sql_server(SqlClient sql_client, string xml_root_tag, Hashtable htable, List<string> sensor_name, List<string> sensor_type, List<string> sensor_value, IEnumerable<XName> elements,string log1)
         {
             Console.WriteLine("+access_sql_server");
-            DateTime dt = DateTime.Now;
+            DateTime dtime = DateTime.Now;
             AUTO_SQL_DATA gps_log = new AUTO_SQL_DATA();
             MANUAL_SQL_DATA operation_log = new MANUAL_SQL_DATA();
             gps_log._or_lat = gps_log._or_lon = gps_log._satellites = gps_log._temperature = gps_log._voltage = "0";
-            string now = string.Format("{0:yyyyMMdd}", dt);
-            gps_log._time = "\'"+string.Format("{0:yyyyMMdd HH:mm:ss.fff}", dt)+"+08"+"\'";
+            string now = string.Format("{0:yyyyMMdd}", dtime);
+            gps_log._time = "\'"+string.Format("{0:yyyyMMdd HH:mm:ss.fff}", dtime)+"+08"+"\'";
 
             sql_client.connect();
             string auto_id_serial_command = sql_client.get_DataTable("SELECT COUNT(_uid)   FROM public._gps_log").Rows[0].ItemArray[0].ToString();
@@ -1728,6 +1740,7 @@ LIMIT 1";
             sql_client.disconnect();
 
             operation_log.request_id = "\'" + ConfigurationManager.AppSettings["request-id"].ToString() + "\'";
+            
             if (htable.ContainsKey("protocol_version"))
             {
                 operation_log.option3 = "\'" + htable["protocol_version"].ToString() + "\'";
@@ -1908,6 +1921,103 @@ LIMIT 1";
             }
             else
                 gps_log._option1 = "\'" + DateTime.Now.ToUniversalTime().ToString("yyyyMMddHHmmss") + "\'";
+
+            #region operation error to access custom.turn_onoff_log table
+            if (elements.Contains(new XElement("operation-error").Name))
+            {
+                if (htable.ContainsKey("suaddr"))
+                {
+                    string sql_cmd = string.Empty;
+                    DataTable dt = new DataTable();
+                    sql_cmd = @"SELECT 
+  custom.turn_onoff_log.serial_no
+FROM
+  custom.turn_onoff_log
+WHERE
+  custom.turn_onoff_log.uid = '" + htable["suaddr"].ToString() + @"' AND 
+custom.turn_onoff_log.on_time IS NOT NULL AND 
+  custom.turn_onoff_log.off_time IS  NULL
+ORDER BY
+  custom.turn_onoff_log.create_time DESC
+LIMIT 1";
+                    sql_client.connect();
+                    dt = sql_client.get_DataTable(sql_cmd);
+                    sql_client.disconnect();
+                    if (dt != null && dt.Rows.Count != 0)
+                    {
+                        //do nothing
+                    }
+                    else
+                    {
+                        Device_power_status dev_power_status = new Device_power_status();
+                        dev_power_status.ID = htable["suaddr"].ToString();
+                        #region
+                        {
+                            string sn = string.Empty;
+                            string power_on_today = DateTime.Now.ToString("yyyyMMdd");
+                            sql_cmd = @"SELECT 
+  custom.turn_onoff_log.serial_no
+FROM
+  custom.turn_onoff_log
+WHERE
+  custom.turn_onoff_log.uid = '" + dev_power_status.ID + @"'
+
+ORDER BY
+  custom.turn_onoff_log.create_time DESC
+LIMIT 1";
+                            sql_client.connect();
+                            dt = sql_client.get_DataTable(sql_cmd);
+                            sql_client.disconnect();
+                            if (dt != null && dt.Rows.Count != 0)
+                            {
+                                foreach (DataRow row in dt.Rows)
+                                {
+                                    sn = row[0].ToString();
+                                }
+
+                                Console.WriteLine("dev_power_status.ID.Length=" + dev_power_status.ID.Length);
+                                Console.WriteLine("dev_power_status.ID=" + dev_power_status.ID);
+
+                                string yyyyMMdd = sn.Substring(dev_power_status.ID.Length, 8);
+                                string count = sn.Substring(dev_power_status.ID.Length + yyyyMMdd.Length, 3);
+
+                                if (power_on_today.Equals(yyyyMMdd))
+                                {
+                                    uint addCount = (uint.Parse(count) + 1);
+                                    dev_power_status.SN = dev_power_status.ID + power_on_today + addCount.ToString("D3");
+                                }
+                                else
+                                {
+                                    int iVal = 0;
+
+                                    dev_power_status.SN = dev_power_status.ID + power_on_today + iVal.ToString("D3");
+                                }
+
+                                
+                            }
+                            else
+                            {
+                                int iVal = 0;
+
+                                dev_power_status.SN = dev_power_status.ID + power_on_today + iVal.ToString("D3");
+                                
+
+                            }
+                        }
+                        #endregion
+                        string sql_table_columns = "serial_no,uid,on_time,create_user,create_ip";
+                        string sql_table_column_value = "\'" + dev_power_status.SN + "\'" + "," + "\'" + dev_power_status.ID + "\'" + "," + "\'" +
+                            DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss") + "\'" + "," + "0" + "," + "\'" + GetLocalIPAddress() + "\'";
+                        sql_cmd = "INSERT INTO custom.turn_onoff_log (" + sql_table_columns + ") VALUES (" + sql_table_column_value + ")";
+                        sql_client.connect();
+                        sql_client.modify(sql_cmd);
+                        sql_client.disconnect();
+                    }
+                }
+
+            }
+            #endregion
+
             if (sql_client.connect())
             {
                 
