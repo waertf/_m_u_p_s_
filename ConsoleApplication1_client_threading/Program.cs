@@ -1836,6 +1836,25 @@ LIMIT 1";
                         operation_log.event_id = "\'" + operation_log.eqp_id + now + id_count.ToString("D12") + "\'";
                         break;
                     case "Unit Present":
+                        if (htable.ContainsKey("suaddr"))
+                        {
+                            sql_client.connect();
+                            string reg_countUid = sql_client.get_DataTable("SELECT COUNT(uid)   FROM custom.regist_log").Rows[0].ItemArray[0].ToString();
+                            sql_client.disconnect();
+                            string reg_sn = "\'" + htable["suaddr"].ToString() + "_" + now + "_" + reg_countUid + "\'";
+                            string reg_uid = "\'" + htable["suaddr"].ToString() + "\'";
+                            string regSqlCmd = @"INSERT INTO
+  custom.regist_log(
+  serial_no,
+  uid)
+  VALUES ("+reg_sn+@","+reg_uid+@")";
+                            sql_client.connect();
+                            sql_client.modify(regSqlCmd);
+                            sql_client.disconnect();
+                        }
+                        
+                        return;
+                        break;
                     case "Unit Absent":
                         gps_log.j_7 = "\'" + htable["event_info"].ToString() + "\'";
                         gps_log.j_6 = "\'" + "null" + "\'";
