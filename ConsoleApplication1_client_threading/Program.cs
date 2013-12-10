@@ -1280,7 +1280,7 @@ WHERE
                     avls_package.Dir = "0,";
                     avls_package.Temp = "NA,";
 
-                    avls_package.Event = "000,";
+                    avls_package.Event = "1,";
                     avls_package.Status = "00000000,";
 
                 
