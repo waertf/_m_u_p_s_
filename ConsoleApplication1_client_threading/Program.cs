@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Net.NetworkInformation;
+using System.Reflection;
 using System.Text;
 using System.Net.Sockets;
 using System.Threading;
@@ -202,6 +203,7 @@ LIMIT 1";
             Console.WriteLine(System.Environment.UserName);//current username
             Console.WriteLine(string.Format("{0:yyMMddHHmmss}", DateTime.Now));
             Console.WriteLine(DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"));
+            Console.WriteLine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location));
            
             tcpClient = new TcpClient();
             /*
@@ -2547,7 +2549,7 @@ LIMIT 1";
         }
         private static bool xml_validation_with_dtd(string xml, string xml_root_tag)
         {
-            string doctype_append = "<?xml version='1.0' encoding='utf-16'?><!DOCTYPE " + xml_root_tag + " SYSTEM \"" + xml_root_tag + ".dtd\">";
+            string doctype_append = "<?xml version='1.0' encoding='utf-16'?><!DOCTYPE " + xml_root_tag + " SYSTEM \"" + Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)+"\\"+xml_root_tag + ".dtd\">";
             /*
             XmlTextReader r = new XmlTextReader(new System.IO.StringReader(doctype_append + xml));
             XmlValidatingReader v = new XmlValidatingReader(r);
