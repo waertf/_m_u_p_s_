@@ -1851,14 +1851,29 @@ LIMIT 1";
                             sql_client.disconnect();
                             string reg_sn = "\'" + htable["suaddr"].ToString() + "_" + now + "_" + reg_countUid + "\'";
                             string reg_uid = "\'" + htable["suaddr"].ToString() + "\'";
-                            string regSqlCmd = @"INSERT INTO
+                            string regSqlCmd = string.Empty;
+                            regSqlCmd = @"SELECT
+  sd.equipment.uid
+  FROM
+  sd.equipment
+  where
+  sd.equipment.uid = '"+htable["suaddr"].ToString()+@"'";
+                            sql_client.connect();
+                            var dt = sql_client.get_DataTable(regSqlCmd);
+                            sql_client.disconnect();
+                            if (dt != null && dt.Rows.Count != 0)
+                            {
+                                regSqlCmd = @"INSERT INTO
   custom.regist_log(
   serial_no,
   uid)
-  VALUES ("+reg_sn+@","+reg_uid+@")";
-                            sql_client.connect();
-                            sql_client.modify(regSqlCmd);
-                            sql_client.disconnect();
+  VALUES (" + reg_sn + @"," + reg_uid + @")";
+                                sql_client.connect();
+                                sql_client.modify(regSqlCmd);
+                                sql_client.disconnect();
+                            }
+
+                            
                         }
                         
                         return;
