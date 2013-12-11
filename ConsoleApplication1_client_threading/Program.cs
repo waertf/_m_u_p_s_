@@ -33,7 +33,7 @@ namespace ConsoleApplication1_client_threading
         private static byte[] fBuffer = null;
         private static int fBytesRead = 0;
         private static TcpClient tcpClient, avls_tcpClient;
-        private static SqlClient sql_client;
+        //private static SqlClient sql_client;
         // ManualResetEvent instances signal completion.
         private static ManualResetEvent connectDone =
             new ManualResetEvent(false);
@@ -227,7 +227,7 @@ LIMIT 1";
             Keeplive.keep(tcpClient.Client);
             NetworkStream netStream = tcpClient.GetStream();
 
-            sql_client = new SqlClient(ConfigurationManager.AppSettings["SQL_SERVER_IP"], ConfigurationManager.AppSettings["SQL_SERVER_PORT"], ConfigurationManager.AppSettings["SQL_SERVER_USER_ID"], ConfigurationManager.AppSettings["SQL_SERVER_PASSWORD"], ConfigurationManager.AppSettings["SQL_SERVER_DATABASE"], ConfigurationManager.AppSettings["Pooling"], ConfigurationManager.AppSettings["MinPoolSize"], ConfigurationManager.AppSettings["MaxPoolSize"], ConfigurationManager.AppSettings["ConnectionLifetime"]);
+            var sql_client = new SqlClient(ConfigurationManager.AppSettings["SQL_SERVER_IP"], ConfigurationManager.AppSettings["SQL_SERVER_PORT"], ConfigurationManager.AppSettings["SQL_SERVER_USER_ID"], ConfigurationManager.AppSettings["SQL_SERVER_PASSWORD"], ConfigurationManager.AppSettings["SQL_SERVER_DATABASE"], ConfigurationManager.AppSettings["Pooling"], ConfigurationManager.AppSettings["MinPoolSize"], ConfigurationManager.AppSettings["MaxPoolSize"], ConfigurationManager.AppSettings["ConnectionLifetime"]);
 
             string registration_msg_error_test = "<Location-Registration-Request><application>" + ConfigurationManager.AppSettings["application_ID"] + "</application></Location-Registration-Request>";
             WriteLine(netStream, data_append_dataLength(registration_msg_error_test), registration_msg_error_test);
@@ -745,7 +745,7 @@ Select 1-6 then press enter to send package
                 Keeplive.keep(tcpClient.Client);
                 myNetworkStream = tcpClient.GetStream();
 
-                sql_client = new SqlClient(ConfigurationManager.AppSettings["SQL_SERVER_IP"], ConfigurationManager.AppSettings["SQL_SERVER_PORT"], ConfigurationManager.AppSettings["SQL_SERVER_USER_ID"], ConfigurationManager.AppSettings["SQL_SERVER_PASSWORD"], ConfigurationManager.AppSettings["SQL_SERVER_DATABASE"], ConfigurationManager.AppSettings["Pooling"], ConfigurationManager.AppSettings["MinPoolSize"], ConfigurationManager.AppSettings["MaxPoolSize"], ConfigurationManager.AppSettings["ConnectionLifetime"]);
+                var sql_client = new SqlClient(ConfigurationManager.AppSettings["SQL_SERVER_IP"], ConfigurationManager.AppSettings["SQL_SERVER_PORT"], ConfigurationManager.AppSettings["SQL_SERVER_USER_ID"], ConfigurationManager.AppSettings["SQL_SERVER_PASSWORD"], ConfigurationManager.AppSettings["SQL_SERVER_DATABASE"], ConfigurationManager.AppSettings["Pooling"], ConfigurationManager.AppSettings["MinPoolSize"], ConfigurationManager.AppSettings["MaxPoolSize"], ConfigurationManager.AppSettings["ConnectionLifetime"]);
 
                 string registration_msg_error_test = "<Location-Registration-Request><application>" + ConfigurationManager.AppSettings["application_ID"] + "</application></Location-Registration-Request>";
                 WriteLine(myNetworkStream, data_append_dataLength(registration_msg_error_test), registration_msg_error_test);
@@ -821,6 +821,8 @@ Select 1-6 then press enter to send package
                 Console.WriteLine("Read:\r\n" + ouput2);
                 //Console.WriteLine("First node:[" + xml_root_tag + "]");
                 Console.WriteLine("E############################################################################");
+                var sql_client = new SqlClient(ConfigurationManager.AppSettings["SQL_SERVER_IP"], ConfigurationManager.AppSettings["SQL_SERVER_PORT"], ConfigurationManager.AppSettings["SQL_SERVER_USER_ID"], ConfigurationManager.AppSettings["SQL_SERVER_PASSWORD"], ConfigurationManager.AppSettings["SQL_SERVER_DATABASE"], ConfigurationManager.AppSettings["Pooling"], ConfigurationManager.AppSettings["MinPoolSize"], ConfigurationManager.AppSettings["MaxPoolSize"], ConfigurationManager.AppSettings["ConnectionLifetime"]);
+
                 xml_parse(tcpClient, fStream, xml_root_tag, xml_data, sql_client);
                 //Console.ReadLine();
 
@@ -1426,6 +1428,8 @@ LIMIT 1";
                     send_string = "%%" + avls_package.ID + avls_package.GPS_Valid + avls_package.Date_Time + avls_package.Loc + avls_package.Speed + avls_package.Dir + avls_package.Temp + avls_package.Status + avls_package.Event + avls_package.Message + "\r\n";
 
                     sendDone.Reset();
+                    var sql_client = new SqlClient(ConfigurationManager.AppSettings["SQL_SERVER_IP"], ConfigurationManager.AppSettings["SQL_SERVER_PORT"], ConfigurationManager.AppSettings["SQL_SERVER_USER_ID"], ConfigurationManager.AppSettings["SQL_SERVER_PASSWORD"], ConfigurationManager.AppSettings["SQL_SERVER_DATABASE"], ConfigurationManager.AppSettings["Pooling"], ConfigurationManager.AppSettings["MinPoolSize"], ConfigurationManager.AppSettings["MaxPoolSize"], ConfigurationManager.AppSettings["ConnectionLifetime"]);
+
                     avls_WriteLine(netStream, System.Text.Encoding.Default.GetBytes(send_string), send_string, sql_client);
                     sendDone.WaitOne();
 
@@ -1658,7 +1662,9 @@ LIMIT 1";
             }
             */
             sendDone.Reset();
-            avls_WriteLine(netStream, System.Text.Encoding.Default.GetBytes(send_string), send_string, sql_client);
+            var sqlclient = new SqlClient(ConfigurationManager.AppSettings["SQL_SERVER_IP"], ConfigurationManager.AppSettings["SQL_SERVER_PORT"], ConfigurationManager.AppSettings["SQL_SERVER_USER_ID"], ConfigurationManager.AppSettings["SQL_SERVER_PASSWORD"], ConfigurationManager.AppSettings["SQL_SERVER_DATABASE"], ConfigurationManager.AppSettings["Pooling"], ConfigurationManager.AppSettings["MinPoolSize"], ConfigurationManager.AppSettings["MaxPoolSize"], ConfigurationManager.AppSettings["ConnectionLifetime"]);
+
+            avls_WriteLine(netStream, System.Text.Encoding.Default.GetBytes(send_string), send_string, sqlclient);
             sendDone.WaitOne();
 
             //ReadLine(avls_tcpClient, netStream, send_string.Length);
