@@ -1872,7 +1872,19 @@ LIMIT 1";
                                 sql_client.modify(regSqlCmd);
                                 sql_client.disconnect();
                             }
-
+                            #region access power status
+                            {
+                                string unsSqlCmd = @"UPDATE 
+  custom.uns_deivce_power_status
+SET
+  power = 'on'
+WHERE
+  custom.uns_deivce_power_status.uid = '" + htable["suaddr"].ToString() + @"'";
+                                sql_client.connect();
+                                sql_client.modify(unsSqlCmd);
+                                sql_client.disconnect();
+                            }
+                            #endregion
                             
                         }
                         
@@ -1883,6 +1895,23 @@ LIMIT 1";
                         gps_log.j_6 = "\'" + "null" + "\'";
                         gps_log.j_8 = "\'" + "null" + "\'";
                         operation_log.event_id = "\'" + operation_log.eqp_id + now + id_count.ToString("D12") + "\'";
+                        #region access power status
+                        {
+                            if (htable.ContainsKey("suaddr"))
+                            {
+                                string unsSqlCmd = @"UPDATE 
+  custom.uns_deivce_power_status
+SET
+  power = 'off'
+WHERE
+  custom.uns_deivce_power_status.uid = '" + htable["suaddr"].ToString() + @"'";
+                                sql_client.connect();
+                                sql_client.modify(unsSqlCmd);
+                                sql_client.disconnect();
+                            }
+                        }
+                        #endregion
+                        
                         return;
                         break;
                     case "Ignition Off":
