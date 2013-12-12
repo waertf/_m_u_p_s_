@@ -193,6 +193,17 @@ LIMIT 1";
                 return false;
             }
         }
+        private static void ConvertLocToAvlsLoc(ref string lat, ref string lon)
+        {
+            double tmpLat = double.Parse(lat);
+            double tmpLon = double.Parse(lon);
+            double latInt = Math.Truncate(tmpLat);
+            double lonInt = Math.Truncate(tmpLon);
+            double latNumberAfterPoint = tmpLat - latInt;
+            double lonNumberAfterPoint = tmpLon - lonInt;
+            lat = ((latNumberAfterPoint * 60 / 100 + latInt) * 100).ToString();
+            lon = ((lonNumberAfterPoint * 60 / 100 + lonInt) * 100).ToString();
+        }
         static void Main(string[] args)
         {
             // Force a reload of the changed section. This 
@@ -1393,22 +1404,26 @@ LIMIT 1";
                             {
                                 GetInitialLocationFromSql(ref avlsLat, ref avlsLon, avls_package.ID);
                             }
-                            GeoAngle lat_value = GeoAngle.FromDouble(Convert.ToDecimal(avlsLat));
-                            GeoAngle long_value = GeoAngle.FromDouble(Convert.ToDecimal(avlsLon));
-                            string lat_str = lat_value.Degrees.ToString() + lat_value.Minutes.ToString("D2") + "." + lat_value.Seconds.ToString("D2") + lat_value.Milliseconds.ToString("D3");
-                            string long_str = long_value.Degrees.ToString() + long_value.Minutes.ToString("D2") + "." + long_value.Seconds.ToString("D2") + long_value.Milliseconds.ToString("D3");
+                            //GeoAngle lat_value = GeoAngle.FromDouble(Convert.ToDecimal(avlsLat));
+                            //GeoAngle long_value = GeoAngle.FromDouble(Convert.ToDecimal(avlsLon));
+                            //string lat_str = lat_value.Degrees.ToString() + lat_value.Minutes.ToString("D2") + "." + lat_value.Seconds.ToString("D2") + lat_value.Milliseconds.ToString("D3");
+                            //string long_str = long_value.Degrees.ToString() + long_value.Minutes.ToString("D2") + "." + long_value.Seconds.ToString("D2") + long_value.Milliseconds.ToString("D3");
                             //avls_package.Loc = "N" + (Convert.ToDouble(htable["lat_value"])*100).ToString() + "E" + (Convert.ToDouble(htable["long_value"])*100).ToString()+ ",";
+                            string lat_str = avlsLat, long_str = avlsLon;
+                            ConvertLocToAvlsLoc(ref lat_str, ref long_str); 
                             avls_package.Loc = "N" + lat_str + "E" + long_str + ",";
                         }
                         else
                         {
                             string avlsLat = string.Empty, avlsLon = string.Empty;
                             GetInitialLocationFromSql(ref avlsLat, ref avlsLon, avls_package.ID);
-                            GeoAngle lat_value = GeoAngle.FromDouble(Convert.ToDecimal(avlsLat));
-                            GeoAngle long_value = GeoAngle.FromDouble(Convert.ToDecimal(avlsLon));
-                            string lat_str = lat_value.Degrees.ToString() + lat_value.Minutes.ToString("D2") + "." + lat_value.Seconds.ToString("D2") + lat_value.Milliseconds.ToString("D3");
-                            string long_str = long_value.Degrees.ToString() + long_value.Minutes.ToString("D2") + "." + long_value.Seconds.ToString("D2") + long_value.Milliseconds.ToString("D3");
+                            //GeoAngle lat_value = GeoAngle.FromDouble(Convert.ToDecimal(avlsLat));
+                            //GeoAngle long_value = GeoAngle.FromDouble(Convert.ToDecimal(avlsLon));
+                            //string lat_str = lat_value.Degrees.ToString() + lat_value.Minutes.ToString("D2") + "." + lat_value.Seconds.ToString("D2") + lat_value.Milliseconds.ToString("D3");
+                            //string long_str = long_value.Degrees.ToString() + long_value.Minutes.ToString("D2") + "." + long_value.Seconds.ToString("D2") + long_value.Milliseconds.ToString("D3");
                             //avls_package.Loc = "N" + (Convert.ToDouble(htable["lat_value"])*100).ToString() + "E" + (Convert.ToDouble(htable["long_value"])*100).ToString()+ ",";
+                            string lat_str = avlsLat, long_str = avlsLon;
+                            ConvertLocToAvlsLoc(ref lat_str, ref long_str); 
                             avls_package.Loc = "N" + lat_str + "E" + long_str + ",";
                             //avls_package.Loc = "N00000.0000E00000.0000,";
                         }
@@ -1490,11 +1505,13 @@ LIMIT 1";
                 ///TODO:implement set last lat lon value    
                 if (htable.ContainsKey("lat_value") && htable.ContainsKey("long_value"))
                 {
-                    GeoAngle lat_value = GeoAngle.FromDouble(Convert.ToDecimal(htable["lat_value"]));
-                    GeoAngle long_value = GeoAngle.FromDouble(Convert.ToDecimal(htable["long_value"]));
-                    string lat_str = lat_value.Degrees.ToString() + lat_value.Minutes.ToString("D2") + "." + lat_value.Seconds.ToString("D2") + lat_value.Milliseconds.ToString("D3");
-                    string long_str = long_value.Degrees.ToString() + long_value.Minutes.ToString("D2") + "." + long_value.Seconds.ToString("D2") + long_value.Milliseconds.ToString("D3");
+                    //GeoAngle lat_value = GeoAngle.FromDouble(Convert.ToDecimal(htable["lat_value"]));
+                    //GeoAngle long_value = GeoAngle.FromDouble(Convert.ToDecimal(htable["long_value"]));
+                    //string lat_str = lat_value.Degrees.ToString() + lat_value.Minutes.ToString("D2") + "." + lat_value.Seconds.ToString("D2") + lat_value.Milliseconds.ToString("D3");
+                    //string long_str = long_value.Degrees.ToString() + long_value.Minutes.ToString("D2") + "." + long_value.Seconds.ToString("D2") + long_value.Milliseconds.ToString("D3");
                     //avls_package.Loc = "N" + (Convert.ToDouble(htable["lat_value"])*100).ToString() + "E" + (Convert.ToDouble(htable["long_value"])*100).ToString()+ ",";
+                    string lat_str = (string) htable["lat_value"], long_str = (string) htable["long_value"];
+                    ConvertLocToAvlsLoc(ref lat_str, ref long_str); 
                     avls_package.Loc = "N" + lat_str + "E" + long_str + ",";
                     last_avls_lat = lat_str;
                     last_avls_lon = long_str;
@@ -1534,22 +1551,26 @@ LIMIT 1";
                             {
                                 GetInitialLocationFromSql(ref avlsLat, ref avlsLon, avls_package.ID);
                             }
-                            GeoAngle lat_value = GeoAngle.FromDouble(Convert.ToDecimal(avlsLat));
-                            GeoAngle long_value = GeoAngle.FromDouble(Convert.ToDecimal(avlsLon));
-                            string lat_str = lat_value.Degrees.ToString() + lat_value.Minutes.ToString("D2") + "." + lat_value.Seconds.ToString("D2") + lat_value.Milliseconds.ToString("D3");
-                            string long_str = long_value.Degrees.ToString() + long_value.Minutes.ToString("D2") + "." + long_value.Seconds.ToString("D2") + long_value.Milliseconds.ToString("D3");
+                            //GeoAngle lat_value = GeoAngle.FromDouble(Convert.ToDecimal(avlsLat));
+                            //GeoAngle long_value = GeoAngle.FromDouble(Convert.ToDecimal(avlsLon));
+                            //string lat_str = lat_value.Degrees.ToString() + lat_value.Minutes.ToString("D2") + "." + lat_value.Seconds.ToString("D2") + lat_value.Milliseconds.ToString("D3");
+                            //string long_str = long_value.Degrees.ToString() + long_value.Minutes.ToString("D2") + "." + long_value.Seconds.ToString("D2") + long_value.Milliseconds.ToString("D3");
                             //avls_package.Loc = "N" + (Convert.ToDouble(htable["lat_value"])*100).ToString() + "E" + (Convert.ToDouble(htable["long_value"])*100).ToString()+ ",";
+                            string lat_str = avlsLat, long_str = avlsLon;
+                            ConvertLocToAvlsLoc(ref lat_str, ref long_str); 
                             avls_package.Loc = "N" + lat_str + "E" + long_str + ",";
                         }
                         else
                         {
                             string avlsLat = string.Empty, avlsLon = string.Empty;
                             GetInitialLocationFromSql(ref avlsLat, ref avlsLon, avls_package.ID);
-                            GeoAngle lat_value = GeoAngle.FromDouble(Convert.ToDecimal(avlsLat));
-                            GeoAngle long_value = GeoAngle.FromDouble(Convert.ToDecimal(avlsLon));
-                            string lat_str = lat_value.Degrees.ToString() + lat_value.Minutes.ToString("D2") + "." + lat_value.Seconds.ToString("D2") + lat_value.Milliseconds.ToString("D3");
-                            string long_str = long_value.Degrees.ToString() + long_value.Minutes.ToString("D2") + "." + long_value.Seconds.ToString("D2") + long_value.Milliseconds.ToString("D3");
+                            //GeoAngle lat_value = GeoAngle.FromDouble(Convert.ToDecimal(avlsLat));
+                            //GeoAngle long_value = GeoAngle.FromDouble(Convert.ToDecimal(avlsLon));
+                            //string lat_str = lat_value.Degrees.ToString() + lat_value.Minutes.ToString("D2") + "." + lat_value.Seconds.ToString("D2") + lat_value.Milliseconds.ToString("D3");
+                            //string long_str = long_value.Degrees.ToString() + long_value.Minutes.ToString("D2") + "." + long_value.Seconds.ToString("D2") + long_value.Milliseconds.ToString("D3");
                             //avls_package.Loc = "N" + (Convert.ToDouble(htable["lat_value"])*100).ToString() + "E" + (Convert.ToDouble(htable["long_value"])*100).ToString()+ ",";
+                            string lat_str = avlsLat, long_str = avlsLon;
+                            ConvertLocToAvlsLoc(ref lat_str, ref long_str); 
                             avls_package.Loc = "N" + lat_str + "E" + long_str + ",";
                             //avls_package.Loc = "N00000.0000E00000.0000,";
                         }
@@ -1571,11 +1592,13 @@ LIMIT 1";
                     {
                         string avlsLat = string.Empty, avlsLon = string.Empty;
                         GetInitialLocationFromSql(ref avlsLat, ref avlsLon, avls_package.ID);
-                        GeoAngle lat_value = GeoAngle.FromDouble(Convert.ToDecimal(avlsLat));
-                        GeoAngle long_value = GeoAngle.FromDouble(Convert.ToDecimal(avlsLon));
-                        string lat_str = lat_value.Degrees.ToString() + lat_value.Minutes.ToString("D2") + "." + lat_value.Seconds.ToString("D2") + lat_value.Milliseconds.ToString("D3");
-                        string long_str = long_value.Degrees.ToString() + long_value.Minutes.ToString("D2") + "." + long_value.Seconds.ToString("D2") + long_value.Milliseconds.ToString("D3");
+                        //GeoAngle lat_value = GeoAngle.FromDouble(Convert.ToDecimal(avlsLat));
+                        //GeoAngle long_value = GeoAngle.FromDouble(Convert.ToDecimal(avlsLon));
+                        //string lat_str = lat_value.Degrees.ToString() + lat_value.Minutes.ToString("D2") + "." + lat_value.Seconds.ToString("D2") + lat_value.Milliseconds.ToString("D3");
+                        //string long_str = long_value.Degrees.ToString() + long_value.Minutes.ToString("D2") + "." + long_value.Seconds.ToString("D2") + long_value.Milliseconds.ToString("D3");
                         //avls_package.Loc = "N" + (Convert.ToDouble(htable["lat_value"])*100).ToString() + "E" + (Convert.ToDouble(htable["long_value"])*100).ToString()+ ",";
+                        string lat_str = avlsLat, long_str = avlsLon;
+                        ConvertLocToAvlsLoc(ref lat_str, ref long_str); 
                         avls_package.Loc = "N" + lat_str + "E" + long_str + ",";
                         //avls_package.Loc = "N00000.0000E00000.0000,";
                     }
