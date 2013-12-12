@@ -1342,7 +1342,7 @@ WHERE
                     avls_package.Dir = "0,";
                     avls_package.Temp = "NA,";
 
-                    avls_package.Event = "1,";
+                    avls_package.Event = "0,";
                     avls_package.Status = "00000000,";
 
                 
@@ -1353,12 +1353,59 @@ WHERE
                     if (htable.ContainsKey("result_msg"))
                     {
                         avls_package.Message = htable["result_msg"].ToString();
+                        //-999 to -500 :motorola error
+                        //-499 to -100 :our error
                         switch (htable["result_msg"].ToString())
                         {
                             case "ABSENT SUBSCRIBER":
                                 avls_package.Event = "182,";
                                 avls_package.Status = "00000000,";
                                 avls_package.Message = "power_off";
+                                break;
+                            case  "SYSTEM FAILURE":
+                                avls_package.Event = "-500,";
+                                break;
+                            case "UNSPECIFIED ERROR":
+                                avls_package.Event = "-501,";
+                                break;
+                            case "UNAUTHORIZED APPLICATION":
+                                avls_package.Event = "-499,";
+                                break;
+                            case "CONGESTION IN MOBILE NETWORK":
+                                avls_package.Event = "-502,";
+                                break;
+                            case "UNSUPPORTED VERSION":
+                                avls_package.Event = "-498,";
+                                break;
+                            case "SYNTAX ERROR":
+                                avls_package.Event = "-497,";
+                                break;
+                            case "SERVICE NOT SUPPORTED":
+                                avls_package.Event = "-496,";
+                                break;
+                            case "QUERY INFO NOT CURRENTLY ATTAINABLE":
+                                avls_package.Event = "-503,";
+                                break;
+                            case "REPORTING WILL STOP":
+                                avls_package.Event = "-99,";
+                                break;
+                            case "INSUFFICIENT GPS SATELLITES":
+                                avls_package.Event = "181,";
+                                break;
+                            case "BAD GPS GEOMETRY":
+                                avls_package.Event = "181,";
+                                break;
+                            case "GPS INVALID":
+                                avls_package.Event = "181,";
+                                break;
+                            case "API DISCONNECTED":
+                                avls_package.Event = "-495,";
+                                break;
+                            case "OPERA TION NOT PERMITTED":
+                                avls_package.Event = "-494,";
+                                break;
+                            case "API NOT LICENSED":
+                                avls_package.Event = "-493,";
                                 break;
                         }
                     }
