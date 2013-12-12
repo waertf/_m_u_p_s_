@@ -1362,6 +1362,7 @@ WHERE
                                 avls_package.Status = "00000000,";
                                 avls_package.Message = "power_off";
                                 break;
+                                /*
                             case  "SYSTEM FAILURE":
                                 avls_package.Event = "-500,";
                                 break;
@@ -1389,15 +1390,17 @@ WHERE
                             case "REPORTING WILL STOP":
                                 avls_package.Event = "-99,";
                                 break;
+                                */
                             case "INSUFFICIENT GPS SATELLITES":
-                                avls_package.Event = "181,";
+                                avls_package.Event = "1,";
                                 break;
                             case "BAD GPS GEOMETRY":
-                                avls_package.Event = "181,";
+                                avls_package.Event = "1,";
                                 break;
                             case "GPS INVALID":
-                                avls_package.Event = "181,";
+                                avls_package.Event = "1,";
                                 break;
+                                /*
                             case "API DISCONNECTED":
                                 avls_package.Event = "-495,";
                                 break;
@@ -1407,6 +1410,7 @@ WHERE
                             case "API NOT LICENSED":
                                 avls_package.Event = "-493,";
                                 break;
+                                */
                         }
                     }
                     else
