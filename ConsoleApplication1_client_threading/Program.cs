@@ -271,11 +271,11 @@ LIMIT 1";
             //sendtest(netStream);
 
             //alonso
-            Thread read_thread = new Thread(() => read_thread_method(tcpClient, netStream, sql_client));
+            Thread read_thread = new Thread(() => read_thread_method(tcpClient, netStream));
             read_thread.Start();
             if (bool.Parse(ConfigurationManager.AppSettings["ManualSend"]))
             {
-                Thread send_test_thread = new Thread(() => ManualSend(netStream, sql_client));
+                Thread send_test_thread = new Thread(() => ManualSend(netStream));
                 send_test_thread.Start();
             }
             else
@@ -538,7 +538,7 @@ LIMIT
             }
         }
          * */
-        private static void ManualSend(NetworkStream netStream, SqlClient sql_client)
+        private static void ManualSend(NetworkStream netStream)
         {
             while (true)
             {
@@ -836,7 +836,7 @@ Select 1-6 then press enter to send package
                 Console.WriteLine("E############################################################################");
                 var sql_client = new SqlClient(ConfigurationManager.AppSettings["SQL_SERVER_IP"], ConfigurationManager.AppSettings["SQL_SERVER_PORT"], ConfigurationManager.AppSettings["SQL_SERVER_USER_ID"], ConfigurationManager.AppSettings["SQL_SERVER_PASSWORD"], ConfigurationManager.AppSettings["SQL_SERVER_DATABASE"], ConfigurationManager.AppSettings["Pooling"], ConfigurationManager.AppSettings["MinPoolSize"], ConfigurationManager.AppSettings["MaxPoolSize"], ConfigurationManager.AppSettings["ConnectionLifetime"]);
 
-                xml_parse(tcpClient, fStream, xml_root_tag, xml_data, sql_client);
+                xml_parse(tcpClient, fStream, xml_root_tag, xml_data);
                 //Console.ReadLine();
 
                 //byte[] bytes = new byte[tcpClient.ReceiveBufferSize];
@@ -882,7 +882,7 @@ Select 1-6 then press enter to send package
                 log.Error("FinishReadError2:\r\n" + ex.Message);
             }
         }
-        static void read_thread_method(TcpClient tcpClient, NetworkStream netStream , SqlClient sql_client)
+        static void read_thread_method(TcpClient tcpClient, NetworkStream netStream)
         {
             Console.WriteLine("in read thread");
             //asyn read
@@ -960,7 +960,7 @@ Select 1-6 then press enter to send package
             Console.WriteLine("out read thread");
         }
 
-        private static void xml_parse(TcpClient tcpClient, NetworkStream netStream, string xml_root_tag, XDocument xml_data, SqlClient sql_client)
+        private static void xml_parse(TcpClient tcpClient, NetworkStream netStream, string xml_root_tag, XDocument xml_data)
         {
             string log = xml_data.ToString();
             using (StreamWriter w = File.AppendText("log.txt"))
@@ -1104,7 +1104,7 @@ Select 1-6 then press enter to send package
                         }
                         if (bool.Parse(ConfigurationManager.AppSettings["SQL_ACCESS"]))
                         {
-                            access_sql_server(sql_client, xml_root_tag, htable, sensor_name, sensor_type, sensor_value, XmlGetAllElementsXname(xml_data), log);
+                            access_sql_server( xml_root_tag, htable, sensor_name, sensor_type, sensor_value, XmlGetAllElementsXname(xml_data), log);
                             Console.WriteLine("SQL Access Enable");
                         }
 
@@ -1184,7 +1184,7 @@ Select 1-6 then press enter to send package
                         }
                     }
                     if (bool.Parse(ConfigurationManager.AppSettings["SQL_ACCESS"]))
-                        access_sql_server(sql_client, xml_root_tag, htable, sensor_name, sensor_type, sensor_value, XmlGetAllElementsXname(xml_data), log);
+                        access_sql_server( xml_root_tag, htable, sensor_name, sensor_type, sensor_value, XmlGetAllElementsXname(xml_data), log);
                     break;
                 case "Immediate-Location-Answer":
                 case "Triggered-Location-Stop-Answer":
@@ -1447,7 +1447,7 @@ LIMIT 1";
                     sendDone.Reset();
                     var sql_client = new SqlClient(ConfigurationManager.AppSettings["SQL_SERVER_IP"], ConfigurationManager.AppSettings["SQL_SERVER_PORT"], ConfigurationManager.AppSettings["SQL_SERVER_USER_ID"], ConfigurationManager.AppSettings["SQL_SERVER_PASSWORD"], ConfigurationManager.AppSettings["SQL_SERVER_DATABASE"], ConfigurationManager.AppSettings["Pooling"], ConfigurationManager.AppSettings["MinPoolSize"], ConfigurationManager.AppSettings["MaxPoolSize"], ConfigurationManager.AppSettings["ConnectionLifetime"]);
 
-                    avls_WriteLine(netStream, System.Text.Encoding.Default.GetBytes(send_string), send_string, sql_client);
+                    avls_WriteLine(netStream, System.Text.Encoding.Default.GetBytes(send_string), send_string);
                     sendDone.WaitOne();
 
                     //ReadLine(avls_tcpClient, netStream, send_string.Length);
@@ -1689,7 +1689,7 @@ LIMIT 1";
             sendDone.Reset();
             var sqlclient = new SqlClient(ConfigurationManager.AppSettings["SQL_SERVER_IP"], ConfigurationManager.AppSettings["SQL_SERVER_PORT"], ConfigurationManager.AppSettings["SQL_SERVER_USER_ID"], ConfigurationManager.AppSettings["SQL_SERVER_PASSWORD"], ConfigurationManager.AppSettings["SQL_SERVER_DATABASE"], ConfigurationManager.AppSettings["Pooling"], ConfigurationManager.AppSettings["MinPoolSize"], ConfigurationManager.AppSettings["MaxPoolSize"], ConfigurationManager.AppSettings["ConnectionLifetime"]);
 
-            avls_WriteLine(netStream, System.Text.Encoding.Default.GetBytes(send_string), send_string, sqlclient);
+            avls_WriteLine(netStream, System.Text.Encoding.Default.GetBytes(send_string), send_string);
             sendDone.WaitOne();
 
             //ReadLine(avls_tcpClient, netStream, send_string.Length);
@@ -1698,7 +1698,7 @@ LIMIT 1";
             Console.WriteLine("-access_avls_server");
         }
 
-        private static void avls_WriteLine(NetworkStream netStream, byte[] writeData, string write, SqlClient sql_client)
+        private static void avls_WriteLine(NetworkStream netStream, byte[] writeData, string write)
         {
             if (netStream.CanWrite)
             {
@@ -1795,9 +1795,10 @@ LIMIT 1";
         {
             MV,TK,EM,PE,UL
         }
-        private static void access_sql_server(SqlClient sql_client, string xml_root_tag, Hashtable htable, List<string> sensor_name, List<string> sensor_type, List<string> sensor_value, IEnumerable<XName> elements,string log1)
+        private static void access_sql_server( string xml_root_tag, Hashtable htable, List<string> sensor_name, List<string> sensor_type, List<string> sensor_value, IEnumerable<XName> elements,string log1)
         {
             Console.WriteLine("+access_sql_server");
+            SqlClient sql_client = new SqlClient(ConfigurationManager.AppSettings["SQL_SERVER_IP"], ConfigurationManager.AppSettings["SQL_SERVER_PORT"], ConfigurationManager.AppSettings["SQL_SERVER_USER_ID"], ConfigurationManager.AppSettings["SQL_SERVER_PASSWORD"], ConfigurationManager.AppSettings["SQL_SERVER_DATABASE"], ConfigurationManager.AppSettings["Pooling"], ConfigurationManager.AppSettings["MinPoolSize"], ConfigurationManager.AppSettings["MaxPoolSize"], ConfigurationManager.AppSettings["ConnectionLifetime"]);
             DateTime dtime = DateTime.Now;
             AUTO_SQL_DATA gps_log = new AUTO_SQL_DATA();
             MANUAL_SQL_DATA operation_log = new MANUAL_SQL_DATA();
