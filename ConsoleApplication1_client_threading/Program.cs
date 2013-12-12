@@ -1351,7 +1351,17 @@ WHERE
                         avls_package.Event = "175,";
                     }
                     if (htable.ContainsKey("result_msg"))
+                    {
                         avls_package.Message = htable["result_msg"].ToString();
+                        switch (htable["result_msg"].ToString())
+                        {
+                            case "ABSENT SUBSCRIBER":
+                                avls_package.Event = "182,";
+                                avls_package.Status = "00000000,";
+                                avls_package.Message = "power_off";
+                                break;
+                        }
+                    }
                     else
                     {
                         avls_package.Message = "null";
