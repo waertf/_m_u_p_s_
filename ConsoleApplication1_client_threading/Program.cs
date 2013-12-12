@@ -1310,7 +1310,7 @@ WHERE
             Console.WriteLine("+access_avls_server");
             string send_string = string.Empty;
             AVLS_UNIT_Report_Packet avls_package = new AVLS_UNIT_Report_Packet();
-            
+            avls_package.Message = "test";
             
             avls_tcpClient = new TcpClient();
 
@@ -1638,16 +1638,18 @@ LIMIT 1";
                         case "Unit Present":
                             avls_package.Event = "181,";
                             avls_package.Status = "00000000,";
-                            netStream.Close();
-                            avls_tcpClient.Close();
-                            return;
+                            avls_package.Message = "power_on";
+                            //netStream.Close();
+                            //avls_tcpClient.Close();
+                            //return;
                             break;
                         case "Unit Absent":
                             avls_package.Event = "182,";
                             avls_package.Status = "00000000,";
-                            netStream.Close();
-                            avls_tcpClient.Close();
-                            return;
+                            avls_package.Message = "power_off";
+                            //netStream.Close();
+                            //avls_tcpClient.Close();
+                            //return;
                             break;
                         case "Ignition Off":
                             avls_package.Event = "000,";
@@ -1669,7 +1671,7 @@ LIMIT 1";
                 {
                     avls_package.Event = "175,";
                 }
-                avls_package.Message = "test";
+                
             }
 
             avls_package.ID += ",";    
