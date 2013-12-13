@@ -245,11 +245,11 @@ LIMIT 1";
 
             string registration_msg_error_test = "<Location-Registration-Request><application>" + ConfigurationManager.AppSettings["application_ID"] + "</application></Location-Registration-Request>";
             WriteLine(netStream, data_append_dataLength(registration_msg_error_test), registration_msg_error_test);
-            using (StreamWriter w = File.AppendText("log.txt"))
+            //using (StreamWriter w = File.AppendText("log.txt"))
             {
-                Log("send:\r\n", registration_msg_error_test, w);
+                log.Info("send:\r\n"+registration_msg_error_test);
                 // Close the writer and underlying file.
-                w.Close();
+                //w.Close();
             }
             {//access sql
                 string now = string.Format("{0:yyyyMMdd}", DateTime.Now);
@@ -559,11 +559,11 @@ LIMIT
                                         "\">" +
                                         requeseHashtable["uid"] +
                                         "</suaddr></Immediate-Location-Request>";
-                                    using (StreamWriter w = File.AppendText("log.txt"))
+                                    //using (StreamWriter w = File.AppendText("log.txt"))
                                     {
-                                        Log("send:\r\n", Immediate_Location_Request, w);
+                                        log.Info("send:\r\n"+ Immediate_Location_Request);
                                         // Close the writer and underlying file.
-                                        w.Close();
+                                        //w.Close();
                                     }
                                     WriteLine(netStream, data_append_dataLength(Immediate_Location_Request), Immediate_Location_Request);
 
@@ -571,11 +571,11 @@ LIMIT
                                 case "-5":
                                     string Location_Protocol_Request = "<Location-Protocol-Request><request-id>" + ConfigurationManager.AppSettings["request-id"] + "</request-id><request-protocol-version>2</request-protocol-version></Location-Protocol-Request>";
 
-                                    using (StreamWriter w = File.AppendText("log.txt"))
+                                    //using (StreamWriter w = File.AppendText("log.txt"))
                                     {
-                                        Log("send:\r\n", Location_Protocol_Request, w);
+                                        log.Info("send:\r\n"+Location_Protocol_Request);
                                         // Close the writer and underlying file.
-                                        w.Close();
+                                        //w.Close();
                                     }
                                     WriteLine(netStream, data_append_dataLength(Location_Protocol_Request), Location_Protocol_Request);
                                     break;
@@ -588,11 +588,11 @@ LIMIT
                                         requeseHashtable["uid"] +
                                         "</suaddr></Triggered-Location-Stop-Request>";
 
-                                    using (StreamWriter w = File.AppendText("log.txt"))
+                                    //using (StreamWriter w = File.AppendText("log.txt"))
                                     {
-                                        Log("send:\r\n", Triggered_Location_Stop_Request, w);
+                                        log.Info("send:\r\n"+ Triggered_Location_Stop_Request);
                                         // Close the writer and underlying file.
-                                        w.Close();
+                                        //w.Close();
                                     }
                                     WriteLine(netStream, data_append_dataLength(Triggered_Location_Stop_Request), Triggered_Location_Stop_Request);
                                     break;
@@ -608,33 +608,33 @@ LIMIT
                                         requeseHashtable["time_interval"] +
                                         "</interval></periodic-trigger></Triggered-Location-Request>";
 
-                                    using (StreamWriter w = File.AppendText("log.txt"))
+                                    //using (StreamWriter w = File.AppendText("log.txt"))
                                     {
-                                        Log("send:\r\n", Triggered_Location_Request_Cadence, w);
+                                        log.Info("send:\r\n"+ Triggered_Location_Request_Cadence);
                                         // Close the writer and underlying file.
-                                        w.Close();
+                                        //w.Close();
                                     }
                                     WriteLine(netStream, data_append_dataLength(Triggered_Location_Request_Cadence), Triggered_Location_Request_Cadence);
                                     break;
                                 case "-1":
                                     string Triggered_Location_Request_Distance = "<Triggered-Location-Request><request-id>" + ConfigurationManager.AppSettings["request-id"] + "</request-id><suaddr suaddr-type=\"" + ConfigurationManager.AppSettings["suaddr-type"] + "\">" + ConfigurationManager.AppSettings["suaddr"] + "</suaddr><periodic-trigger><trg-distance>" + ConfigurationManager.AppSettings["trg-distance"] + "</trg-distance></periodic-trigger></Triggered-Location-Request>";
 
-                                    using (StreamWriter w = File.AppendText("log.txt"))
+                                    //using (StreamWriter w = File.AppendText("log.txt"))
                                     {
-                                        Log("send:\r\n", Triggered_Location_Request_Distance, w);
+                                        log.Info("send:\r\n"+ Triggered_Location_Request_Distance);
                                         // Close the writer and underlying file.
-                                        w.Close();
+                                        //w.Close();
                                     }
                                     WriteLine(netStream, data_append_dataLength(Triggered_Location_Request_Distance), Triggered_Location_Request_Distance);
                                     break;
                                 case "-4":
                                     string Digital_Output_Change_Request = "<Digital-Output-Change-Request><request-id>" + ConfigurationManager.AppSettings["request-id"] + "</request-id><suaddr suaddr-type=\"" + ConfigurationManager.AppSettings["suaddr-type"] + "\">" + ConfigurationManager.AppSettings["suaddr"] + "</suaddr><output-info><output-name>" + ConfigurationManager.AppSettings["output-name"] + "</output-name><output-value>" + ConfigurationManager.AppSettings["output-value"] + "</output-value></output-info></Digital-Output-Change-Request>";
 
-                                    using (StreamWriter w = File.AppendText("log.txt"))
+                                    //using (StreamWriter w = File.AppendText("log.txt"))
                                     {
-                                        Log("send:\r\n", Digital_Output_Change_Request, w);
+                                        log.Info("send:\r\n"+ Digital_Output_Change_Request);
                                         // Close the writer and underlying file.
-                                        w.Close();
+                                        //w.Close();
                                     }
                                     WriteLine(netStream, data_append_dataLength(Digital_Output_Change_Request), Digital_Output_Change_Request);
                                     break;
@@ -747,11 +747,11 @@ Select 1-6 then press enter to send package
                 {
                     case "1":
                         string Immediate_Location_Request = "<Immediate-Location-Request><request-id>" + ConfigurationManager.AppSettings["request-id"] + "</request-id><suaddr suaddr-type=\"" + ConfigurationManager.AppSettings["suaddr-type"] + "\">" + ConfigurationManager.AppSettings["suaddr"] + "</suaddr></Immediate-Location-Request>"; 
-                        using (StreamWriter w = File.AppendText("log.txt"))
+                        //using (StreamWriter w = File.AppendText("log.txt"))
                         {
-                            Log("send:\r\n", Immediate_Location_Request, w);
+                            log.Info("send:\r\n"+ Immediate_Location_Request);
                             // Close the writer and underlying file.
-                            w.Close();
+                            //w.Close();
                         }
                         WriteLine(netStream, data_append_dataLength(Immediate_Location_Request), Immediate_Location_Request);
                         
@@ -759,55 +759,55 @@ Select 1-6 then press enter to send package
                     case "5":
                         string Location_Protocol_Request = "<Location-Protocol-Request><request-id>" + ConfigurationManager.AppSettings["request-id"] + "</request-id><request-protocol-version>2</request-protocol-version></Location-Protocol-Request>";
                         
-                        using (StreamWriter w = File.AppendText("log.txt"))
+                        //using (StreamWriter w = File.AppendText("log.txt"))
                         {
-                            Log("send:\r\n", Location_Protocol_Request, w);
+                            log.Info("send:\r\n"+ Location_Protocol_Request);
                             // Close the writer and underlying file.
-                            w.Close();
+                            //w.Close();
                         }
                         WriteLine(netStream, data_append_dataLength(Location_Protocol_Request), Location_Protocol_Request);
                         break;
                     case "6":
                         string Triggered_Location_Stop_Request = "<Triggered-Location-Stop-Request><request-id>" + ConfigurationManager.AppSettings["request-id"] + "</request-id><suaddr suaddr-type=\"" + ConfigurationManager.AppSettings["suaddr-type"] + "\">" + ConfigurationManager.AppSettings["suaddr"] + "</suaddr></Triggered-Location-Stop-Request>";
                         
-                        using (StreamWriter w = File.AppendText("log.txt"))
+                        //using (StreamWriter w = File.AppendText("log.txt"))
                         {
-                            Log("send:\r\n", Triggered_Location_Stop_Request, w);
+                            log.Info("send:\r\n"+ Triggered_Location_Stop_Request);
                             // Close the writer and underlying file.
-                            w.Close();
+                            //w.Close();
                         }
                         WriteLine(netStream, data_append_dataLength(Triggered_Location_Stop_Request), Triggered_Location_Stop_Request);
                         break;
                     case "2":
                         string Triggered_Location_Request_Cadence = "<Triggered-Location-Request><request-id>" + ConfigurationManager.AppSettings["request-id"] + "</request-id><suaddr suaddr-type=\"" + ConfigurationManager.AppSettings["suaddr-type"] + "\">" + ConfigurationManager.AppSettings["suaddr"] + "</suaddr><periodic-trigger><interval>" + ConfigurationManager.AppSettings["interval"] + "</interval></periodic-trigger></Triggered-Location-Request>";
                         
-                        using (StreamWriter w = File.AppendText("log.txt"))
+                        //using (StreamWriter w = File.AppendText("log.txt"))
                         {
-                            Log("send:\r\n", Triggered_Location_Request_Cadence, w);
+                            log.Info("send:\r\n"+ Triggered_Location_Request_Cadence);
                             // Close the writer and underlying file.
-                            w.Close();
+                            //w.Close();
                         }
                         WriteLine(netStream, data_append_dataLength(Triggered_Location_Request_Cadence), Triggered_Location_Request_Cadence);
                         break;
                     case "3":
                         string Triggered_Location_Request_Distance = "<Triggered-Location-Request><request-id>" + ConfigurationManager.AppSettings["request-id"] + "</request-id><suaddr suaddr-type=\"" + ConfigurationManager.AppSettings["suaddr-type"] + "\">" + ConfigurationManager.AppSettings["suaddr"] + "</suaddr><periodic-trigger><trg-distance>" + ConfigurationManager.AppSettings["trg-distance"] + "</trg-distance></periodic-trigger></Triggered-Location-Request>";
                         
-                        using (StreamWriter w = File.AppendText("log.txt"))
+                        //using (StreamWriter w = File.AppendText("log.txt"))
                         {
-                            Log("send:\r\n", Triggered_Location_Request_Distance, w);
+                            log.Info("send:\r\n"+ Triggered_Location_Request_Distance);
                             // Close the writer and underlying file.
-                            w.Close();
+                            //w.Close();
                         }
                         WriteLine(netStream, data_append_dataLength(Triggered_Location_Request_Distance), Triggered_Location_Request_Distance);
                         break;
                     case "4":
                         string Digital_Output_Change_Request = "<Digital-Output-Change-Request><request-id>" + ConfigurationManager.AppSettings["request-id"] + "</request-id><suaddr suaddr-type=\"" + ConfigurationManager.AppSettings["suaddr-type"] + "\">" + ConfigurationManager.AppSettings["suaddr"] + "</suaddr><output-info><output-name>" + ConfigurationManager.AppSettings["output-name"] + "</output-name><output-value>" + ConfigurationManager.AppSettings["output-value"] + "</output-value></output-info></Digital-Output-Change-Request>";
                         
-                        using (StreamWriter w = File.AppendText("log.txt"))
+                        //using (StreamWriter w = File.AppendText("log.txt"))
                         {
-                            Log("send:\r\n", Digital_Output_Change_Request, w);
+                            log.Info("send:\r\n"+ Digital_Output_Change_Request);
                             // Close the writer and underlying file.
-                            w.Close();
+                            //w.Close();
                         }
                         WriteLine(netStream, data_append_dataLength(Digital_Output_Change_Request), Digital_Output_Change_Request);
                         break;
@@ -948,11 +948,11 @@ Select 1-6 then press enter to send package
 
                 string registration_msg_error_test = "<Location-Registration-Request><application>" + ConfigurationManager.AppSettings["application_ID"] + "</application></Location-Registration-Request>";
                 WriteLine(myNetworkStream, data_append_dataLength(registration_msg_error_test), registration_msg_error_test);
-                using (StreamWriter w = File.AppendText("log.txt"))
+                //using (StreamWriter w = File.AppendText("log.txt"))
                 {
-                    Log("send:\r\n", registration_msg_error_test, w);
+                    log.Info("send:\r\n"+ registration_msg_error_test);
                     // Close the writer and underlying file.
-                    w.Close();
+                    //w.Close();
                 }
                 {//access sql
                     string now = string.Format("{0:yyyyMMdd}", DateTime.Now);
@@ -1148,12 +1148,12 @@ Select 1-6 then press enter to send package
 
         private static void xml_parse(TcpClient tcpClient, NetworkStream netStream, string xml_root_tag, XDocument xml_data)
         {
-            string log = xml_data.ToString();
-            using (StreamWriter w = File.AppendText("log.txt"))
+            string logData = xml_data.ToString();
+            //using (StreamWriter w = File.AppendText("log.txt"))
             {
-                Log("receive:\r\n" , log, w);
+                log.Info("receive:\r\n" + logData);
                 // Close the writer and underlying file.
-                w.Close();
+                //w.Close();
             }
             Hashtable htable = new Hashtable();
             IEnumerable<XElement> de;
@@ -1290,13 +1290,13 @@ Select 1-6 then press enter to send package
                         }
                         if (bool.Parse(ConfigurationManager.AppSettings["SQL_ACCESS"]))
                         {
-                            access_sql_server( xml_root_tag, htable, sensor_name, sensor_type, sensor_value, XmlGetAllElementsXname(xml_data), log);
+                            access_sql_server( xml_root_tag, htable, sensor_name, sensor_type, sensor_value, XmlGetAllElementsXname(xml_data), logData);
                             Console.WriteLine("SQL Access Enable");
                         }
 
                         if (bool.Parse(ConfigurationManager.AppSettings["AVLS_ACCESS"]))
                         {
-                            access_avls_server( xml_root_tag, htable, sensor_name, sensor_type, sensor_value, XmlGetAllElementsXname(xml_data), log);
+                            access_avls_server( xml_root_tag, htable, sensor_name, sensor_type, sensor_value, XmlGetAllElementsXname(xml_data), logData);
                             Console.WriteLine("AVLS Access Enable");
                         }
                            
@@ -1370,7 +1370,7 @@ Select 1-6 then press enter to send package
                         }
                     }
                     if (bool.Parse(ConfigurationManager.AppSettings["SQL_ACCESS"]))
-                        access_sql_server( xml_root_tag, htable, sensor_name, sensor_type, sensor_value, XmlGetAllElementsXname(xml_data), log);
+                        access_sql_server( xml_root_tag, htable, sensor_name, sensor_type, sensor_value, XmlGetAllElementsXname(xml_data), logData);
                     break;
                 case "Immediate-Location-Answer":
                 case "Triggered-Location-Stop-Answer":
@@ -1440,7 +1440,7 @@ Select 1-6 then press enter to send package
                     break;
                 default:
                     //error occur
-                    Console.WriteLine("ERROR:" + log);
+                    Console.WriteLine("ERROR:" + logData);
                     break;
             }
             
@@ -1450,7 +1450,7 @@ Select 1-6 then press enter to send package
                 foreach (DictionaryEntry ht in htable)
                 {
                     Console.WriteLine("Key = {0}, Value = {1}" + Environment.NewLine, ht.Key, ht.Value);
-                    Log("receive:\r\n", ht.Key+"="+ht.Value, w);
+                    log.Info("receive:\r\n"+ht.Key+"="+ht.Value);
                     // Close the writer and underlying file.
                    
 
@@ -1959,11 +1959,11 @@ LIMIT 1";
                     Console.WriteLine("Write:\r\n" + write);
                     Console.WriteLine("E----------------------------------------------------------------------------");
 
-                    using (StreamWriter w = File.AppendText("log.txt"))
+                    //using (StreamWriter w = File.AppendText("log.txt"))
                     {
-                        Log("Write:\r\n", write, w);
+                        log.Info("Write:\r\n"+write);
                         // Close the writer and underlying file.
-                        w.Close();
+                        //w.Close();
                     }
 
                     //send method1
@@ -2845,30 +2845,7 @@ LIMIT 1";
                              .Select(x => Convert.ToByte(hex.Substring(x, 2), 16))
                              .ToArray();
         }
-        public static void Log(string send_receive, String logMessage, TextWriter w)
-        {
-            try
-            {
-                XDocument xml = XDocument.Parse(logMessage);
-                logMessage = send_receive + xml.ToString();
-                /*
-                w.Write("\r\nLog Entry : ");
-                w.WriteLine("{0} {1}", DateTime.Now.ToString("H:mm:ss.fffffff"),
-                    DateTime.Now.ToLongDateString());
-                w.WriteLine("  :");
-                w.WriteLine("  :{0}", logMessage);
-                w.WriteLine("-------------------------------");
-                // Update the underlying file.
-                w.Flush();
-                 * */
-                log.Info(logMessage);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.Message);
-                log.Info(logMessage);
-            }
-        }
+
         private static bool xml_validation_with_dtd(string xml, string xml_root_tag)
         {
             string doctype_append = "<?xml version='1.0' encoding='utf-16'?><!DOCTYPE " + xml_root_tag + " SYSTEM \"" + Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)+"\\"+xml_root_tag + ".dtd\">";
