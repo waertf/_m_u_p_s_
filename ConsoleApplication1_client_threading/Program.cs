@@ -9,6 +9,7 @@ using System.Net.Sockets;
 using System.Threading;
 using System.Configuration;
 using System.Collections.Specialized;
+using System.Timers;
 using System.Xml.Linq;
 using System.IO;
 using Devart.Data.PostgreSql;
@@ -213,7 +214,7 @@ LIMIT 1";
             Console.WriteLine(GetLocalIPAddress());//current ip address
             Console.WriteLine(System.Environment.UserName);//current username
             Console.WriteLine(string.Format("{0:yyMMddHHmmss}", DateTime.Now));
-            Console.WriteLine(DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"));
+            Console.WriteLine(DateTime.Now.ToString("yyyyMMdd HHmmss+8"));
             Console.WriteLine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location));
            
             tcpClient = new TcpClient();
@@ -283,8 +284,11 @@ LIMIT 1";
                 Thread autoSendFromSqlTableThread = new Thread(()=>AutoSend(netStream));
                 autoSendFromSqlTableThread.Start();
             }
-            
 
+            var accessUnsDeivcePowerStatusSqlTable = new System.Timers.Timer(int.Parse(ConfigurationManager.AppSettings["uns_deivce_power_status_Timer_interval_sec"]) * 1000);
+            accessUnsDeivcePowerStatusSqlTable.Elapsed += new ElapsedEventHandler(SendToAvlsEventColumnSetNegativeOneIfPowerOff);
+            accessUnsDeivcePowerStatusSqlTable.Enabled = true;
+            Console.ReadLine();
             //Thread send_test_thread = new Thread(() => sendtest(netStream, sql_client));
             //send_test_thread.Start();
             //output = ReadLine(tcpClient, netStream, output);
@@ -292,6 +296,11 @@ LIMIT 1";
 
 
             //tcpClient.Close();
+        }
+
+        private static void SendToAvlsEventColumnSetNegativeOneIfPowerOff(object sender, ElapsedEventArgs e)
+        {
+            throw new NotImplementedException();
         }
 
         private static object AutoSend(NetworkStream netStream)
@@ -1960,11 +1969,14 @@ LIMIT 1";
                                 sql_client.disconnect();
                             }
                             #region access power status
+
                             {
+                                string unsUpdateTimeStamp = DateTime.Now.ToString("yyyyMMdd HHmmss+8");
                                 string unsSqlCmd = @"UPDATE 
   custom.uns_deivce_power_status
 SET
-  power = 'on'
+  power = 'on',
+""updateTime"" = '"+unsUpdateTimeStamp+@"'::timestamp
 WHERE
   custom.uns_deivce_power_status.uid = '" + htable["suaddr"].ToString() + @"'";
                                 sql_client.connect();
@@ -1986,10 +1998,12 @@ WHERE
                         {
                             if (htable.ContainsKey("suaddr"))
                             {
+                                string unsUpdateTimeStamp = DateTime.Now.ToString("yyyyMMdd HHmmss+8");
                                 string unsSqlCmd = @"UPDATE 
   custom.uns_deivce_power_status
 SET
-  power = 'off'
+  power = 'off',
+""updateTime"" = '" + unsUpdateTimeStamp + @"'::timestamp
 WHERE
   custom.uns_deivce_power_status.uid = '" + htable["suaddr"].ToString() + @"'";
                                 sql_client.connect();
