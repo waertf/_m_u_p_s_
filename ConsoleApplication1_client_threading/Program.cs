@@ -20,6 +20,7 @@ using log4net;
 using log4net.Config;
 using keeplive;
 using System.Net;
+using Gurock.SmartInspect;
 
 namespace ConsoleApplication1_client_threading
 {
@@ -236,7 +237,8 @@ LIMIT 1";
             // Force a reload of the changed section. This 
             // makes the new values available for reading.
             ConfigurationManager.RefreshSection(sectionName);
-
+            SiAuto.Si.Enabled = true;
+            SiAuto.Main.LogMessage("This is my first SmartInspect message!");
             Console.WriteLine(GetLocalIPAddress());//current ip address
             Console.WriteLine(System.Environment.UserName);//current username
             Console.WriteLine(string.Format("{0:yyMMddHHmmss}", DateTime.Now));
@@ -591,6 +593,7 @@ LIMIT
                                         // Close the writer and underlying file.
                                         //w.Close();
                                     }
+                                    SiAuto.Main.LogMessage(Immediate_Location_Request);
                                     WriteLine(netStream, data_append_dataLength(Immediate_Location_Request), Immediate_Location_Request);
 
                                     break;
@@ -613,7 +616,7 @@ LIMIT
                                         "\">" +
                                         requeseHashtable["uid"] +
                                         "</suaddr></Triggered-Location-Stop-Request>";
-
+                                    SiAuto.Main.LogMessage(Triggered_Location_Stop_Request);
                                     //using (StreamWriter w = File.AppendText("log.txt"))
                                     {
                                         log.Info("send:\r\n"+ Triggered_Location_Stop_Request);
@@ -633,7 +636,7 @@ LIMIT
                                         "</suaddr><periodic-trigger><interval>" +
                                         requeseHashtable["time_interval"] +
                                         "</interval></periodic-trigger></Triggered-Location-Request>";
-
+                                    SiAuto.Main.LogMessage(Triggered_Location_Request_Cadence);
                                     //using (StreamWriter w = File.AppendText("log.txt"))
                                     {
                                         log.Info("send:\r\n"+ Triggered_Location_Request_Cadence);
@@ -1224,6 +1227,10 @@ Select 1-6 then press enter to send package
                 case "Immediate-Location-Report":
                 case "Unsolicited-Location-Report":
                     {
+                        if (xml_root_tag.Equals("Immediate-Location-Report"))
+                        {
+                            SiAuto.Main.LogMessage(xml_data.ToString());
+                        }
                         IEnumerable<XName> elements = XmlGetAllElementsXname(xml_data);
                         if (elements.Contains(new XElement("suaddr").Name))
                         {
@@ -2195,6 +2202,141 @@ LIMIT 1";
             //{
             //    gps_log._option3 = "\'"+htable["result_msg"].ToString()+"\'";
             //}
+
+            if (htable.ContainsKey("result_msg"))
+            {
+                //avls_package.Message = htable["result_msg"].ToString();
+                //-999 to -500 :motorola error
+                //-499 to -100 :our error
+                switch (htable["result_msg"].ToString())
+                {
+                    case "ABSENT SUBSCRIBER":
+                        unsSqlPowerOnDeviceCount--;
+                        #region access power status
+                        {
+                            if (htable.ContainsKey("suaddr"))
+                            {
+                                unsSqlPowerOnDeviceCount--;
+                                string unsUpdateTimeStamp = DateTime.Now.ToString("yyyyMMdd HHmmss+8");
+                                string unsSqlCmd = @"UPDATE 
+  custom.uns_deivce_power_status
+SET
+  power = 'off',
+""updateTime"" = '" + unsUpdateTimeStamp + @"'::timestamp
+WHERE
+  custom.uns_deivce_power_status.uid = '" + htable["suaddr"].ToString() + @"'";
+                                sql_client.connect();
+                                sql_client.modify(unsSqlCmd);
+                                sql_client.disconnect();
+                            }
+                        }
+                        #endregion
+                        //avls_package.Event = "182,";
+                        //avls_package.Status = "00000000,";
+                        //avls_package.Message = "power_off";
+                        break;
+                    /*
+                case  "SYSTEM FAILURE":
+                    avls_package.Event = "-500,";
+                    break;
+                case "UNSPECIFIED ERROR":
+                    avls_package.Event = "-501,";
+                    break;
+                case "UNAUTHORIZED APPLICATION":
+                    avls_package.Event = "-499,";
+                    break;
+                case "CONGESTION IN MOBILE NETWORK":
+                    avls_package.Event = "-502,";
+                    break;
+                case "UNSUPPORTED VERSION":
+                    avls_package.Event = "-498,";
+                    break;
+                case "SYNTAX ERROR":
+                    avls_package.Event = "-497,";
+                    break;
+                case "SERVICE NOT SUPPORTED":
+                    avls_package.Event = "-496,";
+                    break;
+                case "QUERY INFO NOT CURRENTLY ATTAINABLE":
+                    avls_package.Event = "-503,";
+                    break;
+                case "REPORTING WILL STOP":
+                    avls_package.Event = "-99,";
+                    break;
+                    */
+                    case "INSUFFICIENT GPS SATELLITES":
+                        unsSqlPowerOnDeviceCount++;
+                        //avls_package.Event = "1,";
+                        #region access power status
+
+                        {
+                            string unsUpdateTimeStamp = DateTime.Now.ToString("yyyyMMdd HHmmss+8");
+                            string unsSqlCmd = @"UPDATE 
+  custom.uns_deivce_power_status
+SET
+  power = 'on',
+""updateTime"" = '" + unsUpdateTimeStamp + @"'::timestamp
+WHERE
+  custom.uns_deivce_power_status.uid = '" + htable["suaddr"].ToString() + @"'";
+                            sql_client.connect();
+                            sql_client.modify(unsSqlCmd);
+                            sql_client.disconnect();
+                        }
+                        #endregion
+                        break;
+                    case "BAD GPS GEOMETRY":
+                        unsSqlPowerOnDeviceCount++;
+                        //avls_package.Event = "1,";
+                        #region access power status
+
+                        {
+                            string unsUpdateTimeStamp = DateTime.Now.ToString("yyyyMMdd HHmmss+8");
+                            string unsSqlCmd = @"UPDATE 
+  custom.uns_deivce_power_status
+SET
+  power = 'on',
+""updateTime"" = '" + unsUpdateTimeStamp + @"'::timestamp
+WHERE
+  custom.uns_deivce_power_status.uid = '" + htable["suaddr"].ToString() + @"'";
+                            sql_client.connect();
+                            sql_client.modify(unsSqlCmd);
+                            sql_client.disconnect();
+                        }
+                        #endregion
+                        break;
+                    case "GPS INVALID":
+                        unsSqlPowerOnDeviceCount++;
+                       // avls_package.Event = "1,";
+                        #region access power status
+
+                        {
+                            string unsUpdateTimeStamp = DateTime.Now.ToString("yyyyMMdd HHmmss+8");
+                            string unsSqlCmd = @"UPDATE 
+  custom.uns_deivce_power_status
+SET
+  power = 'on',
+""updateTime"" = '" + unsUpdateTimeStamp + @"'::timestamp
+WHERE
+  custom.uns_deivce_power_status.uid = '" + htable["suaddr"].ToString() + @"'";
+                            sql_client.connect();
+                            sql_client.modify(unsSqlCmd);
+                            sql_client.disconnect();
+                        }
+                        #endregion
+                        break;
+                    /*
+                case "API DISCONNECTED":
+                    avls_package.Event = "-495,";
+                    break;
+                case "OPERA TION NOT PERMITTED":
+                    avls_package.Event = "-494,";
+                    break;
+                case "API NOT LICENSED":
+                    avls_package.Event = "-493,";
+                    break;
+                    */
+                }
+            }
             if (htable.ContainsKey("event_info"))
             {
                 gps_log._option3 = "\'"+htable["event_info"].ToString()+"\'";
