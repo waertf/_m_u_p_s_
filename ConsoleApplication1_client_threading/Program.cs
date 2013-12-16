@@ -226,7 +226,11 @@ LIMIT 1";
             lat = ((latNumberAfterPoint * 60 / 100 + latInt) * 100).ToString();
             lon = ((lonNumberAfterPoint * 60 / 100 + lonInt) * 100).ToString();
         }
-        
+
+        private static int unsSqlPowerOnDeviceCount = 0;
+        private static int unsAvslPowerOnDeviceCount = 0;
+        private static int powerOnCount = 0;
+
         static void Main(string[] args)
         {
             // Force a reload of the changed section. This 
@@ -1352,7 +1356,30 @@ Select 1-6 then press enter to send package
                             access_avls_server( xml_root_tag, htable, sensor_name, sensor_type, sensor_value, XmlGetAllElementsXname(xml_data), logData);
                             Console.WriteLine("AVLS Access Enable");
                         }
-                           
+                        Console.Clear();
+                        Console.WriteLine("unsAvslPowerOnDeviceCount:"+unsAvslPowerOnDeviceCount);
+                        Console.WriteLine("unsSqlPowerOnDeviceCount:"+unsSqlPowerOnDeviceCount);
+                        try
+                        {
+                            string sendToUdpServer = DateTime.Now.ToString("o") + Environment.NewLine + "unsAvslPowerOnDeviceCount:" + unsAvslPowerOnDeviceCount +
+                                                Environment.NewLine + "unsSqlPowerOnDeviceCount:" +
+                                                unsSqlPowerOnDeviceCount;
+                            UdpClient udpClient = new UdpClient(int.Parse(ConfigurationManager.AppSettings["udpPort"]));
+                            udpClient.Connect(ConfigurationManager.AppSettings["udpServerIP"], int.Parse(ConfigurationManager.AppSettings["udpPort"]));
+
+                            // Sends a message to the host to which you have connected.
+                            Byte[] sendBytes = Encoding.ASCII.GetBytes(sendToUdpServer);
+
+                            udpClient.Send(sendBytes, sendBytes.Length);
+                            udpClient.Close();
+                        }
+                        catch (Exception e)
+                        {
+                            Console.WriteLine(e.ToString());
+                            log.Error(e.ToString());
+                        }
+                       
+
                     }
                      
                     break;
@@ -1597,6 +1624,7 @@ WHERE
                         switch (htable["result_msg"].ToString())
                         {
                             case "ABSENT SUBSCRIBER":
+                                unsAvslPowerOnDeviceCount--;
                                 avls_package.Event = "182,";
                                 avls_package.Status = "00000000,";
                                 avls_package.Message = "power_off";
@@ -1631,12 +1659,15 @@ WHERE
                                 break;
                                 */
                             case "INSUFFICIENT GPS SATELLITES":
+                                unsAvslPowerOnDeviceCount++;
                                 avls_package.Event = "1,";
                                 break;
                             case "BAD GPS GEOMETRY":
+                                unsAvslPowerOnDeviceCount++;
                                 avls_package.Event = "1,";
                                 break;
                             case "GPS INVALID":
+                                unsAvslPowerOnDeviceCount++;
                                 avls_package.Event = "1,";
                                 break;
                                 /*
@@ -1930,12 +1961,15 @@ LIMIT 1";
                         case "Emergency On":
                             avls_package.Event = "150,";
                             avls_package.Status = "00000000,";
+                            avls_package.Message = htable["event_info"].ToString();
                             break;
                         case "Emergency Off":
                             avls_package.Event = "000,";
                             avls_package.Status = "00000000,";
+                            avls_package.Message = htable["event_info"].ToString();
                             break;
                         case "Unit Present":
+                            unsAvslPowerOnDeviceCount++;
                             avls_package.Event = "181,";
                             avls_package.Status = "00000000,";
                             avls_package.Message = "power_on";
@@ -1944,6 +1978,7 @@ LIMIT 1";
                             //return;
                             break;
                         case "Unit Absent":
+                            unsAvslPowerOnDeviceCount--;
                             avls_package.Event = "182,";
                             avls_package.Status = "00000000,";
                             avls_package.Message = "power_off";
@@ -1954,10 +1989,12 @@ LIMIT 1";
                         case "Ignition Off":
                             avls_package.Event = "000,";
                             avls_package.Status = "00000000,";
+                            avls_package.Message = htable["event_info"].ToString();
                             break;
                         case "Ignition On":
                             avls_package.Event = "000,";
                             avls_package.Status = "00020000,";
+                            avls_package.Message = htable["event_info"].ToString();
                             break;
 
                     }
@@ -2174,6 +2211,7 @@ LIMIT 1";
                     case "Unit Present":
                         if (htable.ContainsKey("suaddr"))
                         {
+                            unsSqlPowerOnDeviceCount++;
                             sql_client.connect();
                             string reg_countUid = sql_client.get_DataTable("SELECT COUNT(uid)   FROM custom.regist_log").Rows[0].ItemArray[0].ToString();
                             sql_client.disconnect();
@@ -2230,6 +2268,7 @@ WHERE
                         {
                             if (htable.ContainsKey("suaddr"))
                             {
+                                unsSqlPowerOnDeviceCount--;
                                 string unsUpdateTimeStamp = DateTime.Now.ToString("yyyyMMdd HHmmss+8");
                                 string unsSqlCmd = @"UPDATE 
   custom.uns_deivce_power_status
