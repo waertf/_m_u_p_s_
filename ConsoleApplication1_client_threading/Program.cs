@@ -23,6 +23,23 @@ using System.Net;
 
 namespace ConsoleApplication1_client_threading
 {
+    public static class ExceptionHelper
+    {
+        public static int LineNumber(this Exception e)
+        {
+
+            int linenum = 0;
+            try
+            {
+                linenum = Convert.ToInt32(e.StackTrace.Substring(e.StackTrace.LastIndexOf(":line") + 5));
+            }
+            catch
+            {
+                //Stack trace is not available!
+            }
+            return linenum;
+        }
+    }
     class Program
     {
         //static TcpClient tcpClient = null;
@@ -139,6 +156,8 @@ each set of the byte. To display a four-byte string, there will be 8 digits stri
                 //tcpClient.GetStream().Close();
                 //tcpClient.Close();
                 Console.WriteLine(ex.Message);
+                Console.WriteLine(System.Reflection.MethodBase.GetCurrentMethod().Name +"_errorline:" + ex.LineNumber());
+                log.Error(System.Reflection.MethodBase.GetCurrentMethod().Name + "_errorline:" + ex.LineNumber());
                 log.Error(ex.Message);
                 tcpClient = new TcpClient();
                 
@@ -163,12 +182,14 @@ each set of the byte. To display a four-byte string, there will be 8 digits stri
                 //tcpClient.GetStream().Close();
                 //tcpClient.Close();
                 Console.WriteLine(ex.Message);
+                Console.WriteLine(System.Reflection.MethodBase.GetCurrentMethod().Name + "_errorline:" + ex.LineNumber());
+                log.Error(System.Reflection.MethodBase.GetCurrentMethod().Name + "_errorline:" + ex.LineNumber());
                 log.Error(ex.Message);
                 avls_tcpClient = new TcpClient();
                 avls_connectDone.Reset();
                 avls_tcpClient.BeginConnect(avls_ipaddress, avls_port, new AsyncCallback(avls_ConnectCallback), avls_tcpClient);
                 avls_connectDone.WaitOne();
-                Keeplive.keep(avls_tcpClient.Client);
+                //Keeplive.keep(avls_tcpClient.Client);
             }
 
         }
@@ -205,6 +226,7 @@ LIMIT 1";
             lat = ((latNumberAfterPoint * 60 / 100 + latInt) * 100).ToString();
             lon = ((lonNumberAfterPoint * 60 / 100 + lonInt) * 100).ToString();
         }
+        
         static void Main(string[] args)
         {
             // Force a reload of the changed section. This 
@@ -851,6 +873,8 @@ Select 1-6 then press enter to send package
                 catch (Exception ex)
                 {
                     Console.WriteLine("WriteLineError:\r\n" + ex.Message);
+                    Console.WriteLine(System.Reflection.MethodBase.GetCurrentMethod().Name + "_errorline:" + ex.LineNumber());
+                    log.Error(System.Reflection.MethodBase.GetCurrentMethod().Name + "_errorline:" + ex.LineNumber());
                     log.Error("WriteLineError:\r\n" + ex.Message);
                 }
 
@@ -859,16 +883,38 @@ Select 1-6 then press enter to send package
         }
         public static void myWriteCallBack(IAsyncResult ar)
         {
+            try
+            {
+                NetworkStream myNetworkStream = (NetworkStream)ar.AsyncState;
+                myNetworkStream.EndWrite(ar);
+            }
+            catch (Exception ex)
+            {
 
-            NetworkStream myNetworkStream = (NetworkStream)ar.AsyncState;
-            myNetworkStream.EndWrite(ar);
+                Console.WriteLine("myWriteCallBack:\r\n" + ex.Message);
+                Console.WriteLine(System.Reflection.MethodBase.GetCurrentMethod().Name + "_errorline:" + ex.LineNumber());
+                log.Error(System.Reflection.MethodBase.GetCurrentMethod().Name + "_errorline:" + ex.LineNumber());
+                log.Error("myWriteCallBack:\r\n" + ex.Message);
+            }
+            
         }
         public static void avls_myWriteCallBack(IAsyncResult ar)
         {
+            try
+            {
+                NetworkStream myNetworkStream = (NetworkStream)ar.AsyncState;
+                myNetworkStream.EndWrite(ar);
+                sendDone.Set();
+            }
+            catch (Exception ex)
+            {
 
-            NetworkStream myNetworkStream = (NetworkStream)ar.AsyncState;
-            myNetworkStream.EndWrite(ar);
-            sendDone.Set();
+                Console.WriteLine("avls_myWriteCallBack:\r\n" + ex.Message);
+                Console.WriteLine(System.Reflection.MethodBase.GetCurrentMethod().Name + "_errorline:" + ex.LineNumber());
+                log.Error(System.Reflection.MethodBase.GetCurrentMethod().Name + "_errorline:" + ex.LineNumber());
+                log.Error("avls_myWriteCallBack:\r\n" + ex.Message);
+            }
+            
 
         }
         private static void ReadLine(TcpClient tcpClient, NetworkStream netStream,int prefix_length)
@@ -908,6 +954,8 @@ Select 1-6 then press enter to send package
             catch (Exception ex)
             {
                 Console.WriteLine("ReadLineError:\r\n" + ex.Message);
+                Console.WriteLine(System.Reflection.MethodBase.GetCurrentMethod().Name + "_errorline:" + ex.LineNumber());
+                log.Error(System.Reflection.MethodBase.GetCurrentMethod().Name + "_errorline:" + ex.LineNumber());
                 log.Error("ReadLineError:\r\n" + ex.Message);
             }
         }
@@ -933,6 +981,8 @@ Select 1-6 then press enter to send package
             catch (Exception ex)
             {
                 Console.WriteLine("myReadSizeCallBackError:"+Environment.NewLine+ex.Message);
+                Console.WriteLine(System.Reflection.MethodBase.GetCurrentMethod().Name + "_errorline:" + ex.LineNumber());
+                log.Error(System.Reflection.MethodBase.GetCurrentMethod().Name + "_errorline:" + ex.LineNumber());
                 log.Error("myReadSizeCallBackError:" + Environment.NewLine + ex.Message);
                 if(myNetworkStream!=null)
                     myNetworkStream.Dispose();
@@ -946,11 +996,11 @@ Select 1-6 then press enter to send package
 
                 var sql_client = new SqlClient(ConfigurationManager.AppSettings["SQL_SERVER_IP"], ConfigurationManager.AppSettings["SQL_SERVER_PORT"], ConfigurationManager.AppSettings["SQL_SERVER_USER_ID"], ConfigurationManager.AppSettings["SQL_SERVER_PASSWORD"], ConfigurationManager.AppSettings["SQL_SERVER_DATABASE"], ConfigurationManager.AppSettings["Pooling"], ConfigurationManager.AppSettings["MinPoolSize"], ConfigurationManager.AppSettings["MaxPoolSize"], ConfigurationManager.AppSettings["ConnectionLifetime"]);
 
-                string registration_msg_error_test = "<Location-Registration-Request><application>" + ConfigurationManager.AppSettings["application_ID"] + "</application></Location-Registration-Request>";
-                WriteLine(myNetworkStream, data_append_dataLength(registration_msg_error_test), registration_msg_error_test);
+                string registration_msg = "<Location-Registration-Request><application>" + ConfigurationManager.AppSettings["application_ID"] + "</application></Location-Registration-Request>";
+                WriteLine(myNetworkStream, data_append_dataLength(registration_msg), registration_msg);
                 //using (StreamWriter w = File.AppendText("log.txt"))
                 {
-                    log.Info("send:\r\n"+ registration_msg_error_test);
+                    log.Info("send:\r\n"+ registration_msg);
                     // Close the writer and underlying file.
                     //w.Close();
                 }
@@ -1007,15 +1057,15 @@ Select 1-6 then press enter to send package
                 string xml_root_tag = xml_data.Root.Name.ToString();
                 Console.WriteLine();
                 string ouput2 = string.Empty;
-                try
-                {
+                //try
+                //{
                     ouput2 = xml_data.ToString();
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine("FinishReadError1:\r\n" + ex.Message);
-                    log.Error("FinishReadError1:\r\n" + ex.Message);
-                }
+                //}
+                //catch (Exception ex)
+                //{
+                    //Console.WriteLine("FinishReadError1:\r\n" + ex.Message);
+                    //log.Error("FinishReadError1:\r\n" + ex.Message);
+                //}
                 Console.WriteLine("S############################################################################");
                 Console.WriteLine("Read:\r\n" + ouput2);
                 //Console.WriteLine("First node:[" + xml_root_tag + "]");
@@ -1064,8 +1114,11 @@ Select 1-6 then press enter to send package
             }
             catch (Exception ex)
             {
-                Console.WriteLine("FinishReadError2:\r\n" + ex.Message);
-                log.Error("FinishReadError2:\r\n" + ex.Message);
+                Console.WriteLine("FinishReadError:\r\n" + ex.Message);
+                Console.WriteLine(System.Reflection.MethodBase.GetCurrentMethod().Name + "_errorline:" + ex.LineNumber());
+                log.Error(System.Reflection.MethodBase.GetCurrentMethod().Name + "_errorline:" + ex.LineNumber());
+                log.Error("FinishReadError:\r\n" + ex.Message);
+                
             }
         }
         static void read_thread_method(TcpClient tcpClient, NetworkStream netStream)
@@ -1978,6 +2031,8 @@ LIMIT 1";
                 catch (Exception ex)
                 {
                     Console.WriteLine("avls_WriteLineError:\r\n" + ex.Message);
+                    Console.WriteLine(System.Reflection.MethodBase.GetCurrentMethod().Name + "_errorline:" + ex.LineNumber());
+                    log.Error(System.Reflection.MethodBase.GetCurrentMethod().Name + "_errorline:" + ex.LineNumber());
                     log.Error("avls_WriteLineError:\r\n" + ex.Message);
                 }
 
@@ -2656,6 +2711,8 @@ LIMIT 1";
                 catch (Exception ex)
                 {
                     Console.WriteLine("access_sql_serverError:"+Environment.NewLine+ex.Message);
+                    Console.WriteLine(System.Reflection.MethodBase.GetCurrentMethod().Name + "_errorline:" + ex.LineNumber());
+                    log.Error(System.Reflection.MethodBase.GetCurrentMethod().Name + "_errorline:" + ex.LineNumber());
                     log.Error("access_sql_serverError:" + Environment.NewLine + ex.Message);
                 }
                 finally
@@ -2732,9 +2789,11 @@ LIMIT 1";
             {
                 result = (string)(from e1 in xml_data.Descendants(tag_name) select e1.Attribute(tag_attribute_name).Value).First();
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                Console.WriteLine("XmlGetTagAttributeValue:"+tag_name + ":" + tag_attribute_name+":"+e.Message);
+                Console.WriteLine("XmlGetTagAttributeValue:"+tag_name + ":" + tag_attribute_name+":"+ex.Message);
+                Console.WriteLine(System.Reflection.MethodBase.GetCurrentMethod().Name + "_errorline:" + ex.LineNumber());
+                log.Error(System.Reflection.MethodBase.GetCurrentMethod().Name + "_errorline:" + ex.LineNumber());
                 result = "";
             }
 
@@ -2748,10 +2807,12 @@ LIMIT 1";
             {
                 result = (string)(from el in xml_data.Descendants(tag_name) select el).First();
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                Console.WriteLine("XmlGetTagValue:"+tag_name+":"+e.Message);
-                log.Error("XmlGetTagValue:" + tag_name + ":" + e.Message);
+                Console.WriteLine("XmlGetTagValue:"+tag_name+":"+ex.Message);
+                Console.WriteLine(System.Reflection.MethodBase.GetCurrentMethod().Name + "_errorline:" + ex.LineNumber());
+                log.Error(System.Reflection.MethodBase.GetCurrentMethod().Name + "_errorline:" + ex.LineNumber());
+                log.Error("XmlGetTagValue:" + tag_name + ":" + ex.Message);
                 result = "";
             }
 
@@ -2771,10 +2832,12 @@ LIMIT 1";
             {
                 result = (string)(from e in xml_data.Descendants(parent_tag_name) select e.Elements().First().Name.LocalName).First();
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                Console.WriteLine("XmlGetFirstChildTagName:"+parent_tag_name+":"+e.Message);
-                log.Error("XmlGetFirstChildTagName:" + parent_tag_name + ":" + e.Message);
+                Console.WriteLine("XmlGetFirstChildTagName:"+parent_tag_name+":"+ex.Message);
+                Console.WriteLine(System.Reflection.MethodBase.GetCurrentMethod().Name + "_errorline:" + ex.LineNumber());
+                log.Error(System.Reflection.MethodBase.GetCurrentMethod().Name + "_errorline:" + ex.LineNumber());
+                log.Error("XmlGetFirstChildTagName:" + parent_tag_name + ":" + ex.Message);
                 result = "";
             }
 
