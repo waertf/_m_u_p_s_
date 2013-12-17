@@ -143,6 +143,18 @@ each set of the byte. To display a four-byte string, there will be 8 digits stri
             public string Message;
         }
 
+        public static int UnsAvslPowerOnDeviceCount
+        {
+            get { return _unsAvslPowerOnDeviceCount; }
+            set { _unsAvslPowerOnDeviceCount = value; }
+        }
+
+        public static int UnsSqlPowerOnDeviceCount
+        {
+            get { return _unsSqlPowerOnDeviceCount; }
+            set { _unsSqlPowerOnDeviceCount = value; }
+        }
+
         static void ConnectCallback(IAsyncResult ar)
         {
             try
@@ -228,9 +240,8 @@ LIMIT 1";
             lon = ((lonNumberAfterPoint * 60 / 100 + lonInt) * 100).ToString();
         }
 
-        private static int unsSqlPowerOnDeviceCount = 0;
-        private static int unsAvslPowerOnDeviceCount = 0;
-        private static int powerOnCount = 0;
+        private static int _unsSqlPowerOnDeviceCount = 0;
+        private static int _unsAvslPowerOnDeviceCount = 0;
 
         static void Main(string[] args)
         {
@@ -1374,6 +1385,7 @@ Select 1-6 then press enter to send package
                             
                             Console.WriteLine("AVLS Access Enable");
                         }
+                        /*
                         Console.Clear();
                         Console.WriteLine("unsAvslPowerOnDeviceCount:"+unsAvslPowerOnDeviceCount);
                         Console.WriteLine("unsSqlPowerOnDeviceCount:"+unsSqlPowerOnDeviceCount);
@@ -1396,7 +1408,7 @@ Select 1-6 then press enter to send package
                             Console.WriteLine(e.ToString());
                             log.Error(e.ToString());
                         }
-                       
+                       */
 
                     }
                      
@@ -1647,7 +1659,7 @@ WHERE
                         switch (htable["result_msg"].ToString())
                         {
                             case "ABSENT SUBSCRIBER":
-                                unsAvslPowerOnDeviceCount--;
+                                UnsAvslPowerOnDeviceCount--;
                                 avls_package.Event = "182,";
                                 avls_package.Status = "00000000,";
                                 avls_package.Message = "power_off";
@@ -1682,15 +1694,15 @@ WHERE
                                 break;
                                 */
                             case "INSUFFICIENT GPS SATELLITES":
-                                unsAvslPowerOnDeviceCount++;
+                                UnsAvslPowerOnDeviceCount++;
                                 avls_package.Event = "1,";
                                 break;
                             case "BAD GPS GEOMETRY":
-                                unsAvslPowerOnDeviceCount++;
+                                UnsAvslPowerOnDeviceCount++;
                                 avls_package.Event = "1,";
                                 break;
                             case "GPS INVALID":
-                                unsAvslPowerOnDeviceCount++;
+                                UnsAvslPowerOnDeviceCount++;
                                 avls_package.Event = "1,";
                                 break;
                                 /*
@@ -1992,7 +2004,7 @@ LIMIT 1";
                             avls_package.Message = htable["event_info"].ToString();
                             break;
                         case "Unit Present":
-                            unsAvslPowerOnDeviceCount++;
+                            UnsAvslPowerOnDeviceCount++;
                             avls_package.Event = "181,";
                             avls_package.Status = "00000000,";
                             avls_package.Message = "power_on";
@@ -2001,7 +2013,7 @@ LIMIT 1";
                             //return;
                             break;
                         case "Unit Absent":
-                            unsAvslPowerOnDeviceCount--;
+                            UnsAvslPowerOnDeviceCount--;
                             avls_package.Event = "182,";
                             avls_package.Status = "00000000,";
                             avls_package.Message = "power_off";
@@ -2226,12 +2238,12 @@ LIMIT 1";
                 switch (htable["result_msg"].ToString())
                 {
                     case "ABSENT SUBSCRIBER":
-                        unsSqlPowerOnDeviceCount--;
+                        UnsSqlPowerOnDeviceCount--;
                         #region access power status
                         {
                             if (htable.ContainsKey("suaddr"))
                             {
-                                unsSqlPowerOnDeviceCount--;
+                                UnsSqlPowerOnDeviceCount--;
                                 string unsUpdateTimeStamp = DateTime.Now.ToString("yyyyMMdd HHmmss+8");
                                 string unsSqlCmd = @"UPDATE 
   custom.uns_deivce_power_status
@@ -2280,7 +2292,7 @@ WHERE
                     break;
                     */
                     case "INSUFFICIENT GPS SATELLITES":
-                        unsSqlPowerOnDeviceCount++;
+                        UnsSqlPowerOnDeviceCount++;
                         //avls_package.Event = "1,";
                         #region access power status
 
@@ -2300,7 +2312,7 @@ WHERE
                         #endregion
                         break;
                     case "BAD GPS GEOMETRY":
-                        unsSqlPowerOnDeviceCount++;
+                        UnsSqlPowerOnDeviceCount++;
                         //avls_package.Event = "1,";
                         #region access power status
 
@@ -2320,7 +2332,7 @@ WHERE
                         #endregion
                         break;
                     case "GPS INVALID":
-                        unsSqlPowerOnDeviceCount++;
+                        UnsSqlPowerOnDeviceCount++;
                        // avls_package.Event = "1,";
                         #region access power status
 
@@ -2368,7 +2380,7 @@ WHERE
                     case "Unit Present":
                         if (htable.ContainsKey("suaddr"))
                         {
-                            unsSqlPowerOnDeviceCount++;
+                            UnsSqlPowerOnDeviceCount++;
                             sql_client.connect();
                             string reg_countUid = sql_client.get_DataTable("SELECT COUNT(uid)   FROM custom.regist_log").Rows[0].ItemArray[0].ToString();
                             sql_client.disconnect();
@@ -2425,7 +2437,7 @@ WHERE
                         {
                             if (htable.ContainsKey("suaddr"))
                             {
-                                unsSqlPowerOnDeviceCount--;
+                                UnsSqlPowerOnDeviceCount--;
                                 string unsUpdateTimeStamp = DateTime.Now.ToString("yyyyMMdd HHmmss+8");
                                 string unsSqlCmd = @"UPDATE 
   custom.uns_deivce_power_status
