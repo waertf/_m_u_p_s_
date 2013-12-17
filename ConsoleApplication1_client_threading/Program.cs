@@ -2932,7 +2932,7 @@ LIMIT 1";
                         switch (htable["event_info"].ToString())
                         {
                             case "Emergency On":
-                                string sn = "\'" + gps_log._uid + now + cgaEventLogIdCount.ToString("000000000000") + "\'";
+                                string sn = "\'" + htable["suaddr"].ToString() + now + cgaEventLogIdCount.ToString("000000000000") + "\'";
                                 string table_columns = "serial_no ,uid ,type ,lat ,lon,altitude ,speed ,course ,radius ,info_time ,server_time ,create_user ,create_ip";
                                 string table_column_value = sn + "," + gps_log._uid + "," + //gps_log._option3
                                     @"'150'" + "," + gps_log._lat + "," + gps_log._lon + "," +
