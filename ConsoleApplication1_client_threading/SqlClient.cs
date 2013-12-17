@@ -94,13 +94,14 @@ namespace ConsoleApplication1_client_threading
 
                     //async
                     IAsyncResult cres = command.BeginExecuteNonQuery(null, null);
-
+                    /*
                     if (cres.IsCompleted)
                         Console.WriteLine("Completed.");
                     else
                         Console.WriteLine("Have to wait for operation to complete...");
+                    */
                     int RowsAffected = command.EndExecuteNonQuery(cres);
-                    Console.WriteLine("Done. Rows affected: " + RowsAffected.ToString());
+                    //Console.WriteLine("Done. Rows affected: " + RowsAffected.ToString());
                     /*
                      //sync
                      int aff = cmd.ExecuteNonQuery();
@@ -132,33 +133,33 @@ namespace ConsoleApplication1_client_threading
                     DataTable datatable = new DataTable();
                     PgSqlCommand command = pgSqlConnection.CreateCommand();
                     command.CommandText = cmd;
-                    Console.WriteLine("Starting asynchronous retrieval of data...");
+                    //Console.WriteLine("Starting asynchronous retrieval of data...");
                     IAsyncResult cres = command.BeginExecuteReader();
-                    if (cres.IsCompleted)
-                        Console.WriteLine("Completed.");
-                    else
-                        Console.WriteLine("Have to wait for operation to complete...");
+                    //if (cres.IsCompleted)
+                        //Console.WriteLine("Completed.");
+                    //else
+                        //Console.WriteLine("Have to wait for operation to complete...");
                     PgSqlDataReader myReader = command.EndExecuteReader(cres);
                     try
                     {
                         // printing the column names
                         for (int i = 0; i < myReader.FieldCount; i++)
                         {
-                            Console.Write(myReader.GetName(i).ToString() + "\t");
+                            //Console.Write(myReader.GetName(i).ToString() + "\t");
                             datatable.Columns.Add(myReader.GetName(i).ToString(), typeof(string));
                         }
-                        Console.Write(Environment.NewLine);
+                        //Console.Write(Environment.NewLine);
                         while (myReader.Read())
                         {
                             DataRow dr = datatable.NewRow();
 
                             for (int i = 0; i < myReader.FieldCount; i++)
                             {
-                                Console.Write(myReader.GetString(i) + "\t");
+                                //Console.Write(myReader.GetString(i) + "\t");
                                 dr[i] = myReader.GetString(i);
                             }
                             datatable.Rows.Add(dr);
-                            Console.Write(Environment.NewLine);
+                            //Console.Write(Environment.NewLine);
                             //Console.WriteLine(myReader.GetInt32(0) + "\t" + myReader.GetString(1) + "\t");
                         }
                     }
@@ -166,6 +167,7 @@ namespace ConsoleApplication1_client_threading
                     {
                         myReader.Close();
                     }
+                    /*
                     foreach (DataRow row in datatable.Rows) // Loop over the rows.
                     {
                         Console.WriteLine("--- Row ---"); // Print separator.
@@ -175,6 +177,7 @@ namespace ConsoleApplication1_client_threading
                             Console.WriteLine(item); // Invokes ToString abstract method.
                         }
                     }
+                    */
                     return datatable;
                 }
                 else
