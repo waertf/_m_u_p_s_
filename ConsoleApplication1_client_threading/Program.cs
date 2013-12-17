@@ -52,7 +52,7 @@ namespace ConsoleApplication1_client_threading
         private static byte[] myReadBuffer = null;
         private static byte[] fBuffer = null;
         private static int fBytesRead = 0;
-        private static TcpClient tcpClient, avls_tcpClient;
+        private static TcpClient tcpClient;
         //private static SqlClient sql_client;
         // ManualResetEvent instances signal completion.
         private static ManualResetEvent connectDone =
@@ -186,7 +186,7 @@ each set of the byte. To display a four-byte string, there will be 8 digits stri
                 Console.WriteLine(System.Reflection.MethodBase.GetCurrentMethod().Name + "_errorline:" + ex.LineNumber());
                 log.Error(System.Reflection.MethodBase.GetCurrentMethod().Name + "_errorline:" + ex.LineNumber());
                 log.Error(ex.Message);
-                avls_tcpClient = new TcpClient();
+                var avls_tcpClient = new TcpClient();
                 avls_connectDone.Reset();
                 avls_tcpClient.BeginConnect(avls_ipaddress, avls_port, new AsyncCallback(avls_ConnectCallback), avls_tcpClient);
                 avls_connectDone.WaitOne();
@@ -1361,13 +1361,17 @@ Select 1-6 then press enter to send package
                         }
                         if (bool.Parse(ConfigurationManager.AppSettings["SQL_ACCESS"]))
                         {
-                            access_sql_server( xml_root_tag, htable, sensor_name, sensor_type, sensor_value, XmlGetAllElementsXname(xml_data), logData);
+                            Thread access_sql = new Thread(() =>  access_sql_server( xml_root_tag, htable, sensor_name, sensor_type, sensor_value, XmlGetAllElementsXname(xml_data), logData));
+                            access_sql.Start();
+                           
                             Console.WriteLine("SQL Access Enable");
                         }
 
                         if (bool.Parse(ConfigurationManager.AppSettings["AVLS_ACCESS"]))
                         {
-                            access_avls_server( xml_root_tag, htable, sensor_name, sensor_type, sensor_value, XmlGetAllElementsXname(xml_data), logData);
+                            Thread access_avls = new Thread(() => access_avls_server( xml_root_tag, htable, sensor_name, sensor_type, sensor_value, XmlGetAllElementsXname(xml_data), logData));
+                            access_avls.Start();
+                            
                             Console.WriteLine("AVLS Access Enable");
                         }
                         Console.Clear();
@@ -1464,7 +1468,10 @@ Select 1-6 then press enter to send package
                         }
                     }
                     if (bool.Parse(ConfigurationManager.AppSettings["SQL_ACCESS"]))
-                        access_sql_server( xml_root_tag, htable, sensor_name, sensor_type, sensor_value, XmlGetAllElementsXname(xml_data), logData);
+                    {
+                        Thread access_sql = new Thread(() => access_sql_server(xml_root_tag, htable, sensor_name, sensor_type, sensor_value, XmlGetAllElementsXname(xml_data), logData));
+                        access_sql.Start();
+                    }
                     break;
                 case "Immediate-Location-Answer":
                 case "Triggered-Location-Stop-Answer":
@@ -1594,7 +1601,7 @@ WHERE
             AVLS_UNIT_Report_Packet avls_package = new AVLS_UNIT_Report_Packet();
             avls_package.Message = "test";
             
-            avls_tcpClient = new TcpClient();
+            var avls_tcpClient = new TcpClient();
 
             //avls_tcpClient.Connect(ipAddress, port);
             avls_connectDone.Reset();
