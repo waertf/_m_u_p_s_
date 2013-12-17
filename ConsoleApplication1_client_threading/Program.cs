@@ -61,7 +61,6 @@ namespace ConsoleApplication1_client_threading
             new ManualResetEvent(false);
         private static ManualResetEvent receiveDone =
             new ManualResetEvent(false);
-
         private static ManualResetEvent avls_connectDone =
            new ManualResetEvent(false);
         private static ManualResetEvent avls_sendDone =
@@ -187,8 +186,12 @@ each set of the byte. To display a four-byte string, there will be 8 digits stri
             {
 
                 TcpClient t = (TcpClient)ar.AsyncState;
-                t.EndConnect(ar);
-                avls_connectDone.Set();
+                if (t != null && t.Client != null)
+                {
+                    t.EndConnect(ar);
+                    avls_connectDone.Set();
+                }
+                
             }
             catch (Exception ex)
             {
@@ -1613,17 +1616,17 @@ WHERE
             AVLS_UNIT_Report_Packet avls_package = new AVLS_UNIT_Report_Packet();
             avls_package.Message = "test";
             
-            var avls_tcpClient = new TcpClient();
+            var avlsTcpClient = new TcpClient();
 
             //avls_tcpClient.Connect(ipAddress, port);
             avls_connectDone.Reset();
-            avls_tcpClient.BeginConnect(avls_ipaddress, avls_port, new AsyncCallback(avls_ConnectCallback), avls_tcpClient);
+            avlsTcpClient.BeginConnect(avls_ipaddress, avls_port, new AsyncCallback(avls_ConnectCallback), avlsTcpClient);
             avls_connectDone.WaitOne();
 
             //avls_tcpClient.NoDelay = false;
 
             //Keeplive.keep(avls_tcpClient.Client);
-            NetworkStream netStream = avls_tcpClient.GetStream();
+            NetworkStream netStream = avlsTcpClient.GetStream();
             /*
             if (htable.ContainsKey("event_info"))
                 if (htable["event_info"].ToString().Equals("Unit Absent"))
@@ -1818,14 +1821,14 @@ LIMIT 1";
 
                     //ReadLine(avls_tcpClient, netStream, send_string.Length);
                     netStream.Close();
-                    avls_tcpClient.Close();
+                    avlsTcpClient.Close();
                     Console.WriteLine("-access_avls_server");
                     return;
                 }
                 else
                 {
                     netStream.Close();
-                    avls_tcpClient.Close();
+                    avlsTcpClient.Close();
                     return;
                 }
 
@@ -1841,7 +1844,7 @@ LIMIT 1";
                 else
                 {
                     netStream.Close();
-                    avls_tcpClient.Close();
+                    avlsTcpClient.Close();
                     return;
                 }
                 if (htable.ContainsKey("result_code"))
@@ -2068,7 +2071,7 @@ LIMIT 1";
 
             //ReadLine(avls_tcpClient, netStream, send_string.Length);
             netStream.Close();
-            avls_tcpClient.Close();
+            avlsTcpClient.Close();
             Console.WriteLine("-access_avls_server");
         }
 
