@@ -158,10 +158,14 @@ each set of the byte. To display a four-byte string, there will be 8 digits stri
         {
             try
             {
-                
                 TcpClient t = (TcpClient)ar.AsyncState;
-                t.EndConnect(ar);
-                connectDone.Set();
+                if (t != null && t.Client != null)
+                {
+                    t.EndConnect(ar);
+                    connectDone.Set();
+                }
+                
+                
             }
             catch (Exception ex)
             {
