@@ -1044,13 +1044,13 @@ Select 1-6 then press enter to send package
         }
         private static void FinishRead(IAsyncResult result)
         {
-            try
+            //try
             {
                 // Finish reading from our stream. 0 bytes read means stream was closed
                 NetworkStream fStream = (NetworkStream)result.AsyncState;
                 int read = fStream.EndRead(result);
                 if (0 == read)
-                    throw new Exception();
+                    throw new Exception("0 == read");
 
                 // Increment the number of bytes we've read. If there's still more to get, get them
                 fBytesRead += read;
@@ -1062,7 +1062,7 @@ Select 1-6 then press enter to send package
 
                 // Should be exactly the right number read now.
                 if (fBytesRead != fBuffer.Length)
-                    throw new Exception();
+                    throw new Exception("fBytesRead != fBuffer.Length");
 
                 // Handle the message and go get the next one.
                 string returndata = Encoding.ASCII.GetString(fBuffer);
@@ -1071,15 +1071,15 @@ Select 1-6 then press enter to send package
                 string xml_root_tag = xml_data.Root.Name.ToString();
                 Console.WriteLine();
                 string ouput2 = string.Empty;
-                //try
-                //{
+                try
+                {
                     ouput2 = xml_data.ToString();
-                //}
-                //catch (Exception ex)
-                //{
-                    //Console.WriteLine("FinishReadError1:\r\n" + ex.Message);
-                    //log.Error("FinishReadError1:\r\n" + ex.Message);
-                //}
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine("FinishReadError1:\r\n" + ex.Message);
+                    log.Error("FinishReadError1:\r\n" + ex.Message);
+                }
                 Console.WriteLine("S############################################################################");
                 Console.WriteLine("Read:\r\n" + ouput2);
                 //Console.WriteLine("First node:[" + xml_root_tag + "]");
@@ -1126,14 +1126,14 @@ Select 1-6 then press enter to send package
                                                                  fStream);
                // fStream.BeginRead(fSizeBuffer, 0, fSizeBuffer.Length, FinishReadSize, null);
             }
-            catch (Exception ex)
-            {
-                Console.WriteLine("FinishReadError:\r\n" + ex.Message);
-                Console.WriteLine(System.Reflection.MethodBase.GetCurrentMethod().Name + "_errorline:" + ex.LineNumber());
-                log.Error(System.Reflection.MethodBase.GetCurrentMethod().Name + "_errorline:" + ex.LineNumber());
-                log.Error("FinishReadError:\r\n" + ex.Message);
+            //catch (Exception ex)
+            //{
+                //Console.WriteLine("FinishReadError:\r\n" + ex.Message);
+                //Console.WriteLine(System.Reflection.MethodBase.GetCurrentMethod().Name + "_errorline:" + ex.LineNumber());
+                //log.Error(System.Reflection.MethodBase.GetCurrentMethod().Name + "_errorline:" + ex.LineNumber());
+                //log.Error("FinishReadError:\r\n" + ex.Message);
                 
-            }
+            //}
         }
         static void read_thread_method(TcpClient tcpClient, NetworkStream netStream)
         {
@@ -2168,11 +2168,12 @@ LIMIT 1";
             sql_client.disconnect();
 
             sql_client.connect();
-            string operationLogIdCount = sql_client.get_DataTable("SELECT COUNT(_id)   FROM public.operation_log").Rows[0].ItemArray[0].ToString();
+            double operationLogIdCount = Convert.ToDouble(sql_client.get_DataTable("SELECT COUNT(_id)   FROM public.operation_log").Rows[0].ItemArray[0].ToString());
             sql_client.disconnect();
-
             
-
+            Console.WriteLine("operationLogIdCount:" + operationLogIdCount);
+            operationLogIdCount.ToString("000000000000");
+            Console.WriteLine("operationLogIdCount:" + operationLogIdCount);
             operation_log.request_id = "\'" + ConfigurationManager.AppSettings["request-id"].ToString() + "\'";
             
             if (htable.ContainsKey("protocol_version"))
@@ -2355,7 +2356,7 @@ WHERE
                         gps_log.j_6 = "\'" + htable["event_info"].ToString() + "\'";
                         gps_log.j_7 = "\'" + "null" + "\'";
                         gps_log.j_8 = "\'" + "null" + "\'";
-                        operation_log.event_id = "\'" + operation_log.eqp_id + now + Convert.ToDouble(operationLogIdCount).ToString("D12") + "\'";
+                        operation_log.event_id = "\'" + operation_log.eqp_id + now + operationLogIdCount.ToString("000000000000") + "\'";
                         break;
                     case "Unit Present":
                         if (htable.ContainsKey("suaddr"))
@@ -2412,7 +2413,7 @@ WHERE
                         gps_log.j_7 = "\'" + htable["event_info"].ToString() + "\'";
                         gps_log.j_6 = "\'" + "null" + "\'";
                         gps_log.j_8 = "\'" + "null" + "\'";
-                        operation_log.event_id = "\'" + operation_log.eqp_id + now + Convert.ToDouble(operationLogIdCount).ToString("D12") + "\'";
+                        operation_log.event_id = "\'" + operation_log.eqp_id + now + operationLogIdCount.ToString("000000000000") + "\'";
                         #region access power status
                         {
                             if (htable.ContainsKey("suaddr"))
@@ -2440,7 +2441,7 @@ WHERE
                         gps_log.j_8 = "\'" + htable["event_info"].ToString() + "\'";
                         gps_log.j_6 = "\'" + "null" + "\'";
                         gps_log.j_7 = "\'" + "null" + "\'";
-                        operation_log.event_id = "\'" + operation_log.eqp_id + now + Convert.ToDouble(operationLogIdCount).ToString("D12") + "\'";
+                        operation_log.event_id = "\'" + operation_log.eqp_id + now + operationLogIdCount.ToString("000000000000") + "\'";
                         break;
                     default:
                         gps_log.j_6 = gps_log.j_7 = gps_log.j_8 =operation_log.event_id= "\'" + "null" + "\'";
@@ -2924,7 +2925,7 @@ LIMIT 1";
                         switch (htable["event_info"].ToString())
                         {
                             case "Emergency On":
-                                string sn = "\'" + gps_log._uid + now + cgaEventLogIdCount.ToString("D12") + "\'";
+                                string sn = "\'" + gps_log._uid + now + cgaEventLogIdCount.ToString("000000000000") + "\'";
                                 string table_columns = "serial_no ,uid ,type ,lat ,lon,altitude ,speed ,course ,radius ,info_time ,server_time ,create_user ,create_ip";
                                 string table_column_value = sn + "," + gps_log._uid + "," + //gps_log._option3
                                     @"'150'" + "," + gps_log._lat + "," + gps_log._lon + "," +
