@@ -341,8 +341,13 @@ SET
             }
             else
             {
-                Thread autoSendFromSqlTableThread = new Thread(()=>AutoSend(netStream));
-                autoSendFromSqlTableThread.Start();
+                //Thread autoSendFromSqlTableThread = new Thread(()=>AutoSend(netStream));
+                //autoSendFromSqlTableThread.Start();
+                var autoSendFromSqlTableTimer =
+                    new System.Timers.Timer((int) uint.Parse(ConfigurationManager.AppSettings["autosend_interval"])*1000);
+                autoSendFromSqlTableTimer.Elapsed += (sender, e) => { AutoSend(netStream); };
+                autoSendFromSqlTableTimer.Enabled = true;
+
             }
 
             var accessUnsDeivcePowerStatusSqlTable = new System.Timers.Timer(int.Parse(ConfigurationManager.AppSettings["uns_deivce_power_status_Timer_interval_sec"]) * 1000);
@@ -356,6 +361,11 @@ SET
 
 
             //tcpClient.Close();
+        }
+
+        static void autoSendFromSqlTableTimer_Elapsed(object sender, ElapsedEventArgs e)
+        {
+            throw new NotImplementedException();
         }
 
         private static void test()
@@ -540,10 +550,10 @@ LIMIT 1";
             log.Info("-access_avls_server:if");
             Console.WriteLine("-access_avls_server:if");
         }
-        private static object AutoSend(NetworkStream netStream)
+        private static void AutoSend(NetworkStream netStream)
         {
             
-            while (true)
+            //while (true)
             {
                 {
                  
@@ -585,7 +595,8 @@ LIMIT
                         }
                         else
                         {
-                            continue;
+                            //continue;
+                            return ;
                         }
                         /*
                         Console.WriteLine(
@@ -714,10 +725,11 @@ LIMIT
                     }
                    
                     
-                    Thread.Sleep((int)uint.Parse(ConfigurationManager.AppSettings["autosend_interval"]) * 1000);
+                    //Thread.Sleep((int)uint.Parse(ConfigurationManager.AppSettings["autosend_interval"]) * 1000);
                 }
                 
             }
+            
         }
         /*
         private static void sendtest(NetworkStream netStream , SqlClient sql_client)
