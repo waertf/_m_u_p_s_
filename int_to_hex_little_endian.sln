@@ -15,6 +15,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsoleApplication1_asyn_tc
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsoleApplication1LogEveryXMinuteTest", "ConsoleApplication1LogEveryXMinuteTest\ConsoleApplication1LogEveryXMinuteTest.csproj", "{9EDBAC78-4631-4BB7-B178-2412D9D2697B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "timer_test", "timer_test\timer_test.csproj", "{9764B8B3-28F1-4872-B5B4-72D7CD3490D0}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -49,6 +51,10 @@ Global
 		{9EDBAC78-4631-4BB7-B178-2412D9D2697B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9EDBAC78-4631-4BB7-B178-2412D9D2697B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9EDBAC78-4631-4BB7-B178-2412D9D2697B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9764B8B3-28F1-4872-B5B4-72D7CD3490D0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9764B8B3-28F1-4872-B5B4-72D7CD3490D0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9764B8B3-28F1-4872-B5B4-72D7CD3490D0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9764B8B3-28F1-4872-B5B4-72D7CD3490D0}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
