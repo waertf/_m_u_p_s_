@@ -52,7 +52,7 @@ namespace ConsoleApplication1_client_threading
         private static byte[] myReadBuffer = null;
         private static byte[] fBuffer = null;
         private static int fBytesRead = 0;
-        private static TcpClient tcpClient;
+        private static TcpClient tcpClient, avlsTcpClient;
         //private static SqlClient sql_client;
         // ManualResetEvent instances signal completion.
         private static ManualResetEvent connectDone =
@@ -205,11 +205,11 @@ each set of the byte. To display a four-byte string, there will be 8 digits stri
                 Console.WriteLine(System.Reflection.MethodBase.GetCurrentMethod().Name + "_errorline:" + ex.LineNumber());
                 log.Error(System.Reflection.MethodBase.GetCurrentMethod().Name + "_errorline:" + ex.LineNumber());
                 log.Error(ex.Message);
-                var avls_tcpClient = new TcpClient();
+                avlsTcpClient = new TcpClient();
                 avls_connectDone.Reset();
-                avls_tcpClient.BeginConnect(avls_ipaddress, avls_port, new AsyncCallback(avls_ConnectCallback), avls_tcpClient);
+                avlsTcpClient.BeginConnect(avls_ipaddress, avls_port, new AsyncCallback(avls_ConnectCallback), avlsTcpClient);
                 avls_connectDone.WaitOne();
-                //Keeplive.keep(avls_tcpClient.Client);
+                Keeplive.keep(avlsTcpClient.Client);
             }
 
         }
@@ -264,6 +264,7 @@ LIMIT 1";
             Console.WriteLine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location));
             test();
             tcpClient = new TcpClient();
+            avlsTcpClient = new TcpClient();
             /*
             while (!mups_connected)
             {
@@ -286,6 +287,12 @@ LIMIT 1";
             connectDone.WaitOne();
             Keeplive.keep(tcpClient.Client);
             NetworkStream netStream = tcpClient.GetStream();
+
+            //avls_tcpClient.Connect(ipAddress, port);
+            avls_connectDone.Reset();
+            avlsTcpClient.BeginConnect(avls_ipaddress, avls_port, new AsyncCallback(avls_ConnectCallback), avlsTcpClient);
+            avls_connectDone.WaitOne();
+            Keeplive.keep(avlsTcpClient.Client);
 
             var sql_client = new SqlClient(ConfigurationManager.AppSettings["SQL_SERVER_IP"], ConfigurationManager.AppSettings["SQL_SERVER_PORT"], ConfigurationManager.AppSettings["SQL_SERVER_USER_ID"], ConfigurationManager.AppSettings["SQL_SERVER_PASSWORD"], ConfigurationManager.AppSettings["SQL_SERVER_DATABASE"], ConfigurationManager.AppSettings["Pooling"], ConfigurationManager.AppSettings["MinPoolSize"], ConfigurationManager.AppSettings["MaxPoolSize"], ConfigurationManager.AppSettings["ConnectionLifetime"]);
             //empty power column in table custom.uns_deivce_power_status
@@ -1104,7 +1111,7 @@ Select 1-6 then press enter to send package
                 Console.WriteLine("E############################################################################");
                 var sql_client = new SqlClient(ConfigurationManager.AppSettings["SQL_SERVER_IP"], ConfigurationManager.AppSettings["SQL_SERVER_PORT"], ConfigurationManager.AppSettings["SQL_SERVER_USER_ID"], ConfigurationManager.AppSettings["SQL_SERVER_PASSWORD"], ConfigurationManager.AppSettings["SQL_SERVER_DATABASE"], ConfigurationManager.AppSettings["Pooling"], ConfigurationManager.AppSettings["MinPoolSize"], ConfigurationManager.AppSettings["MaxPoolSize"], ConfigurationManager.AppSettings["ConnectionLifetime"]);
 
-                xml_parse(tcpClient, fStream, xml_root_tag, xml_data);
+                xml_parse(tcpClient, fStream, xml_root_tag, xml_data, avlsTcpClient);
                 //Console.ReadLine();
 
                 //byte[] bytes = new byte[tcpClient.ReceiveBufferSize];
@@ -1231,7 +1238,7 @@ Select 1-6 then press enter to send package
             Console.WriteLine("out read thread");
         }
 
-        private static void xml_parse(TcpClient tcpClient, NetworkStream netStream, string xml_root_tag, XDocument xml_data)
+        private static void xml_parse(TcpClient tcpClient, NetworkStream netStream, string xml_root_tag, XDocument xml_data, TcpClient avlsTcpClient)
         {
             string logData = xml_data.ToString();
             //using (StreamWriter w = File.AppendText("log.txt"))
@@ -1387,7 +1394,7 @@ Select 1-6 then press enter to send package
 
                         if (bool.Parse(ConfigurationManager.AppSettings["AVLS_ACCESS"]))
                         {
-                            Thread access_avls = new Thread(() => access_avls_server( xml_root_tag, htable, sensor_name, sensor_type, sensor_value, XmlGetAllElementsXname(xml_data), logData));
+                            Thread access_avls = new Thread(() => access_avls_server( xml_root_tag, htable, sensor_name, sensor_type, sensor_value, XmlGetAllElementsXname(xml_data), logData,avlsTcpClient));
                             access_avls.Start();
                             
                             Console.WriteLine("AVLS Access Enable");
@@ -1613,19 +1620,16 @@ WHERE
             }
         }
 
-        private static void access_avls_server(string xml_root_tag, Hashtable htable, List<string> sensor_name, List<string> sensor_type, List<string> sensor_value, IEnumerable<XName> iEnumerable, string log)
+        private static void access_avls_server(string xml_root_tag, Hashtable htable, List<string> sensor_name, List<string> sensor_type, List<string> sensor_value, IEnumerable<XName> iEnumerable, string log, TcpClient avlsTcpClient)
         {
             Console.WriteLine("+access_avls_server");
             string send_string = string.Empty;
             AVLS_UNIT_Report_Packet avls_package = new AVLS_UNIT_Report_Packet();
             avls_package.Message = "test";
             
-            var avlsTcpClient = new TcpClient();
+             
 
-            //avls_tcpClient.Connect(ipAddress, port);
-            avls_connectDone.Reset();
-            avlsTcpClient.BeginConnect(avls_ipaddress, avls_port, new AsyncCallback(avls_ConnectCallback), avlsTcpClient);
-            avls_connectDone.WaitOne();
+            
 
             //avls_tcpClient.NoDelay = false;
 
@@ -1824,15 +1828,15 @@ LIMIT 1";
                     sendDone.WaitOne();
 
                     //ReadLine(avls_tcpClient, netStream, send_string.Length);
-                    netStream.Close();
-                    avlsTcpClient.Close();
+                    //netStream.Close();
+                    //avlsTcpClient.Close();
                     Console.WriteLine("-access_avls_server");
                     return;
                 }
                 else
                 {
-                    netStream.Close();
-                    avlsTcpClient.Close();
+                    //netStream.Close();
+                    //avlsTcpClient.Close();
                     return;
                 }
 
@@ -1847,8 +1851,8 @@ LIMIT 1";
                 }
                 else
                 {
-                    netStream.Close();
-                    avlsTcpClient.Close();
+                   // netStream.Close();
+                    //avlsTcpClient.Close();
                     return;
                 }
                 if (htable.ContainsKey("result_code"))
@@ -2074,8 +2078,8 @@ LIMIT 1";
             sendDone.WaitOne();
 
             //ReadLine(avls_tcpClient, netStream, send_string.Length);
-            netStream.Close();
-            avlsTcpClient.Close();
+            //netStream.Close();
+            //avlsTcpClient.Close();
             Console.WriteLine("-access_avls_server");
         }
 
