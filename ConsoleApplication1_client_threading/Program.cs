@@ -49,24 +49,24 @@ namespace ConsoleApplication1_client_threading
         const int LENGTH_TO_CUT = 4;
         private static bool isValid = true;
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
-        static AutoResetEvent autoEvent = new AutoResetEvent(false);
+        //static AutoResetEvent autoEvent = new AutoResetEvent(false);
         private static byte[] myReadBuffer = null;
         private static byte[] fBuffer = null;
         private static int fBytesRead = 0;
         private static TcpClient tcpClient, avlsTcpClient;
         //private static SqlClient sql_client;
         // ManualResetEvent instances signal completion.
-        private static ManualResetEvent connectDone =
+        private static ManualResetEvent unsConnectDone =
             new ManualResetEvent(false);
-        private static ManualResetEvent sendDone =
+        private static ManualResetEvent unsSendDone =
             new ManualResetEvent(false);
-        private static ManualResetEvent receiveDone =
+        private static ManualResetEvent unsReceiveDone =
             new ManualResetEvent(false);
-        private static ManualResetEvent avls_connectDone =
+        private static ManualResetEvent avlsConnectDone =
            new ManualResetEvent(false);
-        private static ManualResetEvent avls_sendDone =
+        private static ManualResetEvent avlsSendDone =
             new ManualResetEvent(false);
-        private static ManualResetEvent avls_receiveDone =
+        private static ManualResetEvent avlsReceiveDone =
             new ManualResetEvent(false);
 
         static string  last_avls_lon = string.Empty,last_avls_lat =string.Empty;
@@ -163,7 +163,7 @@ each set of the byte. To display a four-byte string, there will be 8 digits stri
                 if (t != null && t.Client != null)
                 {
                     t.EndConnect(ar);
-                    connectDone.Set();
+                    unsConnectDone.Set();
                 }
                 
                 
@@ -178,9 +178,9 @@ each set of the byte. To display a four-byte string, there will be 8 digits stri
                 log.Error(ex.Message);
                 tcpClient = new TcpClient();
                 
-                connectDone.Reset();
+                unsConnectDone.Reset();
                 tcpClient.BeginConnect(ipAddress, port, new AsyncCallback(ConnectCallback), tcpClient);
-                connectDone.WaitOne();
+                unsConnectDone.WaitOne();
                 Keeplive.keep(tcpClient.Client);
             }
             
@@ -194,7 +194,7 @@ each set of the byte. To display a four-byte string, there will be 8 digits stri
                 if (t != null && t.Client != null)
                 {
                     t.EndConnect(ar);
-                    avls_connectDone.Set();
+                    avlsConnectDone.Set();
                 }
                 
             }
@@ -207,9 +207,9 @@ each set of the byte. To display a four-byte string, there will be 8 digits stri
                 log.Error(System.Reflection.MethodBase.GetCurrentMethod().Name + "_errorline:" + ex.LineNumber());
                 log.Error(ex.Message);
                 avlsTcpClient = new TcpClient();
-                avls_connectDone.Reset();
+                avlsConnectDone.Reset();
                 avlsTcpClient.BeginConnect(avls_ipaddress, avls_port, new AsyncCallback(avls_ConnectCallback), avlsTcpClient);
-                avls_connectDone.WaitOne();
+                avlsConnectDone.WaitOne();
                 Keeplive.keep(avlsTcpClient.Client);
             }
 
@@ -284,16 +284,16 @@ LIMIT 1";
             */
             //tcpClient.NoDelay = false;
 
-            connectDone.Reset();
+            unsConnectDone.Reset();
             tcpClient.BeginConnect(ipAddress, port, new AsyncCallback(ConnectCallback), tcpClient);
-            connectDone.WaitOne();
+            unsConnectDone.WaitOne();
             Keeplive.keep(tcpClient.Client);
             NetworkStream netStream = tcpClient.GetStream();
 
             //avls_tcpClient.Connect(ipAddress, port);
-            avls_connectDone.Reset();
+            avlsConnectDone.Reset();
             avlsTcpClient.BeginConnect(avls_ipaddress, avls_port, new AsyncCallback(avls_ConnectCallback), avlsTcpClient);
-            avls_connectDone.WaitOne();
+            avlsConnectDone.WaitOne();
             Keeplive.keep(avlsTcpClient.Client);
             NetworkStream avlsNetworkStream = avlsTcpClient.GetStream();
 
@@ -307,7 +307,7 @@ SET
             sql_client.modify(emptyPowerStatusTable);
             sql_client.disconnect();
             string registration_msg_error_test = "<Location-Registration-Request><application>" + ConfigurationManager.AppSettings["application_ID"] + "</application></Location-Registration-Request>";
-            WriteLine(netStream, data_append_dataLength(registration_msg_error_test), registration_msg_error_test);
+            UnsTcpWriteLine(netStream, data_append_dataLength(registration_msg_error_test), registration_msg_error_test);
             //using (StreamWriter w = File.AppendText("log.txt"))
             {
                 log.Info("send:\r\n"+registration_msg_error_test);
@@ -361,7 +361,7 @@ SET
             //Thread send_test_thread = new Thread(() => sendtest(netStream, sql_client));
             //send_test_thread.Start();
             //output = ReadLine(tcpClient, netStream, output);
-            //WriteLine(netStream, String.Join("\n", commands) + "\n");
+            //UnsTcpWriteLine(netStream, String.Join("\n", commands) + "\n");
 
 
             //tcpClient.Close();
@@ -442,9 +442,9 @@ WHERE
             int port = int.Parse(ConfigurationManager.AppSettings["AVLS_SERVER_PORT"]);
 
             //avlsTcpClient = new TcpClient();
-            connectDone.Reset();
+            avlsConnectDone.Reset();
             avlsTcpClient.BeginConnect(ipAddress, port, new AsyncCallback(avls_ConnectCallback), avlsTcpClient);
-            connectDone.WaitOne();
+            avlsConnectDone.WaitOne();
 
             //avls_tcpClient.NoDelay = false;
 
@@ -544,9 +544,9 @@ LIMIT 1";
             send_string = "%%" + avls_package.ID + avls_package.GPS_Valid + avls_package.Date_Time + avls_package.Loc + avls_package.Speed + avls_package.Dir + avls_package.Temp + avls_package.Status + avls_package.Event + avls_package.Message + "\r\n";
 
 
-            sendDone.Reset();
+            //avlsSendDone.Reset();
             avls_WriteLine(avlsNetworkStream, System.Text.Encoding.Default.GetBytes(send_string), send_string);
-            sendDone.WaitOne();
+            //avlsSendDone.WaitOne();
 
             //ReadLine(avls_tcpClient, netStream, send_string.Length);
             //netStream.Close();
@@ -641,7 +641,7 @@ LIMIT
                                         //w.Close();
                                     }
                                     SiAuto.Main.LogMessage(Immediate_Location_Request);
-                                    WriteLine(netStream, data_append_dataLength(Immediate_Location_Request), Immediate_Location_Request);
+                                    UnsTcpWriteLine(netStream, data_append_dataLength(Immediate_Location_Request), Immediate_Location_Request);
 
                                     break;
                                 case "-5":
@@ -653,7 +653,7 @@ LIMIT
                                         // Close the writer and underlying file.
                                         //w.Close();
                                     }
-                                    WriteLine(netStream, data_append_dataLength(Location_Protocol_Request), Location_Protocol_Request);
+                                    UnsTcpWriteLine(netStream, data_append_dataLength(Location_Protocol_Request), Location_Protocol_Request);
                                     break;
                                 case "2":
                                     string Triggered_Location_Stop_Request = "<Triggered-Location-Stop-Request><request-id>" +
@@ -670,7 +670,7 @@ LIMIT
                                         // Close the writer and underlying file.
                                         //w.Close();
                                     }
-                                    WriteLine(netStream, data_append_dataLength(Triggered_Location_Stop_Request), Triggered_Location_Stop_Request);
+                                    UnsTcpWriteLine(netStream, data_append_dataLength(Triggered_Location_Stop_Request), Triggered_Location_Stop_Request);
                                     break;
                                 case "1":
                                 case "3":
@@ -690,7 +690,7 @@ LIMIT
                                         // Close the writer and underlying file.
                                         //w.Close();
                                     }
-                                    WriteLine(netStream, data_append_dataLength(Triggered_Location_Request_Cadence), Triggered_Location_Request_Cadence);
+                                    UnsTcpWriteLine(netStream, data_append_dataLength(Triggered_Location_Request_Cadence), Triggered_Location_Request_Cadence);
                                     break;
                                 case "-1":
                                     string Triggered_Location_Request_Distance = "<Triggered-Location-Request><request-id>" + ConfigurationManager.AppSettings["request-id"] + "</request-id><suaddr suaddr-type=\"" + ConfigurationManager.AppSettings["suaddr-type"] + "\">" + ConfigurationManager.AppSettings["suaddr"] + "</suaddr><periodic-trigger><trg-distance>" + ConfigurationManager.AppSettings["trg-distance"] + "</trg-distance></periodic-trigger></Triggered-Location-Request>";
@@ -701,7 +701,7 @@ LIMIT
                                         // Close the writer and underlying file.
                                         //w.Close();
                                     }
-                                    WriteLine(netStream, data_append_dataLength(Triggered_Location_Request_Distance), Triggered_Location_Request_Distance);
+                                    UnsTcpWriteLine(netStream, data_append_dataLength(Triggered_Location_Request_Distance), Triggered_Location_Request_Distance);
                                     break;
                                 case "-4":
                                     string Digital_Output_Change_Request = "<Digital-Output-Change-Request><request-id>" + ConfigurationManager.AppSettings["request-id"] + "</request-id><suaddr suaddr-type=\"" + ConfigurationManager.AppSettings["suaddr-type"] + "\">" + ConfigurationManager.AppSettings["suaddr"] + "</suaddr><output-info><output-name>" + ConfigurationManager.AppSettings["output-name"] + "</output-name><output-value>" + ConfigurationManager.AppSettings["output-value"] + "</output-value></output-info></Digital-Output-Change-Request>";
@@ -712,7 +712,7 @@ LIMIT
                                         // Close the writer and underlying file.
                                         //w.Close();
                                     }
-                                    WriteLine(netStream, data_append_dataLength(Digital_Output_Change_Request), Digital_Output_Change_Request);
+                                    UnsTcpWriteLine(netStream, data_append_dataLength(Digital_Output_Change_Request), Digital_Output_Change_Request);
                                     break;
                             }
                         }
@@ -739,7 +739,7 @@ LIMIT
         private static void sendtest(NetworkStream netStream , SqlClient sql_client)
         {
             string Immediate_Location_Request = "<Immediate-Location-Request><request-id>2468ACE0</request-id><suaddr suaddr-type=\"APCO\">1004</suaddr></Immediate-Location-Request>";
-            WriteLine(netStream, data_append_dataLength(Immediate_Location_Request), Immediate_Location_Request);
+            UnsTcpWriteLine(netStream, data_append_dataLength(Immediate_Location_Request), Immediate_Location_Request);
             using (StreamWriter w = File.AppendText("log.txt"))
             {
                 Log("send:\r\n" , Immediate_Location_Request, w);
@@ -748,7 +748,7 @@ LIMIT
             }
 
             string Location_Protocol_Request = "<Location-Protocol-Request><request-id>4356A</request-id><request-protocol-version>2</request-protocol-version></Location-Protocol-Request>";
-            WriteLine(netStream, data_append_dataLength(Location_Protocol_Request), Location_Protocol_Request);
+            UnsTcpWriteLine(netStream, data_append_dataLength(Location_Protocol_Request), Location_Protocol_Request);
             using (StreamWriter w = File.AppendText("log.txt"))
             {
                 Log("send:\r\n" , Location_Protocol_Request, w);
@@ -757,7 +757,7 @@ LIMIT
             }
 
             string Triggered_Location_Stop_Request = "<Triggered-Location-Stop-Request><request-id>2468ACE0</request-id><suaddr suaddr-type=\"APCO\">1004</suaddr></Triggered-Location-Stop-Request>";
-            WriteLine(netStream, data_append_dataLength(Triggered_Location_Stop_Request), Triggered_Location_Stop_Request);
+            UnsTcpWriteLine(netStream, data_append_dataLength(Triggered_Location_Stop_Request), Triggered_Location_Stop_Request);
             using (StreamWriter w = File.AppendText("log.txt"))
             {
                 Log("send:\r\n" , Triggered_Location_Stop_Request, w);
@@ -766,7 +766,7 @@ LIMIT
             }
 
             string Triggered_Location_Request_Cadence = "<Triggered-Location-Request><request-id>2468ACE0</request-id><suaddr suaddr-type=\"APCO\">1004</suaddr><periodic-trigger><interval>60</interval></periodic-trigger></Triggered-Location-Request>";
-            WriteLine(netStream, data_append_dataLength(Triggered_Location_Request_Cadence), Triggered_Location_Request_Cadence);
+            UnsTcpWriteLine(netStream, data_append_dataLength(Triggered_Location_Request_Cadence), Triggered_Location_Request_Cadence);
             using (StreamWriter w = File.AppendText("log.txt"))
             {
                 Log("send:\r\n" , Triggered_Location_Request_Cadence, w);
@@ -775,7 +775,7 @@ LIMIT
             }
 
             string Triggered_Location_Request_Distance = "<Triggered-Location-Request><request-id>2468ACE0</request-id><suaddr suaddr-type=\"APCO\">1004</suaddr><periodic-trigger><trg-distance>100</trg-distance></periodic-trigger></Triggered-Location-Request>";
-            WriteLine(netStream, data_append_dataLength(Triggered_Location_Request_Distance), Triggered_Location_Request_Distance);
+            UnsTcpWriteLine(netStream, data_append_dataLength(Triggered_Location_Request_Distance), Triggered_Location_Request_Distance);
             using (StreamWriter w = File.AppendText("log.txt"))
             {
                 Log("send:\r\n" , Triggered_Location_Request_Distance, w);
@@ -784,7 +784,7 @@ LIMIT
             }
 
             string Digital_Output_Change_Request = "<Digital-Output-Change-Request><request-id>2468ACE0</request-id><suaddr suaddr-type=\"APCO\">1234568</suaddr><output-info><output-name>Alarm</output-name><output-value>1</output-value></output-info></Digital-Output-Change-Request>";
-            WriteLine(netStream, data_append_dataLength(Digital_Output_Change_Request), Digital_Output_Change_Request);
+            UnsTcpWriteLine(netStream, data_append_dataLength(Digital_Output_Change_Request), Digital_Output_Change_Request);
             using (StreamWriter w = File.AppendText("log.txt"))
             {
                 Log("send:\r\n" ,Digital_Output_Change_Request, w);
@@ -792,7 +792,7 @@ LIMIT
                 w.Close();
             }
             string error = "<error></error>";
-            WriteLine(netStream, data_append_dataLength(error), error);
+            UnsTcpWriteLine(netStream, data_append_dataLength(error), error);
             using (StreamWriter w = File.AppendText("log.txt"))
             {
                 Log("send:\r\n" , error, w);
@@ -831,7 +831,7 @@ Select 1-6 then press enter to send package
                             // Close the writer and underlying file.
                             //w.Close();
                         }
-                        WriteLine(netStream, data_append_dataLength(Immediate_Location_Request), Immediate_Location_Request);
+                        UnsTcpWriteLine(netStream, data_append_dataLength(Immediate_Location_Request), Immediate_Location_Request);
                         
                         break;
                     case "5":
@@ -843,7 +843,7 @@ Select 1-6 then press enter to send package
                             // Close the writer and underlying file.
                             //w.Close();
                         }
-                        WriteLine(netStream, data_append_dataLength(Location_Protocol_Request), Location_Protocol_Request);
+                        UnsTcpWriteLine(netStream, data_append_dataLength(Location_Protocol_Request), Location_Protocol_Request);
                         break;
                     case "6":
                         string Triggered_Location_Stop_Request = "<Triggered-Location-Stop-Request><request-id>" + ConfigurationManager.AppSettings["request-id"] + "</request-id><suaddr suaddr-type=\"" + ConfigurationManager.AppSettings["suaddr-type"] + "\">" + ConfigurationManager.AppSettings["suaddr"] + "</suaddr></Triggered-Location-Stop-Request>";
@@ -854,7 +854,7 @@ Select 1-6 then press enter to send package
                             // Close the writer and underlying file.
                             //w.Close();
                         }
-                        WriteLine(netStream, data_append_dataLength(Triggered_Location_Stop_Request), Triggered_Location_Stop_Request);
+                        UnsTcpWriteLine(netStream, data_append_dataLength(Triggered_Location_Stop_Request), Triggered_Location_Stop_Request);
                         break;
                     case "2":
                         string Triggered_Location_Request_Cadence = "<Triggered-Location-Request><request-id>" + ConfigurationManager.AppSettings["request-id"] + "</request-id><suaddr suaddr-type=\"" + ConfigurationManager.AppSettings["suaddr-type"] + "\">" + ConfigurationManager.AppSettings["suaddr"] + "</suaddr><periodic-trigger><interval>" + ConfigurationManager.AppSettings["interval"] + "</interval></periodic-trigger></Triggered-Location-Request>";
@@ -865,7 +865,7 @@ Select 1-6 then press enter to send package
                             // Close the writer and underlying file.
                             //w.Close();
                         }
-                        WriteLine(netStream, data_append_dataLength(Triggered_Location_Request_Cadence), Triggered_Location_Request_Cadence);
+                        UnsTcpWriteLine(netStream, data_append_dataLength(Triggered_Location_Request_Cadence), Triggered_Location_Request_Cadence);
                         break;
                     case "3":
                         string Triggered_Location_Request_Distance = "<Triggered-Location-Request><request-id>" + ConfigurationManager.AppSettings["request-id"] + "</request-id><suaddr suaddr-type=\"" + ConfigurationManager.AppSettings["suaddr-type"] + "\">" + ConfigurationManager.AppSettings["suaddr"] + "</suaddr><periodic-trigger><trg-distance>" + ConfigurationManager.AppSettings["trg-distance"] + "</trg-distance></periodic-trigger></Triggered-Location-Request>";
@@ -876,7 +876,7 @@ Select 1-6 then press enter to send package
                             // Close the writer and underlying file.
                             //w.Close();
                         }
-                        WriteLine(netStream, data_append_dataLength(Triggered_Location_Request_Distance), Triggered_Location_Request_Distance);
+                        UnsTcpWriteLine(netStream, data_append_dataLength(Triggered_Location_Request_Distance), Triggered_Location_Request_Distance);
                         break;
                     case "4":
                         string Digital_Output_Change_Request = "<Digital-Output-Change-Request><request-id>" + ConfigurationManager.AppSettings["request-id"] + "</request-id><suaddr suaddr-type=\"" + ConfigurationManager.AppSettings["suaddr-type"] + "\">" + ConfigurationManager.AppSettings["suaddr"] + "</suaddr><output-info><output-name>" + ConfigurationManager.AppSettings["output-name"] + "</output-name><output-value>" + ConfigurationManager.AppSettings["output-value"] + "</output-value></output-info></Digital-Output-Change-Request>";
@@ -887,14 +887,14 @@ Select 1-6 then press enter to send package
                             // Close the writer and underlying file.
                             //w.Close();
                         }
-                        WriteLine(netStream, data_append_dataLength(Digital_Output_Change_Request), Digital_Output_Change_Request);
+                        UnsTcpWriteLine(netStream, data_append_dataLength(Digital_Output_Change_Request), Digital_Output_Change_Request);
                         break;
                 }
                 Thread.Sleep(100);
             }
             /*                                
             string error = "<error></error>";
-            WriteLine(netStream, data_append_dataLength(error), error, sql_client);
+            UnsTcpWriteLine(netStream, data_append_dataLength(error), error, sql_client);
             using (StreamWriter w = File.AppendText("log.txt"))
             {
                 Log("send:\r\n", error, w);
@@ -904,7 +904,7 @@ Select 1-6 then press enter to send package
             */
         }
 
-        private static void WriteLine(NetworkStream netStream, byte[] writeData,string write )
+        private static void UnsTcpWriteLine(NetworkStream netStream, byte[] writeData,string write )
         {
             if (netStream.CanWrite)
             {
@@ -923,7 +923,7 @@ Select 1-6 then press enter to send package
                     //Thread.Sleep(3000);
 
                     //send method2
-                    IAsyncResult result = netStream.BeginWrite(writeData, 0, writeData.Length, new AsyncCallback(myWriteCallBack), netStream);
+                    IAsyncResult result = netStream.BeginWrite(writeData, 0, writeData.Length, new AsyncCallback(UnsTcpWriteCallBack), netStream);
                     result.AsyncWaitHandle.WaitOne();
                 }
                 catch (Exception ex)
@@ -937,7 +937,7 @@ Select 1-6 then press enter to send package
                 
             }
         }
-        public static void myWriteCallBack(IAsyncResult ar)
+        public static void UnsTcpWriteCallBack(IAsyncResult ar)
         {
             try
             {
@@ -947,10 +947,10 @@ Select 1-6 then press enter to send package
             catch (Exception ex)
             {
 
-                Console.WriteLine("myWriteCallBack:\r\n" + ex.Message);
+                Console.WriteLine("UnsTcpWriteCallBack:\r\n" + ex.Message);
                 Console.WriteLine(System.Reflection.MethodBase.GetCurrentMethod().Name + "_errorline:" + ex.LineNumber());
                 log.Error(System.Reflection.MethodBase.GetCurrentMethod().Name + "_errorline:" + ex.LineNumber());
-                log.Error("myWriteCallBack:\r\n" + ex.Message);
+                log.Error("UnsTcpWriteCallBack:\r\n" + ex.Message);
             }
             
         }
@@ -960,7 +960,7 @@ Select 1-6 then press enter to send package
             {
                 NetworkStream myNetworkStream = (NetworkStream)ar.AsyncState;
                 myNetworkStream.EndWrite(ar);
-                sendDone.Set();
+                //avlsSendDone.Set();
             }
             catch (Exception ex)
             {
@@ -986,7 +986,7 @@ Select 1-6 then press enter to send package
                                                                  new AsyncCallback(myReadSizeCallBack),
                                                                  netStream);
 
-                    autoEvent.WaitOne();
+                    //autoEvent.WaitOne();
                     /*
                     int numBytesRead = netStream.Read(bytes, 0,
                         (int)tcpClient.ReceiveBufferSize);
@@ -1044,16 +1044,16 @@ Select 1-6 then press enter to send package
                     myNetworkStream.Dispose();
                 tcpClient.Close();
                 tcpClient = new TcpClient();
-                connectDone.Reset();
+                unsConnectDone.Reset();
                 tcpClient.BeginConnect(ipAddress, port, new AsyncCallback(ConnectCallback), tcpClient);
-                connectDone.WaitOne();
+                unsConnectDone.WaitOne();
                 Keeplive.keep(tcpClient.Client);
                 myNetworkStream = tcpClient.GetStream();
 
                 var sql_client = new SqlClient(ConfigurationManager.AppSettings["SQL_SERVER_IP"], ConfigurationManager.AppSettings["SQL_SERVER_PORT"], ConfigurationManager.AppSettings["SQL_SERVER_USER_ID"], ConfigurationManager.AppSettings["SQL_SERVER_PASSWORD"], ConfigurationManager.AppSettings["SQL_SERVER_DATABASE"], ConfigurationManager.AppSettings["Pooling"], ConfigurationManager.AppSettings["MinPoolSize"], ConfigurationManager.AppSettings["MaxPoolSize"], ConfigurationManager.AppSettings["ConnectionLifetime"]);
 
                 string registration_msg = "<Location-Registration-Request><application>" + ConfigurationManager.AppSettings["application_ID"] + "</application></Location-Registration-Request>";
-                WriteLine(myNetworkStream, data_append_dataLength(registration_msg), registration_msg);
+                UnsTcpWriteLine(myNetworkStream, data_append_dataLength(registration_msg), registration_msg);
                 //using (StreamWriter w = File.AppendText("log.txt"))
                 {
                     log.Info("send:\r\n"+ registration_msg);
@@ -1840,11 +1840,11 @@ LIMIT 1";
                     avls_package.ID += ",";
                     send_string = "%%" + avls_package.ID + avls_package.GPS_Valid + avls_package.Date_Time + avls_package.Loc + avls_package.Speed + avls_package.Dir + avls_package.Temp + avls_package.Status + avls_package.Event + avls_package.Message + "\r\n";
 
-                    sendDone.Reset();
+                    //avlsSendDone.Reset();
                     var sql_client = new SqlClient(ConfigurationManager.AppSettings["SQL_SERVER_IP"], ConfigurationManager.AppSettings["SQL_SERVER_PORT"], ConfigurationManager.AppSettings["SQL_SERVER_USER_ID"], ConfigurationManager.AppSettings["SQL_SERVER_PASSWORD"], ConfigurationManager.AppSettings["SQL_SERVER_DATABASE"], ConfigurationManager.AppSettings["Pooling"], ConfigurationManager.AppSettings["MinPoolSize"], ConfigurationManager.AppSettings["MaxPoolSize"], ConfigurationManager.AppSettings["ConnectionLifetime"]);
 
                     avls_WriteLine(netStream, System.Text.Encoding.Default.GetBytes(send_string), send_string);
-                    sendDone.WaitOne();
+                    //avlsSendDone.WaitOne();
 
                     //ReadLine(avls_tcpClient, netStream, send_string.Length);
                     //netStream.Close();
@@ -2090,11 +2090,11 @@ LIMIT 1";
                 w.Close();
             }
             */
-            sendDone.Reset();
+            //avlsSendDone.Reset();
             var sqlclient = new SqlClient(ConfigurationManager.AppSettings["SQL_SERVER_IP"], ConfigurationManager.AppSettings["SQL_SERVER_PORT"], ConfigurationManager.AppSettings["SQL_SERVER_USER_ID"], ConfigurationManager.AppSettings["SQL_SERVER_PASSWORD"], ConfigurationManager.AppSettings["SQL_SERVER_DATABASE"], ConfigurationManager.AppSettings["Pooling"], ConfigurationManager.AppSettings["MinPoolSize"], ConfigurationManager.AppSettings["MaxPoolSize"], ConfigurationManager.AppSettings["ConnectionLifetime"]);
 
             avls_WriteLine(netStream, System.Text.Encoding.Default.GetBytes(send_string), send_string);
-            sendDone.WaitOne();
+            //avlsSendDone.WaitOne();
 
             //ReadLine(avls_tcpClient, netStream, send_string.Length);
             //netStream.Close();
