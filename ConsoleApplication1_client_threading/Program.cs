@@ -271,7 +271,12 @@ LIMIT 1";
             Thread.CurrentThread.CurrentUICulture = new CultureInfo("en-us");
             ConfigurationManager.RefreshSection(sectionName);
             SiAuto.Si.Enabled = true;
-            SiAuto.Main.LogMessage("This is my first SmartInspect message!");
+            //SiAuto.Si.Connections = "file(filename=\"log.sil\", append=true,rotate=Monthly,maxsize=\"3MB\")";
+            //while (true)
+            {
+                SiAuto.Main.LogMessage("This is my first SmartInspect message!");
+            }
+            
             Console.WriteLine(GetLocalIPAddress());//current ip address
             Console.WriteLine(System.Environment.UserName);//current username
             Console.WriteLine(string.Format("{0:yyMMddHHmmss}", DateTime.Now));
