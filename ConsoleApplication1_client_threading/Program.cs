@@ -44,7 +44,7 @@ namespace ConsoleApplication1_client_threading
     }
     class Program
     {
-        //static TcpClient tcpClient = null;
+        //static TcpClient unsTcpClient = null;
         //static NetworkStream netStream = null;
         const int LENGTH_TO_CUT = 4;
         private static bool isValid = true;
@@ -53,7 +53,8 @@ namespace ConsoleApplication1_client_threading
         private static byte[] myReadBuffer = null;
         private static byte[] fBuffer = null;
         private static int fBytesRead = 0;
-        private static TcpClient tcpClient, avlsTcpClient;
+        private static TcpClient unsTcpClient, avlsTcpClient;
+        private static NetworkStream avlsNetworkStream;
         //private static SqlClient sql_client;
         // ManualResetEvent instances signal completion.
         private static ManualResetEvent unsConnectDone =
@@ -170,22 +171,29 @@ each set of the byte. To display a four-byte string, there will be 8 digits stri
             }
             catch (Exception ex)
             {
-                //tcpClient.GetStream().Close();
-                //tcpClient.Close();
+                //unsTcpClient.GetStream().Close();
+                //unsTcpClient.Close();
                 Console.WriteLine(ex.Message);
                 Console.WriteLine(System.Reflection.MethodBase.GetCurrentMethod().Name +"_errorline:" + ex.LineNumber());
                 log.Error(System.Reflection.MethodBase.GetCurrentMethod().Name + "_errorline:" + ex.LineNumber());
                 log.Error(ex.Message);
-                tcpClient = new TcpClient();
+                if (unsTcpClient != null)
+                {
+                    if (unsTcpClient.GetStream() != null)
+                        unsTcpClient.GetStream().Close();
+                    unsTcpClient.Close();
+                        
+                }
+                unsTcpClient = new TcpClient();
                 
                 unsConnectDone.Reset();
-                tcpClient.BeginConnect(ipAddress, port, new AsyncCallback(ConnectCallback), tcpClient);
+                unsTcpClient.BeginConnect(ipAddress, port, new AsyncCallback(ConnectCallback), unsTcpClient);
                 unsConnectDone.WaitOne();
-                Keeplive.keep(tcpClient.Client);
+                Keeplive.keep(unsTcpClient.Client);
             }
             
         }
-        static void avls_ConnectCallback(IAsyncResult ar)
+        static void AvlsConnectCallback(IAsyncResult ar)
         {
             try
             {
@@ -200,17 +208,22 @@ each set of the byte. To display a four-byte string, there will be 8 digits stri
             }
             catch (Exception ex)
             {
-                //tcpClient.GetStream().Close();
-                //tcpClient.Close();
+                //unsTcpClient.GetStream().Close();
+                //unsTcpClient.Close();
                 Console.WriteLine(ex.Message);
                 Console.WriteLine(System.Reflection.MethodBase.GetCurrentMethod().Name + "_errorline:" + ex.LineNumber());
                 log.Error(System.Reflection.MethodBase.GetCurrentMethod().Name + "_errorline:" + ex.LineNumber());
                 log.Error(ex.Message);
+                if(avlsNetworkStream!=null)
+                    avlsNetworkStream.Close();
+                if(avlsTcpClient!=null)
+                    avlsTcpClient.Close();
                 avlsTcpClient = new TcpClient();
                 avlsConnectDone.Reset();
-                avlsTcpClient.BeginConnect(avls_ipaddress, avls_port, new AsyncCallback(avls_ConnectCallback), avlsTcpClient);
+                avlsTcpClient.BeginConnect(avls_ipaddress, avls_port, new AsyncCallback(AvlsConnectCallback), avlsTcpClient);
                 avlsConnectDone.WaitOne();
                 Keeplive.keep(avlsTcpClient.Client);
+                avlsNetworkStream = avlsTcpClient.GetStream();
             }
 
         }
@@ -265,14 +278,16 @@ LIMIT 1";
             Console.WriteLine(DateTime.Now.ToString("yyyyMMdd HHmmss+8"));
             Console.WriteLine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location));
             test();
-            tcpClient = new TcpClient();
+            unsTcpClient = new TcpClient();
+            NetworkStream netStream = unsTcpClient.GetStream();
             avlsTcpClient = new TcpClient();
+            avlsNetworkStream = avlsTcpClient.GetStream();
             /*
             while (!mups_connected)
             {
                 try
                 {
-                    tcpClient.Connect(ipAddress, port);
+                    unsTcpClient.Connect(ipAddress, port);
                     mups_connected = true;
                 }
                 catch (Exception ex)
@@ -282,20 +297,20 @@ LIMIT 1";
                 }
             }
             */
-            //tcpClient.NoDelay = false;
+            //unsTcpClient.NoDelay = false;
 
             unsConnectDone.Reset();
-            tcpClient.BeginConnect(ipAddress, port, new AsyncCallback(ConnectCallback), tcpClient);
+            unsTcpClient.BeginConnect(ipAddress, port, new AsyncCallback(ConnectCallback), unsTcpClient);
             unsConnectDone.WaitOne();
-            Keeplive.keep(tcpClient.Client);
-            NetworkStream netStream = tcpClient.GetStream();
+            Keeplive.keep(unsTcpClient.Client);
+            
 
             //avls_tcpClient.Connect(ipAddress, port);
             avlsConnectDone.Reset();
-            avlsTcpClient.BeginConnect(avls_ipaddress, avls_port, new AsyncCallback(avls_ConnectCallback), avlsTcpClient);
+            avlsTcpClient.BeginConnect(avls_ipaddress, avls_port, new AsyncCallback(AvlsConnectCallback), avlsTcpClient);
             avlsConnectDone.WaitOne();
             Keeplive.keep(avlsTcpClient.Client);
-            NetworkStream avlsNetworkStream = avlsTcpClient.GetStream();
+            
 
             var sql_client = new SqlClient(ConfigurationManager.AppSettings["SQL_SERVER_IP"], ConfigurationManager.AppSettings["SQL_SERVER_PORT"], ConfigurationManager.AppSettings["SQL_SERVER_USER_ID"], ConfigurationManager.AppSettings["SQL_SERVER_PASSWORD"], ConfigurationManager.AppSettings["SQL_SERVER_DATABASE"], ConfigurationManager.AppSettings["Pooling"], ConfigurationManager.AppSettings["MinPoolSize"], ConfigurationManager.AppSettings["MaxPoolSize"], ConfigurationManager.AppSettings["ConnectionLifetime"]);
             //empty power column in table custom.uns_deivce_power_status
@@ -335,7 +350,7 @@ SET
             //sendtest(netStream);
 
             //alonso
-            Thread read_thread = new Thread(() => read_thread_method(tcpClient, netStream));
+            Thread read_thread = new Thread(() => read_thread_method(unsTcpClient, netStream));
             read_thread.Start();
             if (bool.Parse(ConfigurationManager.AppSettings["ManualSend"]))
             {
@@ -360,11 +375,11 @@ SET
             Console.ReadLine();
             //Thread send_test_thread = new Thread(() => sendtest(netStream, sql_client));
             //send_test_thread.Start();
-            //output = ReadLine(tcpClient, netStream, output);
+            //output = ReadLine(unsTcpClient, netStream, output);
             //UnsTcpWriteLine(netStream, String.Join("\n", commands) + "\n");
 
 
-            //tcpClient.Close();
+            //unsTcpClient.Close();
         }
 
         static void autoSendFromSqlTableTimer_Elapsed(object sender, ElapsedEventArgs e)
@@ -443,7 +458,7 @@ WHERE
 
             //avlsTcpClient = new TcpClient();
             avlsConnectDone.Reset();
-            avlsTcpClient.BeginConnect(ipAddress, port, new AsyncCallback(avls_ConnectCallback), avlsTcpClient);
+            avlsTcpClient.BeginConnect(ipAddress, port, new AsyncCallback(AvlsConnectCallback), avlsTcpClient);
             avlsConnectDone.WaitOne();
 
             //avls_tcpClient.NoDelay = false;
@@ -979,7 +994,7 @@ Select 1-6 then press enter to send package
             {
                 if (netStream.CanRead)
                 {
-                    //byte[] bytes = new byte[tcpClient.ReceiveBufferSize];
+                    //byte[] bytes = new byte[unsTcpClient.ReceiveBufferSize];
 
                     myReadBuffer = new byte[prefix_length];
                     netStream.BeginRead(myReadBuffer, 0, myReadBuffer.Length,
@@ -989,7 +1004,7 @@ Select 1-6 then press enter to send package
                     //autoEvent.WaitOne();
                     /*
                     int numBytesRead = netStream.Read(bytes, 0,
-                        (int)tcpClient.ReceiveBufferSize);
+                        (int)unsTcpClient.ReceiveBufferSize);
 
                     byte[] bytesRead = new byte[numBytesRead];
                     Array.Copy(bytes, bytesRead, numBytesRead);
@@ -1042,13 +1057,14 @@ Select 1-6 then press enter to send package
                 log.Error("myReadSizeCallBackError:" + Environment.NewLine + ex.Message);
                 if(myNetworkStream!=null)
                     myNetworkStream.Dispose();
-                tcpClient.Close();
-                tcpClient = new TcpClient();
+                unsTcpClient.Close();
+                unsTcpClient = new TcpClient();
+                myNetworkStream = unsTcpClient.GetStream();
                 unsConnectDone.Reset();
-                tcpClient.BeginConnect(ipAddress, port, new AsyncCallback(ConnectCallback), tcpClient);
+                unsTcpClient.BeginConnect(ipAddress, port, new AsyncCallback(ConnectCallback), unsTcpClient);
                 unsConnectDone.WaitOne();
-                Keeplive.keep(tcpClient.Client);
-                myNetworkStream = tcpClient.GetStream();
+                Keeplive.keep(unsTcpClient.Client);
+                
 
                 var sql_client = new SqlClient(ConfigurationManager.AppSettings["SQL_SERVER_IP"], ConfigurationManager.AppSettings["SQL_SERVER_PORT"], ConfigurationManager.AppSettings["SQL_SERVER_USER_ID"], ConfigurationManager.AppSettings["SQL_SERVER_PASSWORD"], ConfigurationManager.AppSettings["SQL_SERVER_DATABASE"], ConfigurationManager.AppSettings["Pooling"], ConfigurationManager.AppSettings["MinPoolSize"], ConfigurationManager.AppSettings["MaxPoolSize"], ConfigurationManager.AppSettings["ConnectionLifetime"]);
 
@@ -1128,13 +1144,13 @@ Select 1-6 then press enter to send package
                 Console.WriteLine("E############################################################################");
                 var sql_client = new SqlClient(ConfigurationManager.AppSettings["SQL_SERVER_IP"], ConfigurationManager.AppSettings["SQL_SERVER_PORT"], ConfigurationManager.AppSettings["SQL_SERVER_USER_ID"], ConfigurationManager.AppSettings["SQL_SERVER_PASSWORD"], ConfigurationManager.AppSettings["SQL_SERVER_DATABASE"], ConfigurationManager.AppSettings["Pooling"], ConfigurationManager.AppSettings["MinPoolSize"], ConfigurationManager.AppSettings["MaxPoolSize"], ConfigurationManager.AppSettings["ConnectionLifetime"]);
 
-                xml_parse(tcpClient, fStream, xml_root_tag, xml_data, avlsTcpClient);
+                xml_parse(unsTcpClient, fStream, xml_root_tag, xml_data, avlsTcpClient);
                 //Console.ReadLine();
 
-                //byte[] bytes = new byte[tcpClient.ReceiveBufferSize];
+                //byte[] bytes = new byte[unsTcpClient.ReceiveBufferSize];
 
                 //int numBytesRead = netStream.Read(bytes, 0,
-                //(int)tcpClient.ReceiveBufferSize);
+                //(int)unsTcpClient.ReceiveBufferSize);
 
                 //byte[] bytesRead = new byte[numBytesRead];
                 //Array.Copy(bytes, bytesRead, numBytesRead);
@@ -1190,7 +1206,7 @@ Select 1-6 then press enter to send package
                 //if (netStream.CanRead)// && netStream.DataAvailable)
                 {
                     //string xml_test = "<test></test>";
-                    //int receive_total_length = tcpClient.ReceiveBufferSize;
+                    //int receive_total_length = unsTcpClient.ReceiveBufferSize;
                     //byte[] length = new byte[2];
                     //int numBytesRead = netStream.Read(length, 0, 2);
                     //int data_length = GetLittleEndianIntegerFromByteArray(length, 0);
@@ -1218,14 +1234,14 @@ Select 1-6 then press enter to send package
                     Console.WriteLine( "Read:\r\n"+ouput2 );
                     //Console.WriteLine("First node:[" + xml_root_tag + "]");
                     Console.WriteLine("E############################################################################");
-                    xml_parse(tcpClient, netStream, xml_root_tag, xml_data, sql_client);
+                    xml_parse(unsTcpClient, netStream, xml_root_tag, xml_data, sql_client);
                     */
                     //Console.ReadLine();
                     
-                    //byte[] bytes = new byte[tcpClient.ReceiveBufferSize];
+                    //byte[] bytes = new byte[unsTcpClient.ReceiveBufferSize];
                     
                     //int numBytesRead = netStream.Read(bytes, 0,
-                        //(int)tcpClient.ReceiveBufferSize);
+                        //(int)unsTcpClient.ReceiveBufferSize);
                     
                     //byte[] bytesRead = new byte[numBytesRead];
                     //Array.Copy(bytes, bytesRead, numBytesRead);
@@ -1653,7 +1669,7 @@ WHERE
             //avls_tcpClient.NoDelay = false;
 
             //Keeplive.keep(avls_tcpClient.Client);
-            NetworkStream netStream = avlsTcpClient.GetStream();
+            NetworkStream netStream = avlsNetworkStream;
             /*
             if (htable.ContainsKey("event_info"))
                 if (htable["event_info"].ToString().Equals("Unit Absent"))
