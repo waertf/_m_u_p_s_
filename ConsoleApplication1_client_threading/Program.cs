@@ -279,9 +279,9 @@ LIMIT 1";
             Console.WriteLine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location));
             test();
             unsTcpClient = new TcpClient();
-            NetworkStream netStream = unsTcpClient.GetStream();
+            
             avlsTcpClient = new TcpClient();
-            avlsNetworkStream = avlsTcpClient.GetStream();
+            
             /*
             while (!mups_connected)
             {
@@ -303,14 +303,14 @@ LIMIT 1";
             unsTcpClient.BeginConnect(ipAddress, port, new AsyncCallback(ConnectCallback), unsTcpClient);
             unsConnectDone.WaitOne();
             Keeplive.keep(unsTcpClient.Client);
-            
+            NetworkStream netStream = unsTcpClient.GetStream();
 
             //avls_tcpClient.Connect(ipAddress, port);
             avlsConnectDone.Reset();
             avlsTcpClient.BeginConnect(avls_ipaddress, avls_port, new AsyncCallback(AvlsConnectCallback), avlsTcpClient);
             avlsConnectDone.WaitOne();
             Keeplive.keep(avlsTcpClient.Client);
-            
+            avlsNetworkStream = avlsTcpClient.GetStream();
 
             var sql_client = new SqlClient(ConfigurationManager.AppSettings["SQL_SERVER_IP"], ConfigurationManager.AppSettings["SQL_SERVER_PORT"], ConfigurationManager.AppSettings["SQL_SERVER_USER_ID"], ConfigurationManager.AppSettings["SQL_SERVER_PASSWORD"], ConfigurationManager.AppSettings["SQL_SERVER_DATABASE"], ConfigurationManager.AppSettings["Pooling"], ConfigurationManager.AppSettings["MinPoolSize"], ConfigurationManager.AppSettings["MaxPoolSize"], ConfigurationManager.AppSettings["ConnectionLifetime"]);
             //empty power column in table custom.uns_deivce_power_status
@@ -1059,12 +1059,12 @@ Select 1-6 then press enter to send package
                     myNetworkStream.Dispose();
                 unsTcpClient.Close();
                 unsTcpClient = new TcpClient();
-                myNetworkStream = unsTcpClient.GetStream();
+                
                 unsConnectDone.Reset();
                 unsTcpClient.BeginConnect(ipAddress, port, new AsyncCallback(ConnectCallback), unsTcpClient);
                 unsConnectDone.WaitOne();
                 Keeplive.keep(unsTcpClient.Client);
-                
+                myNetworkStream = unsTcpClient.GetStream();
 
                 var sql_client = new SqlClient(ConfigurationManager.AppSettings["SQL_SERVER_IP"], ConfigurationManager.AppSettings["SQL_SERVER_PORT"], ConfigurationManager.AppSettings["SQL_SERVER_USER_ID"], ConfigurationManager.AppSettings["SQL_SERVER_PASSWORD"], ConfigurationManager.AppSettings["SQL_SERVER_DATABASE"], ConfigurationManager.AppSettings["Pooling"], ConfigurationManager.AppSettings["MinPoolSize"], ConfigurationManager.AppSettings["MaxPoolSize"], ConfigurationManager.AppSettings["ConnectionLifetime"]);
 
