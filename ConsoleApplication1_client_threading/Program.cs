@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Globalization;
 using System.Linq;
 using System.Net.NetworkInformation;
 using System.Reflection;
@@ -254,6 +255,7 @@ LIMIT 1";
         {
             // Force a reload of the changed section. This 
             // makes the new values available for reading.
+            Thread.CurrentThread.CurrentUICulture = new CultureInfo("en-us");
             ConfigurationManager.RefreshSection(sectionName);
             SiAuto.Si.Enabled = true;
             SiAuto.Main.LogMessage("This is my first SmartInspect message!");
@@ -293,6 +295,7 @@ LIMIT 1";
             avlsTcpClient.BeginConnect(avls_ipaddress, avls_port, new AsyncCallback(avls_ConnectCallback), avlsTcpClient);
             avls_connectDone.WaitOne();
             Keeplive.keep(avlsTcpClient.Client);
+            NetworkStream avlsNetworkStream = avlsTcpClient.GetStream();
 
             var sql_client = new SqlClient(ConfigurationManager.AppSettings["SQL_SERVER_IP"], ConfigurationManager.AppSettings["SQL_SERVER_PORT"], ConfigurationManager.AppSettings["SQL_SERVER_USER_ID"], ConfigurationManager.AppSettings["SQL_SERVER_PASSWORD"], ConfigurationManager.AppSettings["SQL_SERVER_DATABASE"], ConfigurationManager.AppSettings["Pooling"], ConfigurationManager.AppSettings["MinPoolSize"], ConfigurationManager.AppSettings["MaxPoolSize"], ConfigurationManager.AppSettings["ConnectionLifetime"]);
             //empty power column in table custom.uns_deivce_power_status
@@ -351,7 +354,8 @@ SET
             }
 
             var accessUnsDeivcePowerStatusSqlTable = new System.Timers.Timer(int.Parse(ConfigurationManager.AppSettings["uns_deivce_power_status_Timer_interval_sec"]) * 1000);
-            accessUnsDeivcePowerStatusSqlTable.Elapsed += new ElapsedEventHandler(SendToAvlsEventColumnSetNegativeOneIfPowerOff);
+            accessUnsDeivcePowerStatusSqlTable.Elapsed +=
+                (sender, e) => { SendToAvlsEventColumnSetNegativeOneIfPowerOff(avlsTcpClient, avlsNetworkStream); };
             accessUnsDeivcePowerStatusSqlTable.Enabled = true;
             Console.ReadLine();
             //Thread send_test_thread = new Thread(() => sendtest(netStream, sql_client));
@@ -401,7 +405,7 @@ WHERE
             }
         }
 
-        private static void SendToAvlsEventColumnSetNegativeOneIfPowerOff(object sender, ElapsedEventArgs e)
+        private static void SendToAvlsEventColumnSetNegativeOneIfPowerOff(TcpClient avlsTcpClient,NetworkStream avlsNetworkStream)
         {
             var sqlClient = new SqlClient(ConfigurationManager.AppSettings["SQL_SERVER_IP"], ConfigurationManager.AppSettings["SQL_SERVER_PORT"], ConfigurationManager.AppSettings["SQL_SERVER_USER_ID"], ConfigurationManager.AppSettings["SQL_SERVER_PASSWORD"], ConfigurationManager.AppSettings["SQL_SERVER_DATABASE"], ConfigurationManager.AppSettings["Pooling"], ConfigurationManager.AppSettings["MinPoolSize"], ConfigurationManager.AppSettings["MaxPoolSize"], ConfigurationManager.AppSettings["ConnectionLifetime"]);
             DataTable dt = new DataTable();
@@ -423,13 +427,13 @@ WHERE
                 foreach (DataRow row in dt.Rows)
                 {
                     uid = row[0].ToString();
-                    SendPackageToAvlsOnlyByUidAndLocGetFromSql(uid, "-1");
+                    SendPackageToAvlsOnlyByUidAndLocGetFromSql(uid, "-1", avlsTcpClient, avlsNetworkStream);
                 }
             }
         }
-        private static void SendPackageToAvlsOnlyByUidAndLocGetFromSql(string uid, string eventStatus)
+        private static void SendPackageToAvlsOnlyByUidAndLocGetFromSql(string uid, string eventStatus, TcpClient avlsTcpClient, NetworkStream avlsNetworkStream)
         {
-            TcpClient avls_tcpClient;
+            //TcpClient avls_tcpClient;
             string send_string = string.Empty;
             AVLS_UNIT_Report_Packet avls_package = new AVLS_UNIT_Report_Packet();
             //string ipAddress = "127.0.0.1";
@@ -437,15 +441,15 @@ WHERE
             //int port = 23;
             int port = int.Parse(ConfigurationManager.AppSettings["AVLS_SERVER_PORT"]);
 
-            avls_tcpClient = new TcpClient();
+            //avlsTcpClient = new TcpClient();
             connectDone.Reset();
-            avls_tcpClient.BeginConnect(ipAddress, port, new AsyncCallback(ConnectCallback), avls_tcpClient);
+            avlsTcpClient.BeginConnect(ipAddress, port, new AsyncCallback(avls_ConnectCallback), avlsTcpClient);
             connectDone.WaitOne();
 
             //avls_tcpClient.NoDelay = false;
 
             //Keeplive.keep(avls_tcpClient.Client);
-            NetworkStream netStream = avls_tcpClient.GetStream();
+            //NetworkStream netStream = avls_tcpClient.GetStream();
             avls_package.Event = eventStatus + ",";
             avls_package.Date_Time = string.Format("{0:yyMMddHHmmss}", DateTime.Now.ToUniversalTime()) + ",";
             avls_package.ID = uid;
@@ -541,18 +545,18 @@ LIMIT 1";
 
 
             sendDone.Reset();
-            avls_WriteLine(netStream, System.Text.Encoding.Default.GetBytes(send_string), send_string);
+            avls_WriteLine(avlsNetworkStream, System.Text.Encoding.Default.GetBytes(send_string), send_string);
             sendDone.WaitOne();
 
             //ReadLine(avls_tcpClient, netStream, send_string.Length);
-            netStream.Close();
-            avls_tcpClient.Close();
+            //netStream.Close();
+            //avls_tcpClient.Close();
             log.Info("-access_avls_server:if");
             Console.WriteLine("-access_avls_server:if");
         }
         private static void AutoSend(NetworkStream netStream)
         {
-            
+            Thread.CurrentThread.CurrentUICulture = new CultureInfo("en-us");
             //while (true)
             {
                 {
@@ -799,6 +803,7 @@ LIMIT
          * */
         private static void ManualSend(NetworkStream netStream)
         {
+            Thread.CurrentThread.CurrentUICulture = new CultureInfo("en-us");
             while (true)
             {
                 /*
@@ -1175,6 +1180,7 @@ Select 1-6 then press enter to send package
         static void read_thread_method(TcpClient tcpClient, NetworkStream netStream)
         {
             Console.WriteLine("in read thread");
+            Thread.CurrentThread.CurrentUICulture = new CultureInfo("en-us");
             //asyn read
             ReadLine(tcpClient, netStream, 2);
             //syn read
@@ -1635,6 +1641,7 @@ WHERE
         private static void access_avls_server(string xml_root_tag, Hashtable htable, List<string> sensor_name, List<string> sensor_type, List<string> sensor_value, IEnumerable<XName> iEnumerable, string log, TcpClient avlsTcpClient)
         {
             Console.WriteLine("+access_avls_server");
+            Thread.CurrentThread.CurrentUICulture = new CultureInfo("en-us");
             string send_string = string.Empty;
             AVLS_UNIT_Report_Packet avls_package = new AVLS_UNIT_Report_Packet();
             avls_package.Message = "test";
@@ -2197,6 +2204,7 @@ LIMIT 1";
         private static void access_sql_server( string xml_root_tag, Hashtable htable, List<string> sensor_name, List<string> sensor_type, List<string> sensor_value, IEnumerable<XName> elements,string log1)
         {
             Console.WriteLine("+access_sql_server");
+            Thread.CurrentThread.CurrentUICulture = new CultureInfo("en-us");
             SqlClient sql_client = new SqlClient(ConfigurationManager.AppSettings["SQL_SERVER_IP"], ConfigurationManager.AppSettings["SQL_SERVER_PORT"], ConfigurationManager.AppSettings["SQL_SERVER_USER_ID"], ConfigurationManager.AppSettings["SQL_SERVER_PASSWORD"], ConfigurationManager.AppSettings["SQL_SERVER_DATABASE"], ConfigurationManager.AppSettings["Pooling"], ConfigurationManager.AppSettings["MinPoolSize"], ConfigurationManager.AppSettings["MaxPoolSize"], ConfigurationManager.AppSettings["ConnectionLifetime"]);
             DateTime dtime = DateTime.Now;
             AUTO_SQL_DATA gps_log = new AUTO_SQL_DATA();
