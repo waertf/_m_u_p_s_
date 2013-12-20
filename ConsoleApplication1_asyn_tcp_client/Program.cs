@@ -248,7 +248,7 @@ SELECT
                 }
                 catch (Exception e)
                 {
-                    Console.WriteLine(e.ToString());
+                    Console.WriteLine("ConnectCallback:"+e.ToString());
                     log.Error(e.ToString());
                     /*
                     IPEndPoint remoteEP = new IPEndPoint(IpAddress, Port);
@@ -321,7 +321,7 @@ SELECT
                 }
                 catch (Exception e)
                 {
-                    Console.WriteLine(e.ToString());
+                    Console.WriteLine("ReceiveCallback:"+e.ToString());
                 }
             }
 
@@ -352,7 +352,7 @@ SELECT
                 }
                 catch (Exception e)
                 {
-                    Console.WriteLine(e.ToString());
+                    Console.WriteLine("SendCallback:"+e.ToString());
                 }
             }
             private static System.Timers.Timer aTimer;
