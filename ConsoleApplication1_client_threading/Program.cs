@@ -473,9 +473,9 @@ WHERE
             int port = int.Parse(ConfigurationManager.AppSettings["AVLS_SERVER_PORT"]);
 
             //avlsTcpClient = new TcpClient();
-            avlsConnectDone.Reset();
-            avlsTcpClient.BeginConnect(ipAddress, port, new AsyncCallback(AvlsConnectCallback), avlsTcpClient);
-            avlsConnectDone.WaitOne();
+            //avlsConnectDone.Reset();
+            //avlsTcpClient.BeginConnect(ipAddress, port, new AsyncCallback(AvlsConnectCallback), avlsTcpClient);
+            //avlsConnectDone.WaitOne();
 
             //avls_tcpClient.NoDelay = false;
 
@@ -573,7 +573,7 @@ LIMIT 1";
             //}
             avls_package.ID += ",";
             send_string = "%%" + avls_package.ID + avls_package.GPS_Valid + avls_package.Date_Time + avls_package.Loc + avls_package.Speed + avls_package.Dir + avls_package.Temp + avls_package.Status + avls_package.Event + avls_package.Message + "\r\n";
-
+            SiAuto.Main.LogText(Level.Debug, "send_string", send_string);
             avlsSendPackage = send_string;
             //avlsSendDone.Reset();
             avls_WriteLine(avlsNetworkStream, System.Text.Encoding.Default.GetBytes(send_string), send_string);
@@ -582,7 +582,7 @@ LIMIT 1";
             //ReadLine(avls_tcpClient, netStream, send_string.Length);
             //netStream.Close();
             //avls_tcpClient.Close();
-            SiAuto.Main.EnterMethod(Level.Debug, "SendPackageToAvlsOnlyByUidAndLocGetFromSql");
+            SiAuto.Main.LeaveMethod(Level.Debug, "SendPackageToAvlsOnlyByUidAndLocGetFromSql");
 
         }
         private static void AutoSend(NetworkStream netStream)
