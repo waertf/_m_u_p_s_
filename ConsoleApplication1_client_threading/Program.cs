@@ -2389,7 +2389,8 @@ SET
   power = 'off',
 ""updateTime"" = '" + unsUpdateTimeStamp + @"'::timestamp
 WHERE
-  custom.uns_deivce_power_status.uid = '" + htable["suaddr"].ToString() + @"'";
+  custom.uns_deivce_power_status.uid = '" + htable["suaddr"].ToString() + @"'" + @" AND
+  custom.uns_deivce_power_status.power != 'off' ";
                                 sql_client.connect();
                                 sql_client.modify(unsSqlCmd);
                                 sql_client.disconnect();
@@ -2442,7 +2443,8 @@ SET
   power = 'on',
 ""updateTime"" = '" + unsUpdateTimeStamp + @"'::timestamp
 WHERE
-  custom.uns_deivce_power_status.uid = '" + htable["suaddr"].ToString() + @"'";
+  custom.uns_deivce_power_status.uid = '" + htable["suaddr"].ToString() + @"'" + @" AND
+  custom.uns_deivce_power_status.power != 'on' ";
                             sql_client.connect();
                             sql_client.modify(unsSqlCmd);
                             sql_client.disconnect();
@@ -2462,7 +2464,8 @@ SET
   power = 'on',
 ""updateTime"" = '" + unsUpdateTimeStamp + @"'::timestamp
 WHERE
-  custom.uns_deivce_power_status.uid = '" + htable["suaddr"].ToString() + @"'";
+  custom.uns_deivce_power_status.uid = '" + htable["suaddr"].ToString() + @"'" + @" AND
+  custom.uns_deivce_power_status.power != 'on' ";
                             sql_client.connect();
                             sql_client.modify(unsSqlCmd);
                             sql_client.disconnect();
@@ -2482,7 +2485,8 @@ SET
   power = 'on',
 ""updateTime"" = '" + unsUpdateTimeStamp + @"'::timestamp
 WHERE
-  custom.uns_deivce_power_status.uid = '" + htable["suaddr"].ToString() + @"'";
+  custom.uns_deivce_power_status.uid = '" + htable["suaddr"].ToString() + @"'" + @" AND
+  custom.uns_deivce_power_status.power != 'on' ";
                             sql_client.connect();
                             sql_client.modify(unsSqlCmd);
                             sql_client.disconnect();
@@ -2555,7 +2559,8 @@ SET
   power = 'on',
 ""updateTime"" = '"+unsUpdateTimeStamp+@"'::timestamp
 WHERE
-  custom.uns_deivce_power_status.uid = '" + htable["suaddr"].ToString() + @"'";
+  custom.uns_deivce_power_status.uid = '" + htable["suaddr"].ToString() + @"'" + @" AND
+  custom.uns_deivce_power_status.power != 'on' ";
                                 sql_client.connect();
                                 sql_client.modify(unsSqlCmd);
                                 sql_client.disconnect();
@@ -2583,7 +2588,8 @@ SET
   power = 'off',
 ""updateTime"" = '" + unsUpdateTimeStamp + @"'::timestamp
 WHERE
-  custom.uns_deivce_power_status.uid = '" + htable["suaddr"].ToString() + @"'";
+  custom.uns_deivce_power_status.uid = '" + htable["suaddr"].ToString() + @"'" + @" AND
+  custom.uns_deivce_power_status.power != 'off' ";
                                 sql_client.connect();
                                 sql_client.modify(unsSqlCmd);
                                 sql_client.disconnect();
