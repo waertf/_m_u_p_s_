@@ -54,7 +54,13 @@ namespace ConsoleApplication1_client_threading
         private static byte[] fBuffer = null;
         private static int fBytesRead = 0;
         private static TcpClient unsTcpClient, avlsTcpClient;
-        private static NetworkStream avlsNetworkStream;
+        private static NetworkStream avlsNetworkStream,unsNetworkStream;
+
+        [ThreadStatic]
+        private static string avlsSendPackage;
+
+        private static byte[] unsSendPackage = null;
+        private static string unsUnsTcpWriteLineWriteParame = string.Empty;
         //private static SqlClient sql_client;
         // ManualResetEvent instances signal completion.
         private static ManualResetEvent unsConnectDone =
@@ -309,6 +315,7 @@ LIMIT 1";
             unsConnectDone.WaitOne();
             Keeplive.keep(unsTcpClient.Client);
             NetworkStream netStream = unsTcpClient.GetStream();
+            unsNetworkStream = netStream;
 
             //avls_tcpClient.Connect(ipAddress, port);
             avlsConnectDone.Reset();
@@ -563,7 +570,7 @@ LIMIT 1";
             avls_package.ID += ",";
             send_string = "%%" + avls_package.ID + avls_package.GPS_Valid + avls_package.Date_Time + avls_package.Loc + avls_package.Speed + avls_package.Dir + avls_package.Temp + avls_package.Status + avls_package.Event + avls_package.Message + "\r\n";
 
-
+            avlsSendPackage = send_string;
             //avlsSendDone.Reset();
             avls_WriteLine(avlsNetworkStream, System.Text.Encoding.Default.GetBytes(send_string), send_string);
             //avlsSendDone.WaitOne();
@@ -926,6 +933,8 @@ Select 1-6 then press enter to send package
 
         private static void UnsTcpWriteLine(NetworkStream netStream, byte[] writeData,string write )
         {
+            unsSendPackage = writeData;
+            unsUnsTcpWriteLineWriteParame = write;
             if (netStream.CanWrite)
             {
                 //byte[] writeData = Encoding.ASCII.GetBytes(write);
@@ -952,6 +961,26 @@ Select 1-6 then press enter to send package
                     Console.WriteLine(System.Reflection.MethodBase.GetCurrentMethod().Name + "_errorline:" + ex.LineNumber());
                     log.Error(System.Reflection.MethodBase.GetCurrentMethod().Name + "_errorline:" + ex.LineNumber());
                     log.Error("WriteLineError:\r\n" + ex.Message);
+
+                    if (unsTcpClient != null)
+                    {
+                        if (unsTcpClient.GetStream() != null)
+                            unsTcpClient.GetStream().Close();
+                        unsTcpClient.Close();
+
+                    }
+                    unsTcpClient = new TcpClient();
+
+                    unsConnectDone.Reset();
+                    unsTcpClient.BeginConnect(ipAddress, port, new AsyncCallback(ConnectCallback), unsTcpClient);
+                    unsConnectDone.WaitOne();
+                    Keeplive.keep(unsTcpClient.Client);
+                    if (unsTcpClient != null && unsTcpClient.Client != null)
+                    {
+                        unsNetworkStream = unsTcpClient.GetStream();
+                        UnsTcpWriteLine(unsNetworkStream, unsSendPackage, unsUnsTcpWriteLineWriteParame);
+                    }
+                   
                 }
 
                 
@@ -971,6 +1000,25 @@ Select 1-6 then press enter to send package
                 Console.WriteLine(System.Reflection.MethodBase.GetCurrentMethod().Name + "_errorline:" + ex.LineNumber());
                 log.Error(System.Reflection.MethodBase.GetCurrentMethod().Name + "_errorline:" + ex.LineNumber());
                 log.Error("UnsTcpWriteCallBack:\r\n" + ex.Message);
+
+                if (unsTcpClient != null)
+                {
+                    if (unsTcpClient.GetStream() != null)
+                        unsTcpClient.GetStream().Close();
+                    unsTcpClient.Close();
+
+                }
+                unsTcpClient = new TcpClient();
+
+                unsConnectDone.Reset();
+                unsTcpClient.BeginConnect(ipAddress, port, new AsyncCallback(ConnectCallback), unsTcpClient);
+                unsConnectDone.WaitOne();
+                Keeplive.keep(unsTcpClient.Client);
+                if (unsTcpClient != null && unsTcpClient.Client != null)
+                {
+                    unsNetworkStream = unsTcpClient.GetStream();
+                    UnsTcpWriteLine(unsNetworkStream, unsSendPackage, unsUnsTcpWriteLineWriteParame);
+                }
             }
             
         }
@@ -989,6 +1037,21 @@ Select 1-6 then press enter to send package
                 Console.WriteLine(System.Reflection.MethodBase.GetCurrentMethod().Name + "_errorline:" + ex.LineNumber());
                 log.Error(System.Reflection.MethodBase.GetCurrentMethod().Name + "_errorline:" + ex.LineNumber());
                 log.Error("avls_myWriteCallBack:\r\n" + ex.Message);
+                if (avlsNetworkStream != null)
+                    avlsNetworkStream.Close();
+                if (avlsTcpClient != null)
+                    avlsTcpClient.Close();
+                avlsTcpClient = new TcpClient();
+                avlsConnectDone.Reset();
+                avlsTcpClient.BeginConnect(avls_ipaddress, avls_port, new AsyncCallback(AvlsConnectCallback), avlsTcpClient);
+                avlsConnectDone.WaitOne();
+                Keeplive.keep(avlsTcpClient.Client);
+                if (avlsTcpClient != null && avlsTcpClient.Client != null)
+                {
+                    avlsNetworkStream = avlsTcpClient.GetStream();
+                    avls_WriteLine(avlsNetworkStream, System.Text.Encoding.Default.GetBytes(avlsSendPackage), avlsSendPackage);
+                }
+                
             }
             
 
@@ -1863,7 +1926,7 @@ LIMIT 1";
 
                     //avlsSendDone.Reset();
                     var sql_client = new SqlClient(ConfigurationManager.AppSettings["SQL_SERVER_IP"], ConfigurationManager.AppSettings["SQL_SERVER_PORT"], ConfigurationManager.AppSettings["SQL_SERVER_USER_ID"], ConfigurationManager.AppSettings["SQL_SERVER_PASSWORD"], ConfigurationManager.AppSettings["SQL_SERVER_DATABASE"], ConfigurationManager.AppSettings["Pooling"], ConfigurationManager.AppSettings["MinPoolSize"], ConfigurationManager.AppSettings["MaxPoolSize"], ConfigurationManager.AppSettings["ConnectionLifetime"]);
-
+                    avlsSendPackage = send_string;
                     avls_WriteLine(netStream, System.Text.Encoding.Default.GetBytes(send_string), send_string);
                     //avlsSendDone.WaitOne();
 
@@ -2113,7 +2176,7 @@ LIMIT 1";
             */
             //avlsSendDone.Reset();
             var sqlclient = new SqlClient(ConfigurationManager.AppSettings["SQL_SERVER_IP"], ConfigurationManager.AppSettings["SQL_SERVER_PORT"], ConfigurationManager.AppSettings["SQL_SERVER_USER_ID"], ConfigurationManager.AppSettings["SQL_SERVER_PASSWORD"], ConfigurationManager.AppSettings["SQL_SERVER_DATABASE"], ConfigurationManager.AppSettings["Pooling"], ConfigurationManager.AppSettings["MinPoolSize"], ConfigurationManager.AppSettings["MaxPoolSize"], ConfigurationManager.AppSettings["ConnectionLifetime"]);
-
+            avlsSendPackage = send_string;
             avls_WriteLine(netStream, System.Text.Encoding.Default.GetBytes(send_string), send_string);
             //avlsSendDone.WaitOne();
 
@@ -2157,6 +2220,21 @@ LIMIT 1";
                     Console.WriteLine(System.Reflection.MethodBase.GetCurrentMethod().Name + "_errorline:" + ex.LineNumber());
                     log.Error(System.Reflection.MethodBase.GetCurrentMethod().Name + "_errorline:" + ex.LineNumber());
                     log.Error("avls_WriteLineError:\r\n" + ex.Message);
+
+                    if (avlsNetworkStream != null)
+                        avlsNetworkStream.Close();
+                    if (avlsTcpClient != null)
+                        avlsTcpClient.Close();
+                    avlsTcpClient = new TcpClient();
+                    avlsConnectDone.Reset();
+                    avlsTcpClient.BeginConnect(avls_ipaddress, avls_port, new AsyncCallback(AvlsConnectCallback), avlsTcpClient);
+                    avlsConnectDone.WaitOne();
+                    Keeplive.keep(avlsTcpClient.Client);
+                    if (avlsTcpClient != null && avlsTcpClient.Client != null)
+                    {
+                        avlsNetworkStream = avlsTcpClient.GetStream();
+                        avls_WriteLine(avlsNetworkStream, System.Text.Encoding.Default.GetBytes(avlsSendPackage), avlsSendPackage);
+                    }
                 }
 
 
