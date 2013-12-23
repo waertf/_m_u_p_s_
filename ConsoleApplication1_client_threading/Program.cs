@@ -728,7 +728,14 @@ LIMIT
                                     UnsTcpWriteLine(netStream, data_append_dataLength(Triggered_Location_Request_Cadence), Triggered_Location_Request_Cadence);
                                     break;
                                 case "-1":
-                                    string Triggered_Location_Request_Distance = "<Triggered-Location-Request><request-id>" + ConfigurationManager.AppSettings["request-id"] + "</request-id><suaddr suaddr-type=\"" + ConfigurationManager.AppSettings["suaddr-type"] + "\">" + ConfigurationManager.AppSettings["suaddr"] + "</suaddr><periodic-trigger><trg-distance>" + ConfigurationManager.AppSettings["trg-distance"] + "</trg-distance></periodic-trigger></Triggered-Location-Request>";
+                                    string Triggered_Location_Request_Distance = "<Triggered-Location-Request><request-id>" +
+                                        ConfigurationManager.AppSettings["request-id"] + 
+                                        "</request-id><suaddr suaddr-type=\"" + 
+                                        ConfigurationManager.AppSettings["suaddr-type"] + "\">" +
+                                        requeseHashtable["uid"] +
+                                        "</suaddr><periodic-trigger><trg-distance>" +
+                                        ConfigurationManager.AppSettings["trg-distance"] +
+                                        "</trg-distance></periodic-trigger></Triggered-Location-Request>";
 
                                     //using (StreamWriter w = File.AppendText("log.txt"))
                                     {
