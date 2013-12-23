@@ -276,12 +276,13 @@ LIMIT 1";
             // makes the new values available for reading.
             Thread.CurrentThread.CurrentUICulture = new CultureInfo("en-us");
             ConfigurationManager.RefreshSection(sectionName);
+
             SiAuto.Si.Enabled = true;
+            SiAuto.Si.Level = Level.Debug;
             //SiAuto.Si.Connections = "file(filename=\"log.sil\", append=true,rotate=Monthly,maxsize=\"3MB\")";
-            //while (true)
-            {
-                SiAuto.Main.LogMessage("This is my first SmartInspect message!");
-            }
+            //SiAuto.Main.LogMessage("This is my first SmartInspect message!");
+            //SiAuto.Main.LogText(Level.Debug,"test","hahaha");
+            
             
             Console.WriteLine(GetLocalIPAddress());//current ip address
             Console.WriteLine(System.Environment.UserName);//current username
@@ -434,6 +435,7 @@ WHERE
 
         private static void SendToAvlsEventColumnSetNegativeOneIfPowerOff(TcpClient avlsTcpClient,NetworkStream avlsNetworkStream)
         {
+            SiAuto.Main.EnterMethod(Level.Debug, "SendToAvlsEventColumnSetNegativeOneIfPowerOff");
             var sqlClient = new SqlClient(ConfigurationManager.AppSettings["SQL_SERVER_IP"], ConfigurationManager.AppSettings["SQL_SERVER_PORT"], ConfigurationManager.AppSettings["SQL_SERVER_USER_ID"], ConfigurationManager.AppSettings["SQL_SERVER_PASSWORD"], ConfigurationManager.AppSettings["SQL_SERVER_DATABASE"], ConfigurationManager.AppSettings["Pooling"], ConfigurationManager.AppSettings["MinPoolSize"], ConfigurationManager.AppSettings["MaxPoolSize"], ConfigurationManager.AppSettings["ConnectionLifetime"]);
             DataTable dt = new DataTable();
             var sqlCmd =@"SELECT 
@@ -457,9 +459,11 @@ WHERE
                     SendPackageToAvlsOnlyByUidAndLocGetFromSql(uid, "-1", avlsTcpClient, avlsNetworkStream);
                 }
             }
+            SiAuto.Main.LeaveMethod(Level.Debug, "SendToAvlsEventColumnSetNegativeOneIfPowerOff");
         }
         private static void SendPackageToAvlsOnlyByUidAndLocGetFromSql(string uid, string eventStatus, TcpClient avlsTcpClient, NetworkStream avlsNetworkStream)
         {
+            SiAuto.Main.EnterMethod(Level.Debug, "SendPackageToAvlsOnlyByUidAndLocGetFromSql");
             //TcpClient avls_tcpClient;
             string send_string = string.Empty;
             AVLS_UNIT_Report_Packet avls_package = new AVLS_UNIT_Report_Packet();
@@ -578,8 +582,8 @@ LIMIT 1";
             //ReadLine(avls_tcpClient, netStream, send_string.Length);
             //netStream.Close();
             //avls_tcpClient.Close();
-            log.Info("-access_avls_server:if");
-            Console.WriteLine("-access_avls_server:if");
+            SiAuto.Main.EnterMethod(Level.Debug, "SendPackageToAvlsOnlyByUidAndLocGetFromSql");
+
         }
         private static void AutoSend(NetworkStream netStream)
         {
@@ -667,7 +671,7 @@ LIMIT
                                         // Close the writer and underlying file.
                                         //w.Close();
                                     }
-                                    SiAuto.Main.LogMessage(Immediate_Location_Request);
+                                    SiAuto.Main.LogText(Level.Debug, "Immediate_Location_Request", Immediate_Location_Request);
                                     UnsTcpWriteLine(netStream, data_append_dataLength(Immediate_Location_Request), Immediate_Location_Request);
 
                                     break;
@@ -690,7 +694,7 @@ LIMIT
                                         "\">" +
                                         requeseHashtable["uid"] +
                                         "</suaddr></Triggered-Location-Stop-Request>";
-                                    SiAuto.Main.LogMessage(Triggered_Location_Stop_Request);
+                                    SiAuto.Main.LogText(Level.Debug, "Triggered_Location_Stop_Request", Triggered_Location_Stop_Request);
                                     //using (StreamWriter w = File.AppendText("log.txt"))
                                     {
                                         log.Info("send:\r\n"+ Triggered_Location_Stop_Request);
@@ -710,7 +714,7 @@ LIMIT
                                         "</suaddr><periodic-trigger><interval>" +
                                         requeseHashtable["time_interval"] +
                                         "</interval></periodic-trigger></Triggered-Location-Request>";
-                                    SiAuto.Main.LogMessage(Triggered_Location_Request_Cadence);
+                                    SiAuto.Main.LogText(Level.Debug, "Triggered_Location_Request_Cadence", Triggered_Location_Request_Cadence);
                                     //using (StreamWriter w = File.AppendText("log.txt"))
                                     {
                                         log.Info("send:\r\n"+ Triggered_Location_Request_Cadence);
@@ -1354,7 +1358,7 @@ Select 1-6 then press enter to send package
             List<string> sensor_name = new List<string>();
             List<string> sensor_value = new List<string>();
             List<string> sensor_type = new List<string>();
-            SiAuto.Main.LogMessage(xml_data.ToString());
+            SiAuto.Main.LogText(Level.Debug, xml_root_tag, xml_data.ToString());
             switch (xml_root_tag)
             {
                 case "Triggered-Location-Report":
