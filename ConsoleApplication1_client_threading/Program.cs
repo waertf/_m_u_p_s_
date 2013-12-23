@@ -331,9 +331,9 @@ LIMIT 1";
   custom.uns_deivce_power_status
 SET
   power = NULL";
-            sql_client.connect();
-            sql_client.modify(emptyPowerStatusTable);
-            sql_client.disconnect();
+            //sql_client.connect();
+            //sql_client.modify(emptyPowerStatusTable);
+            //sql_client.disconnect();
             string registration_msg_error_test = "<Location-Registration-Request><application>" + ConfigurationManager.AppSettings["application_ID"] + "</application></Location-Registration-Request>";
             UnsTcpWriteLine(netStream, data_append_dataLength(registration_msg_error_test), registration_msg_error_test);
             //using (StreamWriter w = File.AppendText("log.txt"))
@@ -2389,8 +2389,9 @@ SET
   power = 'off',
 ""updateTime"" = '" + unsUpdateTimeStamp + @"'::timestamp
 WHERE
-  custom.uns_deivce_power_status.uid = '" + htable["suaddr"].ToString() + @"'" + @" AND
-  custom.uns_deivce_power_status.power != 'off' ";
+  custom.uns_deivce_power_status.uid = '" + htable["suaddr"].ToString() + @"'" + @" AND 
+  (custom.uns_deivce_power_status.power <> 'off' OR 
+  custom.uns_deivce_power_status.power IS NULL)";
                                 sql_client.connect();
                                 sql_client.modify(unsSqlCmd);
                                 sql_client.disconnect();
@@ -2443,8 +2444,9 @@ SET
   power = 'on',
 ""updateTime"" = '" + unsUpdateTimeStamp + @"'::timestamp
 WHERE
-  custom.uns_deivce_power_status.uid = '" + htable["suaddr"].ToString() + @"'" + @" AND
-  custom.uns_deivce_power_status.power != 'on' ";
+  custom.uns_deivce_power_status.uid = '" + htable["suaddr"].ToString() + @"'" + @" AND 
+  (custom.uns_deivce_power_status.power <> 'on' OR 
+  custom.uns_deivce_power_status.power IS NULL) ";
                             sql_client.connect();
                             sql_client.modify(unsSqlCmd);
                             sql_client.disconnect();
@@ -2464,8 +2466,9 @@ SET
   power = 'on',
 ""updateTime"" = '" + unsUpdateTimeStamp + @"'::timestamp
 WHERE
-  custom.uns_deivce_power_status.uid = '" + htable["suaddr"].ToString() + @"'" + @" AND
-  custom.uns_deivce_power_status.power != 'on' ";
+  custom.uns_deivce_power_status.uid = '" + htable["suaddr"].ToString() + @"'" + @" AND 
+  (custom.uns_deivce_power_status.power <> 'on' OR 
+  custom.uns_deivce_power_status.power IS NULL) ";
                             sql_client.connect();
                             sql_client.modify(unsSqlCmd);
                             sql_client.disconnect();
@@ -2485,8 +2488,9 @@ SET
   power = 'on',
 ""updateTime"" = '" + unsUpdateTimeStamp + @"'::timestamp
 WHERE
-  custom.uns_deivce_power_status.uid = '" + htable["suaddr"].ToString() + @"'" + @" AND
-  custom.uns_deivce_power_status.power != 'on' ";
+  custom.uns_deivce_power_status.uid = '" + htable["suaddr"].ToString() + @"'" + @" AND 
+  (custom.uns_deivce_power_status.power <> 'on' OR 
+  custom.uns_deivce_power_status.power IS NULL) ";
                             sql_client.connect();
                             sql_client.modify(unsSqlCmd);
                             sql_client.disconnect();
@@ -2559,8 +2563,9 @@ SET
   power = 'on',
 ""updateTime"" = '"+unsUpdateTimeStamp+@"'::timestamp
 WHERE
-  custom.uns_deivce_power_status.uid = '" + htable["suaddr"].ToString() + @"'" + @" AND
-  custom.uns_deivce_power_status.power != 'on' ";
+  custom.uns_deivce_power_status.uid = '" + htable["suaddr"].ToString() + @"'" + @"AND 
+  (custom.uns_deivce_power_status.power <> 'on' OR 
+  custom.uns_deivce_power_status.power IS NULL) ";
                                 sql_client.connect();
                                 sql_client.modify(unsSqlCmd);
                                 sql_client.disconnect();
@@ -2588,8 +2593,9 @@ SET
   power = 'off',
 ""updateTime"" = '" + unsUpdateTimeStamp + @"'::timestamp
 WHERE
-  custom.uns_deivce_power_status.uid = '" + htable["suaddr"].ToString() + @"'" + @" AND
-  custom.uns_deivce_power_status.power != 'off' ";
+  custom.uns_deivce_power_status.uid = '" + htable["suaddr"].ToString() + @"'" + @" AND 
+  (custom.uns_deivce_power_status.power <> 'off' OR 
+  custom.uns_deivce_power_status.power IS NULL) ";
                                 sql_client.connect();
                                 sql_client.modify(unsSqlCmd);
                                 sql_client.disconnect();
