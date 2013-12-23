@@ -456,7 +456,11 @@ WHERE
                 foreach (DataRow row in dt.Rows)
                 {
                     uid = row[0].ToString();
-                    SendPackageToAvlsOnlyByUidAndLocGetFromSql(uid, "-1", avlsTcpClient, avlsNetworkStream);
+                    string device_uid = uid;
+                    //alonso
+                    Thread TSendPackageToAvlsOnlyByUidAndLocGetFromSql = new Thread(() => SendPackageToAvlsOnlyByUidAndLocGetFromSql(device_uid, "-1", avlsTcpClient, avlsNetworkStream));
+                    TSendPackageToAvlsOnlyByUidAndLocGetFromSql.Start();
+                    
                 }
             }
             SiAuto.Main.LeaveMethod(Level.Debug, "SendToAvlsEventColumnSetNegativeOneIfPowerOff");
