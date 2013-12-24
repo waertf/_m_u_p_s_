@@ -2737,7 +2737,7 @@ LIMIT 1";
             }
             else
                 gps_log._option1 = "\'" + DateTime.Now.ToUniversalTime().ToString("yyyyMMddHHmmss") + "\'";
-
+            /*
             #region operation error to access custom.turn_onoff_log table
             if (elements.Contains(new XElement("operation-error").Name))
             {
@@ -2833,7 +2833,7 @@ LIMIT 1";
 
             }
             #endregion
-
+            */
             if (sql_client.connect())
             {
                 
