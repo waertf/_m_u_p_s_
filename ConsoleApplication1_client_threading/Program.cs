@@ -363,7 +363,7 @@ SET
             //sendtest(netStream);
 
             //alonso
-            Thread read_thread = new Thread(() => read_thread_method(unsTcpClient, netStream));
+            Thread read_thread = new Thread(() => read_thread_method(unsTcpClient));
             read_thread.Start();
             if (bool.Parse(ConfigurationManager.AppSettings["ManualSend"]))
             {
@@ -1071,8 +1071,9 @@ Select 1-6 then press enter to send package
             
 
         }
-        private static void ReadLine(TcpClient tcpClient, NetworkStream netStream,int prefix_length)
+        private static void ReadLine(TcpClient tcpClient, int prefix_length)
         {
+            NetworkStream netStream = tcpClient.GetStream();
             try
             {
                 if (netStream.CanRead)
@@ -1083,7 +1084,7 @@ Select 1-6 then press enter to send package
                     netStream.BeginRead(myReadBuffer, 0, myReadBuffer.Length,
                                                                  new AsyncCallback(myReadSizeCallBack),
                                                                  netStream);
-
+                    
                     //autoEvent.WaitOne();
                     /*
                     int numBytesRead = netStream.Read(bytes, 0,
@@ -1111,6 +1112,7 @@ Select 1-6 then press enter to send package
                 Console.WriteLine(System.Reflection.MethodBase.GetCurrentMethod().Name + "_errorline:" + ex.LineNumber());
                 log.Error(System.Reflection.MethodBase.GetCurrentMethod().Name + "_errorline:" + ex.LineNumber());
                 log.Error("ReadLineError:\r\n" + ex.Message);
+                ReadRecovery(netStream);
             }
         }
         public static void myReadSizeCallBack(IAsyncResult ar)
@@ -1138,57 +1140,67 @@ Select 1-6 then press enter to send package
                 Console.WriteLine(System.Reflection.MethodBase.GetCurrentMethod().Name + "_errorline:" + ex.LineNumber());
                 log.Error(System.Reflection.MethodBase.GetCurrentMethod().Name + "_errorline:" + ex.LineNumber());
                 log.Error("myReadSizeCallBackError:" + Environment.NewLine + ex.Message);
-                if(myNetworkStream!=null)
-                    myNetworkStream.Dispose();
-                unsTcpClient.Close();
-                unsTcpClient = new TcpClient();
+                ReadRecovery(myNetworkStream);
                 
-                unsConnectDone.Reset();
-                unsTcpClient.BeginConnect(ipAddress, port, new AsyncCallback(ConnectCallback), unsTcpClient);
-                unsConnectDone.WaitOne();
-                Keeplive.keep(unsTcpClient.Client);
-                myNetworkStream = unsTcpClient.GetStream();
-
-                var sql_client = new SqlClient(ConfigurationManager.AppSettings["SQL_SERVER_IP"], ConfigurationManager.AppSettings["SQL_SERVER_PORT"], ConfigurationManager.AppSettings["SQL_SERVER_USER_ID"], ConfigurationManager.AppSettings["SQL_SERVER_PASSWORD"], ConfigurationManager.AppSettings["SQL_SERVER_DATABASE"], ConfigurationManager.AppSettings["Pooling"], ConfigurationManager.AppSettings["MinPoolSize"], ConfigurationManager.AppSettings["MaxPoolSize"], ConfigurationManager.AppSettings["ConnectionLifetime"]);
-
-                string registration_msg = "<Location-Registration-Request><application>" + ConfigurationManager.AppSettings["application_ID"] + "</application></Location-Registration-Request>";
-                UnsTcpWriteLine(myNetworkStream, data_append_dataLength(registration_msg), registration_msg);
-                //using (StreamWriter w = File.AppendText("log.txt"))
-                {
-                    log.Info("send:\r\n"+ registration_msg);
-                    // Close the writer and underlying file.
-                    //w.Close();
-                }
-                {//access sql
-                    string now = string.Format("{0:yyyyMMdd}", DateTime.Now);
-                    sql_client.connect();
-                    string manual_id_serial_command = sql_client.get_DataTable("SELECT COUNT(_id)   FROM public.operation_log").Rows[0].ItemArray[0].ToString();
-                    sql_client.disconnect();
-                    MANUAL_SQL_DATA operation_log = new MANUAL_SQL_DATA();
-                    operation_log._id = "\'" + "operation" + "_" + now + "_" + manual_id_serial_command + "\'";
-                    operation_log.event_id = @"'null'";
-                    operation_log.application_id = "\'" + ConfigurationManager.AppSettings["application_ID"] + "\'";
-                    operation_log.create_user = @"'System'";
-                    string table_columns, table_column_value, cmd;
-                    table_column_value = operation_log._id + "," + operation_log.event_id + "," + operation_log.application_id + "," + operation_log.create_user;
-                    table_columns = "_id,event_id,application_id,create_user";
-                    cmd = "INSERT INTO public.operation_log (" + table_columns + ") VALUES  (" + table_column_value + ")";
-                    sql_client.connect();
-                    sql_client.modify(cmd);
-                    sql_client.disconnect();
-                }
-
-                myNetworkStream.BeginRead(myReadBuffer, 0, myReadBuffer.Length,
-                                                                 new AsyncCallback(myReadSizeCallBack),
-                                                                 myNetworkStream);
+                
             }
         }
+
+        private static void ReadRecovery(NetworkStream myNetworkStream)
+        {
+            if (unsTcpClient != null)
+            {
+                if (myNetworkStream != null)
+                    myNetworkStream.Close();
+                unsTcpClient.Close();
+            }
+
+            unsTcpClient = new TcpClient();
+
+            unsConnectDone.Reset();
+            unsTcpClient.BeginConnect(ipAddress, port, new AsyncCallback(ConnectCallback), unsTcpClient);
+            unsConnectDone.WaitOne();
+            Keeplive.keep(unsTcpClient.Client);
+            myNetworkStream = unsTcpClient.GetStream();
+
+            var sql_client = new SqlClient(ConfigurationManager.AppSettings["SQL_SERVER_IP"], ConfigurationManager.AppSettings["SQL_SERVER_PORT"], ConfigurationManager.AppSettings["SQL_SERVER_USER_ID"], ConfigurationManager.AppSettings["SQL_SERVER_PASSWORD"], ConfigurationManager.AppSettings["SQL_SERVER_DATABASE"], ConfigurationManager.AppSettings["Pooling"], ConfigurationManager.AppSettings["MinPoolSize"], ConfigurationManager.AppSettings["MaxPoolSize"], ConfigurationManager.AppSettings["ConnectionLifetime"]);
+
+            string registration_msg = "<Location-Registration-Request><application>" + ConfigurationManager.AppSettings["application_ID"] + "</application></Location-Registration-Request>";
+            UnsTcpWriteLine(myNetworkStream, data_append_dataLength(registration_msg), registration_msg);
+            //using (StreamWriter w = File.AppendText("log.txt"))
+            {
+                log.Info("send:\r\n" + registration_msg);
+                // Close the writer and underlying file.
+                //w.Close();
+            }
+            {//access sql
+                string now = string.Format("{0:yyyyMMdd}", DateTime.Now);
+                sql_client.connect();
+                string manual_id_serial_command = sql_client.get_DataTable("SELECT COUNT(_id)   FROM public.operation_log").Rows[0].ItemArray[0].ToString();
+                sql_client.disconnect();
+                MANUAL_SQL_DATA operation_log = new MANUAL_SQL_DATA();
+                operation_log._id = "\'" + "operation" + "_" + now + "_" + manual_id_serial_command + "\'";
+                operation_log.event_id = @"'null'";
+                operation_log.application_id = "\'" + ConfigurationManager.AppSettings["application_ID"] + "\'";
+                operation_log.create_user = @"'System'";
+                string table_columns, table_column_value, cmd;
+                table_column_value = operation_log._id + "," + operation_log.event_id + "," + operation_log.application_id + "," + operation_log.create_user;
+                table_columns = "_id,event_id,application_id,create_user";
+                cmd = "INSERT INTO public.operation_log (" + table_columns + ") VALUES  (" + table_column_value + ")";
+                sql_client.connect();
+                sql_client.modify(cmd);
+                sql_client.disconnect();
+            }
+            ReadLine(unsTcpClient, 2);
+        }
+
         private static void FinishRead(IAsyncResult result)
         {
-            //try
+            NetworkStream fStream = (NetworkStream)result.AsyncState;
+            try
             {
                 // Finish reading from our stream. 0 bytes read means stream was closed
-                NetworkStream fStream = (NetworkStream)result.AsyncState;
+                
                 int read = fStream.EndRead(result);
                 if (0 == read)
                     throw new Exception("0 == read");
@@ -1267,21 +1279,21 @@ Select 1-6 then press enter to send package
                                                                  fStream);
                // fStream.BeginRead(fSizeBuffer, 0, fSizeBuffer.Length, FinishReadSize, null);
             }
-            //catch (Exception ex)
-            //{
-                //Console.WriteLine("FinishReadError:\r\n" + ex.Message);
-                //Console.WriteLine(System.Reflection.MethodBase.GetCurrentMethod().Name + "_errorline:" + ex.LineNumber());
-                //log.Error(System.Reflection.MethodBase.GetCurrentMethod().Name + "_errorline:" + ex.LineNumber());
-                //log.Error("FinishReadError:\r\n" + ex.Message);
-                
-            //}
+            catch (Exception ex)
+            {
+                Console.WriteLine("FinishReadError:\r\n" + ex.Message);
+                Console.WriteLine(System.Reflection.MethodBase.GetCurrentMethod().Name + "_errorline:" + ex.LineNumber());
+                log.Error(System.Reflection.MethodBase.GetCurrentMethod().Name + "_errorline:" + ex.LineNumber());
+                log.Error("FinishReadError:\r\n" + ex.Message);
+                ReadRecovery(fStream);
+            }
         }
-        static void read_thread_method(TcpClient tcpClient, NetworkStream netStream)
+        static void read_thread_method(TcpClient tcpClient)
         {
             Console.WriteLine("in read thread");
             Thread.CurrentThread.CurrentUICulture = new CultureInfo("en-us");
             //asyn read
-            ReadLine(tcpClient, netStream, 2);
+            ReadLine(tcpClient, 2);
             //syn read
             //while (true)
             {
