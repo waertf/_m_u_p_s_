@@ -53,14 +53,14 @@ namespace ConsoleApplication1_client_threading
         private static byte[] myReadBuffer = null;
         private static byte[] fBuffer = null;
         private static int fBytesRead = 0;
-        private static TcpClient unsTcpClient, avlsTcpClient;
-        private static NetworkStream avlsNetworkStream,unsNetworkStream;
+        private volatile static TcpClient unsTcpClient, avlsTcpClient;
+        private volatile static NetworkStream avlsNetworkStream, unsNetworkStream;
 
         [ThreadStatic]
         private static string avlsSendPackage;
 
-        private static byte[] unsSendPackage = null;
-        private static string unsUnsTcpWriteLineWriteParame = string.Empty;
+        private volatile static byte[] unsSendPackage = null;
+        private volatile static string unsUnsTcpWriteLineWriteParame = string.Empty;
         //private static SqlClient sql_client;
         // ManualResetEvent instances signal completion.
         private static ManualResetEvent unsConnectDone =
