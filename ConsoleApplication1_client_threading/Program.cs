@@ -387,6 +387,11 @@ SET
             accessUnsDeivcePowerStatusSqlTable.Elapsed +=
                 (sender, e) => { SendToAvlsEventColumnSetNegativeOneIfPowerOff(avlsTcpClient, avlsNetworkStream); };
             accessUnsDeivcePowerStatusSqlTable.Enabled = true;
+
+            var every30SecondSendUidEqlSixZeroToAvls = new System.Timers.Timer(30*1000);
+            every30SecondSendUidEqlSixZeroToAvls.Elapsed +=
+                (sender, e) => { every30SecondSendUidEqlSixZeroToAvls_Elapsed(avlsTcpClient, avlsNetworkStream); };
+            every30SecondSendUidEqlSixZeroToAvls.Enabled = true;
             Console.ReadLine();
             //Thread send_test_thread = new Thread(() => sendtest(netStream, sql_client));
             //send_test_thread.Start();
@@ -397,10 +402,13 @@ SET
             //unsTcpClient.Close();
         }
 
-        static void autoSendFromSqlTableTimer_Elapsed(object sender, ElapsedEventArgs e)
+        private static void every30SecondSendUidEqlSixZeroToAvls_Elapsed(TcpClient avlsTcpClient, NetworkStream avlsNetworkStream)
         {
-            throw new NotImplementedException();
+            Thread Tevery30SecondSendUidEqlSixZeroToAvls = new Thread(() => SendPackageToAvlsOnlyByUidAndLocGetFromSql("000000", "0", avlsTcpClient, avlsNetworkStream));
+            Tevery30SecondSendUidEqlSixZeroToAvls.Start();
         }
+
+        
 
         private static void test()
         {
