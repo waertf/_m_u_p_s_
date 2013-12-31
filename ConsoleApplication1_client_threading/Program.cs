@@ -388,10 +388,15 @@ SET
                 (sender, e) => { SendToAvlsEventColumnSetNegativeOneIfPowerOff(avlsTcpClient, avlsNetworkStream); };
             accessUnsDeivcePowerStatusSqlTable.Enabled = true;
 
-            var every30SecondSendUidEqlSixZeroToAvls = new System.Timers.Timer(30*1000);
-            every30SecondSendUidEqlSixZeroToAvls.Elapsed +=
-                (sender, e) => { every30SecondSendUidEqlSixZeroToAvls_Elapsed(avlsTcpClient, avlsNetworkStream); };
-            every30SecondSendUidEqlSixZeroToAvls.Enabled = true;
+            if (bool.Parse(ConfigurationManager.AppSettings["IsEvery30SecondSendUidEqlSixZeroToAvls"]))
+            {
+                var every30SecondSendUidEqlSixZeroToAvls = new System.Timers.Timer(30 * 1000);
+                every30SecondSendUidEqlSixZeroToAvls.Elapsed +=
+                    (sender, e) => { every30SecondSendUidEqlSixZeroToAvls_Elapsed(avlsTcpClient, avlsNetworkStream); };
+                every30SecondSendUidEqlSixZeroToAvls.Enabled = true;
+            }
+            
+
             Console.ReadLine();
             //Thread send_test_thread = new Thread(() => sendtest(netStream, sql_client));
             //send_test_thread.Start();
