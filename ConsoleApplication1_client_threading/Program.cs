@@ -2750,6 +2750,7 @@ WHERE
                             sql_client.disconnect();
                             if (dt != null && dt.Rows.Count != 0)
                             {
+                                /*
                                 regSqlCmd = @"INSERT INTO
   custom.regist_log(
   serial_no,
@@ -2761,7 +2762,7 @@ WHERE
                                 }
                                 sql_client.modify(regSqlCmd);
                                 sql_client.disconnect();
-
+                                */
                                 #region access power status
 
                                 
@@ -2799,7 +2800,7 @@ LIMIT 1";
                             {
                                 Thread.Sleep(300);
                             }
-                            dt = sql_client.get_DataTable(regSqlCmd);
+                                dt = sql_client.get_DataTable(unsSqlCmd);
                             sql_client.disconnect();
                                 if (dt != null && dt.Rows.Count != 0)
                                 {
@@ -2886,7 +2887,7 @@ LIMIT 1";
                                     {
                                         Thread.Sleep(300);
                                     }
-                                    dt = sql_client.get_DataTable(regSqlCmd);
+                                    dt = sql_client.get_DataTable(unsSqlCmd);
                                     sql_client.disconnect();
                                     if (dt != null && dt.Rows.Count != 0)
                                     {
