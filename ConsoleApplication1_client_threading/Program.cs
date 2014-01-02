@@ -2727,13 +2727,15 @@ WHERE
                         if (htable.ContainsKey("suaddr"))
                         {
                             UnsSqlPowerOnDeviceCount++;
+                            /*
                             while (!sql_client.connect())
                             {
                                 Thread.Sleep(300);
                             }
                             string reg_countUid = sql_client.get_DataTable("SELECT COUNT(uid)   FROM custom.regist_log").Rows[0].ItemArray[0].ToString();
                             sql_client.disconnect();
-                            string reg_sn = "\'" + htable["suaddr"].ToString() + "_" + now + "_" + reg_countUid + "\'";
+                            */
+                            //string reg_sn = "\'" + htable["suaddr"].ToString() + "_" + now + "_" + reg_countUid + "\'";
                             string reg_uid = "\'" + htable["suaddr"].ToString() + "\'";
                             string regSqlCmd = string.Empty;
                             regSqlCmd = @"SELECT
