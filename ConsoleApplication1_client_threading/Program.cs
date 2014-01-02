@@ -488,11 +488,48 @@ WHERE
                     uid = row[0].ToString();
                     string device_uid = uid;
                     //alonso
-                    Thread TSendPackageToAvlsOnlyByUidAndLocGetFromSql = new Thread(() => SendPackageToAvlsOnlyByUidAndLocGetFromSql(device_uid, "-1", avlsTcpClient, avlsNetworkStream));
+                    Thread TSendPackageToAvlsOnlyByUidAndLocGetFromSql =
+                        new Thread(
+                            () =>
+                                SendPackageToAvlsOnlyByUidAndLocGetFromSql(device_uid, "-1", avlsTcpClient,
+                                    avlsNetworkStream));
                     TSendPackageToAvlsOnlyByUidAndLocGetFromSql.Start();
-                    
+
                 }
-            }
+            }/*
+            else
+            {
+                //send power on only
+                sqlCmd = @"SELECT 
+  custom.uns_deivce_power_status.uid
+FROM
+  custom.uns_deivce_power_status
+WHERE
+  custom.uns_deivce_power_status.power = 'on'";
+                while (!sqlClient.connect())
+                {
+                    Thread.Sleep(300);
+                }
+
+                dt = sqlClient.get_DataTable(sqlCmd);
+                sqlClient.disconnect();
+                if (dt != null && dt.Rows.Count != 0)
+                {
+                    foreach (DataRow row in dt.Rows)
+                    {
+                        uid = row[0].ToString();
+                        string device_uid = uid;
+                        //alonso
+                        Thread TSendPackageToAvlsOnlyByUidAndLocGetFromSqlPowerOn =
+                            new Thread(
+                                () =>
+                                    SendPackageToAvlsOnlyByUidAndLocGetFromSql(device_uid, "181", avlsTcpClient,
+                                        avlsNetworkStream));
+                        TSendPackageToAvlsOnlyByUidAndLocGetFromSqlPowerOn.Start();
+
+                    }
+                }
+            }*/
             SiAuto.Main.LeaveMethod(Level.Debug, "SendToAvlsEventColumnSetNegativeOneIfPowerOff");
         }
         private static void SendPackageToAvlsOnlyByUidAndLocGetFromSql(string uid, string eventStatus, TcpClient avlsTcpClient, NetworkStream avlsNetworkStream)
@@ -600,6 +637,12 @@ LIMIT 1";
             {
                 case "-1":
                     avls_package.Message = "power_off_over_1_hour";
+                    break;
+                case "181":
+                    avls_package.Message = "power_on";
+                    break;
+                case "182":
+                    avls_package.Message = "power_off";
                     break;
                 default:
                     avls_package.Message = "0";
