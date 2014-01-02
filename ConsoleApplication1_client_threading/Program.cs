@@ -2718,29 +2718,69 @@ WHERE
                                 }
                                 sql_client.modify(regSqlCmd);
                                 sql_client.disconnect();
-                            }
-                            #region access power status
 
-                            {
-                                string unsUpdateTimeStamp = DateTime.Now.ToString("yyyyMMdd HHmmss+8");
-                                string unsSqlCmd = @"UPDATE 
+                                #region access power status
+
+                                
+                                    string unsUpdateTimeStamp = DateTime.Now.ToString("yyyyMMdd HHmmss+8");
+                                    string unsSqlCmd = @"UPDATE 
   custom.uns_deivce_power_status
 SET
   power = 'on',
-""updateTime"" = '"+unsUpdateTimeStamp+@"'::timestamp
+""updateTime"" = '" + unsUpdateTimeStamp + @"'::timestamp
 WHERE
   custom.uns_deivce_power_status.uid = '" + htable["suaddr"].ToString() + @"'" + @"AND 
   (custom.uns_deivce_power_status.power <> 'on' OR 
   custom.uns_deivce_power_status.power IS NULL) ";
+                                    while (!sql_client.connect())
+                                    {
+                                        Thread.Sleep(300);
+                                    }
+                                    sql_client.modify(unsSqlCmd);
+                                    sql_client.disconnect();
+                                
+                                #endregion
+                                #region access custom.unsPowerStatusHistory
+
+                                unsSqlCmd = @"SELECT 
+  custom.""unsPowerStatusHistory"".sn
+FROM
+  custom.""unsPowerStatusHistory""
+WHERE
+  custom.""unsPowerStatusHistory"".status = 'on' AND 
+  custom.""unsPowerStatusHistory"".uid = '"+htable["suaddr"].ToString()+@"'
+ORDER BY
+  custom.""unsPowerStatusHistory"".""createTime"" DESC
+LIMIT 1";
+                                while (!sql_client.connect())
+                            {
+                                Thread.Sleep(300);
+                            }
+                            dt = sql_client.get_DataTable(regSqlCmd);
+                            sql_client.disconnect();
+                                if (dt != null && dt.Rows.Count != 0)
+                                {
+                                }
+                                else
+                                {
+                                    unsSqlCmd = @"INSERT INTO
+  custom.""unsPowerStatusHistory""(
+  uid,
+  status)
+VALUES(
+  '" + htable["suaddr"].ToString() + @"',
+  'on')";
+                                }
                                 while (!sql_client.connect())
                                 {
                                     Thread.Sleep(300);
                                 }
                                 sql_client.modify(unsSqlCmd);
                                 sql_client.disconnect();
+                                #endregion
                             }
-                            #endregion
-                            
+                      
+
                         }
                         
                         return;
@@ -2754,9 +2794,23 @@ WHERE
                         {
                             if (htable.ContainsKey("suaddr"))
                             {
-                                UnsSqlPowerOnDeviceCount--;
-                                string unsUpdateTimeStamp = DateTime.Now.ToString("yyyyMMdd HHmmss+8");
-                                string unsSqlCmd = @"UPDATE 
+                                string regSqlCmd = @"SELECT
+  sd.equipment.uid
+  FROM
+  sd.equipment
+  where
+  sd.equipment.uid = '" +htable["suaddr"].ToString()+@"'";
+                            while (!sql_client.connect())
+                            {
+                                Thread.Sleep(300);
+                            }
+                            var dt = sql_client.get_DataTable(regSqlCmd);
+                            sql_client.disconnect();
+                                if (dt != null && dt.Rows.Count != 0)
+                                {
+                                    UnsSqlPowerOnDeviceCount--;
+                                    string unsUpdateTimeStamp = DateTime.Now.ToString("yyyyMMdd HHmmss+8");
+                                    string unsSqlCmd = @"UPDATE 
   custom.uns_deivce_power_status
 SET
   power = 'off',
@@ -2765,13 +2819,55 @@ WHERE
   custom.uns_deivce_power_status.uid = '" + htable["suaddr"].ToString() + @"'" + @" AND 
   (custom.uns_deivce_power_status.power <> 'off' OR 
   custom.uns_deivce_power_status.power IS NULL) ";
-                                
-                                while (!sql_client.connect())
-                                {
-                                    Thread.Sleep(300);
+
+                                    while (!sql_client.connect())
+                                    {
+                                        Thread.Sleep(300);
+                                    }
+                                    sql_client.modify(unsSqlCmd);
+                                    sql_client.disconnect();
+
+                                    #region access custom.unsPowerStatusHistory
+
+                                    unsSqlCmd = @"SELECT 
+  custom.""unsPowerStatusHistory"".sn
+FROM
+  custom.""unsPowerStatusHistory""
+WHERE
+  custom.""unsPowerStatusHistory"".status = 'off' AND 
+  custom.""unsPowerStatusHistory"".uid = '" + htable["suaddr"].ToString() + @"'
+ORDER BY
+  custom.""unsPowerStatusHistory"".""createTime"" DESC
+LIMIT 1";
+                                    while (!sql_client.connect())
+                                    {
+                                        Thread.Sleep(300);
+                                    }
+                                    dt = sql_client.get_DataTable(regSqlCmd);
+                                    sql_client.disconnect();
+                                    if (dt != null && dt.Rows.Count != 0)
+                                    {
+                                    }
+                                    else
+                                    {
+                                        unsSqlCmd = @"INSERT INTO
+  custom.""unsPowerStatusHistory""(
+  uid,
+  status)
+VALUES(
+  '" + htable["suaddr"].ToString() + @"',
+  'off')";
+                                    }
+                                    while (!sql_client.connect())
+                                    {
+                                        Thread.Sleep(300);
+                                    }
+                                    sql_client.modify(unsSqlCmd);
+                                    sql_client.disconnect();
+                                    #endregion
+
                                 }
-                                sql_client.modify(unsSqlCmd);
-                                sql_client.disconnect();
+                                
                             }
                         }
                         #endregion
