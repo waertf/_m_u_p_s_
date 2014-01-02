@@ -1,0 +1,9 @@
+--------------- SQL ---------------
+
+CREATE TABLE custom."unsPowerStatusHistory" (
+  sn BIGSERIAL NOT NULL,
+  uid VARCHAR(6),
+  status VARCHAR(3),
+  "createTime" TIMESTAMP(0) WITH TIME ZONE DEFAULT now(),
+  PRIMARY KEY(sn)
+) ;
