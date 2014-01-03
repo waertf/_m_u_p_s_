@@ -166,9 +166,10 @@ each set of the byte. To display a four-byte string, there will be 8 digits stri
 
         static void ConnectCallback(IAsyncResult ar)
         {
+            TcpClient t = (TcpClient)ar.AsyncState;
             try
             {
-                TcpClient t = (TcpClient)ar.AsyncState;
+                
                 if (t != null && t.Client != null)
                 {
                     t.EndConnect(ar);
@@ -185,10 +186,10 @@ each set of the byte. To display a four-byte string, there will be 8 digits stri
                 Console.WriteLine(System.Reflection.MethodBase.GetCurrentMethod().Name +"_errorline:" + ex.LineNumber());
                 log.Error(System.Reflection.MethodBase.GetCurrentMethod().Name + "_errorline:" + ex.LineNumber());
                 log.Error(ex.Message);
+                if(unsNetworkStream!=null)
+                    unsNetworkStream.Close();
                 if (unsTcpClient != null)
                 {
-                    if (unsTcpClient.GetStream() != null)
-                        unsTcpClient.GetStream().Close();
                     unsTcpClient.Close();
                         
                 }
@@ -1063,8 +1064,8 @@ Select 1-6 then press enter to send package
 
                     if (unsTcpClient != null)
                     {
-                        if (unsTcpClient.GetStream() != null)
-                            unsTcpClient.GetStream().Close();
+                        if (netStream != null)
+                            netStream.Close();
                         unsTcpClient.Close();
 
                     }
@@ -1087,9 +1088,10 @@ Select 1-6 then press enter to send package
         }
         public static void UnsTcpWriteCallBack(IAsyncResult ar)
         {
+            NetworkStream myNetworkStream = (NetworkStream)ar.AsyncState;
             try
             {
-                NetworkStream myNetworkStream = (NetworkStream)ar.AsyncState;
+                
                 myNetworkStream.EndWrite(ar);
             }
             catch (Exception ex)
@@ -1102,8 +1104,8 @@ Select 1-6 then press enter to send package
 
                 if (unsTcpClient != null)
                 {
-                    if (unsTcpClient.GetStream() != null)
-                        unsTcpClient.GetStream().Close();
+                    if (myNetworkStream != null)
+                        myNetworkStream.Close();
                     unsTcpClient.Close();
 
                 }
