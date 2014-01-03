@@ -1900,7 +1900,15 @@ WHERE
             else
             {
                 lat = lon = "0";
-                log.Error("Cannot find lat lon of deviceID: " + id + "in sql table: sd.initial_location ");
+                switch (id)
+                {
+                    case "000000":
+                        break;
+                    default:
+                        log.Error("Cannot find lat lon of deviceID: " + id + " in sql table: sd.initial_location ");
+                        break;
+                }
+                
             }
         }
 
