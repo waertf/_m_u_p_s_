@@ -2312,7 +2312,7 @@ LIMIT 1";
                             avls_package.Message = htable["event_info"].ToString();
                             break;
                         case "Emergency Off":
-                            avls_package.Event = "000,";
+                            avls_package.Event = "0,";
                             avls_package.Status = "00000000,";
                             avls_package.Message = htable["event_info"].ToString();
                             break;
@@ -2335,12 +2335,12 @@ LIMIT 1";
                             //return;
                             break;
                         case "Ignition Off":
-                            avls_package.Event = "000,";
+                            avls_package.Event = "0,";
                             avls_package.Status = "00000000,";
                             avls_package.Message = htable["event_info"].ToString();
                             break;
                         case "Ignition On":
-                            avls_package.Event = "000,";
+                            avls_package.Event = "0,";
                             avls_package.Status = "00020000,";
                             avls_package.Message = htable["event_info"].ToString();
                             break;
@@ -2349,7 +2349,7 @@ LIMIT 1";
                 }
                 else
                 {
-                    avls_package.Event = "000,";
+                    avls_package.Event = "0,";
                     avls_package.Status = "00000000,";
                 }
                 if (xml_root_tag.Equals("Immediate-Location-Report"))
