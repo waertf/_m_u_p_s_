@@ -817,7 +817,8 @@ LIMIT
                                         ConfigurationManager.AppSettings["suaddr-type"] + "\">" +
                                         requeseHashtable["uid"] +
                                         "</suaddr><periodic-trigger><trg-distance>" +
-                                        (int)(double.Parse(requeseHashtable["distance_interval"].ToString()) * 1.0936133) +
+                                        requeseHashtable["distance_interval"]+ // meter
+                                        //(int)(double.Parse(requeseHashtable["distance_interval"].ToString()) * 1.0936133) +//meter to yard
                                         "</trg-distance></periodic-trigger></Triggered-Location-Request>";
 
                                     //using (StreamWriter w = File.AppendText("log.txt"))
