@@ -709,6 +709,7 @@ LIMIT
                             requeseHashtable.Add("uid", row[2]);
                             requeseHashtable.Add("send_value", row[3]);
                             requeseHashtable.Add("time_interval", row[4]);
+                            requeseHashtable.Add("distance_interval", row[4]);
                             requeseHashtable.Add("create_time", row[5]);
                         }
                         if (CheckIfUidExist(requeseHashtable["uid"].ToString()))
@@ -809,14 +810,14 @@ LIMIT
                                     }
                                     UnsTcpWriteLine(netStream, data_append_dataLength(Triggered_Location_Request_Cadence), Triggered_Location_Request_Cadence);
                                     break;
-                                case "-1":
+                                case "4":
                                     string Triggered_Location_Request_Distance = "<Triggered-Location-Request><request-id>" +
                                         ConfigurationManager.AppSettings["request-id"] + 
                                         "</request-id><suaddr suaddr-type=\"" + 
                                         ConfigurationManager.AppSettings["suaddr-type"] + "\">" +
                                         requeseHashtable["uid"] +
                                         "</suaddr><periodic-trigger><trg-distance>" +
-                                        ConfigurationManager.AppSettings["trg-distance"] +
+                                        (int)(double.Parse(requeseHashtable["distance_interval"].ToString()) * 1.0936133) +
                                         "</trg-distance></periodic-trigger></Triggered-Location-Request>";
 
                                     //using (StreamWriter w = File.AppendText("log.txt"))
