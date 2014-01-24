@@ -488,6 +488,22 @@ WHERE
                 {
                     uid = row[0].ToString();
                     string device_uid = uid;
+
+                    string unsUpdateTimeStamp = DateTime.Now.ToString("yyyyMMdd HHmmss+8");
+                    string unsSqlCmd = @"UPDATE 
+  custom.uns_deivce_power_status
+SET
+  power = NULL,
+""updateTime"" = '" + unsUpdateTimeStamp + @"'::timestamp
+WHERE
+  custom.uns_deivce_power_status.uid = '" + device_uid + @"'";
+                    while (!sqlClient.connect())
+                    {
+                        Thread.Sleep(300);
+                    }
+                    sqlClient.modify(unsSqlCmd);
+                    sqlClient.disconnect();
+
                     //alonso
                     Thread TSendPackageToAvlsOnlyByUidAndLocGetFromSql =
                         new Thread(
