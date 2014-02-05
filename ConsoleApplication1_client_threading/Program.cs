@@ -1147,7 +1147,7 @@ Select 1-6 then press enter to send package
             {
                 NetworkStream myNetworkStream = (NetworkStream)ar.AsyncState;
                 myNetworkStream.EndWrite(ar);
-                //avlsSendDone.Set();
+                avlsSendDone.Set();
             }
             catch (Exception ex)
             {
@@ -1684,6 +1684,17 @@ Select 1-6 then press enter to send package
                                 //Console.WriteLine("Odometer:{0}", Odometer);
                             }
                         }
+
+                        if (bool.Parse(ConfigurationManager.AppSettings["AVLS_ACCESS"]))
+                        {
+                            avlsSendDone.Reset();
+                            Thread access_avls = new Thread(() => access_avls_server(xml_root_tag, htable, sensor_name, sensor_type, sensor_value, XmlGetAllElementsXname(xml_data), logData, avlsTcpClient));
+                            access_avls.Start();
+
+                            Console.WriteLine("AVLS Access Enable");
+                            avlsSendDone.WaitOne();
+                        }
+
                         if (bool.Parse(ConfigurationManager.AppSettings["SQL_ACCESS"]))
                         {
                             Thread access_sql = new Thread(() =>  access_sql_server( xml_root_tag, htable, sensor_name, sensor_type, sensor_value, XmlGetAllElementsXname(xml_data), logData));
@@ -1692,13 +1703,7 @@ Select 1-6 then press enter to send package
                             Console.WriteLine("SQL Access Enable");
                         }
 
-                        if (bool.Parse(ConfigurationManager.AppSettings["AVLS_ACCESS"]))
-                        {
-                            Thread access_avls = new Thread(() => access_avls_server( xml_root_tag, htable, sensor_name, sensor_type, sensor_value, XmlGetAllElementsXname(xml_data), logData,avlsTcpClient));
-                            access_avls.Start();
-                            
-                            Console.WriteLine("AVLS Access Enable");
-                        }
+                        
                         /*
                         Console.Clear();
                         Console.WriteLine("unsAvslPowerOnDeviceCount:"+unsAvslPowerOnDeviceCount);
