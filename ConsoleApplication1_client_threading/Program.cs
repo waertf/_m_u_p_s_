@@ -75,6 +75,8 @@ namespace ConsoleApplication1_client_threading
             new ManualResetEvent(false);
         private static ManualResetEvent avlsReceiveDone =
             new ManualResetEvent(false);
+        private static ManualResetEvent sqlAccessEvent =
+            new ManualResetEvent(false);
 
         private static object readRecoveryLock = new object();
 
@@ -1393,8 +1395,9 @@ Select 1-6 then press enter to send package
                 //Console.WriteLine("First node:[" + xml_root_tag + "]");
                 Console.WriteLine("E############################################################################");
                 var sql_client = new SqlClient(ConfigurationManager.AppSettings["SQL_SERVER_IP"], ConfigurationManager.AppSettings["SQL_SERVER_PORT"], ConfigurationManager.AppSettings["SQL_SERVER_USER_ID"], ConfigurationManager.AppSettings["SQL_SERVER_PASSWORD"], ConfigurationManager.AppSettings["SQL_SERVER_DATABASE"], ConfigurationManager.AppSettings["Pooling"], ConfigurationManager.AppSettings["MinPoolSize"], ConfigurationManager.AppSettings["MaxPoolSize"], ConfigurationManager.AppSettings["ConnectionLifetime"]);
-
-                xml_parse(unsTcpClient, fStream, xml_root_tag, xml_data, avlsTcpClient);
+                Thread xmlParseThread = new Thread(() => xml_parse(unsTcpClient, fStream, xml_root_tag, xml_data, avlsTcpClient));
+                xmlParseThread.Start();
+                //xml_parse(unsTcpClient, fStream, xml_root_tag, xml_data, avlsTcpClient);
                 //Console.ReadLine();
 
                 //byte[] bytes = new byte[unsTcpClient.ReceiveBufferSize];
@@ -1697,10 +1700,12 @@ Select 1-6 then press enter to send package
 
                         if (bool.Parse(ConfigurationManager.AppSettings["SQL_ACCESS"]))
                         {
+                            sqlAccessEvent.Reset();
                             Thread access_sql = new Thread(() =>  access_sql_server( xml_root_tag, htable, sensor_name, sensor_type, sensor_value, XmlGetAllElementsXname(xml_data), logData));
                             access_sql.Start();
                            
                             Console.WriteLine("SQL Access Enable");
+                            sqlAccessEvent.WaitOne();
                         }
 
                         
@@ -3499,6 +3504,7 @@ LIMIT 1";
             }
             
             Console.WriteLine("-access_sql_server");
+            sqlAccessEvent.Set();
         }
         /*
              * <result result-code="A">SYNTAX ERROR</result>
