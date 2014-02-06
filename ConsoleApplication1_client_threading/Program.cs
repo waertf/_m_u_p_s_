@@ -1395,12 +1395,12 @@ Select 1-6 then press enter to send package
                 //Console.WriteLine("First node:[" + xml_root_tag + "]");
                 Console.WriteLine("E############################################################################");
                 var sql_client = new SqlClient(ConfigurationManager.AppSettings["SQL_SERVER_IP"], ConfigurationManager.AppSettings["SQL_SERVER_PORT"], ConfigurationManager.AppSettings["SQL_SERVER_USER_ID"], ConfigurationManager.AppSettings["SQL_SERVER_PASSWORD"], ConfigurationManager.AppSettings["SQL_SERVER_DATABASE"], ConfigurationManager.AppSettings["Pooling"], ConfigurationManager.AppSettings["MinPoolSize"], ConfigurationManager.AppSettings["MaxPoolSize"], ConfigurationManager.AppSettings["ConnectionLifetime"]);
-                //Thread xmlParseThread = new Thread(() => xml_parse(unsTcpClient, fStream, returndata, avlsTcpClient));
-                //xmlParseThread.Start();
-                xml_parse(unsTcpClient, fStream, returndata, avlsTcpClient);
+                Thread xmlParseThread = new Thread(() => xml_parse(unsTcpClient, fStream, returndata, avlsTcpClient));
+                xmlParseThread.Start();
+                //xml_parse(unsTcpClient, fStream, returndata, avlsTcpClient);
                 //Console.ReadLine();
 
-                //byte[] bytes = new byte[unsTcpClient.ReceiveBufferSize];
+                //byte[] bytes = new byte[unsTcpClient.ReceiveBufferSize];test
 
                 //int numBytesRead = netStream.Read(bytes, 0,
                 //(int)unsTcpClient.ReceiveBufferSize);
