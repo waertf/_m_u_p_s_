@@ -90,9 +90,15 @@ namespace ConsoleApplication1_client_threading
                     PgSqlCommand command = pgSqlConnection.CreateCommand();
                     command.CommandText = cmd;
                     //cmd.CommandText = "INSERT INTO public.test (id) VALUES (1)";
-
+                    pgSqlConnection.BeginTransaction();
                     //async
                     IAsyncResult cres = command.BeginExecuteNonQuery(null, null);
+                    Console.Write("In progress...");
+                    while (!cres.IsCompleted)
+                    {
+                        Console.Write(".");
+                        //Perform here any operation you need
+                    }
                     /*
                     if (cres.IsCompleted)
                         Console.WriteLine("Completed.");
@@ -107,6 +113,7 @@ namespace ConsoleApplication1_client_threading
                      Console.WriteLine(aff + " rows were affected.");
                      * 
                      */
+                    pgSqlConnection.Commit();
                     return true;
                 }
                 else
@@ -118,6 +125,7 @@ namespace ConsoleApplication1_client_threading
                 Console.WriteLine("Modify exception occurs: {0}" + Environment.NewLine + "{1}", ex.Error, cmd);
                 log.Error("Modify exception occurs: " + Environment.NewLine + ex.Error + Environment.NewLine + cmd);
                 Console.ResetColor();
+                pgSqlConnection.Rollback();
                 return false;
             }
 
@@ -134,6 +142,13 @@ namespace ConsoleApplication1_client_threading
                     command.CommandText = cmd;
                     //Console.WriteLine("Starting asynchronous retrieval of data...");
                     IAsyncResult cres = command.BeginExecuteReader();
+                    Console.Write("In progress...");
+                    while (!cres.IsCompleted)
+                    {
+                        Console.Write(".");
+                        //Perform here any operation you need
+                    }
+
                     //if (cres.IsCompleted)
                         //Console.WriteLine("Completed.");
                     //else
