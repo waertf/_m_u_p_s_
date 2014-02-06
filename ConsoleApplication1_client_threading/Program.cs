@@ -1884,7 +1884,7 @@ Select 1-6 then press enter to send package
             }
             
             Console.WriteLine("::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::");
-            using (StreamWriter w = File.AppendText("log.txt"))
+            //using (StreamWriter w = File.AppendText("log.txt"))
             {
                 foreach (DictionaryEntry ht in htable)
                 {
@@ -1894,7 +1894,7 @@ Select 1-6 then press enter to send package
                    
 
                 }
-                w.Close();
+                //w.Close();
             }
             
             Console.WriteLine("::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::");
