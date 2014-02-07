@@ -1571,8 +1571,17 @@ Select 1-6 then press enter to send package
                         IEnumerable<XName> elements = XmlGetAllElementsXname(xml_data);
                         if (elements.Contains(new XElement("suaddr").Name))
                         {
-                            htable.Add("suaddr", XmlGetTagValue(xml_data, "suaddr"));
-                            Console.WriteLine("suaddr:{0}", htable["suaddr"]);
+                            string id = string.Empty;
+                            id = XmlGetTagValue(xml_data, "suaddr");
+                            if(id.Equals(string.Empty))
+                                return;
+                            else
+                            {
+                                htable.Add("suaddr", id);
+                                Console.WriteLine("suaddr:{0}", htable["suaddr"]);
+                            }
+                            
+                            
                             if(CheckIfUidExist(htable["suaddr"].ToString()))
                             {}
                             else
@@ -1822,8 +1831,17 @@ Select 1-6 then press enter to send package
                         IEnumerable<XName> elements = XmlGetAllElementsXname(xml_data);
                         if (elements.Contains(new XElement("suaddr").Name))
                         {
-                            htable.Add( "suaddr" , XmlGetTagValue(xml_data, "suaddr"));
-                            //Console.WriteLine("suaddr:{0}", suaddr);
+                            string id = string.Empty;
+                            id = XmlGetTagValue(xml_data, "suaddr");
+                            if (id.Equals(string.Empty))
+                                return;
+                            else
+                            {
+                                htable.Add("suaddr", id);
+                                Console.WriteLine("suaddr:{0}", htable["suaddr"]);
+                            }
+
+                            
                             if (CheckIfUidExist(htable["suaddr"].ToString()))
                             { }
                             else
@@ -1861,8 +1879,15 @@ Select 1-6 then press enter to send package
                         IEnumerable<XName> elements = XmlGetAllElementsXname(xml_data);
                         if (elements.Contains(new XElement("suaddr").Name))
                         {
-                            htable.Add("suaddr", XmlGetTagValue(xml_data, "suaddr"));
-                            //Console.WriteLine("suaddr:{0}", suaddr);
+                            string id = string.Empty;
+                            id = XmlGetTagValue(xml_data, "suaddr");
+                            if (id.Equals(string.Empty))
+                                return;
+                            else
+                            {
+                                htable.Add("suaddr", id);
+                                Console.WriteLine("suaddr:{0}", htable["suaddr"]);
+                            }
                             if (CheckIfUidExist(htable["suaddr"].ToString()))
                             { }
                             else
@@ -3505,7 +3530,7 @@ LIMIT 1";
                     sql_client.disconnect();
                 }
             }
-            
+            sql_client.Dispose();
             Console.WriteLine("-access_sql_server");
             //sqlAccessEvent.Set();
         }
