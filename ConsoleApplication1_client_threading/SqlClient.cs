@@ -9,7 +9,7 @@ using log4net.Config;
 
 namespace ConsoleApplication1_client_threading
 {
-    class SqlClient
+    class SqlClient:IDisposable
     {
         PgSqlConnectionStringBuilder pgCSB = new PgSqlConnectionStringBuilder();
         PgSqlConnection pgSqlConnection;
@@ -207,5 +207,9 @@ namespace ConsoleApplication1_client_threading
             }
         }
 
+        public void Dispose()
+        {
+            pgSqlConnection.Dispose();
+        }
     }
 }
