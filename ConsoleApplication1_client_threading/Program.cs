@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 using System.Net.NetworkInformation;
@@ -1919,6 +1920,10 @@ Select 1-6 then press enter to send package
 
         private static void GetInitialLocationFromSql(ref string lat, ref string lon, string id)
         {
+            StackFrame frame = new StackFrame(1);
+            var callerMethod = frame.GetMethod();
+            var callerType = callerMethod.DeclaringType;
+            var callerName = callerMethod.Name;
             var sqlClient = new SqlClient(ConfigurationManager.AppSettings["SQL_SERVER_IP"], ConfigurationManager.AppSettings["SQL_SERVER_PORT"], ConfigurationManager.AppSettings["SQL_SERVER_USER_ID"], ConfigurationManager.AppSettings["SQL_SERVER_PASSWORD"], ConfigurationManager.AppSettings["SQL_SERVER_DATABASE"], ConfigurationManager.AppSettings["Pooling"], ConfigurationManager.AppSettings["MinPoolSize"], ConfigurationManager.AppSettings["MaxPoolSize"], ConfigurationManager.AppSettings["ConnectionLifetime"]);
             string sqlCmd = @"SELECT 
   sd.initial_location.lat,
@@ -1952,6 +1957,8 @@ WHERE
                     case "000000":
                         break;
                     default:
+                        log.Error("callerType:" + callerType);
+                        log.Error("callerName:" + callerName);
                         log.Error("Cannot find lat lon of deviceID: " + id + " in sql table: sd.initial_location ");
                         break;
                 }
@@ -2987,6 +2994,15 @@ VALUES(
             {
                 if (htable.ContainsKey("suaddr"))
                 {
+                    string deviceID = string.Empty;
+                    deviceID = htable["suaddr"] as string;
+                    if(deviceID!=null)
+                    {}
+                    else
+                    {
+                        log.Error("access_sql_server:1:deviceID is null");
+                        return;
+                    }
                     string sqlCmd = @"SELECT 
   public._gps_log._lat,
   public._gps_log._lon
@@ -2994,7 +3010,7 @@ FROM
   public._gps_log
 WHERE
   public._gps_log._time < now() AND 
-  public._gps_log._uid = '" + htable["suaddr"] + @"'
+  public._gps_log._uid = '" + deviceID + @"'
 ORDER BY
   public._gps_log._time DESC
 LIMIT 1";
@@ -3016,7 +3032,7 @@ LIMIT 1";
                         if (gps_log._lat.Equals(zero) || gps_log._lon.Equals(zero))
                         {
                             string lat = string.Empty, lon = string.Empty;
-                            GetInitialLocationFromSql(ref lat, ref lon, (string)htable["suaddr"]);
+                            GetInitialLocationFromSql(ref lat, ref lon, deviceID);
                             gps_log._lat = gps_log._or_lat = operation_log.eqp_lat = lat;
                             gps_log._lon = gps_log._or_lon = operation_log.eqp_lon = lon;
                         }
@@ -3028,7 +3044,7 @@ LIMIT 1";
                         //gps_log._lon = operation_log.eqp_lon = zero;
 
                         string lat = string.Empty, lon = string.Empty;
-                        GetInitialLocationFromSql(ref lat, ref lon, (string) htable["suaddr"]);
+                        GetInitialLocationFromSql(ref lat, ref lon, deviceID);
                         gps_log._lat = gps_log._or_lat=operation_log.eqp_lat = lat;
                         gps_log._lon = gps_log._or_lon=operation_log.eqp_lon = lon;
                     }
@@ -3038,9 +3054,17 @@ LIMIT 1";
                     //string zero = "0";
                     //gps_log._lat = operation_log.eqp_lat = zero;
                     //gps_log._lon = operation_log.eqp_lon = zero;
-
+                    string deviceID = string.Empty;
+                    deviceID = htable["suaddr"] as string;
+                    if (deviceID != null)
+                    { }
+                    else
+                    {
+                        log.Error("access_sql_server:2:deviceID is null");
+                        return;
+                    }
                     string lat = string.Empty, lon = string.Empty;
-                    GetInitialLocationFromSql(ref lat, ref lon, (string)htable["suaddr"]);
+                    GetInitialLocationFromSql(ref lat, ref lon, deviceID);
                     gps_log._lat = gps_log._or_lat=operation_log.eqp_lat = lat;
                     gps_log._lon = gps_log._or_lon=operation_log.eqp_lon = lon;
                 }
