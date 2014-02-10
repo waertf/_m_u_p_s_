@@ -1971,6 +1971,7 @@ WHERE
             Console.WriteLine("+access_avls_server");
             Thread.CurrentThread.CurrentUICulture = new CultureInfo("en-us");
             string send_string = string.Empty;
+            string initialLat = string.Empty, initialLon = string.Empty;
             AVLS_UNIT_Report_Packet avls_package = new AVLS_UNIT_Report_Packet();
             avls_package.Message = "test";
             
@@ -2120,8 +2121,8 @@ LIMIT 1";
                             string avlsLat = string.Empty, avlsLon = string.Empty;
                             foreach (DataRow row in dt.Rows)
                             {
-                                avlsLat = row[0].ToString();
-                                avlsLon = row[1].ToString();
+                                initialLat=avlsLat = row[0].ToString();
+                                initialLon=avlsLon = row[1].ToString();
                             }
                             string zero = "0";
                             if (avlsLat.Equals(zero) || avlsLon.Equals(zero))
@@ -2146,7 +2147,7 @@ LIMIT 1";
                             //string lat_str = lat_value.Degrees.ToString() + lat_value.Minutes.ToString("D2") + "." + lat_value.Seconds.ToString("D2") + lat_value.Milliseconds.ToString("D3");
                             //string long_str = long_value.Degrees.ToString() + long_value.Minutes.ToString("D2") + "." + long_value.Seconds.ToString("D2") + long_value.Milliseconds.ToString("D3");
                             //avls_package.Loc = "N" + (Convert.ToDouble(htable["lat_value"])*100).ToString() + "E" + (Convert.ToDouble(htable["long_value"])*100).ToString()+ ",";
-                            string lat_str = avlsLat, long_str = avlsLon;
+                            string lat_str = initialLat=avlsLat, long_str = initialLon=avlsLon;
                             ConvertLocToAvlsLoc(ref lat_str, ref long_str); 
                             avls_package.Loc = "N" + lat_str + "E" + long_str + ",";
                             //avls_package.Loc = "N00000.0000E00000.0000,";
@@ -2165,6 +2166,7 @@ LIMIT 1";
     LIMIT 1
                          */
                     }
+                    //check range of initialLat/initialLon in exclusion_area_boundary then send event by avls_package.Event
                     avls_package.ID += ",";
                     send_string = "%%" + avls_package.ID + avls_package.GPS_Valid + avls_package.Date_Time + avls_package.Loc + avls_package.Speed + avls_package.Dir + avls_package.Temp + avls_package.Status + avls_package.Event + avls_package.Message + "\r\n";
 
@@ -2234,7 +2236,7 @@ LIMIT 1";
                     //string lat_str = lat_value.Degrees.ToString() + lat_value.Minutes.ToString("D2") + "." + lat_value.Seconds.ToString("D2") + lat_value.Milliseconds.ToString("D3");
                     //string long_str = long_value.Degrees.ToString() + long_value.Minutes.ToString("D2") + "." + long_value.Seconds.ToString("D2") + long_value.Milliseconds.ToString("D3");
                     //avls_package.Loc = "N" + (Convert.ToDouble(htable["lat_value"])*100).ToString() + "E" + (Convert.ToDouble(htable["long_value"])*100).ToString()+ ",";
-                    string lat_str = (string) htable["lat_value"], long_str = (string) htable["long_value"];
+                    string lat_str = initialLat=(string) htable["lat_value"], long_str =initialLon= (string) htable["long_value"];
                     ConvertLocToAvlsLoc(ref lat_str, ref long_str); 
                     avls_package.Loc = "N" + lat_str + "E" + long_str + ",";
                     last_avls_lat = lat_str;
@@ -2283,7 +2285,7 @@ LIMIT 1";
                             //string lat_str = lat_value.Degrees.ToString() + lat_value.Minutes.ToString("D2") + "." + lat_value.Seconds.ToString("D2") + lat_value.Milliseconds.ToString("D3");
                             //string long_str = long_value.Degrees.ToString() + long_value.Minutes.ToString("D2") + "." + long_value.Seconds.ToString("D2") + long_value.Milliseconds.ToString("D3");
                             //avls_package.Loc = "N" + (Convert.ToDouble(htable["lat_value"])*100).ToString() + "E" + (Convert.ToDouble(htable["long_value"])*100).ToString()+ ",";
-                            string lat_str = avlsLat, long_str = avlsLon;
+                            string lat_str = initialLat = avlsLat, long_str = initialLon = avlsLon;
                             ConvertLocToAvlsLoc(ref lat_str, ref long_str); 
                             avls_package.Loc = "N" + lat_str + "E" + long_str + ",";
                         }
@@ -2296,7 +2298,7 @@ LIMIT 1";
                             //string lat_str = lat_value.Degrees.ToString() + lat_value.Minutes.ToString("D2") + "." + lat_value.Seconds.ToString("D2") + lat_value.Milliseconds.ToString("D3");
                             //string long_str = long_value.Degrees.ToString() + long_value.Minutes.ToString("D2") + "." + long_value.Seconds.ToString("D2") + long_value.Milliseconds.ToString("D3");
                             //avls_package.Loc = "N" + (Convert.ToDouble(htable["lat_value"])*100).ToString() + "E" + (Convert.ToDouble(htable["long_value"])*100).ToString()+ ",";
-                            string lat_str = avlsLat, long_str = avlsLon;
+                            string lat_str =initialLat= avlsLat, long_str =initialLon= avlsLon;
                             ConvertLocToAvlsLoc(ref lat_str, ref long_str); 
                             avls_package.Loc = "N" + lat_str + "E" + long_str + ",";
                             //avls_package.Loc = "N00000.0000E00000.0000,";
@@ -2324,7 +2326,7 @@ LIMIT 1";
                         //string lat_str = lat_value.Degrees.ToString() + lat_value.Minutes.ToString("D2") + "." + lat_value.Seconds.ToString("D2") + lat_value.Milliseconds.ToString("D3");
                         //string long_str = long_value.Degrees.ToString() + long_value.Minutes.ToString("D2") + "." + long_value.Seconds.ToString("D2") + long_value.Milliseconds.ToString("D3");
                         //avls_package.Loc = "N" + (Convert.ToDouble(htable["lat_value"])*100).ToString() + "E" + (Convert.ToDouble(htable["long_value"])*100).ToString()+ ",";
-                        string lat_str = avlsLat, long_str = avlsLon;
+                        string lat_str = initialLat=avlsLat, long_str =initialLon= avlsLon;
                         ConvertLocToAvlsLoc(ref lat_str, ref long_str); 
                         avls_package.Loc = "N" + lat_str + "E" + long_str + ",";
                         //avls_package.Loc = "N00000.0000E00000.0000,";
@@ -2404,7 +2406,7 @@ LIMIT 1";
                 }
                 
             }
-
+            //check range of initialLat/initialLon in exclusion_area_boundary then send event by avls_package.Event
             avls_package.ID += ",";    
             send_string = "%%"+avls_package.ID+avls_package.GPS_Valid+avls_package.Date_Time+avls_package.Loc+avls_package.Speed+avls_package.Dir+avls_package.Temp+avls_package.Status+avls_package.Event+avls_package.Message+"\r\n";
             /*
