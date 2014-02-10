@@ -2587,10 +2587,13 @@ LIMIT 1";
             }
             else
                 operation_log.application_id = "\'" + "null" + "\'";
+            string deviceID = string.Empty;
+            
             if (htable.ContainsKey("suaddr"))
             {
-                gps_log._uid = operation_log.eqp_id= "\'" + htable["suaddr"].ToString() + "\'";
-                gps_log._id = "\'" + htable["suaddr"].ToString() + "_" + now + "_" + _gps_logUidCount + "\'";
+                deviceID = htable["suaddr"] as string;
+                gps_log._uid = operation_log.eqp_id = "\'" + deviceID + "\'";
+                gps_log._id = "\'" + deviceID + "_" + now + "_" + _gps_logUidCount + "\'";
                 operation_log._id = "\'" + "operation" + "_" + now + "_" + operationLogIdCount + "\'";
             }
             else
@@ -2622,7 +2625,7 @@ LIMIT 1";
                     case "ABSENT SUBSCRIBER":
                         #region access power status
                         {
-                            if (htable.ContainsKey("suaddr"))
+                            if (!string.IsNullOrEmpty(deviceID))
                             {
                                 string unsUpdateTimeStamp = DateTime.Now.ToString("yyyyMMdd HHmmss+8");
                                 string unsSqlCmd = @"UPDATE 
@@ -2631,7 +2634,7 @@ SET
   power = 'off',
 ""updateTime"" = '" + unsUpdateTimeStamp + @"'::timestamp
 WHERE
-  custom.uns_deivce_power_status.uid = '" + htable["suaddr"].ToString() + @"'" + @" AND 
+  custom.uns_deivce_power_status.uid = '" + deviceID + @"'" + @" AND 
   (custom.uns_deivce_power_status.power <> 'off' OR 
   custom.uns_deivce_power_status.power IS NULL)";
                                 while (!sql_client.connect())
@@ -2679,7 +2682,7 @@ WHERE
                     case "INSUFFICIENT GPS SATELLITES":
                         //avls_package.Event = "1,";
                         #region access power status
-
+                        if (!string.IsNullOrEmpty(deviceID))
                         {
                             string unsUpdateTimeStamp = DateTime.Now.ToString("yyyyMMdd HHmmss+8");
                             string unsSqlCmd = @"UPDATE 
@@ -2688,7 +2691,7 @@ SET
   power = 'on',
 ""updateTime"" = '" + unsUpdateTimeStamp + @"'::timestamp
 WHERE
-  custom.uns_deivce_power_status.uid = '" + htable["suaddr"].ToString() + @"'" + @" AND 
+  custom.uns_deivce_power_status.uid = '" + deviceID + @"'" + @" AND 
   (custom.uns_deivce_power_status.power <> 'on' OR 
   custom.uns_deivce_power_status.power IS NULL) ";
                             while (!sql_client.connect())
@@ -2703,7 +2706,7 @@ WHERE
                     case "BAD GPS GEOMETRY":
                         //avls_package.Event = "1,";
                         #region access power status
-
+                        if (!string.IsNullOrEmpty(deviceID))
                         {
                             string unsUpdateTimeStamp = DateTime.Now.ToString("yyyyMMdd HHmmss+8");
                             string unsSqlCmd = @"UPDATE 
@@ -2712,7 +2715,7 @@ SET
   power = 'on',
 ""updateTime"" = '" + unsUpdateTimeStamp + @"'::timestamp
 WHERE
-  custom.uns_deivce_power_status.uid = '" + htable["suaddr"].ToString() + @"'" + @" AND 
+  custom.uns_deivce_power_status.uid = '" + deviceID + @"'" + @" AND 
   (custom.uns_deivce_power_status.power <> 'on' OR 
   custom.uns_deivce_power_status.power IS NULL) ";
                             while (!sql_client.connect())
@@ -2727,7 +2730,7 @@ WHERE
                     case "GPS INVALID":
                        // avls_package.Event = "1,";
                         #region access power status
-
+                        if (!string.IsNullOrEmpty(deviceID))
                         {
                             string unsUpdateTimeStamp = DateTime.Now.ToString("yyyyMMdd HHmmss+8");
                             string unsSqlCmd = @"UPDATE 
@@ -2736,7 +2739,7 @@ SET
   power = 'on',
 ""updateTime"" = '" + unsUpdateTimeStamp + @"'::timestamp
 WHERE
-  custom.uns_deivce_power_status.uid = '" + htable["suaddr"].ToString() + @"'" + @" AND 
+  custom.uns_deivce_power_status.uid = '" + deviceID + @"'" + @" AND 
   (custom.uns_deivce_power_status.power <> 'on' OR 
   custom.uns_deivce_power_status.power IS NULL) ";
                             while (!sql_client.connect())
@@ -2775,7 +2778,7 @@ WHERE
                         operation_log.event_id = "\'" + operation_log.eqp_id + now + operationLogIdCount.ToString("000000000000") + "\'";
                         break;
                     case "Unit Present":
-                        if (htable.ContainsKey("suaddr"))
+                        if (!string.IsNullOrEmpty(deviceID))
                         {
                             /*
                             while (!sql_client.connect())
@@ -2785,15 +2788,15 @@ WHERE
                             string reg_countUid = sql_client.get_DataTable("SELECT COUNT(uid)   FROM custom.regist_log").Rows[0].ItemArray[0].ToString();
                             sql_client.disconnect();
                             */
-                            //string reg_sn = "\'" + htable["suaddr"].ToString() + "_" + now + "_" + reg_countUid + "\'";
-                            string reg_uid = "\'" + htable["suaddr"].ToString() + "\'";
+                            //string reg_sn = "\'" + deviceID + "_" + now + "_" + reg_countUid + "\'";
+                            string reg_uid = "\'" + deviceID + "\'";
                             string regSqlCmd = string.Empty;
                             regSqlCmd = @"SELECT
   sd.equipment.uid
   FROM
   sd.equipment
   where
-  sd.equipment.uid = '"+htable["suaddr"].ToString()+@"'";
+  sd.equipment.uid = '"+deviceID+@"'";
                             while (!sql_client.connect())
                             {
                                 Thread.Sleep(300);
@@ -2818,6 +2821,7 @@ WHERE
                                 #region access power status
 
                                 
+                                
                                     string unsUpdateTimeStamp = DateTime.Now.ToString("yyyyMMdd HHmmss+8");
                                     string unsSqlCmd = @"UPDATE 
   custom.uns_deivce_power_status
@@ -2825,7 +2829,7 @@ SET
   power = 'on',
 ""updateTime"" = '" + unsUpdateTimeStamp + @"'::timestamp
 WHERE
-  custom.uns_deivce_power_status.uid = '" + htable["suaddr"].ToString() + @"'" + @"AND 
+  custom.uns_deivce_power_status.uid = '" + deviceID + @"'" + @"AND 
   (custom.uns_deivce_power_status.power <> 'on' OR 
   custom.uns_deivce_power_status.power IS NULL) ";
                                     while (!sql_client.connect())
@@ -2835,6 +2839,7 @@ WHERE
                                     sql_client.modify(unsSqlCmd);
                                     sql_client.disconnect();
                                 
+
                                 #endregion
                                 #region access custom.unsPowerStatusHistory
 
@@ -2844,7 +2849,7 @@ FROM
   custom.""unsPowerStatusHistory""
 WHERE
   custom.""unsPowerStatusHistory"".status = 'on' AND 
-  custom.""unsPowerStatusHistory"".uid = '"+htable["suaddr"].ToString()+@"'
+  custom.""unsPowerStatusHistory"".uid = '"+deviceID+@"'
 ORDER BY
   custom.""unsPowerStatusHistory"".""createTime"" DESC
 LIMIT 1";
@@ -2864,7 +2869,7 @@ LIMIT 1";
   uid,
   status)
 VALUES(
-  '" + htable["suaddr"].ToString() + @"',
+  '" + deviceID + @"',
   'on')";
                                 }
                                 while (!sql_client.connect())
@@ -2888,14 +2893,14 @@ VALUES(
                         operation_log.event_id = "\'" + operation_log.eqp_id + now + operationLogIdCount.ToString("000000000000") + "\'";
                         #region access power status
                         {
-                            if (htable.ContainsKey("suaddr"))
+                            if (!string.IsNullOrEmpty(deviceID))
                             {
                                 string regSqlCmd = @"SELECT
   sd.equipment.uid
   FROM
   sd.equipment
   where
-  sd.equipment.uid = '" +htable["suaddr"].ToString()+@"'";
+  sd.equipment.uid = '" +deviceID+@"'";
                             while (!sql_client.connect())
                             {
                                 Thread.Sleep(300);
@@ -2911,7 +2916,7 @@ SET
   power = 'off',
 ""updateTime"" = '" + unsUpdateTimeStamp + @"'::timestamp
 WHERE
-  custom.uns_deivce_power_status.uid = '" + htable["suaddr"].ToString() + @"'" + @" AND 
+  custom.uns_deivce_power_status.uid = '" + deviceID + @"'" + @" AND 
   (custom.uns_deivce_power_status.power <> 'off' OR 
   custom.uns_deivce_power_status.power IS NULL) ";
 
@@ -2930,7 +2935,7 @@ FROM
   custom.""unsPowerStatusHistory""
 WHERE
   custom.""unsPowerStatusHistory"".status = 'off' AND 
-  custom.""unsPowerStatusHistory"".uid = '" + htable["suaddr"].ToString() + @"'
+  custom.""unsPowerStatusHistory"".uid = '" + deviceID + @"'
 ORDER BY
   custom.""unsPowerStatusHistory"".""createTime"" DESC
 LIMIT 1";
@@ -2950,7 +2955,7 @@ LIMIT 1";
   uid,
   status)
 VALUES(
-  '" + htable["suaddr"].ToString() + @"',
+  '" + deviceID + @"',
   'off')";
                                     }
                                     while (!sql_client.connect())
@@ -2994,9 +2999,8 @@ VALUES(
             {
                 if (htable.ContainsKey("suaddr"))
                 {
-                    string deviceID = string.Empty;
-                    deviceID = htable["suaddr"] as string;
-                    if(deviceID!=null)
+
+                    if (!string.IsNullOrEmpty(deviceID))
                     {}
                     else
                     {
@@ -3054,9 +3058,8 @@ LIMIT 1";
                     //string zero = "0";
                     //gps_log._lat = operation_log.eqp_lat = zero;
                     //gps_log._lon = operation_log.eqp_lon = zero;
-                    string deviceID = string.Empty;
-                    deviceID = htable["suaddr"] as string;
-                    if (deviceID != null)
+
+                    if (!string.IsNullOrEmpty(deviceID))
                     { }
                     else
                     {
@@ -3127,7 +3130,7 @@ LIMIT 1";
 FROM
   custom.turn_onoff_log
 WHERE
-  custom.turn_onoff_log.uid = '" + htable["suaddr"].ToString() + @"' AND 
+  custom.turn_onoff_log.uid = '" + deviceID + @"' AND 
 custom.turn_onoff_log.on_time IS NOT NULL AND 
   custom.turn_onoff_log.off_time IS  NULL
 ORDER BY
@@ -3143,7 +3146,7 @@ LIMIT 1";
                     else
                     {
                         Device_power_status dev_power_status = new Device_power_status();
-                        dev_power_status.ID = htable["suaddr"].ToString();
+                        dev_power_status.ID = deviceID;
                         #region
                         {
                             string sn = string.Empty;
@@ -3487,7 +3490,7 @@ LIMIT 1";
                         switch (htable["event_info"].ToString())
                         {
                             case "Emergency On":
-                                string sn = "\'" + htable["suaddr"].ToString() + now + cgaEventLogIdCount.ToString("000000000000") + "\'";
+                                string sn = "\'" + deviceID + now + cgaEventLogIdCount.ToString("000000000000") + "\'";
                                 string table_columns = "serial_no ,uid ,type ,lat ,lon,altitude ,speed ,course ,radius ,info_time ,server_time ,create_user ,create_ip,start_time,create_time";
                                 string table_column_value = sn + "," +
                                     gps_log._uid + "," + //gps_log._option3
