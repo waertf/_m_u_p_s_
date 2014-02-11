@@ -2412,7 +2412,7 @@ LIMIT 1";
             List<EAB> prohibitedList, locationList;
             string prohibitedTableName = string.Empty, locationTableName = string.Empty;
             prohibitedTableName = "public.prohibited";
-            locationTableName = "public.location";
+            locationTableName = "public.patrol_location";
             GetRidAndGeomFromSqlTable(prohibitedTableName, out prohibitedList);
             GetRidAndGeomFromSqlTable(locationTableName, out locationList);
 
