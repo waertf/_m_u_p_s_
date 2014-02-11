@@ -2404,7 +2404,7 @@ LIMIT 1";
                 {
                     avls_package.Event = "175,";
                 }
-                //test
+                
             }
             //check range of initialLat/initialLon in exclusion_area_boundary then send event by avls_package.Event
             avls_package.ID += ",";    
