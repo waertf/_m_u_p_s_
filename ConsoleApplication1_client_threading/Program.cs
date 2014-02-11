@@ -2406,7 +2406,16 @@ LIMIT 1";
                 }
                 
             }
+
             //check range of initialLat/initialLon in exclusion_area_boundary then send event by avls_package.Event
+
+            List<EAB> prohibited, location;
+            string prohibitedTableName = string.Empty, locationTableName = string.Empty;
+            prohibitedTableName = "public.prohibited";
+            locationTableName = "public.location";
+            GetRidAndGeomFromSqlTable(prohibitedTableName, out prohibited);
+            GetRidAndGeomFromSqlTable(locationTableName, out location);
+
             avls_package.ID += ",";    
             send_string = "%%"+avls_package.ID+avls_package.GPS_Valid+avls_package.Date_Time+avls_package.Loc+avls_package.Speed+avls_package.Dir+avls_package.Temp+avls_package.Status+avls_package.Event+avls_package.Message+"\r\n";
             /*
@@ -2431,6 +2440,31 @@ LIMIT 1";
             //netStream.Close();
             //avlsTcpClient.Close();
             Console.WriteLine("-access_avls_server");
+        }
+
+        private static void GetRidAndGeomFromSqlTable(string table, out List<EAB> myList)
+        {
+            string regSqlCmd = string.Empty;
+            regSqlCmd = @"SELECT 
+  "+table+@".rid,
+  " + table + @".the_geom
+FROM
+  "+table;
+            myList = new List<EAB>();
+            SqlClient sql_client = new SqlClient(ConfigurationManager.AppSettings["SQL_SERVER_IP"], ConfigurationManager.AppSettings["SQL_SERVER_PORT"], ConfigurationManager.AppSettings["SQL_SERVER_USER_ID"], ConfigurationManager.AppSettings["SQL_SERVER_PASSWORD"], ConfigurationManager.AppSettings["SQL_SERVER_DATABASE"], ConfigurationManager.AppSettings["Pooling"], ConfigurationManager.AppSettings["MinPoolSize"], ConfigurationManager.AppSettings["MaxPoolSize"], ConfigurationManager.AppSettings["ConnectionLifetime"]);
+            while (!sql_client.connect())
+            {
+                Thread.Sleep(300);
+            }
+            var dt = sql_client.get_DataTable(regSqlCmd);
+                            sql_client.disconnect();
+            if (dt != null && dt.Rows.Count != 0)
+            {
+                foreach (DataRow row in dt.Rows)
+                {
+                    myList.Add(new EAB(row[0].ToString(), row[1].ToString()));
+                }
+            }
         }
 
         private static void avls_WriteLine(NetworkStream netStream, byte[] writeData, string write)
@@ -3836,4 +3870,15 @@ LIMIT 1";
         }
     }
 
+    public class EAB //exclusion_area_boundary
+    {
+        public string rid { get; set; }
+        public string the_geom { get; set; }
+
+        public EAB(string Rid, string Geom)
+        {
+            rid = Rid;
+            the_geom = Geom;
+        }
+    }
 }
