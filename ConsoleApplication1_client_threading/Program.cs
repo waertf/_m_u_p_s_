@@ -2409,12 +2409,12 @@ LIMIT 1";
 
             //check range of initialLat/initialLon in exclusion_area_boundary then send event by avls_package.Event
 
-            List<EAB> prohibited, location;
+            List<EAB> prohibitedList, locationList;
             string prohibitedTableName = string.Empty, locationTableName = string.Empty;
             prohibitedTableName = "public.prohibited";
             locationTableName = "public.location";
-            GetRidAndGeomFromSqlTable(prohibitedTableName, out prohibited);
-            GetRidAndGeomFromSqlTable(locationTableName, out location);
+            GetRidAndGeomFromSqlTable(prohibitedTableName, out prohibitedList);
+            GetRidAndGeomFromSqlTable(locationTableName, out locationList);
 
             avls_package.ID += ",";    
             send_string = "%%"+avls_package.ID+avls_package.GPS_Valid+avls_package.Date_Time+avls_package.Loc+avls_package.Speed+avls_package.Dir+avls_package.Temp+avls_package.Status+avls_package.Event+avls_package.Message+"\r\n";
