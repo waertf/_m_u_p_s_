@@ -2409,12 +2409,17 @@ LIMIT 1";
 
             //check range of initialLat/initialLon in exclusion_area_boundary then send event by avls_package.Event
 
-            List<EAB> prohibitedList, locationList;
+            //List<EAB> prohibitedList, locationList;
             string prohibitedTableName = string.Empty, locationTableName = string.Empty;
-            prohibitedTableName = "public.prohibited";
+            //prohibitedTableName = "public.prohibited";
+            //locationTableName = "public.patrol_location";
+            //GetRidAndGeomFromSqlTable(prohibitedTableName, out prohibitedList);
+            //GetRidAndGeomFromSqlTable(locationTableName, out locationList);
+
+            prohibitedTableName = "public.p_prohibited";
             locationTableName = "public.patrol_location";
-            GetRidAndGeomFromSqlTable(prohibitedTableName, out prohibitedList);
-            GetRidAndGeomFromSqlTable(locationTableName, out locationList);
+            GetGidAndFullnameFromP_prohibitedAndPatrol_locationFromSql(prohibitedTableName, locationTableName,
+                ref avls_package.Message,initialLat,initialLon);
 
             avls_package.ID += ",";    
             send_string = "%%"+avls_package.ID+avls_package.GPS_Valid+avls_package.Date_Time+avls_package.Loc+avls_package.Speed+avls_package.Dir+avls_package.Temp+avls_package.Status+avls_package.Event+avls_package.Message+"\r\n";
@@ -2441,6 +2446,55 @@ LIMIT 1";
             //avlsTcpClient.Close();
             Console.WriteLine("-access_avls_server");
         }
+
+        private static void GetGidAndFullnameFromP_prohibitedAndPatrol_locationFromSql(string prohibitedTableName, string locationTableName, ref string message, string initialLat, string initialLon)
+        {
+            string DB = string.Empty;
+            DB = "lmap100";
+            SqlClient sql_client = new SqlClient(ConfigurationManager.AppSettings["SQL_SERVER_IP"], ConfigurationManager.AppSettings["SQL_SERVER_PORT"], ConfigurationManager.AppSettings["SQL_SERVER_USER_ID"], ConfigurationManager.AppSettings["SQL_SERVER_PASSWORD"], DB, ConfigurationManager.AppSettings["Pooling"], ConfigurationManager.AppSettings["MinPoolSize"], ConfigurationManager.AppSettings["MaxPoolSize"], ConfigurationManager.AppSettings["ConnectionLifetime"]);
+            string regSqlCmdForProhibitedTable = string.Empty;
+            string regSqlCmdForLocationTable = string.Empty;
+            regSqlCmdForProhibitedTable = @"select gid, fullname
+from p_prohibited
+where st_intersects(the_geom, st_geomfromtext('POINT("+initialLon+" "+initialLat+@")', 4326)) ";
+            regSqlCmdForLocationTable = @"select gid, fullname
+from patrol_location
+where st_intersects(st_buffer(the_geom, 0.00009009), st_geomfromtext('POINT(" + initialLon + " " + initialLat + @")', 4326))";
+
+            while (!sql_client.connect())
+            {
+                Thread.Sleep(300);
+            }
+            var dt = sql_client.get_DataTable(regSqlCmdForProhibitedTable);
+            sql_client.disconnect();
+            List<EAB2> prohibitedEab2s= new List<EAB2>();
+            if (dt != null && dt.Rows.Count != 0)
+            {
+                message = string.Empty;
+                foreach (DataRow row in dt.Rows)
+                {
+                    prohibitedEab2s.Add(new EAB2("p_prohibited",row[0].ToString(),row[1].ToString()));
+                    message += "p_prohibited" + "," + row[0].ToString() + "," + row[1].ToString() + ";";
+                }
+            }
+
+            while (!sql_client.connect())
+            {
+                Thread.Sleep(300);
+            }
+            dt = sql_client.get_DataTable(regSqlCmdForLocationTable);
+            sql_client.disconnect();
+            List<EAB2> locationEab2s = new List<EAB2>();
+            if (dt != null && dt.Rows.Count != 0)
+            {
+                foreach (DataRow row in dt.Rows)
+                {
+                    locationEab2s.Add(new EAB2("patrol_location", row[0].ToString(), row[1].ToString()));
+                    message += "patrol_location" + "," + row[0].ToString() + "," + row[1].ToString() + ";";
+                }
+            }
+        }
+
 
         private static void GetRidAndGeomFromSqlTable(string table, out List<EAB> myList)
         {
@@ -3879,6 +3933,19 @@ LIMIT 1";
         {
             rid = Rid;
             the_geom = Geom;
+        }
+    }
+    public class EAB2 //exclusion_area_boundary
+    {
+        public string table { get; set; }
+        public string gid { get; set; }
+        public string fullname { get; set; }
+
+        public EAB2(string Table,string Gid, string Fullname)
+        {
+            table = Table;
+            gid = Gid;
+            fullname = Fullname;
         }
     }
 }
