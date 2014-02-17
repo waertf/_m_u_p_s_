@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Data.Linq;
 using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
@@ -270,6 +271,27 @@ LIMIT 1";
 
         static void Main(string[] args)
         {
+            /*
+            string connString = "Data Source = 'StayCheck.sdf'";
+            StayCheck sqlCEdb = new StayCheck(connString);
+            string searchID = string.Empty;
+            try
+            {
+                searchID = (from p in sqlCEdb.CheckIfOverTime where p.Uid == "id" select p.Uid).First();
+            }
+            catch (Exception)
+            {
+
+                if (string.IsNullOrEmpty(searchID))
+                {
+                    //not found id in sql->add new row with id
+                    CheckIfOverTime newRow = new CheckIfOverTime();
+                    newRow.Uid = "id";
+                    sqlCEdb.CheckIfOverTime.InsertOnSubmit(newRow);
+                    sqlCEdb.SubmitChanges();
+                }
+            }
+            */
             // Force a reload of the changed section. This 
             // makes the new values available for reading.
             Thread.CurrentThread.CurrentUICulture = new CultureInfo("en-us");
@@ -2419,7 +2441,7 @@ LIMIT 1";
             prohibitedTableName = "public.p_prohibited";
             locationTableName = "public.patrol_location";
             GetGidAndFullnameFromP_prohibitedAndPatrol_locationFromSql(prohibitedTableName, locationTableName,
-                ref avls_package.Message,initialLat,initialLon);
+                ref avls_package.Message,initialLat,initialLon,avls_package.ID);
 
             avls_package.ID += ",";    
             send_string = "%%"+avls_package.ID+avls_package.GPS_Valid+avls_package.Date_Time+avls_package.Loc+avls_package.Speed+avls_package.Dir+avls_package.Temp+avls_package.Status+avls_package.Event+avls_package.Message+"\r\n";
@@ -2447,8 +2469,28 @@ LIMIT 1";
             Console.WriteLine("-access_avls_server");
         }
 
-        private static void GetGidAndFullnameFromP_prohibitedAndPatrol_locationFromSql(string prohibitedTableName, string locationTableName, ref string message, string initialLat, string initialLon)
+        private static void GetGidAndFullnameFromP_prohibitedAndPatrol_locationFromSql(string prohibitedTableName, string locationTableName, ref string message, string initialLat, string initialLon,string id)
         {
+            string connString = "Data Source = 'StayCheck.sdf'";
+            StayCheck sqlCEdb = new StayCheck(connString);
+            string searchID = string.Empty;
+            try
+            {
+                searchID = (from p in sqlCEdb.CheckIfOverTime where p.Uid == id select p.Uid).First();
+            }
+            catch (Exception)
+            {
+
+                if (string.IsNullOrEmpty(searchID))
+                {
+                    //not found id in sql->add new row with id
+                    CheckIfOverTime newRow = new CheckIfOverTime();
+                    newRow.Uid = id;
+                    sqlCEdb.CheckIfOverTime.InsertOnSubmit(newRow);
+                    sqlCEdb.SubmitChanges();
+                }
+            }
+            
             string DB = string.Empty;
             DB = "lmap100";
             SqlClient sql_client = new SqlClient(ConfigurationManager.AppSettings["SQL_SERVER_IP"], ConfigurationManager.AppSettings["SQL_SERVER_PORT"], ConfigurationManager.AppSettings["SQL_SERVER_USER_ID"], ConfigurationManager.AppSettings["SQL_SERVER_PASSWORD"], DB, ConfigurationManager.AppSettings["Pooling"], ConfigurationManager.AppSettings["MinPoolSize"], ConfigurationManager.AppSettings["MaxPoolSize"], ConfigurationManager.AppSettings["ConnectionLifetime"]);
@@ -2470,12 +2512,42 @@ where st_intersects(st_buffer(the_geom, 0.00009009), st_geomfromtext('POINT(" + 
             List<EAB2> prohibitedEab2s= new List<EAB2>();
             if (dt != null && dt.Rows.Count != 0)
             {
-                message = string.Empty;
-                foreach (DataRow row in dt.Rows)
+                try
                 {
-                    prohibitedEab2s.Add(new EAB2("p_prohibited",row[0].ToString(),row[1].ToString()));
-                    message += "p_prohibited" + "," + row[0].ToString() + "," + row[1].ToString() + ";";
+                    CheckIfOverTime getRow = sqlCEdb.CheckIfOverTime.First(p => p.CreateTime == null && p.Uid == id);
+                    if (getRow != null)
+                    {
+                        getRow.CreateTime = DateTime.Now;
+                        sqlCEdb.SubmitChanges();
+                    }
+                    else
+                    {
+                        //table:p_config
+                        //column:stay_time
+                        //unit:min
+
+                        //check if over time 
+                        //over->send msg with prohibited data
+                        //not over -> do nothing
+
+                        #region send with prohibite data
+                        foreach (DataRow row in dt.Rows)
+                        {
+                            prohibitedEab2s.Add(new EAB2("p_prohibited", row[0].ToString(), row[1].ToString()));
+                            message += "p_prohibited" + "," + row[0].ToString() + "," + row[1].ToString() + ";";
+                        }
+                        #endregion send with prohibite data
+                    }
+                   
                 }
+                catch (Exception ex)
+                {
+                    
+                    SiAuto.Main.LogText(Level.Debug, "sqlCEException",ex.Message);
+                }
+                
+                message = string.Empty;
+              
             }
 
             while (!sql_client.connect())
@@ -2487,11 +2559,40 @@ where st_intersects(st_buffer(the_geom, 0.00009009), st_geomfromtext('POINT(" + 
             List<EAB2> locationEab2s = new List<EAB2>();
             if (dt != null && dt.Rows.Count != 0)
             {
-                foreach (DataRow row in dt.Rows)
+                try
                 {
-                    locationEab2s.Add(new EAB2("patrol_location", row[0].ToString(), row[1].ToString()));
-                    message += "patrol_location" + "," + row[0].ToString() + "," + row[1].ToString() + ";";
+                    CheckIfOverTime getRow = sqlCEdb.CheckIfOverTime.First(p => p.CreateTime == null && p.Uid == id);
+                    if (getRow != null)
+                    {
+                        getRow.CreateTime = DateTime.Now;
+                        sqlCEdb.SubmitChanges();
+                    }
+                    else
+                    {
+                        //table:p_config
+                        //column:stay_time
+                        //unit:min
+
+                        //check if over time 
+                        //over->send msg with prohibited data
+                        //not over -> do nothing
+
+
+                        #region send with location data
+                        foreach (DataRow row in dt.Rows)
+                        {
+                            locationEab2s.Add(new EAB2("patrol_location", row[0].ToString(), row[1].ToString()));
+                            message += "patrol_location" + "," + row[0].ToString() + "," + row[1].ToString() + ";";
+                        }
+                        #endregion send with location data
+                    }
                 }
+                catch (Exception ex)
+                {
+
+                    SiAuto.Main.LogText(Level.Debug, "sqlCEException", ex.Message);
+                }
+                
             }
         }
 
