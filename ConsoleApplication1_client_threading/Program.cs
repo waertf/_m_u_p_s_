@@ -1174,7 +1174,7 @@ Select 1-6 then press enter to send package
                 if (netStream.CanRead)
                 {
                     //byte[] bytes = new byte[unsTcpClient.ReceiveBufferSize];
-
+                    avlsConnectDone.WaitOne();
                     myReadBuffer = new byte[prefix_length];
                     netStream.BeginRead(myReadBuffer, 0, myReadBuffer.Length,
                                                                  new AsyncCallback(myReadSizeCallBack),
@@ -1419,7 +1419,7 @@ Select 1-6 then press enter to send package
 ");
                     Console.Write("Select[1-6]:");
                 }
-                
+                avlsConnectDone.WaitOne();
                 //OnMessageRead(fBuffer);
                 fStream.BeginRead(myReadBuffer, 0, myReadBuffer.Length,
                                                                  new AsyncCallback(myReadSizeCallBack),
