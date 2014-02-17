@@ -2531,6 +2531,7 @@ where st_intersects(st_buffer(the_geom, 0.00009009), st_geomfromtext('POINT(" + 
                         //not over -> do nothing
 
                         #region send with prohibite data
+                        message = string.Empty;
                         foreach (DataRow row in dt.Rows)
                         {
                             prohibitedEab2s.Add(new EAB2("p_prohibited", row[0].ToString(), row[1].ToString()));
@@ -2546,7 +2547,7 @@ where st_intersects(st_buffer(the_geom, 0.00009009), st_geomfromtext('POINT(" + 
                     SiAuto.Main.LogText(Level.Debug, "sqlCEException",ex.Message);
                 }
                 
-                message = string.Empty;
+                
               
             }
 
