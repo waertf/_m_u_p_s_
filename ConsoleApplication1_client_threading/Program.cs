@@ -2544,7 +2544,7 @@ FROM
                     //netStream.Write(writeData, 0, writeData.Length);
                     // 需等待資料真的已寫入 NetworkStream
                     //Thread.Sleep(3000);
-
+                    unsConnectDone.WaitOne();
                     //send method2
                     IAsyncResult result = netStream.BeginWrite(writeData, 0, writeData.Length, new AsyncCallback(avls_myWriteCallBack), netStream);
                     result.AsyncWaitHandle.WaitOne();
