@@ -2582,12 +2582,21 @@ where st_intersects(st_buffer(the_geom, 0.00009009), st_geomfromtext('POINT(" + 
             }
             else
             {
-                CheckIfOverTime getRow = sqlCEdb.CheckIfOverTime.First(p => p.CreateTime != null && p.Uid == id);
-                if (getRow != null)
+                try
                 {
-                    getRow.CreateTime = null;
-                    sqlCEdb.SubmitChanges();
+                    CheckIfOverTime getRow = sqlCEdb.CheckIfOverTime.First(p => p.CreateTime != null && p.Uid == id);
+                    if (getRow != null)
+                    {
+                        getRow.CreateTime = null;
+                        sqlCEdb.SubmitChanges();
+                    }
                 }
+                catch (Exception ex)
+                {
+                    
+                    SiAuto.Main.LogText(Level.Debug, "sqlce excep",ex.Message);
+                }
+                
             }
 
             while (!sql_client.connect())
@@ -2661,12 +2670,21 @@ where st_intersects(st_buffer(the_geom, 0.00009009), st_geomfromtext('POINT(" + 
             }
             else
             {
-                CheckIfOverTime getRow = sqlCEdb.CheckIfOverTime.First(p => p.CreateTime != null && p.Uid == id);
-                if (getRow != null)
+                try
                 {
-                    getRow.CreateTime = null;
-                    sqlCEdb.SubmitChanges();
+                    CheckIfOverTime getRow = sqlCEdb.CheckIfOverTime.First(p => p.CreateTime != null && p.Uid == id);
+                    if (getRow != null)
+                    {
+                        getRow.CreateTime = null;
+                        sqlCEdb.SubmitChanges();
+                    }
                 }
+                catch (Exception ex)
+                {
+
+                    SiAuto.Main.LogText(Level.Debug, "sqlce excep", ex.Message);
+                }
+                
             }
         }
 
