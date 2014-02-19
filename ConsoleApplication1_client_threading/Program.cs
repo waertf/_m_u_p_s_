@@ -300,7 +300,7 @@ LIMIT 1";
 
             SiAuto.Si.Enabled = true;
             SiAuto.Si.Level = Level.Debug;
-            //SiAuto.Si.Connections = "file(filename=\"log.sil\", append=true,rotate=Monthly,maxsize=\"3MB\")";
+            SiAuto.Si.Connections = @"file(filename=" + Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) + "\\log.sil,rotate=weekly,append=true,maxparts=5)";
             //SiAuto.Main.LogMessage("This is my first SmartInspect message!");
             //SiAuto.Main.LogText(Level.Debug,"test","hahaha");
             
