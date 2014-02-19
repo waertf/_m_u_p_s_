@@ -2833,7 +2833,7 @@ FROM
         private static void access_sql_server(string xml_root_tag, Hashtable htable, List<string> sensor_name,
             List<string> sensor_type, List<string> sensor_value, IEnumerable<XName> elements, string log1)
         {
-            lock (accessSqlLock)
+            //lock (accessSqlLock)
             {
             Console.WriteLine("+access_sql_server");
             Thread.CurrentThread.CurrentUICulture = new CultureInfo("en-us");
