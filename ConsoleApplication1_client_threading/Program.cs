@@ -2574,7 +2574,7 @@ where st_intersects(st_buffer(the_geom, 0.00009009), st_geomfromtext('POINT(" + 
                 catch (Exception ex)
                 {
                     
-                    SiAuto.Main.LogText(Level.Debug, "sqlCEException",ex.Message);
+                    SiAuto.Main.LogText(Level.Debug, "sqlCEException",ex.ToString());
                 }
                 
                 
@@ -2594,7 +2594,7 @@ where st_intersects(st_buffer(the_geom, 0.00009009), st_geomfromtext('POINT(" + 
                 catch (Exception ex)
                 {
                     
-                    SiAuto.Main.LogText(Level.Debug, "sqlce excep",ex.Message);
+                    SiAuto.Main.LogText(Level.Debug, "sqlce excep",ex.ToString());
                 }
                 
             }
@@ -2664,7 +2664,7 @@ where st_intersects(st_buffer(the_geom, 0.00009009), st_geomfromtext('POINT(" + 
                 catch (Exception ex)
                 {
 
-                    SiAuto.Main.LogText(Level.Debug, "sqlCEException", ex.Message);
+                    SiAuto.Main.LogText(Level.Debug, "sqlCEException", ex.ToString());
                 }
                 
             }
@@ -2682,7 +2682,7 @@ where st_intersects(st_buffer(the_geom, 0.00009009), st_geomfromtext('POINT(" + 
                 catch (Exception ex)
                 {
 
-                    SiAuto.Main.LogText(Level.Debug, "sqlce excep", ex.Message);
+                    SiAuto.Main.LogText(Level.Debug, "sqlce excep", ex.ToString());
                 }
                 
             }
