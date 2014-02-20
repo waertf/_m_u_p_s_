@@ -2687,6 +2687,7 @@ where st_intersects(st_buffer(the_geom, 0.00009009), st_geomfromtext('POINT(" + 
                 }
                 
             }
+            sql_client.Dispose();
         }
 
 
