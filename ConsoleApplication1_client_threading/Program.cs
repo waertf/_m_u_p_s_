@@ -273,6 +273,11 @@ LIMIT 1";
 
         static void Main(string[] args)
         {
+            string StartupPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            string datalogicFilePath = Path.Combine(StartupPath, "StayCheck.sdf");
+            string connString = string.Format("Data Source={0}", datalogicFilePath);
+            Console.WriteLine(connString);
+
             /*
             string connString = "Data Source = 'StayCheck.sdf'";
             StayCheck sqlCEdb = new StayCheck(connString);
@@ -2476,8 +2481,20 @@ LIMIT 1";
 
         private static void GetGidAndFullnameFromP_prohibitedAndPatrol_locationFromSql(string prohibitedTableName, string locationTableName, ref string message, string initialLat, string initialLon,string id)
         {
-            string connString = "Data Source = 'StayCheck.sdf'";
-            StayCheck sqlCEdb = new StayCheck(connString);
+            string startupPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            string datalogicFilePath = Path.Combine(startupPath, "StayCheck.sdf");
+            string connString = string.Format("Data Source={0}", datalogicFilePath);
+            StayCheck sqlCEdb;
+            try
+            {
+                sqlCEdb = new StayCheck(connString);
+            }
+            catch (Exception ex)
+            {
+                
+                SiAuto.Main.LogError(ex.ToString());
+                return;
+            }
             string searchID = string.Empty;
             double  stayTimeInMin =0;
             
@@ -2487,15 +2504,23 @@ LIMIT 1";
             }
             catch (Exception)
             {
-
-                if (string.IsNullOrEmpty(searchID))
+                try
                 {
-                    //not found id in sql->add new row with id
-                    CheckIfOverTime newRow = new CheckIfOverTime();
-                    newRow.Uid = id;
-                    sqlCEdb.CheckIfOverTime.InsertOnSubmit(newRow);
-                    sqlCEdb.SubmitChanges();
+                    if (string.IsNullOrEmpty(searchID))
+                    {
+                        //not found id in sql->add new row with id
+                        CheckIfOverTime newRow = new CheckIfOverTime();
+                        newRow.Uid = id;
+                        sqlCEdb.CheckIfOverTime.InsertOnSubmit(newRow);
+                        sqlCEdb.SubmitChanges();
+                    }
                 }
+                catch (Exception ex)
+                {
+
+                    SiAuto.Main.LogError(ex.ToString());
+                }
+                
             }
             
             string DB = string.Empty;
