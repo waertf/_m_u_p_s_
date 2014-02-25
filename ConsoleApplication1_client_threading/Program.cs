@@ -2495,12 +2495,13 @@ LIMIT 1";
                 SiAuto.Main.LogError(ex.ToString());
                 return;
             }
-            string searchID = string.Empty;
+            string searchID = string.Empty, searchID2 = string.Empty;
             double  stayTimeInMin =0;
             
             try
             {
                 searchID = (from p in sqlCEdb.CheckIfOverTime where p.Uid == id select p.Uid).First();
+                searchID2 = (from p in sqlCEdb.CheckIfOverTime2 where p.Uid == id select p.Uid).First();
             }
             catch (Exception)
             {
@@ -2512,6 +2513,14 @@ LIMIT 1";
                         CheckIfOverTime newRow = new CheckIfOverTime();
                         newRow.Uid = id;
                         sqlCEdb.CheckIfOverTime.InsertOnSubmit(newRow);
+                        sqlCEdb.SubmitChanges();
+                    }
+                    if (string.IsNullOrEmpty(searchID2))
+                    {
+                        //not found id in sql->add new row with id
+                        CheckIfOverTime2 newRow2 = new CheckIfOverTime2();
+                        newRow2.Uid = id;
+                        sqlCEdb.CheckIfOverTime2.InsertOnSubmit(newRow2);
                         sqlCEdb.SubmitChanges();
                     }
                 }
@@ -2544,16 +2553,19 @@ where st_intersects(st_buffer(the_geom, 0.00009009), st_geomfromtext('POINT(" + 
             List<EAB2> prohibitedEab2s= new List<EAB2>();
             if (dt != null && dt.Rows.Count != 0)
             {
+                SiAuto.Main.AddCheckpoint(Level.Debug,id+"-find data from sql", regSqlCmdForProhibitedTable);
                 try
                 {
                     CheckIfOverTime getRow = sqlCEdb.CheckIfOverTime.First(p => p.CreateTime == null && p.Uid == id);
                     if (getRow != null)
                     {
+                        SiAuto.Main.AddCheckpoint(Level.Debug, id+" assign time");
                         getRow.CreateTime = DateTime.Now;
                         sqlCEdb.SubmitChanges();
                     }
                     else
                     {
+                        SiAuto.Main.AddCheckpoint(Level.Debug, id+" has time");
                         //table:p_config
                         //column:stay_time
                         //unit:min
@@ -2576,12 +2588,16 @@ where st_intersects(st_buffer(the_geom, 0.00009009), st_geomfromtext('POINT(" + 
                                 stayTimeInMin = double .Parse(row[0].ToString());
                             }
                         }
+                        SiAuto.Main.WatchDouble(Level.Debug, "stayTimeInMin", stayTimeInMin);
                         DateTime getTime = new DateTime();
                         var dateTime = (from p in sqlCEdb.CheckIfOverTime where p.Uid == id select p.CreateTime).First();
                         if (dateTime != null)
                             getTime = dateTime.Value;
+                        SiAuto.Main.WatchDateTime(Level.Debug, "getTime", getTime);
                         int result;
                         result = DateTime.Compare(DateTime.Now, getTime.AddMinutes(stayTimeInMin));
+                        SiAuto.Main.LogText(Level.Debug, id + "-result-" + result,
+                            DateTime.Now + "--" + getTime.AddMinutes(stayTimeInMin));
                         if (result > 0)
                         {
                             #region send with prohibite data
@@ -2599,8 +2615,8 @@ where st_intersects(st_buffer(the_geom, 0.00009009), st_geomfromtext('POINT(" + 
                 }
                 catch (Exception ex)
                 {
-                    
-                    SiAuto.Main.LogText(Level.Debug, "sqlCEException",ex.ToString());
+
+                    SiAuto.Main.LogText(Level.Debug, id+":sqlCEException", ex.ToString());
                 }
                 
                 
@@ -2613,14 +2629,15 @@ where st_intersects(st_buffer(the_geom, 0.00009009), st_geomfromtext('POINT(" + 
                     CheckIfOverTime getRow = sqlCEdb.CheckIfOverTime.First(p => p.CreateTime != null && p.Uid == id);
                     if (getRow != null)
                     {
+                        SiAuto.Main.AddCheckpoint(Level.Debug,id+" remove time");
                         getRow.CreateTime = null;
                         sqlCEdb.SubmitChanges();
                     }
                 }
                 catch (Exception ex)
                 {
-                    
-                    SiAuto.Main.LogText(Level.Debug, "sqlce excep",ex.ToString());
+
+                    //SiAuto.Main.LogText(Level.Debug, id + "sqlce excep", ex.ToString());
                 }
                 
             }
@@ -2634,16 +2651,19 @@ where st_intersects(st_buffer(the_geom, 0.00009009), st_geomfromtext('POINT(" + 
             List<EAB2> locationEab2s = new List<EAB2>();
             if (dt != null && dt.Rows.Count != 0)
             {
+                SiAuto.Main.AddCheckpoint(Level.Debug, id + "-find data from sql", regSqlCmdForLocationTable);
                 try
                 {
-                    CheckIfOverTime getRow = sqlCEdb.CheckIfOverTime.First(p => p.CreateTime == null && p.Uid == id);
+                    CheckIfOverTime2 getRow = sqlCEdb.CheckIfOverTime2.First(p => p.CreateTime == null && p.Uid == id);
                     if (getRow != null)
                     {
+                        SiAuto.Main.AddCheckpoint(Level.Debug, id + " assign time");
                         getRow.CreateTime = DateTime.Now;
                         sqlCEdb.SubmitChanges();
                     }
                     else
                     {
+                        SiAuto.Main.AddCheckpoint(Level.Debug, id + " has time");
                         //table:p_config
                         //column:stay_time
                         //unit:min
@@ -2667,12 +2687,16 @@ where st_intersects(st_buffer(the_geom, 0.00009009), st_geomfromtext('POINT(" + 
                                 stayTimeInMin = double.Parse(row[0].ToString());
                             }
                         }
+                        SiAuto.Main.WatchDouble(Level.Debug, "stayTimeInMin", stayTimeInMin);
                         DateTime getTime = new DateTime();
-                        var dateTime = (from p in sqlCEdb.CheckIfOverTime where p.Uid == id select p.CreateTime).First();
+                        var dateTime = (from p in sqlCEdb.CheckIfOverTime2 where p.Uid == id select p.CreateTime).First();
                         if (dateTime != null)
                             getTime = dateTime.Value;
+                        SiAuto.Main.WatchDateTime(Level.Debug, "getTime", getTime);
                         int result;
                         result = DateTime.Compare(DateTime.Now, getTime.AddMinutes(stayTimeInMin));
+                        SiAuto.Main.LogText(Level.Debug, id + "-result-" + result,
+                            DateTime.Now + "--" + getTime.AddMinutes(stayTimeInMin));
                         if (result > 0)
                         {
 
@@ -2690,7 +2714,7 @@ where st_intersects(st_buffer(the_geom, 0.00009009), st_geomfromtext('POINT(" + 
                 catch (Exception ex)
                 {
 
-                    SiAuto.Main.LogText(Level.Debug, "sqlCEException", ex.ToString());
+                    SiAuto.Main.LogText(Level.Debug, id + ":sqlCEException", ex.ToString() );
                 }
                 
             }
@@ -2698,9 +2722,10 @@ where st_intersects(st_buffer(the_geom, 0.00009009), st_geomfromtext('POINT(" + 
             {
                 try
                 {
-                    CheckIfOverTime getRow = sqlCEdb.CheckIfOverTime.First(p => p.CreateTime != null && p.Uid == id);
+                    CheckIfOverTime2 getRow = sqlCEdb.CheckIfOverTime2.First(p => p.CreateTime != null && p.Uid == id);
                     if (getRow != null)
                     {
+                        SiAuto.Main.AddCheckpoint(Level.Debug, id + " remove time");
                         getRow.CreateTime = null;
                         sqlCEdb.SubmitChanges();
                     }
@@ -2708,7 +2733,7 @@ where st_intersects(st_buffer(the_geom, 0.00009009), st_geomfromtext('POINT(" + 
                 catch (Exception ex)
                 {
 
-                    SiAuto.Main.LogText(Level.Debug, "sqlce excep", ex.ToString());
+                    //SiAuto.Main.LogText(Level.Debug, id + "sqlce excep", ex.ToString() );
                 }
                 
             }
