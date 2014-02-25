@@ -366,10 +366,14 @@ LIMIT 1";
             string emptyPowerStatusTable = @"UPDATE 
   custom.uns_deivce_power_status
 SET
-  power = NULL";
-            //sql_client.connect();
-            //sql_client.modify(emptyPowerStatusTable);
-            //sql_client.disconnect();
+  power = NULL,
+  ""updateTime"" = NULL";
+            while (!sql_client.connect())
+            {
+                Thread.Sleep(300);
+            }
+            sql_client.modify(emptyPowerStatusTable);
+            sql_client.disconnect();
             string registration_msg_error_test = "<Location-Registration-Request><application>" + ConfigurationManager.AppSettings["application_ID"] + "</application></Location-Registration-Request>";
             UnsTcpWriteLine(netStream, data_append_dataLength(registration_msg_error_test), registration_msg_error_test);
             //using (StreamWriter w = File.AppendText("log.txt"))
