@@ -6,4 +6,10 @@
       <Column Name="createTime" Member="CreateTime" Type="System.DateTime" DbType="DateTime" CanBeNull="true" />
     </Type>
   </Table>
+  <Table Name="checkIfOverTime2" Member="CheckIfOverTime2">
+    <Type Name="CheckIfOverTime2">
+      <Column Name="uid" Member="Uid" Type="System.String" DbType="NVarChar(100) NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
+      <Column Name="createTime" Member="CreateTime" Type="System.DateTime" DbType="DateTime" CanBeNull="true" />
+    </Type>
+  </Table>
 </Database>

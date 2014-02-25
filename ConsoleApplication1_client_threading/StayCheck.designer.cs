@@ -32,6 +32,9 @@ namespace ConsoleApplication1_client_threading
     partial void InsertCheckIfOverTime(CheckIfOverTime instance);
     partial void UpdateCheckIfOverTime(CheckIfOverTime instance);
     partial void DeleteCheckIfOverTime(CheckIfOverTime instance);
+    partial void InsertCheckIfOverTime2(CheckIfOverTime2 instance);
+    partial void UpdateCheckIfOverTime2(CheckIfOverTime2 instance);
+    partial void DeleteCheckIfOverTime2(CheckIfOverTime2 instance);
     #endregion
 		
 		public StayCheck(string connection) : 
@@ -65,6 +68,14 @@ namespace ConsoleApplication1_client_threading
 				return this.GetTable<CheckIfOverTime>();
 			}
 		}
+		
+		public System.Data.Linq.Table<CheckIfOverTime2> CheckIfOverTime2
+		{
+			get
+			{
+				return this.GetTable<CheckIfOverTime2>();
+			}
+		}
 	}
 	
 	[Table(Name="checkIfOverTime")]
@@ -88,6 +99,92 @@ namespace ConsoleApplication1_client_threading
     #endregion
 		
 		public CheckIfOverTime()
+		{
+			OnCreated();
+		}
+		
+		[Column(Name="uid", Storage="_Uid", DbType="NVarChar(100) NOT NULL", CanBeNull=false, IsPrimaryKey=true)]
+		public string Uid
+		{
+			get
+			{
+				return this._Uid;
+			}
+			set
+			{
+				if ((this._Uid != value))
+				{
+					this.OnUidChanging(value);
+					this.SendPropertyChanging();
+					this._Uid = value;
+					this.SendPropertyChanged("Uid");
+					this.OnUidChanged();
+				}
+			}
+		}
+		
+		[Column(Name="createTime", Storage="_CreateTime", DbType="DateTime")]
+		public System.Nullable<System.DateTime> CreateTime
+		{
+			get
+			{
+				return this._CreateTime;
+			}
+			set
+			{
+				if ((this._CreateTime != value))
+				{
+					this.OnCreateTimeChanging(value);
+					this.SendPropertyChanging();
+					this._CreateTime = value;
+					this.SendPropertyChanged("CreateTime");
+					this.OnCreateTimeChanged();
+				}
+			}
+		}
+		
+		public event PropertyChangingEventHandler PropertyChanging;
+		
+		public event PropertyChangedEventHandler PropertyChanged;
+		
+		protected virtual void SendPropertyChanging()
+		{
+			if ((this.PropertyChanging != null))
+			{
+				this.PropertyChanging(this, emptyChangingEventArgs);
+			}
+		}
+		
+		protected virtual void SendPropertyChanged(String propertyName)
+		{
+			if ((this.PropertyChanged != null))
+			{
+				this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+			}
+		}
+	}
+	
+	[Table(Name="checkIfOverTime2")]
+	public partial class CheckIfOverTime2 : INotifyPropertyChanging, INotifyPropertyChanged
+	{
+		
+		private static PropertyChangingEventArgs emptyChangingEventArgs = new PropertyChangingEventArgs(String.Empty);
+		
+		private string _Uid;
+		
+		private System.Nullable<System.DateTime> _CreateTime;
+		
+    #region Extensibility Method Definitions
+    partial void OnLoaded();
+    partial void OnValidate(System.Data.Linq.ChangeAction action);
+    partial void OnCreated();
+    partial void OnUidChanging(string value);
+    partial void OnUidChanged();
+    partial void OnCreateTimeChanging(System.Nullable<System.DateTime> value);
+    partial void OnCreateTimeChanged();
+    #endregion
+		
+		public CheckIfOverTime2()
 		{
 			OnCreated();
 		}
