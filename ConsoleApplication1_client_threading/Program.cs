@@ -279,7 +279,7 @@ LIMIT 1";
             Console.WriteLine(connString);
 
             /*
-            string connString = "Data Source = 'StayCheck.sdf'";
+            //string connString = "Data Source = 'StayCheck.sdf'";
             StayCheck sqlCEdb = new StayCheck(connString);
             string searchID = string.Empty;
             try
@@ -294,9 +294,18 @@ LIMIT 1";
                     //not found id in sql->add new row with id
                     CheckIfOverTime newRow = new CheckIfOverTime();
                     newRow.Uid = "id";
+                    newRow.CreateTime = DateTime.Now;
                     sqlCEdb.CheckIfOverTime.InsertOnSubmit(newRow);
                     sqlCEdb.SubmitChanges();
                 }
+            }
+            CheckIfOverTime getRow = sqlCEdb.CheckIfOverTime.FirstOrDefault(p => p.CreateTime == null && p.Uid == "id");
+            if (getRow != null)
+            {
+            }
+            else
+            {
+                
             }
             */
             // Force a reload of the changed section. This 
@@ -2556,7 +2565,7 @@ where st_intersects(st_buffer(the_geom, 0.00009009), st_geomfromtext('POINT(" + 
                 SiAuto.Main.AddCheckpoint(Level.Debug,id+"-find data from sql", regSqlCmdForProhibitedTable);
                 try
                 {
-                    CheckIfOverTime getRow = sqlCEdb.CheckIfOverTime.First(p => p.CreateTime == null && p.Uid == id);
+                    CheckIfOverTime getRow = sqlCEdb.CheckIfOverTime.FirstOrDefault(p => p.CreateTime == null && p.Uid == id);
                     if (getRow != null)
                     {
                         SiAuto.Main.AddCheckpoint(Level.Debug, id+" assign time");
@@ -2590,8 +2599,8 @@ where st_intersects(st_buffer(the_geom, 0.00009009), st_geomfromtext('POINT(" + 
                         }
                         SiAuto.Main.WatchDouble(Level.Debug, "stayTimeInMin", stayTimeInMin);
                         DateTime getTime = new DateTime();
-                        var dateTime = (from p in sqlCEdb.CheckIfOverTime where p.Uid == id select p.CreateTime).First();
-                        if (dateTime != null)
+                        var dateTime = (from p in sqlCEdb.CheckIfOverTime where p.Uid == id select p.CreateTime).FirstOrDefault();
+                        if (dateTime != default(DateTime))
                             getTime = dateTime.Value;
                         SiAuto.Main.WatchDateTime(Level.Debug, "getTime", getTime);
                         int result;
@@ -2605,7 +2614,7 @@ where st_intersects(st_buffer(the_geom, 0.00009009), st_geomfromtext('POINT(" + 
                             foreach (DataRow row in dt.Rows)
                             {
                                 prohibitedEab2s.Add(new EAB2("p_prohibited", row[0].ToString(), row[1].ToString()));
-                                message += "p_prohibited" + "," + row[0].ToString() + "," + row[1].ToString() + ";";
+                                message += ";"+"p_prohibited" + "#" + row[0].ToString() + "#" + row[1].ToString();
                             }
                             #endregion send with prohibite data
                         }
@@ -2626,7 +2635,7 @@ where st_intersects(st_buffer(the_geom, 0.00009009), st_geomfromtext('POINT(" + 
             {
                 try
                 {
-                    CheckIfOverTime getRow = sqlCEdb.CheckIfOverTime.First(p => p.CreateTime != null && p.Uid == id);
+                    CheckIfOverTime getRow = sqlCEdb.CheckIfOverTime.FirstOrDefault(p => p.CreateTime != null && p.Uid == id);
                     if (getRow != null)
                     {
                         SiAuto.Main.AddCheckpoint(Level.Debug,id+" remove time");
@@ -2654,7 +2663,7 @@ where st_intersects(st_buffer(the_geom, 0.00009009), st_geomfromtext('POINT(" + 
                 SiAuto.Main.AddCheckpoint(Level.Debug, id + "-find data from sql", regSqlCmdForLocationTable);
                 try
                 {
-                    CheckIfOverTime2 getRow = sqlCEdb.CheckIfOverTime2.First(p => p.CreateTime == null && p.Uid == id);
+                    CheckIfOverTime2 getRow = sqlCEdb.CheckIfOverTime2.FirstOrDefault(p => p.CreateTime == null && p.Uid == id);
                     if (getRow != null)
                     {
                         SiAuto.Main.AddCheckpoint(Level.Debug, id + " assign time");
@@ -2689,8 +2698,8 @@ where st_intersects(st_buffer(the_geom, 0.00009009), st_geomfromtext('POINT(" + 
                         }
                         SiAuto.Main.WatchDouble(Level.Debug, "stayTimeInMin", stayTimeInMin);
                         DateTime getTime = new DateTime();
-                        var dateTime = (from p in sqlCEdb.CheckIfOverTime2 where p.Uid == id select p.CreateTime).First();
-                        if (dateTime != null)
+                        var dateTime = (from p in sqlCEdb.CheckIfOverTime2 where p.Uid == id select p.CreateTime).FirstOrDefault();
+                        if (dateTime != default(DateTime))
                             getTime = dateTime.Value;
                         SiAuto.Main.WatchDateTime(Level.Debug, "getTime", getTime);
                         int result;
@@ -2704,7 +2713,7 @@ where st_intersects(st_buffer(the_geom, 0.00009009), st_geomfromtext('POINT(" + 
                             foreach (DataRow row in dt.Rows)
                             {
                                 locationEab2s.Add(new EAB2("patrol_location", row[0].ToString(), row[1].ToString()));
-                                message += "patrol_location" + "," + row[0].ToString() + "," + row[1].ToString() + ";";
+                                message += ";"+"patrol_location" + "#" + row[0].ToString() + "#" + row[1].ToString();
                             }
                             #endregion send with location data
                         }
@@ -2722,7 +2731,7 @@ where st_intersects(st_buffer(the_geom, 0.00009009), st_geomfromtext('POINT(" + 
             {
                 try
                 {
-                    CheckIfOverTime2 getRow = sqlCEdb.CheckIfOverTime2.First(p => p.CreateTime != null && p.Uid == id);
+                    CheckIfOverTime2 getRow = sqlCEdb.CheckIfOverTime2.FirstOrDefault(p => p.CreateTime != null && p.Uid == id);
                     if (getRow != null)
                     {
                         SiAuto.Main.AddCheckpoint(Level.Debug, id + " remove time");
