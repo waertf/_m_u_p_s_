@@ -2460,10 +2460,16 @@ LIMIT 1";
 
             prohibitedTableName = "public.p_prohibited";
             locationTableName = "public.patrol_location";
+            string getMessage = string.Empty;
             lock (getGidAndFullnameLock)
             {
-                GetGidAndFullnameFromP_prohibitedAndPatrol_locationFromSql(prohibitedTableName, locationTableName,
-                ref avls_package.Message, initialLat, initialLon, avls_package.ID);
+                getMessage = GetGidAndFullnameFromP_prohibitedAndPatrol_locationFromSql(prohibitedTableName,
+                    locationTableName,
+                    initialLat, initialLon, avls_package.ID);
+                if (!string.IsNullOrEmpty(getMessage))
+                {
+                    avls_package.Message = getMessage;
+                }
             }
 
             avls_package.ID += ",";    
@@ -2492,11 +2498,13 @@ LIMIT 1";
             Console.WriteLine("-access_avls_server");
         }
 
-        private static void GetGidAndFullnameFromP_prohibitedAndPatrol_locationFromSql(string prohibitedTableName, string locationTableName, ref string message, string initialLat, string initialLon,string id)
+        private static string GetGidAndFullnameFromP_prohibitedAndPatrol_locationFromSql(string prohibitedTableName, string locationTableName, string initialLat, string initialLon,string id)
         {
+            object mylock = new object();
             string startupPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
             string datalogicFilePath = Path.Combine(startupPath, "StayCheck.sdf");
             string connString = string.Format("Data Source={0}", datalogicFilePath);
+            string message = string.Empty;
             StayCheck sqlCEdb;
             try
             {
@@ -2506,7 +2514,7 @@ LIMIT 1";
             {
                 
                 SiAuto.Main.LogError(ex.ToString());
-                return;
+                return string.Empty;
             }
             string searchID = string.Empty, searchID2 = string.Empty;
             double  stayTimeInMin =0;
@@ -2563,7 +2571,7 @@ where st_intersects(st_buffer(the_geom, 0.00009009), st_geomfromtext('POINT(" + 
             }
             var dt = sql_client.get_DataTable(regSqlCmdForProhibitedTable);
             sql_client.disconnect();
-            List<EAB2> prohibitedEab2s= new List<EAB2>();
+            //List<EAB2> prohibitedEab2s= new List<EAB2>();
             if (dt != null && dt.Rows.Count != 0)
             {
                 SiAuto.Main.AddCheckpoint(Level.Debug,id+"-find data from sql", regSqlCmdForProhibitedTable);
@@ -2592,9 +2600,9 @@ where st_intersects(st_buffer(the_geom, 0.00009009), st_geomfromtext('POINT(" + 
                         {
                             Thread.Sleep(300);
                         }
-                        dt = sql_client.get_DataTable(sqlCmd);
+                        var dt2 = sql_client.get_DataTable(sqlCmd);
                         sql_client.disconnect();
-                        if (dt != null && dt.Rows.Count != 0)
+                        if (dt2 != null && dt2.Rows.Count != 0)
                         {
                             foreach (DataRow row in dt.Rows)
                             {
@@ -2614,11 +2622,17 @@ where st_intersects(st_buffer(the_geom, 0.00009009), st_geomfromtext('POINT(" + 
                         if (result > 0)
                         {
                             #region send with prohibite data
-                            message = string.Empty;
+
+                            
+                            
                             foreach (DataRow row in dt.Rows)
                             {
-                                prohibitedEab2s.Add(new EAB2("p_prohibited", row[0].ToString(), row[1].ToString()));
-                                message += ";"+"p_prohibited" + "#" + row[0].ToString() + "#" + row[1].ToString();
+                                //prohibitedEab2s.Add(new EAB2("p_prohibited", row[0].ToString(), row[1].ToString()));
+                                lock (mylock)
+                                {
+                                    message += ";" + "p_prohibited" + "#" + row[0].ToString() + "#" + row[1].ToString();
+                                }
+                                
                             }
                             #endregion send with prohibite data
                         }
@@ -2661,7 +2675,7 @@ where st_intersects(st_buffer(the_geom, 0.00009009), st_geomfromtext('POINT(" + 
             }
             dt = sql_client.get_DataTable(regSqlCmdForLocationTable);
             sql_client.disconnect();
-            List<EAB2> locationEab2s = new List<EAB2>();
+            //List<EAB2> locationEab2s = new List<EAB2>();
             if (dt != null && dt.Rows.Count != 0)
             {
                 SiAuto.Main.AddCheckpoint(Level.Debug, id + "-find data from sql", regSqlCmdForLocationTable);
@@ -2691,9 +2705,9 @@ where st_intersects(st_buffer(the_geom, 0.00009009), st_geomfromtext('POINT(" + 
                         {
                             Thread.Sleep(300);
                         }
-                        dt = sql_client.get_DataTable(sqlCmd);
+                        var dt2 = sql_client.get_DataTable(sqlCmd);
                         sql_client.disconnect();
-                        if (dt != null && dt.Rows.Count != 0)
+                        if (dt2 != null && dt2.Rows.Count != 0)
                         {
                             foreach (DataRow row in dt.Rows)
                             {
@@ -2716,8 +2730,12 @@ where st_intersects(st_buffer(the_geom, 0.00009009), st_geomfromtext('POINT(" + 
                             #region send with location data
                             foreach (DataRow row in dt.Rows)
                             {
-                                locationEab2s.Add(new EAB2("patrol_location", row[0].ToString(), row[1].ToString()));
-                                message += ";"+"patrol_location" + "#" + row[0].ToString() + "#" + row[1].ToString();
+                                //locationEab2s.Add(new EAB2("patrol_location", row[0].ToString(), row[1].ToString()));
+                                lock (mylock)
+                                {
+                                    message += ";" + "patrol_location" + "#" + row[0].ToString() + "#" + row[1].ToString();
+                                }
+                                
                             }
                             #endregion send with location data
                         }
@@ -2750,7 +2768,9 @@ where st_intersects(st_buffer(the_geom, 0.00009009), st_geomfromtext('POINT(" + 
                 }
                 
             }
+            
             sql_client.Dispose();
+            return message;
         }
 
 
