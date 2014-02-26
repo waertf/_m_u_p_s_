@@ -2563,7 +2563,7 @@ from p_prohibited
 where st_intersects(the_geom, st_geomfromtext('POINT("+initialLon+" "+initialLat+@")', 4326)) ";
             regSqlCmdForLocationTable = @"select gid, fullname
 from patrol_location
-where st_intersects(st_buffer(the_geom, 0.00009009), st_geomfromtext('POINT(" + initialLon + " " + initialLat + @")', 4326))";
+where st_intersects(st_buffer(the_geom, 0.0009009), st_geomfromtext('POINT(" + initialLon + " " + initialLat + @")', 4326))";
 
             while (!sql_client.connect())
             {
