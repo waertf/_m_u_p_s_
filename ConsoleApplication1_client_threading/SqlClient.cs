@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using Devart.Data.PostgreSql;
 using System.Data;
+using Gurock.SmartInspect;
 using log4net;
 using log4net.Config;
 
@@ -133,6 +135,8 @@ namespace ConsoleApplication1_client_threading
         //For SELECT statements
         public DataTable get_DataTable(string cmd)
         {
+            Stopwatch stopWatch = new Stopwatch();
+            stopWatch.Start();
             try
             {
                 if (pgSqlConnection != null && IsConnected)
@@ -180,6 +184,15 @@ namespace ConsoleApplication1_client_threading
                     finally
                     {
                         myReader.Close();
+                        stopWatch.Stop();
+                        // Get the elapsed time as a TimeSpan value.
+                        TimeSpan ts = stopWatch.Elapsed;
+
+                        // Format and display the TimeSpan value.
+                        string elapsedTime = String.Format("{0:00}:{1:00}:{2:00}.{3:00}",
+                            ts.Hours, ts.Minutes, ts.Seconds,
+                            ts.Milliseconds / 10);
+                        SiAuto.Main.AddCheckpoint(Level.Debug,"sql query take time:"+elapsedTime,cmd);
                     }
                     /*
                     foreach (DataRow row in datatable.Rows) // Loop over the rows.
