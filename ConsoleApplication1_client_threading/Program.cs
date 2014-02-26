@@ -3948,6 +3948,22 @@ LIMIT 1";
                 }
             }
 
+            string prohibitedTableName = string.Empty, locationTableName = string.Empty;
+            
+            prohibitedTableName = "public.p_prohibited";
+            locationTableName = "public.patrol_location";
+            string getMessage = string.Empty;
+            lock (getGidAndFullnameLock)
+            {
+                getMessage = GetGidAndFullnameFromP_prohibitedAndPatrol_locationFromSql(prohibitedTableName,
+                    locationTableName,
+                    gps_log._lat, gps_log._lon, deviceID);
+                if (!string.IsNullOrEmpty(getMessage))
+                {
+                    
+                }
+            }
+
             //insert into custom.cga_event_log
 
             while (!sql_client.connect())
