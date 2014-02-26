@@ -2917,7 +2917,7 @@ FROM
         private static void access_sql_server(string xml_root_tag, Hashtable htable, List<string> sensor_name,
             List<string> sensor_type, List<string> sensor_value, IEnumerable<XName> elements, string log1)
         {
-            //lock (accessSqlLock)
+            lock (accessSqlLock)
             {
             Console.WriteLine("+access_sql_server");
             Thread.CurrentThread.CurrentUICulture = new CultureInfo("en-us");
@@ -2932,17 +2932,21 @@ FROM
             AUTO_SQL_DATA gps_log = new AUTO_SQL_DATA();
             MANUAL_SQL_DATA operation_log = new MANUAL_SQL_DATA();
             gps_log._or_lat = gps_log._or_lon = gps_log._satellites = gps_log._temperature = gps_log._voltage = "0";
-            string now = string.Format("{0:yyyyMMdd}", dtime);
+            string now = string.Format("{0:yyyyMMddHH}", dtime);
             gps_log._time = "\'" + string.Format("{0:yyyyMMdd HH:mm:ss.fff}", dtime) + "+08" + "\'";
 
             while (!sql_client.connect())
             {
                 Thread.Sleep(300);
             }
-
-            string _gps_logUidCount =
-                sql_client.get_DataTable("SELECT COUNT(_uid)   FROM public._gps_log").Rows[0].ItemArray[0].ToString();
-            sql_client.disconnect();
+                string _gps_logUidCount = string.Empty;
+                if (htable.ContainsKey("suaddr"))
+                {
+                    _gps_logUidCount =
+                sql_client.get_DataTable("SELECT COUNT(_uid)   FROM public._gps_log WHERE _uid ='"+htable["suaddr"] as string+"\'").Rows[0].ItemArray[0].ToString();
+                    sql_client.disconnect();
+                }
+            
 
             while (!sql_client.connect())
             {
@@ -3952,7 +3956,7 @@ LIMIT 1";
             }
             double cgaEventLogIdCount =
                 Convert.ToDouble(
-                    sql_client.get_DataTable("SELECT COUNT(uid)   FROM custom.cga_event_log").Rows[0].ItemArray[0]);
+                    sql_client.get_DataTable("SELECT COUNT(uid)   FROM custom.cga_event_log WHERE uid = '"+deviceID+"\'").Rows[0].ItemArray[0]);
             sql_client.disconnect();
             string yyyymmddhhmmss = DateTime.Now.ToString("yyyyMMddHHmmss");
             while (!sql_client.connect())
