@@ -695,7 +695,7 @@ LIMIT 1";
                     avls_package.Message = "power_off";
                     break;
                 default:
-                    avls_package.Message = "0";
+                    avls_package.Message = "null";
                     break;
 
             }
@@ -2007,7 +2007,23 @@ WHERE
                 
             }
         }
-
+        /*
+         * avls event list:
+         * 175:Immediate-Location-Report
+         * 182:msg(power_off):ABSENT SUBSCRIBER,Unit Absent
+         * 181:msg(power_on):Unit Present
+         * 1:INSUFFICIENT GPS SATELLITES,BAD GPS GEOMETRY,GPS INVALID
+         * 0:Emergency Off,Ignition Off,Ignition On
+         * -1:msg(power_off_over_1_hour):
+         * 
+         * avls message default:"null"
+         * 
+         * only for access sql table:custom.cga_event_log
+         * event:2->msg:p_prohibited
+         * event:3->msg:patrol_location
+         * event:4->msg:p_prohibited,patrol_location
+         * 
+        */
         private static void access_avls_server(string xml_root_tag, Hashtable htable, List<string> sensor_name, List<string> sensor_type, List<string> sensor_value, IEnumerable<XName> iEnumerable, string log, TcpClient avlsTcpClient)
         {
             Console.WriteLine("+access_avls_server");
@@ -2015,7 +2031,7 @@ WHERE
             string send_string = string.Empty;
             string initialLat = string.Empty, initialLon = string.Empty;
             AVLS_UNIT_Report_Packet avls_package = new AVLS_UNIT_Report_Packet();
-            avls_package.Message = "test";
+            avls_package.Message = "null";
             
              
 
@@ -2932,7 +2948,7 @@ FROM
             AUTO_SQL_DATA gps_log = new AUTO_SQL_DATA();
             MANUAL_SQL_DATA operation_log = new MANUAL_SQL_DATA();
             gps_log._or_lat = gps_log._or_lon = gps_log._satellites = gps_log._temperature = gps_log._voltage = "0";
-            string now = string.Format("{0:yyyyMMddHH}", dtime);
+            string now = string.Format("{0:yyyyMMdd}", dtime);
             gps_log._time = "\'" + string.Format("{0:yyyyMMdd HH:mm:ss.fff}", dtime) + "+08" + "\'";
 
             while (!sql_client.connect())
@@ -3947,24 +3963,8 @@ LIMIT 1";
                     sql_client.disconnect();
                 }
             }
-
-            string prohibitedTableName = string.Empty, locationTableName = string.Empty;
             
-            prohibitedTableName = "public.p_prohibited";
-            locationTableName = "public.patrol_location";
-            string getMessage = string.Empty;
-            lock (getGidAndFullnameLock)
-            {
-                getMessage = GetGidAndFullnameFromP_prohibitedAndPatrol_locationFromSql(prohibitedTableName,
-                    locationTableName,
-                    gps_log._lat, gps_log._lon, deviceID);
-                if (!string.IsNullOrEmpty(getMessage))
-                {
-                    
-                }
-            }
-
-            //insert into custom.cga_event_log
+            
 
             while (!sql_client.connect())
             {
@@ -3975,6 +3975,85 @@ LIMIT 1";
                     sql_client.get_DataTable("SELECT COUNT(uid)   FROM custom.cga_event_log WHERE uid = '"+deviceID+"\'").Rows[0].ItemArray[0]);
             sql_client.disconnect();
             string yyyymmddhhmmss = DateTime.Now.ToString("yyyyMMddHHmmss");
+
+            #region access GetGidAndFullnameFromP_prohibitedAndPatrol_locationFromSql
+            string prohibitedTableName = string.Empty, locationTableName = string.Empty;
+
+            prohibitedTableName = "public.p_prohibited";
+            locationTableName = "public.patrol_location";
+            string getMessage = string.Empty,bundaryEventNumber = string.Empty;
+            lock (getGidAndFullnameLock)
+            {
+
+                /* 
+                 * only for access sql table:custom.cga_event_log
+                 * event:2->msg:p_prohibited
+                 * event:3->msg:patrol_location
+                 * event:4->msg:p_prohibited,patrol_location
+                 */
+                getMessage = GetGidAndFullnameFromP_prohibitedAndPatrol_locationFromSql(prohibitedTableName,
+                    locationTableName,
+                    gps_log._lat, gps_log._lon, deviceID);
+                if (!string.IsNullOrEmpty(getMessage))
+                {
+                    if (getMessage.Contains("p_prohibited") && getMessage.Contains("patrol_location"))
+                    {
+                        bundaryEventNumber = "4";
+                    }
+                    else
+                    {
+                        if (getMessage.Contains("p_prohibited"))
+                        {
+                            bundaryEventNumber = "2";
+                        }
+                        else
+                        {
+                            if (getMessage.Contains("patrol_location"))
+                            {
+                                bundaryEventNumber = "3";
+                            }
+                        }
+                    }
+                    //insert into custom.cga_event_log
+                    while (!sql_client.connect())
+                    {
+                        Thread.Sleep(300);
+                    }
+                    string sn = "\'" + deviceID + now + cgaEventLogIdCount.ToString("000000000000") + "\'";
+                    string table_columns =
+                        "serial_no ,uid ,type ,lat ,lon,altitude ,speed ,course ,radius ,info_time ,server_time ,create_user ,create_ip,start_time,create_time";
+                    string table_column_value = sn + "," +
+                                                gps_log._uid + "," + //gps_log._option3
+                                                @"'"+bundaryEventNumber+@"'" + "," + gps_log._lat + "," + gps_log._lon + "," +
+                                                gps_log._altitude + "," + gps_log._speed + "," +
+                                                gps_log._course + "," +
+                                                gps_log.j_5 + "," + "to_timestamp(" +
+                                                gps_log._option0 + @",'YYYYMMDDHH24MISS')" +
+                                                "," + "to_timestamp(" +
+                                                gps_log._option1 + @",'YYYYMMDDHH24MISS')" +
+                                                "," + @"1" + "," + @"'" + GetLocalIPAddress().ToString() +
+                                                @"'" +
+                                                "," + @"to_timestamp('" + yyyymmddhhmmss +
+                                                @"','YYYYMMDDHH24MISS')" +
+                                                "," + @"to_timestamp('" + yyyymmddhhmmss +
+                                                @"','YYYYMMDDHH24MISS')";
+                    string cmd = "INSERT INTO custom.cga_event_log (" + table_columns + ") VALUES  (" +
+                                 table_column_value + ")";
+                    sql_client.modify(cmd);
+                    sql_client.disconnect();
+                }
+            }
+            #endregion access GetGidAndFullnameFromP_prohibitedAndPatrol_locationFromSql
+
+            //insert into custom.cga_event_log
+            while (!sql_client.connect())
+            {
+                Thread.Sleep(300);
+            }
+             cgaEventLogIdCount =
+                Convert.ToDouble(
+                    sql_client.get_DataTable("SELECT COUNT(uid)   FROM custom.cga_event_log WHERE uid = '" + deviceID + "\'").Rows[0].ItemArray[0]);
+            sql_client.disconnect();
             while (!sql_client.connect())
             {
                 Thread.Sleep(300);
