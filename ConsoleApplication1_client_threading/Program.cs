@@ -273,6 +273,8 @@ LIMIT 1";
 
         static void Main(string[] args)
         {
+            Console.WriteLine(AppDomain.CurrentDomain.BaseDirectory + "Client.exe");
+            Thread.Sleep(5000);
             string StartupPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
             string datalogicFilePath = Path.Combine(StartupPath, "StayCheck.sdf");
             string connString = string.Format("Data Source={0}", datalogicFilePath);
@@ -374,11 +376,11 @@ SET
             }
             sql_client.modify(emptyPowerStatusTable);
             sql_client.disconnect();
-            string registration_msg_error_test = "<Location-Registration-Request><application>" + ConfigurationManager.AppSettings["application_ID"] + "</application></Location-Registration-Request>";
-            UnsTcpWriteLine(netStream, data_append_dataLength(registration_msg_error_test), registration_msg_error_test);
+            string registration_msg = "<Location-Registration-Request><application>" + ConfigurationManager.AppSettings["application_ID"] + "</application></Location-Registration-Request>";
+            UnsTcpWriteLine(netStream, data_append_dataLength(registration_msg), registration_msg);
             //using (StreamWriter w = File.AppendText("log.txt"))
             {
-                log.Info("send:\r\n"+registration_msg_error_test);
+                log.Info("send:\r\n"+registration_msg);
                 // Close the writer and underlying file.
                 //w.Close();
             }
@@ -1630,6 +1632,10 @@ Select 1-6 then press enter to send package
                              htable.Add("result_code",XmlGetTagAttributeValue(xml_data, "result", "result-code"));
                              //htable.Add("err_msg" , XmlGetTagValue(xml_data, "result"));
                              htable.Add("result_msg", ConfigurationManager.AppSettings["RESULT_CODE_" + htable["result_code"]]);
+                             if (htable["result_code"].Equals("3"))//UNAUTHORIZED APPLICATION
+                             {
+                                 Restart();
+                             }
                              Console.WriteLine("result_code:{0}", htable["result_code"]);
                              Console.WriteLine("result_msg:{0}", htable["result_msg"]);
                         }
@@ -1958,6 +1964,16 @@ Select 1-6 then press enter to send package
             }
             
             Console.WriteLine("::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::");
+        }
+
+        private static void Restart()
+        {
+            Process.Start(AppDomain.CurrentDomain.BaseDirectory + "Client.exe");
+
+            //some time to start the new instance.
+            Thread.Sleep(2000);
+
+            Environment.Exit(-1);//Force termination of the current process.
         }
 
         private static void GetInitialLocationFromSql(ref string lat, ref string lon, string id)
