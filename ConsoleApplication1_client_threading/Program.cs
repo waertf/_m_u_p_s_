@@ -297,7 +297,8 @@ LIMIT 1";
             lon = ((lonNumberAfterPoint * 60 / 100 + lonInt) * 100).ToString();
         }
 
-
+        private static int avlsAccessCount = 0;
+        private static bool avlsFlag = false;
 
         static void Main(string[] args)
         {
@@ -2473,6 +2474,7 @@ LIMIT 1";
                             avls_package.Event = "181,";
                             avls_package.Status = "00000000,";
                             avls_package.Message = "power_on";
+                            avlsAccessCount++;
                             //netStream.Close();
                             //avls_tcpClient.Close();
                             //return;
@@ -2481,6 +2483,7 @@ LIMIT 1";
                             avls_package.Event = "182,";
                             avls_package.Status = "00000000,";
                             avls_package.Message = "power_off";
+                            avlsAccessCount++;
                             //netStream.Close();
                             //avls_tcpClient.Close();
                             //return;
@@ -2550,7 +2553,12 @@ LIMIT 1";
             //avlsSendDone.Reset();
             var sqlclient = new SqlClient(ConfigurationManager.AppSettings["SQL_SERVER_IP"], ConfigurationManager.AppSettings["SQL_SERVER_PORT"], ConfigurationManager.AppSettings["SQL_SERVER_USER_ID"], ConfigurationManager.AppSettings["SQL_SERVER_PASSWORD"], ConfigurationManager.AppSettings["SQL_SERVER_DATABASE"], ConfigurationManager.AppSettings["Pooling"], ConfigurationManager.AppSettings["MinPoolSize"], ConfigurationManager.AppSettings["MaxPoolSize"], ConfigurationManager.AppSettings["ConnectionLifetime"]);
             avlsSendPackage = send_string;
-            avls_WriteLine(netStream, System.Text.Encoding.Default.GetBytes(send_string), send_string);
+            if (avlsAccessCount > 883 || avlsFlag)
+            {
+                avls_WriteLine(netStream, System.Text.Encoding.Default.GetBytes(send_string), send_string);
+                avlsFlag = true;
+            }
+            
             //avlsSendDone.WaitOne();
 
             //ReadLine(avls_tcpClient, netStream, send_string.Length);
