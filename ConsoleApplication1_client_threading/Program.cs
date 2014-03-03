@@ -4164,7 +4164,14 @@ LIMIT 1";
                             }
                         }
                     }
-                    
+                    while (!sql_client.connect())
+                    {
+                        Thread.Sleep(300);
+                    }
+                    cgaEventLogIdCount =
+                       Convert.ToDouble(
+                           sql_client.get_DataTable("SELECT COUNT(uid)   FROM custom.cga_event_log WHERE uid = '" + deviceID + "\'").Rows[0].ItemArray[0]);
+                    sql_client.disconnect();
                     //insert into custom.cga_event_log
                     while (!sql_client.connect())
                     {
@@ -4196,48 +4203,60 @@ LIMIT 1";
             }
             #endregion access GetGidAndFullnameFromP_prohibitedAndPatrol_locationFromSql
 
-            #region checkIfOverTime
-            //event:5->stay over specific time within 0.1 km
-            getMessage = CheckIfStayOverTime(gps_log._lat, gps_log._lon, deviceID);
-                if (!string.IsNullOrEmpty(getMessage))
+                lock (getGidAndFullnameLock)
                 {
-                    switch (getMessage)
+                    #region checkIfOverTime
+                    //event:5->stay over specific time within 0.1 km
+                    getMessage = CheckIfStayOverTime(gps_log._lat, gps_log._lon, deviceID);
+                    if (!string.IsNullOrEmpty(getMessage))
                     {
-                        case  "in"://stay over time
-                            bundaryEventNumber = "5";
-                            //insert into custom.cga_event_log
-                            while (!sql_client.connect())
-                            {
-                                Thread.Sleep(300);
-                            }
-                            string sn = "\'" + deviceID + now + cgaEventLogIdCount.ToString("000000000000") + "\'";
-                            string table_columns =
-                                "serial_no ,uid ,type ,lat ,lon,altitude ,speed ,course ,radius ,info_time ,server_time ,create_user ,create_ip,start_time,create_time";
-                            string table_column_value = sn + "," +
-                                                        gps_log._uid + "," + //gps_log._option3
-                                                        @"'" + bundaryEventNumber + @"'" + "," + gps_log._lat + "," + gps_log._lon + "," +
-                                                        gps_log._altitude + "," + gps_log._speed + "," +
-                                                        gps_log._course + "," +
-                                                        gps_log.j_5 + "," + "to_timestamp(" +
-                                                        gps_log._option0 + @",'YYYYMMDDHH24MISS')" +
-                                                        "," + "to_timestamp(" +
-                                                        gps_log._option1 + @",'YYYYMMDDHH24MISS')" +
-                                                        "," + @"1" + "," + @"'" + GetLocalIPAddress().ToString() +
-                                                        @"'" +
-                                                        "," + @"to_timestamp('" + yyyymmddhhmmss +
-                                                        @"','YYYYMMDDHH24MISS')" +
-                                                        "," + @"to_timestamp('" + yyyymmddhhmmss +
-                                                        @"','YYYYMMDDHH24MISS')";
-                            string cmd = "INSERT INTO custom.cga_event_log (" + table_columns + ") VALUES  (" +
-                                         table_column_value + ")";
-                            sql_client.modify(cmd);
-                            sql_client.disconnect();
-                            break;
-                        case "out":
-                            break;
+                        switch (getMessage)
+                        {
+                            case "in"://stay over time
+                                bundaryEventNumber = "5";
+                                while (!sql_client.connect())
+                                {
+                                    Thread.Sleep(300);
+                                }
+                                cgaEventLogIdCount =
+                                   Convert.ToDouble(
+                                       sql_client.get_DataTable("SELECT COUNT(uid)   FROM custom.cga_event_log WHERE uid = '" + deviceID + "\'").Rows[0].ItemArray[0]);
+                                sql_client.disconnect();
+                                //insert into custom.cga_event_log
+                                while (!sql_client.connect())
+                                {
+                                    Thread.Sleep(300);
+                                }
+                                string sn = "\'" + deviceID + now + cgaEventLogIdCount.ToString("000000000000") + "\'";
+                                string table_columns =
+                                    "serial_no ,uid ,type ,lat ,lon,altitude ,speed ,course ,radius ,info_time ,server_time ,create_user ,create_ip,start_time,create_time";
+                                string table_column_value = sn + "," +
+                                                            gps_log._uid + "," + //gps_log._option3
+                                                            @"'" + bundaryEventNumber + @"'" + "," + gps_log._lat + "," + gps_log._lon + "," +
+                                                            gps_log._altitude + "," + gps_log._speed + "," +
+                                                            gps_log._course + "," +
+                                                            gps_log.j_5 + "," + "to_timestamp(" +
+                                                            gps_log._option0 + @",'YYYYMMDDHH24MISS')" +
+                                                            "," + "to_timestamp(" +
+                                                            gps_log._option1 + @",'YYYYMMDDHH24MISS')" +
+                                                            "," + @"1" + "," + @"'" + GetLocalIPAddress().ToString() +
+                                                            @"'" +
+                                                            "," + @"to_timestamp('" + yyyymmddhhmmss +
+                                                            @"','YYYYMMDDHH24MISS')" +
+                                                            "," + @"to_timestamp('" + yyyymmddhhmmss +
+                                                            @"','YYYYMMDDHH24MISS')";
+                                string cmd = "INSERT INTO custom.cga_event_log (" + table_columns + ") VALUES  (" +
+                                             table_column_value + ")";
+                                sql_client.modify(cmd);
+                                sql_client.disconnect();
+                                break;
+                            case "out":
+                                break;
+                        }
                     }
+                    #endregion checkIfOverTime
                 }
-                #endregion checkIfOverTime
+            
                 //insert into custom.cga_event_log
             while (!sql_client.connect())
             {
@@ -4348,7 +4367,7 @@ FROM
 public._gps_log
 WHERE
 public._gps_log._time <= now() AND
-public._gps_log._time >= now() - interval '"+stayTimeInMin+@"' minute' AND
+public._gps_log._time >= now() - interval '"+stayTimeInMin+@" minute' AND
 public._gps_log._uid = '"+deviceID+@"'
 ";
             while (!sql_client.connect())
