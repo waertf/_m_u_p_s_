@@ -44,6 +44,34 @@ namespace ConsoleApplication1_client_threading
             return linenum;
         }
     }
+    public static class GeoCodeCalc
+    {
+        public const double EarthRadiusInMiles = 3956.0;
+        public const double EarthRadiusInKilometers = 6367.0;
+        public static double ToRadian(double val) { return val * (Math.PI / 180); }
+        public static double DiffRadian(double val1, double val2) { return ToRadian(val2) - ToRadian(val1); }
+        /// <summary> 
+        /// Calculate the distance between two geocodes. Defaults to using Miles. 
+        /// </summary> 
+        public static double CalcDistance(double lat1, double lng1, double lat2, double lng2)
+        {
+            return CalcDistance(lat1, lng1, lat2, lng2, GeoCodeCalcMeasurement.Miles);
+        }
+        /// <summary> 
+        /// Calculate the distance between two geocodes. 
+        /// </summary> 
+        public static double CalcDistance(double lat1, double lng1, double lat2, double lng2, GeoCodeCalcMeasurement m)
+        {
+            double radius = GeoCodeCalc.EarthRadiusInMiles;
+            if (m == GeoCodeCalcMeasurement.Kilometers) { radius = GeoCodeCalc.EarthRadiusInKilometers; }
+            return radius * 2 * Math.Asin(Math.Min(1, Math.Sqrt((Math.Pow(Math.Sin((DiffRadian(lat1, lat2)) / 2.0), 2.0) + Math.Cos(ToRadian(lat1)) * Math.Cos(ToRadian(lat2)) * Math.Pow(Math.Sin((DiffRadian(lng1, lng2)) / 2.0), 2.0)))));
+        }
+    }
+    public enum GeoCodeCalcMeasurement : int
+    {
+        Miles = 0,
+        Kilometers = 1
+    }
     class Program
     {
         //static TcpClient unsTcpClient = null;
@@ -2038,7 +2066,8 @@ WHERE
          * event:2->msg:p_prohibited
          * event:3->msg:patrol_location
          * event:4->msg:p_prohibited,patrol_location
-         * 
+         * event:x.5->x stay over specific time
+         * event:5->stay over specific time within 0.1 km
         */
         private static void access_avls_server(string xml_root_tag, Hashtable htable, List<string> sensor_name, List<string> sensor_type, List<string> sensor_value, IEnumerable<XName> iEnumerable, string log, TcpClient avlsTcpClient)
         {
@@ -2497,7 +2526,7 @@ LIMIT 1";
             {
                 getMessage = GetGidAndFullnameFromP_prohibitedAndPatrol_locationFromSql(prohibitedTableName,
                     locationTableName,
-                    initialLat, initialLon, avls_package.ID);
+                    initialLat, initialLon, avls_package.ID,true);
                 if (!string.IsNullOrEmpty(getMessage))
                 {
                     avls_package.Message = getMessage;
@@ -2530,7 +2559,7 @@ LIMIT 1";
             Console.WriteLine("-access_avls_server");
         }
 
-        private static string GetGidAndFullnameFromP_prohibitedAndPatrol_locationFromSql(string prohibitedTableName, string locationTableName, string initialLat, string initialLon,string id)
+        private static string GetGidAndFullnameFromP_prohibitedAndPatrol_locationFromSql(string prohibitedTableName, string locationTableName, string initialLat, string initialLon,string id,bool isStayTimeEnable)
         {
             object mylock = new object();
             string startupPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
@@ -2636,7 +2665,7 @@ where st_intersects(st_buffer(the_geom, 0.0009009), st_geomfromtext('POINT(" + i
                         sql_client.disconnect();
                         if (dt2 != null && dt2.Rows.Count != 0)
                         {
-                            foreach (DataRow row in dt.Rows)
+                            foreach (DataRow row in dt2.Rows)
                             {
                                 stayTimeInMin = double .Parse(row[0].ToString());
                             }
@@ -2651,12 +2680,32 @@ where st_intersects(st_buffer(the_geom, 0.0009009), st_geomfromtext('POINT(" + i
                         result = DateTime.Compare(DateTime.Now, getTime.AddMinutes(stayTimeInMin));
                         SiAuto.Main.LogText(Level.Debug, id + "-result-" + result,
                             DateTime.Now + "--" + getTime.AddMinutes(stayTimeInMin));
-                        if (result > 0)
+                        if (isStayTimeEnable)
+                        {
+                            if (result > 0)
+                            {
+                                #region send with prohibite data
+
+
+
+                                foreach (DataRow row in dt.Rows)
+                                {
+                                    //prohibitedEab2s.Add(new EAB2("p_prohibited", row[0].ToString(), row[1].ToString()));
+                                    lock (mylock)
+                                    {
+                                        message += ";" + "p_prohibited" + "#" + row[0].ToString() + "#" + row[1].ToString();
+                                    }
+
+                                }
+                                #endregion send with prohibite data
+                            }
+                        }
+                        else
                         {
                             #region send with prohibite data
 
-                            
-                            
+
+
                             foreach (DataRow row in dt.Rows)
                             {
                                 //prohibitedEab2s.Add(new EAB2("p_prohibited", row[0].ToString(), row[1].ToString()));
@@ -2664,10 +2713,12 @@ where st_intersects(st_buffer(the_geom, 0.0009009), st_geomfromtext('POINT(" + i
                                 {
                                     message += ";" + "p_prohibited" + "#" + row[0].ToString() + "#" + row[1].ToString();
                                 }
-                                
+
                             }
                             #endregion send with prohibite data
                         }
+                        
+
                         
                     }
                    
@@ -2741,7 +2792,7 @@ where st_intersects(st_buffer(the_geom, 0.0009009), st_geomfromtext('POINT(" + i
                         sql_client.disconnect();
                         if (dt2 != null && dt2.Rows.Count != 0)
                         {
-                            foreach (DataRow row in dt.Rows)
+                            foreach (DataRow row in dt2.Rows)
                             {
                                 stayTimeInMin = double.Parse(row[0].ToString());
                             }
@@ -2756,9 +2807,26 @@ where st_intersects(st_buffer(the_geom, 0.0009009), st_geomfromtext('POINT(" + i
                         result = DateTime.Compare(DateTime.Now, getTime.AddMinutes(stayTimeInMin));
                         SiAuto.Main.LogText(Level.Debug, id + "-result-" + result,
                             DateTime.Now + "--" + getTime.AddMinutes(stayTimeInMin));
-                        if (result > 0)
+                        if (isStayTimeEnable)
                         {
+                            if (result > 0)
+                            {
 
+                                #region send with location data
+                                foreach (DataRow row in dt.Rows)
+                                {
+                                    //locationEab2s.Add(new EAB2("patrol_location", row[0].ToString(), row[1].ToString()));
+                                    lock (mylock)
+                                    {
+                                        message += ";" + "patrol_location" + "#" + row[0].ToString() + "#" + row[1].ToString();
+                                    }
+
+                                }
+                                #endregion send with location data
+                            }
+                        }
+                        else
+                        {
                             #region send with location data
                             foreach (DataRow row in dt.Rows)
                             {
@@ -2767,10 +2835,11 @@ where st_intersects(st_buffer(the_geom, 0.0009009), st_geomfromtext('POINT(" + i
                                 {
                                     message += ";" + "patrol_location" + "#" + row[0].ToString() + "#" + row[1].ToString();
                                 }
-                                
+
                             }
                             #endregion send with location data
                         }
+                        
 
                     }
                 }
@@ -4006,10 +4075,12 @@ LIMIT 1";
                  * event:2->msg:p_prohibited
                  * event:3->msg:patrol_location
                  * event:4->msg:p_prohibited,patrol_location
+                 * event:x.5->x stay over specific 
+                 * event:5->stay over specific time within 0.1 km
                  */
                 getMessage = GetGidAndFullnameFromP_prohibitedAndPatrol_locationFromSql(prohibitedTableName,
                     locationTableName,
-                    gps_log._lat, gps_log._lon, deviceID);
+                    gps_log._lat, gps_log._lon, deviceID,false);
                 if (!string.IsNullOrEmpty(getMessage))
                 {
                     if (getMessage.Contains("p_prohibited") && getMessage.Contains("patrol_location"))
@@ -4059,9 +4130,115 @@ LIMIT 1";
                     sql_client.disconnect();
                 }
             }
+            lock (getGidAndFullnameLock)
+            {
+
+                /* 
+                 * only for access sql table:custom.cga_event_log
+                 * event:2->msg:p_prohibited
+                 * event:3->msg:patrol_location
+                 * event:4->msg:p_prohibited,patrol_location
+                 * event:x.5->x stay over specific time
+                 * event:5->stay over specific time within 0.1 km
+                 */
+                getMessage = GetGidAndFullnameFromP_prohibitedAndPatrol_locationFromSql(prohibitedTableName,
+                    locationTableName,
+                    gps_log._lat, gps_log._lon, deviceID, true);
+                if (!string.IsNullOrEmpty(getMessage))
+                {
+                    if (getMessage.Contains("p_prohibited") && getMessage.Contains("patrol_location"))
+                    {
+                        bundaryEventNumber = "4.5";
+                    }
+                    else
+                    {
+                        if (getMessage.Contains("p_prohibited"))
+                        {
+                            bundaryEventNumber = "2.5";
+                        }
+                        else
+                        {
+                            if (getMessage.Contains("patrol_location"))
+                            {
+                                bundaryEventNumber = "3.5";
+                            }
+                        }
+                    }
+                    
+                    //insert into custom.cga_event_log
+                    while (!sql_client.connect())
+                    {
+                        Thread.Sleep(300);
+                    }
+                    string sn = "\'" + deviceID + now + cgaEventLogIdCount.ToString("000000000000") + "\'";
+                    string table_columns =
+                        "serial_no ,uid ,type ,lat ,lon,altitude ,speed ,course ,radius ,info_time ,server_time ,create_user ,create_ip,start_time,create_time";
+                    string table_column_value = sn + "," +
+                                                gps_log._uid + "," + //gps_log._option3
+                                                @"'" + bundaryEventNumber + @"'" + "," + gps_log._lat + "," + gps_log._lon + "," +
+                                                gps_log._altitude + "," + gps_log._speed + "," +
+                                                gps_log._course + "," +
+                                                gps_log.j_5 + "," + "to_timestamp(" +
+                                                gps_log._option0 + @",'YYYYMMDDHH24MISS')" +
+                                                "," + "to_timestamp(" +
+                                                gps_log._option1 + @",'YYYYMMDDHH24MISS')" +
+                                                "," + @"1" + "," + @"'" + GetLocalIPAddress().ToString() +
+                                                @"'" +
+                                                "," + @"to_timestamp('" + yyyymmddhhmmss +
+                                                @"','YYYYMMDDHH24MISS')" +
+                                                "," + @"to_timestamp('" + yyyymmddhhmmss +
+                                                @"','YYYYMMDDHH24MISS')";
+                    string cmd = "INSERT INTO custom.cga_event_log (" + table_columns + ") VALUES  (" +
+                                 table_column_value + ")";
+                    sql_client.modify(cmd);
+                    sql_client.disconnect();
+                }
+            }
             #endregion access GetGidAndFullnameFromP_prohibitedAndPatrol_locationFromSql
 
-            //insert into custom.cga_event_log
+            #region checkIfOverTime
+            //event:5->stay over specific time within 0.1 km
+            getMessage = CheckIfStayOverTime(gps_log._lat, gps_log._lon, deviceID);
+                if (!string.IsNullOrEmpty(getMessage))
+                {
+                    switch (getMessage)
+                    {
+                        case  "in"://stay over time
+                            bundaryEventNumber = "5";
+                            //insert into custom.cga_event_log
+                            while (!sql_client.connect())
+                            {
+                                Thread.Sleep(300);
+                            }
+                            string sn = "\'" + deviceID + now + cgaEventLogIdCount.ToString("000000000000") + "\'";
+                            string table_columns =
+                                "serial_no ,uid ,type ,lat ,lon,altitude ,speed ,course ,radius ,info_time ,server_time ,create_user ,create_ip,start_time,create_time";
+                            string table_column_value = sn + "," +
+                                                        gps_log._uid + "," + //gps_log._option3
+                                                        @"'" + bundaryEventNumber + @"'" + "," + gps_log._lat + "," + gps_log._lon + "," +
+                                                        gps_log._altitude + "," + gps_log._speed + "," +
+                                                        gps_log._course + "," +
+                                                        gps_log.j_5 + "," + "to_timestamp(" +
+                                                        gps_log._option0 + @",'YYYYMMDDHH24MISS')" +
+                                                        "," + "to_timestamp(" +
+                                                        gps_log._option1 + @",'YYYYMMDDHH24MISS')" +
+                                                        "," + @"1" + "," + @"'" + GetLocalIPAddress().ToString() +
+                                                        @"'" +
+                                                        "," + @"to_timestamp('" + yyyymmddhhmmss +
+                                                        @"','YYYYMMDDHH24MISS')" +
+                                                        "," + @"to_timestamp('" + yyyymmddhhmmss +
+                                                        @"','YYYYMMDDHH24MISS')";
+                            string cmd = "INSERT INTO custom.cga_event_log (" + table_columns + ") VALUES  (" +
+                                         table_column_value + ")";
+                            sql_client.modify(cmd);
+                            sql_client.disconnect();
+                            break;
+                        case "out":
+                            break;
+                    }
+                }
+                #endregion checkIfOverTime
+                //insert into custom.cga_event_log
             while (!sql_client.connect())
             {
                 Thread.Sleep(300);
@@ -4136,6 +4313,83 @@ LIMIT 1";
             //sqlAccessEvent.Set();
         }
     }
+
+        private static string CheckIfStayOverTime(string lat, string lon, string deviceID)
+        {
+            double distanceLimit = 0.1;//unit:km
+            string DB = string.Empty, stayTimeInMin = string.Empty;
+            List<string> resultList= new List<string>();
+            DB = "lmap100";
+            SqlClient sql_client = new SqlClient(ConfigurationManager.AppSettings["SQL_SERVER_IP"], ConfigurationManager.AppSettings["SQL_SERVER_PORT"], ConfigurationManager.AppSettings["SQL_SERVER_USER_ID"], ConfigurationManager.AppSettings["SQL_SERVER_PASSWORD"], DB, ConfigurationManager.AppSettings["Pooling"], ConfigurationManager.AppSettings["MinPoolSize"], ConfigurationManager.AppSettings["MaxPoolSize"], ConfigurationManager.AppSettings["ConnectionLifetime"]);
+            
+            string sqlCmd = @"select stay_time from p_config LIMIT 1";
+
+            while (!sql_client.connect())
+            {
+                Thread.Sleep(300);
+            }
+            var dt2 = sql_client.get_DataTable(sqlCmd);
+            sql_client.disconnect();
+            if (dt2 != null && dt2.Rows.Count != 0)
+            {
+                foreach (DataRow row in dt2.Rows)
+                {
+                    stayTimeInMin = row[0].ToString();
+                }
+            }
+            else
+            {
+                stayTimeInMin = "0";
+            }
+            sqlCmd = @"SELECT
+public._gps_log._lat,
+public._gps_log._lon
+FROM
+public._gps_log
+WHERE
+public._gps_log._time <= now() AND
+public._gps_log._time >= now() - interval '"+stayTimeInMin+@"' minute' AND
+public._gps_log._uid = '"+deviceID+@"'
+";
+            while (!sql_client.connect())
+            {
+                Thread.Sleep(300);
+            }
+            dt2 = sql_client.get_DataTable(sqlCmd);
+            sql_client.disconnect();
+            if (dt2 != null && dt2.Rows.Count != 0)
+            {
+                foreach (DataRow row in dt2.Rows)
+                {
+                    double d = GeoCodeCalc.CalcDistance(double.Parse(lat), double.Parse(lon), double.Parse(row[0].ToString()),
+                        double.Parse(row[1].ToString()), GeoCodeCalcMeasurement.Kilometers);
+                    if(d<=distanceLimit)
+                        resultList.Add("in");
+                    else
+                    {
+                        resultList.Add("out");
+                    }
+                }
+                resultList.Sort();
+                int index = resultList.BinarySearch("out");
+                if (index<0)
+                {
+                    string result = string.Empty;
+                    result = "out";
+                    return result;
+                }
+                else
+                {
+                    string result = string.Empty;
+                    result = "in";
+                    return result;
+                }
+            }
+            else
+            {
+                return string.Empty;
+            }
+        }
         /*
              * <result result-code="A">SYNTAX ERROR</result>
          * *****************************************************
