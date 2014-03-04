@@ -24,6 +24,7 @@ using log4net.Config;
 using keeplive;
 using System.Net;
 using Gurock.SmartInspect;
+using Configuration = System.Configuration.Configuration;
 
 namespace ConsoleApplication1_client_threading
 {
@@ -299,6 +300,7 @@ LIMIT 1";
 
         private static int avlsAccessCount = 0;
         private static bool avlsFlag = false;
+        private static object IsFirstExecuteLock = new object();
 
         static void Main(string[] args)
         {
@@ -2533,6 +2535,23 @@ LIMIT 1";
             avlsSendPackage = send_string;
             if (avlsAccessCount > 883 || avlsFlag)
             {
+                lock (IsFirstExecuteLock)
+                {
+                    if (bool.Parse(ConfigurationManager.AppSettings["IsFirstExecute"]))
+                    {
+                        Configuration config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
+
+                        //make changes
+                        config.AppSettings.Settings["IsFirstExecute"].Value = "false";
+
+                        //save to apply changes
+                        config.Save(ConfigurationSaveMode.Modified);
+                        ConfigurationManager.RefreshSection("appSettings");
+                    }
+               
+                }
+                
+
                 avls_WriteLine(netStream, System.Text.Encoding.Default.GetBytes(send_string), send_string);
                 avlsFlag = true;
 
@@ -2583,6 +2602,11 @@ LIMIT 1";
                 {
                     avls_WriteLine(netStream, System.Text.Encoding.Default.GetBytes(send_string), send_string);
                 }
+                if (bool.Parse(ConfigurationManager.AppSettings["IsFirstExecute"]))
+                {
+                    avls_WriteLine(netStream, System.Text.Encoding.Default.GetBytes(send_string), send_string);
+                }
+                
             }
             
             //avlsSendDone.WaitOne();
