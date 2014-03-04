@@ -2527,12 +2527,28 @@ LIMIT 1";
             string getMessage = string.Empty;
             lock (getGidAndFullnameLock)
             {
+                send_string = "%%" + avls_package.ID+"," + avls_package.GPS_Valid + avls_package.Date_Time + avls_package.Loc + avls_package.Speed + avls_package.Dir + avls_package.Temp + avls_package.Status + avls_package.Event;
                 getMessage = GetGidAndFullnameFromP_prohibitedAndPatrol_locationFromSql(prohibitedTableName,
                     locationTableName,
                     initialLat, initialLon, avls_package.ID,true);
                 if (!string.IsNullOrEmpty(getMessage))
                 {
-                    avls_package.Message = getMessage;
+                    send_string += getMessage + "\r\n";
+                    avls_WriteLine(netStream, System.Text.Encoding.Default.GetBytes(send_string), send_string);
+                }
+
+                send_string = "%%" + avls_package.ID + "," + avls_package.GPS_Valid + avls_package.Date_Time + avls_package.Loc + avls_package.Speed + avls_package.Dir + avls_package.Temp + avls_package.Status + avls_package.Event;
+                getMessage = CheckIfStayOverTime(initialLat, initialLon, avls_package.ID);
+                if (!string.IsNullOrEmpty(getMessage))
+                {
+                    switch (getMessage)
+                    {
+                        case "in": //stay over time
+                            send_string += @";stay_over_specific_time" + "\r\n";
+                            avls_WriteLine(netStream, System.Text.Encoding.Default.GetBytes(send_string), send_string);
+                            break;
+                    }
+                    
                 }
             }
 
