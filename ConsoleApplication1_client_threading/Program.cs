@@ -301,6 +301,7 @@ LIMIT 1";
         private static int avlsAccessCount = 0;
         private static bool avlsFlag = false;
         private static object IsFirstExecuteLock = new object();
+        private static uint deviceCount = 0;
 
         static void Main(string[] args)
         {
@@ -395,6 +396,15 @@ LIMIT 1";
             avlsNetworkStream = avlsTcpClient.GetStream();
 
             var sql_client = new SqlClient(ConfigurationManager.AppSettings["SQL_SERVER_IP"], ConfigurationManager.AppSettings["SQL_SERVER_PORT"], ConfigurationManager.AppSettings["SQL_SERVER_USER_ID"], ConfigurationManager.AppSettings["SQL_SERVER_PASSWORD"], ConfigurationManager.AppSettings["SQL_SERVER_DATABASE"], ConfigurationManager.AppSettings["Pooling"], ConfigurationManager.AppSettings["MinPoolSize"], ConfigurationManager.AppSettings["MaxPoolSize"], ConfigurationManager.AppSettings["ConnectionLifetime"]);
+
+            while (!sql_client.connect())
+            {
+                Thread.Sleep(300);
+            }
+            string totalDevice = sql_client.get_DataTable(@"SELECT reltuples FROM pg_class WHERE oid = 'sd.equipment'::regclass").Rows[0].ItemArray[0].ToString();
+            sql_client.disconnect();
+
+            deviceCount = uint.Parse(totalDevice);
             //empty power column in table custom.uns_deivce_power_status
             string emptyPowerStatusTable = @"UPDATE 
   custom.uns_deivce_power_status
@@ -2533,7 +2543,7 @@ LIMIT 1";
             //avlsSendDone.Reset();
             var sqlclient = new SqlClient(ConfigurationManager.AppSettings["SQL_SERVER_IP"], ConfigurationManager.AppSettings["SQL_SERVER_PORT"], ConfigurationManager.AppSettings["SQL_SERVER_USER_ID"], ConfigurationManager.AppSettings["SQL_SERVER_PASSWORD"], ConfigurationManager.AppSettings["SQL_SERVER_DATABASE"], ConfigurationManager.AppSettings["Pooling"], ConfigurationManager.AppSettings["MinPoolSize"], ConfigurationManager.AppSettings["MaxPoolSize"], ConfigurationManager.AppSettings["ConnectionLifetime"]);
             avlsSendPackage = send_string;
-            if (avlsAccessCount > 883 || avlsFlag)
+            if (avlsAccessCount > deviceCount || avlsFlag)
             {
                 lock (IsFirstExecuteLock)
                 {
