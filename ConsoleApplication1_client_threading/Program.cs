@@ -4432,14 +4432,14 @@ public._gps_log._uid = '"+deviceID+@"'
                 if (index<0)
                 {
                     string result = string.Empty;
-                    result = "out";
+                    result = "in";
                     sql_client.Dispose();
                     return result;
                 }
                 else
                 {
                     string result = string.Empty;
-                    result = "in";
+                    result = "out";
                     sql_client.Dispose();
                     return result;
                 }
