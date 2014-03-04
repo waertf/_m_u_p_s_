@@ -2558,6 +2558,13 @@ LIMIT 1";
                 avls_WriteLine(netStream, System.Text.Encoding.Default.GetBytes(send_string), send_string);
                 avlsFlag = true;
             }
+            else
+            {
+                if (!xml_root_tag.Equals("Unsolicited-Location-Report"))
+                {
+                    avls_WriteLine(netStream, System.Text.Encoding.Default.GetBytes(send_string), send_string);
+                }
+            }
             
             //avlsSendDone.WaitOne();
 
