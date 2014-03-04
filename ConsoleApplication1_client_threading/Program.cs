@@ -2565,46 +2565,51 @@ LIMIT 1";
                 avls_WriteLine(netStream, System.Text.Encoding.Default.GetBytes(send_string), send_string);
                 avlsFlag = true;
 
-                #region send specific msg
-                //check range of initialLat/initialLon in exclusion_area_boundary then send event by avls_package.Event
-
-                //List<EAB> prohibitedList, locationList;
-                string prohibitedTableName = string.Empty, locationTableName = string.Empty;
-                //prohibitedTableName = "public.prohibited";
-                //locationTableName = "public.patrol_location";
-                //GetRidAndGeomFromSqlTable(prohibitedTableName, out prohibitedList);
-                //GetRidAndGeomFromSqlTable(locationTableName, out locationList);
-
-                prohibitedTableName = "public.p_prohibited";
-                locationTableName = "public.patrol_location";
-                string getMessage = string.Empty;
-                lock (getGidAndFullnameLock)
+                var deviceChar = deviceID.ToCharArray();
+                if (!deviceChar[3].Equals('0'))
                 {
-                    send_string = "%%" + avls_package.ID + avls_package.GPS_Valid + avls_package.Date_Time + avls_package.Loc + avls_package.Speed + avls_package.Dir + avls_package.Temp + avls_package.Status + avls_package.Event;
-                    getMessage = GetGidAndFullnameFromP_prohibitedAndPatrol_locationFromSql(prohibitedTableName,
-                        locationTableName,
-                        initialLat, initialLon, deviceID, true);
-                    if (!string.IsNullOrEmpty(getMessage))
-                    {
-                        send_string += getMessage + "\r\n";
-                        avls_WriteLine(netStream, System.Text.Encoding.Default.GetBytes(send_string), send_string);
-                    }
+                    #region send specific msg
+                    //check range of initialLat/initialLon in exclusion_area_boundary then send event by avls_package.Event
 
-                    send_string = "%%" + avls_package.ID + avls_package.GPS_Valid + avls_package.Date_Time + avls_package.Loc + avls_package.Speed + avls_package.Dir + avls_package.Temp + avls_package.Status + avls_package.Event;
-                    getMessage = CheckIfStayOverTime(initialLat, initialLon, deviceID);
-                    if (!string.IsNullOrEmpty(getMessage))
+                    //List<EAB> prohibitedList, locationList;
+                    string prohibitedTableName = string.Empty, locationTableName = string.Empty;
+                    //prohibitedTableName = "public.prohibited";
+                    //locationTableName = "public.patrol_location";
+                    //GetRidAndGeomFromSqlTable(prohibitedTableName, out prohibitedList);
+                    //GetRidAndGeomFromSqlTable(locationTableName, out locationList);
+
+                    prohibitedTableName = "public.p_prohibited";
+                    locationTableName = "public.patrol_location";
+                    string getMessage = string.Empty;
+                    lock (getGidAndFullnameLock)
                     {
-                        switch (getMessage)
+                        send_string = "%%" + avls_package.ID + avls_package.GPS_Valid + avls_package.Date_Time + avls_package.Loc + avls_package.Speed + avls_package.Dir + avls_package.Temp + avls_package.Status + avls_package.Event;
+                        getMessage = GetGidAndFullnameFromP_prohibitedAndPatrol_locationFromSql(prohibitedTableName,
+                            locationTableName,
+                            initialLat, initialLon, deviceID, true);
+                        if (!string.IsNullOrEmpty(getMessage))
                         {
-                            case "in": //stay over time
-                                send_string += @";stay_over_specific_time" + "\r\n";
-                                avls_WriteLine(netStream, System.Text.Encoding.Default.GetBytes(send_string), send_string);
-                                break;
+                            send_string += getMessage + "\r\n";
+                            avls_WriteLine(netStream, System.Text.Encoding.Default.GetBytes(send_string), send_string);
                         }
 
+                        send_string = "%%" + avls_package.ID + avls_package.GPS_Valid + avls_package.Date_Time + avls_package.Loc + avls_package.Speed + avls_package.Dir + avls_package.Temp + avls_package.Status + avls_package.Event;
+                        getMessage = CheckIfStayOverTime(initialLat, initialLon, deviceID);
+                        if (!string.IsNullOrEmpty(getMessage))
+                        {
+                            switch (getMessage)
+                            {
+                                case "in": //stay over time
+                                    send_string += @";stay_over_specific_time" + "\r\n";
+                                    avls_WriteLine(netStream, System.Text.Encoding.Default.GetBytes(send_string), send_string);
+                                    break;
+                            }
+
+                        }
                     }
+                    #endregion  send specific msg
                 }
-                #endregion  send specific msg
+                
             }
             else
             {
