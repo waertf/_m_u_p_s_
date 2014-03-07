@@ -2694,10 +2694,14 @@ LIMIT 1";
             string regSqlCmdForLocationTable = string.Empty;
             regSqlCmdForProhibitedTable = @"select gid, fullname
 from p_prohibited
-where st_intersects(the_geom, st_geomfromtext('POINT("+initialLon+" "+initialLat+@")', 4326)) ";
+where st_intersects(the_geom, st_geomfromtext('POINT(" +initialLon+" "+initialLat+@")', 4326)) AND
+now() >= start_time AND
+now() <= end_time ";
             regSqlCmdForLocationTable = @"select gid, fullname
 from patrol_location
-where st_intersects(st_buffer(the_geom, 0.0009009), st_geomfromtext('POINT(" + initialLon + " " + initialLat + @")', 4326))";
+where st_intersects(st_buffer(the_geom, 0.0009009/100*raidus), st_geomfromtext('POINT(" + initialLon + " " + initialLat + @")', 4326))AND
+now() >= start_time AND
+now() <= end_time ";
 
             while (!sql_client.connect())
             {
