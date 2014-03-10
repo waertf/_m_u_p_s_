@@ -2694,14 +2694,14 @@ LIMIT 1";
             string regSqlCmdForLocationTable = string.Empty;
             regSqlCmdForProhibitedTable = @"select gid, fullname
 from p_prohibited
-where st_intersects(the_geom, st_geomfromtext('POINT(" +initialLon+" "+initialLat+@")', 4326)) AND
-now() >= start_time AND
-now() <= end_time ";
+where st_intersects(the_geom, st_geomfromtext('POINT(" +initialLon+" "+initialLat+ @")', 4326)) AND
+now() >= start_time::timestamp AND
+now() <= end_time::timestamp ";
             regSqlCmdForLocationTable = @"select gid, fullname
 from patrol_location
 where st_intersects(st_buffer(the_geom, 0.0009009/100*raidus), st_geomfromtext('POINT(" + initialLon + " " + initialLat + @")', 4326))AND
-now() >= start_time AND
-now() <= end_time ";
+now() >= start_time::timestamp AND
+now() <= end_time::timestamp ";
 
             while (!sql_client.connect())
             {
@@ -3097,7 +3097,7 @@ FROM
         {
             lock (accessSqlLock)
             {
-            Console.WriteLine("+access_sql_server");
+            //Console.WriteLine("+access_sql_server");
             Thread.CurrentThread.CurrentUICulture = new CultureInfo("en-us");
             SqlClient sql_client = new SqlClient(ConfigurationManager.AppSettings["SQL_SERVER_IP"],
                 ConfigurationManager.AppSettings["SQL_SERVER_PORT"],
@@ -3136,9 +3136,9 @@ FROM
                         .ToString());
             sql_client.disconnect();
 
-            Console.WriteLine("operationLogIdCount:" + operationLogIdCount);
+            //Console.WriteLine("operationLogIdCount:" + operationLogIdCount);
             operationLogIdCount.ToString("000000000000");
-            Console.WriteLine("operationLogIdCount:" + operationLogIdCount);
+            //Console.WriteLine("operationLogIdCount:" + operationLogIdCount);
             operation_log.request_id = "\'" + ConfigurationManager.AppSettings["request-id"].ToString() + "\'";
 
             if (htable.ContainsKey("protocol_version"))
@@ -4405,7 +4405,7 @@ LIMIT 1";
                 }
             }
             sql_client.Dispose();
-            Console.WriteLine("-access_sql_server");
+            //Console.WriteLine("-access_sql_server");
             //sqlAccessEvent.Set();
         }
     }
