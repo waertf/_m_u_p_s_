@@ -2586,7 +2586,7 @@ LIMIT 1";
                         send_string = "%%" + avls_package.ID + avls_package.GPS_Valid + avls_package.Date_Time + avls_package.Loc + avls_package.Speed + avls_package.Dir + avls_package.Temp + avls_package.Status + avls_package.Event;
                         getMessage = GetGidAndFullnameFromP_prohibitedAndPatrol_locationFromSql(prohibitedTableName,
                             locationTableName,
-                            initialLat, initialLon, deviceID, true);
+                            initialLat, initialLon, deviceID, false);
                         if (!string.IsNullOrEmpty(getMessage))
                         {
                             send_string += getMessage + "\r\n";
@@ -2721,6 +2721,20 @@ now() <= end_time::timestamp ";
                         SiAuto.Main.AddCheckpoint(Level.Debug, id+" assign time");
                         getRow.CreateTime = DateTime.Now;
                         sqlCEdb.SubmitChanges();
+                        #region send with prohibite data
+
+
+
+                        foreach (DataRow row in dt.Rows)
+                        {
+                            //prohibitedEab2s.Add(new EAB2("p_prohibited", row[0].ToString(), row[1].ToString()));
+                            lock (mylock)
+                            {
+                                message += ";" + "p_prohibited" + "#" + row[0].ToString() + "#" + row[1].ToString();
+                            }
+
+                        }
+                        #endregion send with prohibite data
                     }
                     else
                     {
@@ -2847,6 +2861,17 @@ now() <= end_time::timestamp ";
                         SiAuto.Main.AddCheckpoint(Level.Debug, id + " assign time");
                         getRow.CreateTime = DateTime.Now;
                         sqlCEdb.SubmitChanges();
+                        #region send with location data
+                        foreach (DataRow row in dt.Rows)
+                        {
+                            //locationEab2s.Add(new EAB2("patrol_location", row[0].ToString(), row[1].ToString()));
+                            lock (mylock)
+                            {
+                                message += ";" + "patrol_location" + "#" + row[0].ToString() + "#" + row[1].ToString();
+                            }
+
+                        }
+                        #endregion send with location data
                     }
                     else
                     {
@@ -4220,7 +4245,7 @@ LIMIT 1";
                  */
                 getMessage = GetGidAndFullnameFromP_prohibitedAndPatrol_locationFromSql(prohibitedTableName,
                     locationTableName,
-                    gps_log._lat, gps_log._lon, deviceID, true);
+                    gps_log._lat, gps_log._lon, deviceID, false);
                 if (!string.IsNullOrEmpty(getMessage))
                 {
                     if (getMessage.Contains("p_prohibited") && getMessage.Contains("patrol_location"))
