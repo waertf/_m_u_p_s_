@@ -95,10 +95,10 @@ namespace ConsoleApplication1_client_threading
                     pgSqlConnection.BeginTransaction();
                     //async
                     IAsyncResult cres = command.BeginExecuteNonQuery(null, null);
-                    Console.Write("In progress...");
+                    //Console.Write("In progress...");
                     while (!cres.IsCompleted)
                     {
-                        Console.Write(".");
+                        //Console.Write(".");
                         //Perform here any operation you need
                     }
                     /*
@@ -146,10 +146,10 @@ namespace ConsoleApplication1_client_threading
                     command.CommandText = cmd;
                     //Console.WriteLine("Starting asynchronous retrieval of data...");
                     IAsyncResult cres = command.BeginExecuteReader();
-                    Console.Write("In progress...");
+                    //Console.Write("In progress...");
                     while (!cres.IsCompleted)
                     {
-                        Console.Write(".");
+                        //Console.Write(".");
                         //Perform here any operation you need
                     }
 
