@@ -750,7 +750,7 @@ LIMIT 1";
             SiAuto.Main.LogText(Level.Debug, "send_string", send_string);
             avlsSendPackage = send_string;
             //avlsSendDone.Reset();
-            avls_WriteLine(avlsNetworkStream, System.Text.Encoding.Default.GetBytes(send_string), send_string);
+            avls_WriteLine(avlsNetworkStream, System.Text.Encoding.UTF8.GetBytes(send_string), send_string);
             //avlsSendDone.WaitOne();
 
             //ReadLine(avls_tcpClient, netStream, send_string.Length);
@@ -1244,7 +1244,7 @@ Select 1-6 then press enter to send package
                 if (avlsTcpClient != null && avlsTcpClient.Client != null)
                 {
                     avlsNetworkStream = avlsTcpClient.GetStream();
-                    avls_WriteLine(avlsNetworkStream, System.Text.Encoding.Default.GetBytes(avlsSendPackage), avlsSendPackage);
+                    avls_WriteLine(avlsNetworkStream, System.Text.Encoding.UTF8.GetBytes(avlsSendPackage), avlsSendPackage);
                 }
                 
             }
@@ -2289,7 +2289,7 @@ LIMIT 1";
                     //avlsSendDone.Reset();
                     var sql_client = new SqlClient(ConfigurationManager.AppSettings["SQL_SERVER_IP"], ConfigurationManager.AppSettings["SQL_SERVER_PORT"], ConfigurationManager.AppSettings["SQL_SERVER_USER_ID"], ConfigurationManager.AppSettings["SQL_SERVER_PASSWORD"], ConfigurationManager.AppSettings["SQL_SERVER_DATABASE"], ConfigurationManager.AppSettings["Pooling"], ConfigurationManager.AppSettings["MinPoolSize"], ConfigurationManager.AppSettings["MaxPoolSize"], ConfigurationManager.AppSettings["ConnectionLifetime"]);
                     avlsSendPackage = send_string;
-                    avls_WriteLine(netStream, System.Text.Encoding.Default.GetBytes(send_string), send_string);
+                    avls_WriteLine(netStream, System.Text.Encoding.UTF8.GetBytes(send_string), send_string);
                     //avlsSendDone.WaitOne();
 
                     //ReadLine(avls_tcpClient, netStream, send_string.Length);
@@ -2560,9 +2560,9 @@ LIMIT 1";
                     }
                
                 }
-                
 
-                avls_WriteLine(netStream, System.Text.Encoding.Default.GetBytes(send_string), send_string);
+
+                avls_WriteLine(netStream, System.Text.Encoding.UTF8.GetBytes(send_string), send_string);
                 avlsFlag = true;
 
                 var deviceChar = deviceID.ToCharArray();
@@ -2590,7 +2590,7 @@ LIMIT 1";
                         if (!string.IsNullOrEmpty(getMessage))
                         {
                             send_string += getMessage + "\r\n";
-                            avls_WriteLine(netStream, System.Text.Encoding.Default.GetBytes(send_string), send_string);
+                            avls_WriteLine(netStream, System.Text.Encoding.UTF8.GetBytes(send_string), send_string);
                         }
 
                         send_string = "%%" + avls_package.ID + avls_package.GPS_Valid + avls_package.Date_Time + avls_package.Loc + avls_package.Speed + avls_package.Dir + avls_package.Temp + avls_package.Status + avls_package.Event;
@@ -2601,7 +2601,7 @@ LIMIT 1";
                             {
                                 case "in": //stay over time
                                     send_string += @";stay_over_specific_time" + "\r\n";
-                                    avls_WriteLine(netStream, System.Text.Encoding.Default.GetBytes(send_string), send_string);
+                                    avls_WriteLine(netStream, System.Text.Encoding.UTF8.GetBytes(send_string), send_string);
                                     break;
                             }
 
@@ -2615,11 +2615,11 @@ LIMIT 1";
             {
                 if (!xml_root_tag.Equals("Unsolicited-Location-Report"))
                 {
-                    avls_WriteLine(netStream, System.Text.Encoding.Default.GetBytes(send_string), send_string);
+                    avls_WriteLine(netStream, System.Text.Encoding.UTF8.GetBytes(send_string), send_string);
                 }
                 if (bool.Parse(ConfigurationManager.AppSettings["IsFirstExecute"]))
                 {
-                    avls_WriteLine(netStream, System.Text.Encoding.Default.GetBytes(send_string), send_string);
+                    avls_WriteLine(netStream, System.Text.Encoding.UTF8.GetBytes(send_string), send_string);
                 }
                 
             }
@@ -3024,7 +3024,7 @@ FROM
                     if (avlsTcpClient != null && avlsTcpClient.Client != null)
                     {
                         avlsNetworkStream = avlsTcpClient.GetStream();
-                        avls_WriteLine(avlsNetworkStream, System.Text.Encoding.Default.GetBytes(avlsSendPackage), avlsSendPackage);
+                        avls_WriteLine(avlsNetworkStream, System.Text.Encoding.UTF8.GetBytes(avlsSendPackage), avlsSendPackage);
                     }
                 }
 
