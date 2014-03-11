@@ -2833,6 +2833,21 @@ now() <= end_time::timestamp ";
                         SiAuto.Main.AddCheckpoint(Level.Debug,id+" remove time");
                         getRow.CreateTime = null;
                         sqlCEdb.SubmitChanges();
+
+                        #region send with prohibite data
+
+
+
+                        foreach (DataRow row in dt.Rows)
+                        {
+                            //prohibitedEab2s.Add(new EAB2("p_prohibited", row[0].ToString(), row[1].ToString()));
+                            lock (mylock)
+                            {
+                                message += ";" + "p_prohibited_out";
+                            }
+
+                        }
+                        #endregion send with prohibite data
                     }
                 }
                 catch (Exception ex)
@@ -2962,6 +2977,18 @@ now() <= end_time::timestamp ";
                         SiAuto.Main.AddCheckpoint(Level.Debug, id + " remove time");
                         getRow.CreateTime = null;
                         sqlCEdb.SubmitChanges();
+
+                        #region send with location data
+                        foreach (DataRow row in dt.Rows)
+                        {
+                            //locationEab2s.Add(new EAB2("patrol_location", row[0].ToString(), row[1].ToString()));
+                            lock (mylock)
+                            {
+                                //message += ";" + "patrol_location" + "#" + "lout";
+                            }
+
+                        }
+                        #endregion send with location data
                     }
                 }
                 catch (Exception ex)
@@ -4179,30 +4206,41 @@ LIMIT 1";
                  * event:4->msg:p_prohibited,patrol_location
                  * event:x.5->x stay over specific 
                  * event:5->stay over specific time within 0.1 km
+                 * event:-2->msg:p_prohibited_out
+                 * event:-5->out of prohibited but in patrol_location
                  */
                 getMessage = GetGidAndFullnameFromP_prohibitedAndPatrol_locationFromSql(prohibitedTableName,
                     locationTableName,
                     gps_log._lat, gps_log._lon, deviceID,false);
                 if (!string.IsNullOrEmpty(getMessage))
                 {
-                    if (getMessage.Contains("p_prohibited") && getMessage.Contains("patrol_location"))
+                    if (getMessage.Contains("p_prohibited") && getMessage.Contains("patrol_location") && !getMessage.Contains("p_prohibited_out"))
                     {
                         bundaryEventNumber = "4";
                     }
                     else
                     {
-                        if (getMessage.Contains("p_prohibited"))
+                        if (getMessage.Contains("p_prohibited") && !getMessage.Contains("p_prohibited_out"))
                         {
                             bundaryEventNumber = "2";
                         }
                         else
                         {
-                            if (getMessage.Contains("patrol_location"))
+                            if (getMessage.Contains("patrol_location") && !getMessage.Contains("p_prohibited_out"))
                             {
                                 bundaryEventNumber = "3";
                             }
                         }
                     }
+                    if (getMessage.Contains("p_prohibited_out") && !getMessage.Contains("patrol_location"))
+                    {
+                        bundaryEventNumber = "-2";
+                    }
+                    if (getMessage.Contains("p_prohibited_out") && getMessage.Contains("patrol_location"))
+                    {
+                        bundaryEventNumber = "-5";
+                    }
+
                     //insert into custom.cga_event_log
                     while (!sql_client.connect())
                     {
@@ -4245,27 +4283,28 @@ LIMIT 1";
                  */
                 getMessage = GetGidAndFullnameFromP_prohibitedAndPatrol_locationFromSql(prohibitedTableName,
                     locationTableName,
-                    gps_log._lat, gps_log._lon, deviceID, false);
+                    gps_log._lat, gps_log._lon, deviceID, true);
                 if (!string.IsNullOrEmpty(getMessage))
                 {
-                    if (getMessage.Contains("p_prohibited") && getMessage.Contains("patrol_location"))
+                    if (getMessage.Contains("p_prohibited") && getMessage.Contains("patrol_location") && !getMessage.Contains("p_prohibited_out"))
                     {
                         bundaryEventNumber = "4.5";
                     }
                     else
                     {
-                        if (getMessage.Contains("p_prohibited"))
+                        if (getMessage.Contains("p_prohibited") && !getMessage.Contains("p_prohibited_out"))
                         {
                             bundaryEventNumber = "2.5";
                         }
                         else
                         {
-                            if (getMessage.Contains("patrol_location"))
+                            if (getMessage.Contains("patrol_location") && !getMessage.Contains("p_prohibited_out"))
                             {
                                 bundaryEventNumber = "3.5";
                             }
                         }
                     }
+                    
                     while (!sql_client.connect())
                     {
                         Thread.Sleep(300);
