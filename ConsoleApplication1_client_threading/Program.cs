@@ -1776,10 +1776,28 @@ Select 1-6 then press enter to send package
                                 //Console.WriteLine("Odometer:{0}", Odometer);
                             }
                         }
+
+                        //List<EAB> prohibitedList, locationList;
+                    string prohibitedTableName = string.Empty, locationTableName = string.Empty;
+                    //prohibitedTableName = "public.prohibited";
+                    //locationTableName = "public.patrol_location";
+                    //GetRidAndGeomFromSqlTable(prohibitedTableName, out prohibitedList);
+                    //GetRidAndGeomFromSqlTable(locationTableName, out locationList);
+
+                    prohibitedTableName = "public.p_prohibited";
+                    locationTableName = "public.patrol_location";
+                    string getMessage = string.Empty;
+                        lock (getGidAndFullnameLock)
+                        {
+                            if (htable.ContainsKey("lat_value") && htable.ContainsKey("long_value") && htable.ContainsKey("suaddr"))
+                            getMessage = GetGidAndFullnameFromP_prohibitedAndPatrol_locationFromSql(prohibitedTableName,
+                                locationTableName,
+                                htable["lat_value"] as string, htable["long_value"] as string, htable["suaddr"] as string, false);
+                        }
                         if (bool.Parse(ConfigurationManager.AppSettings["SQL_ACCESS"]))
                         {
                             //sqlAccessEvent.Reset();
-                            Thread access_sql = new Thread(() => access_sql_server(xml_root_tag, htable, sensor_name, sensor_type, sensor_value, XmlGetAllElementsXname(xml_data), logData));
+                            Thread access_sql = new Thread(() => access_sql_server(xml_root_tag, htable, sensor_name, sensor_type, sensor_value, XmlGetAllElementsXname(xml_data), logData, getMessage));
                             access_sql.Start();
 
                             Console.WriteLine("SQL Access Enable");
@@ -1789,7 +1807,7 @@ Select 1-6 then press enter to send package
                         if (bool.Parse(ConfigurationManager.AppSettings["AVLS_ACCESS"]))
                         {
                             //avlsSendDone.Reset();
-                            Thread access_avls = new Thread(() => access_avls_server(xml_root_tag, htable, sensor_name, sensor_type, sensor_value, XmlGetAllElementsXname(xml_data), logData, avlsTcpClient));
+                            Thread access_avls = new Thread(() => access_avls_server(xml_root_tag, htable, sensor_name, sensor_type, sensor_value, XmlGetAllElementsXname(xml_data), logData, avlsTcpClient, getMessage));
                             access_avls.Priority = ThreadPriority.BelowNormal;
                             access_avls.Start();
 
@@ -1896,7 +1914,7 @@ Select 1-6 then press enter to send package
                     }
                     if (bool.Parse(ConfigurationManager.AppSettings["SQL_ACCESS"]))
                     {
-                        Thread access_sql = new Thread(() => access_sql_server(xml_root_tag, htable, sensor_name, sensor_type, sensor_value, XmlGetAllElementsXname(xml_data), logData));
+                        Thread access_sql = new Thread(() => access_sql_server(xml_root_tag, htable, sensor_name, sensor_type, sensor_value, XmlGetAllElementsXname(xml_data), logData,null));
                         access_sql.Start();
                     }
                     break;
@@ -2082,7 +2100,7 @@ WHERE
          * event:x.5->x stay over specific time
          * event:5->stay over specific time within 0.1 km
         */
-        private static void access_avls_server(string xml_root_tag, Hashtable htable, List<string> sensor_name, List<string> sensor_type, List<string> sensor_value, IEnumerable<XName> iEnumerable, string log, TcpClient avlsTcpClient)
+        private static void access_avls_server(string xml_root_tag, Hashtable htable, List<string> sensor_name, List<string> sensor_type, List<string> sensor_value, IEnumerable<XName> iEnumerable, string log, TcpClient avlsTcpClient, string getMessage)
         {
             Console.WriteLine("+access_avls_server");
             Thread.CurrentThread.CurrentUICulture = new CultureInfo("en-us");
@@ -2580,16 +2598,21 @@ LIMIT 1";
 
                     prohibitedTableName = "public.p_prohibited";
                     locationTableName = "public.patrol_location";
-                    string getMessage = string.Empty;
+                    //string getMessage = string.Empty;
                     lock (getGidAndFullnameLock)
                     {
                         send_string = "%%" + avls_package.ID + avls_package.GPS_Valid + avls_package.Date_Time + avls_package.Loc + avls_package.Speed + avls_package.Dir + avls_package.Temp + avls_package.Status + avls_package.Event;
-                        getMessage = GetGidAndFullnameFromP_prohibitedAndPatrol_locationFromSql(prohibitedTableName,
-                            locationTableName,
-                            initialLat, initialLon, deviceID, false);
+                        //getMessage = GetGidAndFullnameFromP_prohibitedAndPatrol_locationFromSql(prohibitedTableName,
+                            //locationTableName,
+                            //initialLat, initialLon, deviceID, false);
+                        if (getMessage.Contains("p_prohibited"))
+                            SiAuto.Main.LogMessage(getMessage);
+
                         if (!string.IsNullOrEmpty(getMessage))
                         {
                             send_string += getMessage + "\r\n";
+                            if (getMessage.Contains("p_prohibited"))
+                                SiAuto.Main.LogMessage(send_string);
                             avls_WriteLine(netStream, System.Text.Encoding.UTF8.GetBytes(send_string), send_string);
                         }
 
@@ -2838,12 +2861,13 @@ now() <= end_time::timestamp ";
 
 
 
-                        foreach (DataRow row in dt.Rows)
+                       // foreach (DataRow row in dt.Rows)
                         {
                             //prohibitedEab2s.Add(new EAB2("p_prohibited", row[0].ToString(), row[1].ToString()));
                             lock (mylock)
                             {
                                 message += ";" + "p_prohibited_out";
+                                SiAuto.Main.LogMessage(message);
                             }
 
                         }
@@ -2979,7 +3003,7 @@ now() <= end_time::timestamp ";
                         sqlCEdb.SubmitChanges();
 
                         #region send with location data
-                        foreach (DataRow row in dt.Rows)
+                        //foreach (DataRow row in dt.Rows)
                         {
                             //locationEab2s.Add(new EAB2("patrol_location", row[0].ToString(), row[1].ToString()));
                             lock (mylock)
@@ -3000,6 +3024,8 @@ now() <= end_time::timestamp ";
             }
             
             sql_client.Dispose();
+            if (message.Contains("p_prohibited"))
+                SiAuto.Main.LogMessage(message);
             return message;
         }
 
@@ -3145,7 +3171,7 @@ FROM
         }
 
         private static void access_sql_server(string xml_root_tag, Hashtable htable, List<string> sensor_name,
-            List<string> sensor_type, List<string> sensor_value, IEnumerable<XName> elements, string log1)
+            List<string> sensor_type, List<string> sensor_value, IEnumerable<XName> elements, string log1, string getMessage)
         {
             lock (accessSqlLock)
             {
@@ -4195,7 +4221,8 @@ LIMIT 1";
 
             prohibitedTableName = "public.p_prohibited";
             locationTableName = "public.patrol_location";
-            string getMessage = string.Empty,bundaryEventNumber = string.Empty;
+            //string getMessage = string.Empty,bundaryEventNumber = string.Empty;
+                string bundaryEventNumber = string.Empty;
             lock (getGidAndFullnameLock)
             {
 
@@ -4209,9 +4236,9 @@ LIMIT 1";
                  * event:-2->msg:p_prohibited_out
                  * event:-5->out of prohibited but in patrol_location
                  */
-                getMessage = GetGidAndFullnameFromP_prohibitedAndPatrol_locationFromSql(prohibitedTableName,
-                    locationTableName,
-                    gps_log._lat, gps_log._lon, deviceID,false);
+                //getMessage = GetGidAndFullnameFromP_prohibitedAndPatrol_locationFromSql(prohibitedTableName,
+                    //locationTableName,
+                    //gps_log._lat, gps_log._lon, deviceID,false);
                 if (!string.IsNullOrEmpty(getMessage))
                 {
                     if (getMessage.Contains("p_prohibited") && getMessage.Contains("patrol_location") && !getMessage.Contains("p_prohibited_out"))
@@ -4270,17 +4297,18 @@ LIMIT 1";
                     sql_client.disconnect();
                 }
             }
+                /*
             lock (getGidAndFullnameLock)
             {
 
-                /* 
-                 * only for access sql table:custom.cga_event_log
-                 * event:2->msg:p_prohibited
-                 * event:3->msg:patrol_location
-                 * event:4->msg:p_prohibited,patrol_location
-                 * event:x.5->x stay over specific time
-                 * event:5->stay over specific time within 0.1 km
-                 */
+                 
+                 // only for access sql table:custom.cga_event_log
+                 // event:2->msg:p_prohibited
+                 // event:3->msg:patrol_location
+                 // event:4->msg:p_prohibited,patrol_location
+                 // event:x.5->x stay over specific time
+                 // event:5->stay over specific time within 0.1 km
+                 //
                 getMessage = GetGidAndFullnameFromP_prohibitedAndPatrol_locationFromSql(prohibitedTableName,
                     locationTableName,
                     gps_log._lat, gps_log._lon, deviceID, true);
@@ -4342,6 +4370,7 @@ LIMIT 1";
                     sql_client.disconnect();
                 }
             }
+                */
             #endregion access GetGidAndFullnameFromP_prohibitedAndPatrol_locationFromSql
 
                 lock (getGidAndFullnameLock)
