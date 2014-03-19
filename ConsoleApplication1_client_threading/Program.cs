@@ -2469,7 +2469,7 @@ LIMIT 1";
                 }
                 if (htable.ContainsKey("speed-hor"))
                 {
-                    avls_package.Speed = Convert.ToInt32((double.Parse(htable["speed-hor"].ToString()) * 1.609344)).ToString() + ",";
+                    avls_package.Speed = Convert.ToInt32((double.Parse(htable["speed-hor"].ToString()) * 3.6)).ToString() + ",";
                 }
                 else
                 {
@@ -3768,7 +3768,7 @@ LIMIT 1";
                 //gps_log._speed = htable["speed-hor"].ToString();
                 gps_log._speed =
                     operation_log.eqp_speed =
-                        Convert.ToInt32((double.Parse(htable["speed-hor"].ToString())*1.609344)).ToString();
+                        Convert.ToInt32((double.Parse(htable["speed-hor"].ToString())*3.6)).ToString();
             }
             else
                 gps_log._speed = operation_log.eqp_speed = "0";
