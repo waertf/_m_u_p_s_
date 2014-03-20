@@ -3786,13 +3786,17 @@ LIMIT 1";
             }
             if (htable.ContainsKey("info_time"))
             {
-                gps_log._option0 = "\'" + htable["info_time"].ToString() + "\'";
+                DateTime infoTime = DateTime.ParseExact(htable["info_time"].ToString(), "yyyyMMddHHmmss",
+                    CultureInfo.InvariantCulture).ToLocalTime();
+                gps_log._option0 = "\'" + infoTime.ToString("yyyyMMddHHmmss") + "\'";
             }
             else
                 gps_log._option0 = "\'" + DateTime.Now.ToUniversalTime().ToString("yyyyMMddHHmmss") + "\'";
             if (htable.ContainsKey("server_time"))
             {
-                gps_log._option1 = "\'" + htable["server_time"].ToString() + "\'";
+                DateTime serverTime = DateTime.ParseExact(htable["server_time"].ToString(), "yyyyMMddHHmmss",
+                    CultureInfo.InvariantCulture).ToLocalTime();
+                gps_log._option1 = "\'" + serverTime.ToString("yyyyMMddHHmmss") + "\'";
             }
             else
                 gps_log._option1 = "\'" + DateTime.Now.ToUniversalTime().ToString("yyyyMMddHHmmss") + "\'";
