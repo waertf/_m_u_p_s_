@@ -3264,7 +3264,7 @@ FROM
                 {
                     _gps_logUidCount =
                 sql_client.get_DataTable("SELECT COUNT(_uid)   FROM public._gps_log WHERE _uid ='" + htable["suaddr"] as string + "\'" +
-                " AND public._gps_log._time = CURRENT_DATE").Rows[0].ItemArray[0].ToString();
+                " AND public._gps_log._time::Date = current_date").Rows[0].ItemArray[0].ToString();
                     sql_client.disconnect();
                 }
             
