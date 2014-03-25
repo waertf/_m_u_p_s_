@@ -3791,7 +3791,7 @@ LIMIT 1";
                 gps_log._option0 = "\'" + infoTime.ToString("yyyyMMddHHmmss") + "\'";
             }
             else
-                gps_log._option0 = "\'" + DateTime.Now.ToUniversalTime().ToString("yyyyMMddHHmmss") + "\'";
+                gps_log._option0 = "\'" + DateTime.Now.ToLocalTime().ToString("yyyyMMddHHmmss") + "\'";
             if (htable.ContainsKey("server_time"))
             {
                 DateTime serverTime = DateTime.ParseExact(htable["server_time"].ToString(), "yyyyMMddHHmmss",
@@ -3799,7 +3799,7 @@ LIMIT 1";
                 gps_log._option1 = "\'" + serverTime.ToString("yyyyMMddHHmmss") + "\'";
             }
             else
-                gps_log._option1 = "\'" + DateTime.Now.ToUniversalTime().ToString("yyyyMMddHHmmss") + "\'";
+                gps_log._option1 = "\'" + DateTime.Now.ToLocalTime().ToString("yyyyMMddHHmmss") + "\'";
             /*
             #region operation error to access custom.turn_onoff_log table
             if (elements.Contains(new XElement("operation-error").Name))
