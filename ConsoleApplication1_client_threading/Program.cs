@@ -1469,9 +1469,9 @@ Select 1-6 then press enter to send package
                 //Console.WriteLine("First node:[" + xml_root_tag + "]");
                 Console.WriteLine("E############################################################################");
                 var sql_client = new SqlClient(ConfigurationManager.AppSettings["SQL_SERVER_IP"], ConfigurationManager.AppSettings["SQL_SERVER_PORT"], ConfigurationManager.AppSettings["SQL_SERVER_USER_ID"], ConfigurationManager.AppSettings["SQL_SERVER_PASSWORD"], ConfigurationManager.AppSettings["SQL_SERVER_DATABASE"], ConfigurationManager.AppSettings["Pooling"], ConfigurationManager.AppSettings["MinPoolSize"], ConfigurationManager.AppSettings["MaxPoolSize"], ConfigurationManager.AppSettings["ConnectionLifetime"]);
-                //Thread xmlParseThread = new Thread(() => xml_parse(unsTcpClient, fStream, returndata, avlsTcpClient));
-                //xmlParseThread.Start();
-                xml_parse(unsTcpClient, fStream, returndata, avlsTcpClient);
+                Thread xmlParseThread = new Thread(() => xml_parse(unsTcpClient, fStream, returndata, avlsTcpClient));
+                xmlParseThread.Start();
+                //xml_parse(unsTcpClient, fStream, returndata, avlsTcpClient);
                 //xml_parse(unsTcpClient, fStream, returndata, avlsTcpClient);
                 //Console.ReadLine();
 
@@ -1800,7 +1800,7 @@ Select 1-6 then press enter to send package
                             //sqlAccessEvent.Reset();
                             Thread access_sql = new Thread(() => access_sql_server(xml_root_tag, htable, sensor_name, sensor_type, sensor_value, XmlGetAllElementsXname(xml_data), logData, getMessage));
                             access_sql.Start();
-                            access_sql.Join();
+                            //access_sql.Join();
                             Console.WriteLine("SQL Access Enable");
                             //sqlAccessEvent.WaitOne();
                         }
@@ -1811,7 +1811,7 @@ Select 1-6 then press enter to send package
                             Thread access_avls = new Thread(() => access_avls_server(xml_root_tag, htable, sensor_name, sensor_type, sensor_value, XmlGetAllElementsXname(xml_data), logData, avlsTcpClient, getMessage));
                             access_avls.Priority = ThreadPriority.BelowNormal;
                             access_avls.Start();
-                            access_avls.Join();
+                            //access_avls.Join();
                             Console.WriteLine("AVLS Access Enable");
                             //avlsSendDone.WaitOne();
                         }
@@ -1917,7 +1917,7 @@ Select 1-6 then press enter to send package
                     {
                         Thread access_sql = new Thread(() => access_sql_server(xml_root_tag, htable, sensor_name, sensor_type, sensor_value, XmlGetAllElementsXname(xml_data), logData,null));
                         access_sql.Start();
-                        access_sql.Join();
+                        //access_sql.Join();
                     }
                     break;
                 case "Immediate-Location-Answer":
