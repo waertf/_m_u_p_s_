@@ -483,7 +483,11 @@ SET
                 every30SecondSendUidEqlSixZeroToAvls.Enabled = true;
             }
             
-
+            //GC
+            var GC =
+                    new System.Timers.Timer(60*60 * 1000);
+            GC.Elapsed += (sender, e) => { GCFunction(); };
+            GC.Enabled = true;
             Console.ReadLine();
             //Thread send_test_thread = new Thread(() => sendtest(netStream, sql_client));
             //send_test_thread.Start();
@@ -492,6 +496,11 @@ SET
 
 
             //unsTcpClient.Close();
+        }
+
+        private static void GCFunction()
+        {
+            GC.Collect();
         }
 
         private static void every30SecondSendUidEqlSixZeroToAvls_Elapsed(TcpClient avlsTcpClient, NetworkStream avlsNetworkStream)
@@ -1450,6 +1459,7 @@ Select 1-6 then press enter to send package
 
                 // Handle the message and go get the next one.
                 string returndata = Encoding.ASCII.GetString(fBuffer);
+                fBuffer = null;
                 string output = String.Format("Read: Length: {0}, Data: {1}", returndata.Length, returndata);
                 //XDocument xml_data = XDocument.Parse(returndata);
                 //string xml_root_tag = xml_data.Root.Name.ToString();
@@ -1468,7 +1478,6 @@ Select 1-6 then press enter to send package
                 Console.WriteLine("Read:\r\n" + ouput2);
                 //Console.WriteLine("First node:[" + xml_root_tag + "]");
                 Console.WriteLine("E############################################################################");
-                var sql_client = new SqlClient(ConfigurationManager.AppSettings["SQL_SERVER_IP"], ConfigurationManager.AppSettings["SQL_SERVER_PORT"], ConfigurationManager.AppSettings["SQL_SERVER_USER_ID"], ConfigurationManager.AppSettings["SQL_SERVER_PASSWORD"], ConfigurationManager.AppSettings["SQL_SERVER_DATABASE"], ConfigurationManager.AppSettings["Pooling"], ConfigurationManager.AppSettings["MinPoolSize"], ConfigurationManager.AppSettings["MaxPoolSize"], ConfigurationManager.AppSettings["ConnectionLifetime"]);
                 Thread xmlParseThread = new Thread(() => xml_parse(unsTcpClient, fStream, returndata, avlsTcpClient));
                 xmlParseThread.Start();
                 //xml_parse(unsTcpClient, fStream, returndata, avlsTcpClient);
@@ -1632,7 +1641,7 @@ Select 1-6 then press enter to send package
             List<string> sensor_name = new List<string>();
             List<string> sensor_value = new List<string>();
             List<string> sensor_type = new List<string>();
-            SiAuto.Main.LogText(Level.Debug, xml_root_tag, xml_data.ToString());
+            SiAuto.Main.LogText(Level.Debug, xml_root_tag+"reveive time:"+DateTime.UtcNow.ToString("g"), xml_data.ToString());
             switch (xml_root_tag)
             {
                 case "Triggered-Location-Report":
@@ -2561,8 +2570,61 @@ LIMIT 1";
             }
             */
             //avlsSendDone.Reset();
-            var sqlclient = new SqlClient(ConfigurationManager.AppSettings["SQL_SERVER_IP"], ConfigurationManager.AppSettings["SQL_SERVER_PORT"], ConfigurationManager.AppSettings["SQL_SERVER_USER_ID"], ConfigurationManager.AppSettings["SQL_SERVER_PASSWORD"], ConfigurationManager.AppSettings["SQL_SERVER_DATABASE"], ConfigurationManager.AppSettings["Pooling"], ConfigurationManager.AppSettings["MinPoolSize"], ConfigurationManager.AppSettings["MaxPoolSize"], ConfigurationManager.AppSettings["ConnectionLifetime"]);
             avlsSendPackage = send_string;
+
+            avls_WriteLine(netStream, System.Text.Encoding.UTF8.GetBytes(send_string), send_string);
+            avlsFlag = true;
+
+            var deviceChar = deviceID.ToCharArray();
+            if (!deviceChar[3].Equals('0'))
+            {
+                #region send specific msg
+                //check range of initialLat/initialLon in exclusion_area_boundary then send event by avls_package.Event
+
+                //List<EAB> prohibitedList, locationList;
+                string prohibitedTableName = string.Empty, locationTableName = string.Empty;
+                //prohibitedTableName = "public.prohibited";
+                //locationTableName = "public.patrol_location";
+                //GetRidAndGeomFromSqlTable(prohibitedTableName, out prohibitedList);
+                //GetRidAndGeomFromSqlTable(locationTableName, out locationList);
+
+                prohibitedTableName = "public.p_prohibited";
+                locationTableName = "public.patrol_location";
+                //string getMessage = string.Empty;
+                lock (getGidAndFullnameLock)
+                {
+                    send_string = "%%" + avls_package.ID + avls_package.GPS_Valid + avls_package.Date_Time + avls_package.Loc + avls_package.Speed + avls_package.Dir + avls_package.Temp + avls_package.Status + avls_package.Event;
+                    //getMessage = GetGidAndFullnameFromP_prohibitedAndPatrol_locationFromSql(prohibitedTableName,
+                    //locationTableName,
+                    //initialLat, initialLon, deviceID, false);
+                    if (getMessage.Contains("p_prohibited"))
+                        SiAuto.Main.LogMessage(getMessage);
+
+                    if (!string.IsNullOrEmpty(getMessage))
+                    {
+                        send_string += getMessage + "\r\n";
+                        if (getMessage.Contains("p_prohibited"))
+                            SiAuto.Main.LogMessage(send_string);
+                        avls_WriteLine(netStream, System.Text.Encoding.UTF8.GetBytes(send_string), send_string);
+                    }
+
+                    send_string = "%%" + avls_package.ID + avls_package.GPS_Valid + avls_package.Date_Time + avls_package.Loc + avls_package.Speed + avls_package.Dir + avls_package.Temp + avls_package.Status + avls_package.Event;
+                    getMessage = CheckIfStayOverTime(initialLat, initialLon, deviceID);
+                    if (!string.IsNullOrEmpty(getMessage))
+                    {
+                        switch (getMessage)
+                        {
+                            case "in": //stay over time
+                                send_string += @";stay_over_specific_time" + "\r\n";
+                                avls_WriteLine(netStream, System.Text.Encoding.UTF8.GetBytes(send_string), send_string);
+                                break;
+                        }
+
+                    }
+                }
+                #endregion  send specific msg
+            }
+            /*
             if (avlsAccessCount > deviceCount || avlsFlag)
             {
                 lock (IsFirstExecuteLock)
@@ -2648,7 +2710,7 @@ LIMIT 1";
                 }
                 
             }
-            
+            */
             //avlsSendDone.WaitOne();
 
             //ReadLine(avls_tcpClient, netStream, send_string.Length);
