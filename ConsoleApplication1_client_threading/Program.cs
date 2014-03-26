@@ -81,7 +81,7 @@ namespace ConsoleApplication1_client_threading
         private static bool isValid = true;
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
         //static AutoResetEvent autoEvent = new AutoResetEvent(false);
-        private static byte[] myReadBuffer = null;
+        private static byte[] myReadBuffer = new byte[2];
         private static byte[] fBuffer = null;
         private static int fBytesRead = 0;
         private volatile static TcpClient unsTcpClient, avlsTcpClient;
@@ -1269,7 +1269,7 @@ Select 1-6 then press enter to send package
                 {
                     //byte[] bytes = new byte[unsTcpClient.ReceiveBufferSize];
                     avlsConnectDone.WaitOne();
-                    myReadBuffer = new byte[prefix_length];
+                    //myReadBuffer = new byte[prefix_length];
                     netStream.BeginRead(myReadBuffer, 0, myReadBuffer.Length,
                                                                  new AsyncCallback(myReadSizeCallBack),
                                                                  netStream);
@@ -1459,6 +1459,10 @@ Select 1-6 then press enter to send package
 
                 // Handle the message and go get the next one.
                 string returndata = Encoding.ASCII.GetString(fBuffer);
+                for (int i = 0; i < fBuffer.Length; i++)
+                {
+                    fBuffer[i] = 0;
+                }
                 fBuffer = null;
                 string output = String.Format("Read: Length: {0}, Data: {1}", returndata.Length, returndata);
                 //XDocument xml_data = XDocument.Parse(returndata);
