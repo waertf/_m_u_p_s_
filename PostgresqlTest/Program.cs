@@ -8,6 +8,7 @@ namespace PostgresqlTest
 {
     class Program
     {
+        static object lockSql = new object();
         static void Main(string[] args)
         {
             try
@@ -43,9 +44,13 @@ namespace PostgresqlTest
                 "20",
                 "0");
             sqlClient.connect();
-            sqlClient.modify(@"INSERT INTO test(
+            lock (lockSql)
+            {
+                sqlClient.modify(@"INSERT INTO test(
             sn, text)
     VALUES ((select count(sn) from test)::text || 'dd', 'cc');");
+            }
+            
             sqlClient.disconnect();
             sqlClient.Dispose();
         }
