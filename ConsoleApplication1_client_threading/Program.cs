@@ -2036,7 +2036,8 @@ Select 1-6 then press enter to send package
                 }
                 //w.Close();
             }
-            
+            htable.Clear();
+            htable = null;
             Console.WriteLine("::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::");
         }
 
@@ -2115,9 +2116,10 @@ WHERE
          * event:x.5->x stay over specific time
          * event:5->stay over specific time within 0.1 km
         */
-        private static void access_avls_server(string xml_root_tag, Hashtable htable, List<string> sensor_name, List<string> sensor_type, List<string> sensor_value, IEnumerable<XName> iEnumerable, string log, TcpClient avlsTcpClient, string getMessage)
+        private static void access_avls_server(string xml_root_tag, Hashtable shtable, List<string> sensor_name, List<string> sensor_type, List<string> sensor_value, IEnumerable<XName> iEnumerable, string log, TcpClient avlsTcpClient, string getMessage)
         {
             Console.WriteLine("+access_avls_server");
+            Hashtable htable = shtable.Clone() as Hashtable;
             Thread.CurrentThread.CurrentUICulture = new CultureInfo("en-us");
             string send_string = string.Empty;
             string initialLat = string.Empty, initialLon = string.Empty;
@@ -2720,6 +2722,8 @@ LIMIT 1";
             //ReadLine(avls_tcpClient, netStream, send_string.Length);
             //netStream.Close();
             //avlsTcpClient.Close();
+            htable.Clear();
+            htable = null;
             Console.WriteLine("-access_avls_server");
         }
 
@@ -3238,11 +3242,12 @@ FROM
             MV,TK,EM,PE,UL
         }
 
-        private static void access_sql_server(string xml_root_tag, Hashtable htable, List<string> sensor_name,
+        private static void access_sql_server(string xml_root_tag, Hashtable shtable, List<string> sensor_name,
             List<string> sensor_type, List<string> sensor_value, IEnumerable<XName> elements, string log1, string getMessage)
         {
             lock (accessSqlLock)
             {
+                Hashtable htable = shtable.Clone() as Hashtable;
             //Console.WriteLine("+access_sql_server");
             Thread.CurrentThread.CurrentUICulture = new CultureInfo("en-us");
             SqlClient sql_client = new SqlClient(ConfigurationManager.AppSettings["SQL_SERVER_IP"],
@@ -4570,6 +4575,8 @@ LIMIT 1";
                     sql_client.disconnect();
                 }
             }
+                htable.Clear();
+                htable = null;
             sql_client.Dispose();
             //Console.WriteLine("-access_sql_server");
             //sqlAccessEvent.Set();
