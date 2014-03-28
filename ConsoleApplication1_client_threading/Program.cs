@@ -2119,7 +2119,7 @@ WHERE
         private static void access_avls_server(string xml_root_tag, Hashtable shtable, List<string> sensor_name, List<string> sensor_type, List<string> sensor_value, IEnumerable<XName> iEnumerable, string log, TcpClient avlsTcpClient, string getMessage)
         {
             Console.WriteLine("+access_avls_server");
-            Hashtable htable = shtable.Clone() as Hashtable;
+            Hashtable htable = new Hashtable(shtable);
             Thread.CurrentThread.CurrentUICulture = new CultureInfo("en-us");
             string send_string = string.Empty;
             string initialLat = string.Empty, initialLon = string.Empty;
@@ -3247,7 +3247,7 @@ FROM
         {
             lock (accessSqlLock)
             {
-                Hashtable htable = shtable.Clone() as Hashtable;
+                Hashtable htable = new Hashtable(shtable);
             //Console.WriteLine("+access_sql_server");
             Thread.CurrentThread.CurrentUICulture = new CultureInfo("en-us");
             SqlClient sql_client = new SqlClient(ConfigurationManager.AppSettings["SQL_SERVER_IP"],
