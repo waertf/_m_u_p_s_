@@ -1811,7 +1811,7 @@ Select 1-6 then press enter to send package
                         if (bool.Parse(ConfigurationManager.AppSettings["SQL_ACCESS"]))
                         {
                             //sqlAccessEvent.Reset();
-                            Thread access_sql = new Thread(() => access_sql_server(xml_root_tag, htable, sensor_name, sensor_type, sensor_value, XmlGetAllElementsXname(xml_data), logData, getMessage));
+                            Thread access_sql = new Thread(() => access_sql_server(xml_root_tag, new Hashtable(htable), sensor_name, sensor_type, sensor_value, XmlGetAllElementsXname(xml_data), logData, getMessage));
                             access_sql.Start();
                             //access_sql.Join();
                             Console.WriteLine("SQL Access Enable");
@@ -1821,7 +1821,7 @@ Select 1-6 then press enter to send package
                         if (bool.Parse(ConfigurationManager.AppSettings["AVLS_ACCESS"]))
                         {
                             //avlsSendDone.Reset();
-                            Thread access_avls = new Thread(() => access_avls_server(xml_root_tag, htable, sensor_name, sensor_type, sensor_value, XmlGetAllElementsXname(xml_data), logData, avlsTcpClient, getMessage));
+                            Thread access_avls = new Thread(() => access_avls_server(xml_root_tag, new Hashtable(htable), sensor_name, sensor_type, sensor_value, XmlGetAllElementsXname(xml_data), logData, avlsTcpClient, getMessage));
                             access_avls.Priority = ThreadPriority.BelowNormal;
                             access_avls.Start();
                             //access_avls.Join();
@@ -1928,7 +1928,7 @@ Select 1-6 then press enter to send package
                     }
                     if (bool.Parse(ConfigurationManager.AppSettings["SQL_ACCESS"]))
                     {
-                        Thread access_sql = new Thread(() => access_sql_server(xml_root_tag, htable, sensor_name, sensor_type, sensor_value, XmlGetAllElementsXname(xml_data), logData,null));
+                        Thread access_sql = new Thread(() => access_sql_server(xml_root_tag, new Hashtable(htable), sensor_name, sensor_type, sensor_value, XmlGetAllElementsXname(xml_data), logData, null));
                         access_sql.Start();
                         //access_sql.Join();
                     }
@@ -2116,10 +2116,9 @@ WHERE
          * event:x.5->x stay over specific time
          * event:5->stay over specific time within 0.1 km
         */
-        private static void access_avls_server(string xml_root_tag, Hashtable shtable, List<string> sensor_name, List<string> sensor_type, List<string> sensor_value, IEnumerable<XName> iEnumerable, string log, TcpClient avlsTcpClient, string getMessage)
+        private static void access_avls_server(string xml_root_tag, Hashtable htable, List<string> sensor_name, List<string> sensor_type, List<string> sensor_value, IEnumerable<XName> iEnumerable, string log, TcpClient avlsTcpClient, string getMessage)
         {
             Console.WriteLine("+access_avls_server");
-            Hashtable htable = new Hashtable(shtable);
             Thread.CurrentThread.CurrentUICulture = new CultureInfo("en-us");
             string send_string = string.Empty;
             string initialLat = string.Empty, initialLon = string.Empty;
@@ -3242,12 +3241,11 @@ FROM
             MV,TK,EM,PE,UL
         }
 
-        private static void access_sql_server(string xml_root_tag, Hashtable shtable, List<string> sensor_name,
+        private static void access_sql_server(string xml_root_tag, Hashtable htable, List<string> sensor_name,
             List<string> sensor_type, List<string> sensor_value, IEnumerable<XName> elements, string log1, string getMessage)
         {
             lock (accessSqlLock)
             {
-                Hashtable htable = new Hashtable(shtable);
             //Console.WriteLine("+access_sql_server");
             Thread.CurrentThread.CurrentUICulture = new CultureInfo("en-us");
             SqlClient sql_client = new SqlClient(ConfigurationManager.AppSettings["SQL_SERVER_IP"],
