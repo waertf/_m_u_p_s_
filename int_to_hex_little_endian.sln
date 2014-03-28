@@ -21,6 +21,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WindowsServiceUNSClientThre
 EndProject
 Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "SetupUNS", "SetupUNS\SetupUNS.vdproj", "{A760776E-2AF4-478D-9ED3-F5B46C485E97}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PostgresqlTest", "PostgresqlTest\PostgresqlTest.csproj", "{523E096B-B4C7-4CB0-9FED-80520CE1D9E2}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -117,6 +119,14 @@ Global
 		{A760776E-2AF4-478D-9ED3-F5B46C485E97}.Release|x64.Build.0 = Release
 		{A760776E-2AF4-478D-9ED3-F5B46C485E97}.Release|x86.ActiveCfg = Release
 		{A760776E-2AF4-478D-9ED3-F5B46C485E97}.Release|x86.Build.0 = Release
+		{523E096B-B4C7-4CB0-9FED-80520CE1D9E2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{523E096B-B4C7-4CB0-9FED-80520CE1D9E2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{523E096B-B4C7-4CB0-9FED-80520CE1D9E2}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{523E096B-B4C7-4CB0-9FED-80520CE1D9E2}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{523E096B-B4C7-4CB0-9FED-80520CE1D9E2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{523E096B-B4C7-4CB0-9FED-80520CE1D9E2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{523E096B-B4C7-4CB0-9FED-80520CE1D9E2}.Release|x64.ActiveCfg = Release|Any CPU
+		{523E096B-B4C7-4CB0-9FED-80520CE1D9E2}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
