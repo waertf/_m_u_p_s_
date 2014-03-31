@@ -111,7 +111,8 @@ namespace ConsoleApplication1_client_threading
 
         private static object readRecoveryLock = new object();
         private static object getGidAndFullnameLock = new object();
-        private static object accessSqlLock = new object();
+        private static object gpsLogAccessSqlLock = new object();
+        private static object cgaEventAccessSqlLock = new object();
 
         static string  last_avls_lon = string.Empty,last_avls_lat =string.Empty;
 
@@ -3250,7 +3251,7 @@ FROM
         private static void access_sql_server(string xml_root_tag, Hashtable htable, List<string> sensor_name,
             List<string> sensor_type, List<string> sensor_value, IEnumerable<XName> elements, string log1, string getMessage)
         {
-            lock (accessSqlLock)
+            
             {
             //Console.WriteLine("+access_sql_server");
             Thread.CurrentThread.CurrentUICulture = new CultureInfo("en-us");
@@ -3268,32 +3269,10 @@ FROM
             string now = string.Format("{0:yyyyMMdd}", dtime);
             gps_log._time = "\'" + string.Format("{0:yyyyMMdd HH:mm:ss.fff}", dtime) + "+08" + "\'";
 
-            while (!sql_client.connect())
-            {
-                Thread.Sleep(300);
-            }
-                string _gps_logUidCount = string.Empty;
-                if (htable.ContainsKey("suaddr"))
-                {
-                    _gps_logUidCount =
-                sql_client.get_DataTable("SELECT COUNT(_uid)   FROM public._gps_log WHERE _uid ='" + htable["suaddr"] as string + "\'" +
-                " AND public._gps_log._time::Date = current_date").Rows[0].ItemArray[0].ToString();
-                    sql_client.disconnect();
-                }
             
 
-            while (!sql_client.connect())
-            {
-                Thread.Sleep(300);
-            }
-            double operationLogIdCount =
-                Convert.ToDouble(
-                    sql_client.get_DataTable("SELECT COUNT(_id)   FROM public.operation_log").Rows[0].ItemArray[0]
-                        .ToString());
-            sql_client.disconnect();
-
             //Console.WriteLine("operationLogIdCount:" + operationLogIdCount);
-            operationLogIdCount.ToString("000000000000");
+            
             //Console.WriteLine("operationLogIdCount:" + operationLogIdCount);
             operation_log.request_id = "\'" + ConfigurationManager.AppSettings["request-id"].ToString() + "\'";
 
@@ -3308,22 +3287,52 @@ FROM
             else
                 operation_log.application_id = "\'" + "null" + "\'";
             string deviceID = string.Empty;
+                double operationLogIdCount;
+                lock (gpsLogAccessSqlLock)
+                {
+                    #region sql get/set id
+                    while (!sql_client.connect())
+                    {
+                        Thread.Sleep(300);
+                    }
+                    string _gps_logUidCount = string.Empty;
+                    if (htable.ContainsKey("suaddr"))
+                    {
+                        _gps_logUidCount =
+                    sql_client.get_DataTable("SELECT COUNT(_uid)   FROM public._gps_log WHERE _uid ='" + htable["suaddr"] as string + "\'" +
+                    " AND public._gps_log._time::Date = current_date").Rows[0].ItemArray[0].ToString();
+                        sql_client.disconnect();
+                    }
 
-            if (htable.ContainsKey("suaddr"))
-            {
-                deviceID = htable["suaddr"] as string;
-                gps_log._uid = operation_log.eqp_id = "\'" + deviceID + "\'";
-                gps_log._id = "\'" + deviceID + "_" + now + "_" + _gps_logUidCount + "\'";
-                operation_log._id = "\'" + "operation" + "_" + now + "_" + operationLogIdCount + "\'";
-            }
-            else
-            {
-                gps_log._uid = operation_log.eqp_id = "\'" + "null" + "\'";
-                gps_log._id = "\'" + Convert.ToBase64String(System.Guid.NewGuid().ToByteArray()) + "_" +
-                              _gps_logUidCount + "\'";
-                //operation_log._id = "\'" + Convert.ToBase64String(System.Guid.NewGuid().ToByteArray()) + "_" + manual_id_serial_command + "\'";
-                operation_log._id = "\'" + "operation" + "_" + now + "_" + operationLogIdCount + "\'";
-            }
+
+                    while (!sql_client.connect())
+                    {
+                        Thread.Sleep(300);
+                    }
+                    operationLogIdCount =
+                        Convert.ToDouble(
+                            sql_client.get_DataTable("SELECT COUNT(_id)   FROM public.operation_log").Rows[0].ItemArray[0]
+                                .ToString());
+                    sql_client.disconnect();
+                    operationLogIdCount.ToString("000000000000");
+                    if (htable.ContainsKey("suaddr"))
+                    {
+                        deviceID = htable["suaddr"] as string;
+                        gps_log._uid = operation_log.eqp_id = "\'" + deviceID + "\'";
+                        gps_log._id = "\'" + deviceID + "_" + now + "_" + _gps_logUidCount + "\'";
+                        operation_log._id = "\'" + "operation" + "_" + now + "_" + operationLogIdCount + "\'";
+                    }
+                    else
+                    {
+                        gps_log._uid = operation_log.eqp_id = "\'" + "null" + "\'";
+                        gps_log._id = "\'" + Convert.ToBase64String(System.Guid.NewGuid().ToByteArray()) + "_" +
+                                      _gps_logUidCount + "\'";
+                        //operation_log._id = "\'" + Convert.ToBase64String(System.Guid.NewGuid().ToByteArray()) + "_" + manual_id_serial_command + "\'";
+                        operation_log._id = "\'" + "operation" + "_" + now + "_" + operationLogIdCount + "\'";
+                    }
+                    #endregion sql get/set id
+                }
+            
             if (htable.ContainsKey("result_code"))
             {
                 gps_log._option2 = operation_log.result_code = "\'" + htable["result_code"].ToString() + "\'";
@@ -3584,7 +3593,7 @@ WHERE
 
 
                                 #endregion
-
+                                /*
                                 #region access custom.unsPowerStatusHistory
 
                                 unsSqlCmd = @"SELECT 
@@ -3624,6 +3633,7 @@ VALUES(
                                 sql_client.disconnect();
 
                                 #endregion
+                                */
                             }
 
 
@@ -3674,7 +3684,7 @@ WHERE
                                 }
                                 sql_client.modify(unsSqlCmd);
                                 sql_client.disconnect();
-
+                                /*
                                 #region access custom.unsPowerStatusHistory
 
                                 unsSqlCmd = @"SELECT 
@@ -3714,7 +3724,7 @@ VALUES(
                                 sql_client.disconnect();
 
                                 #endregion
-
+                                */
                             }
 
                         }
@@ -4508,78 +4518,83 @@ LIMIT 1";
                     }
                     #endregion checkIfOverTime
                 }
-            
-                //insert into custom.cga_event_log
-            while (!sql_client.connect())
-            {
-                Thread.Sleep(300);
-            }
-             cgaEventLogIdCount =
-                Convert.ToDouble(
-                    sql_client.get_DataTable("SELECT COUNT(uid)   FROM custom.cga_event_log WHERE uid = '" + deviceID + "\'").Rows[0].ItemArray[0]);
-            sql_client.disconnect();
-            while (!sql_client.connect())
-            {
-                Thread.Sleep(300);
-            }
-            {
-                try
+                lock (cgaEventAccessSqlLock)
                 {
-                    if (xml_root_tag == "Unsolicited-Location-Report" && htable.ContainsKey("event_info"))
+                    #region insert into custom.cga_event_log
+                    while (!sql_client.connect())
                     {
-                        switch (htable["event_info"].ToString())
+                        Thread.Sleep(300);
+                    }
+                    cgaEventLogIdCount =
+                       Convert.ToDouble(
+                           sql_client.get_DataTable("SELECT COUNT(uid)   FROM custom.cga_event_log WHERE uid = '" + deviceID + "\'").Rows[0].ItemArray[0]);
+                    sql_client.disconnect();
+
+                    {
+                        try
                         {
-                            case "Emergency On":
-                                string sn = "\'" + deviceID + now + cgaEventLogIdCount.ToString("000000000000") + "\'";
-                                string table_columns =
-                                    "serial_no ,uid ,type ,lat ,lon,altitude ,speed ,course ,radius ,info_time ,server_time ,create_user ,create_ip,start_time,create_time";
-                                string table_column_value = sn + "," +
-                                                            gps_log._uid + "," + //gps_log._option3
-                                                            @"'150'" + "," + gps_log._lat + "," + gps_log._lon + "," +
-                                                            gps_log._altitude + "," + gps_log._speed + "," +
-                                                            gps_log._course + "," +
-                                                            gps_log.j_5 + "," + "to_timestamp(" +
-                                                            gps_log._option0 + @",'YYYYMMDDHH24MISS')" +
-                                                            "," + "to_timestamp(" +
-                                                            gps_log._option1 + @",'YYYYMMDDHH24MISS')" +
-                                                            "," + @"1" + "," + @"'" + GetLocalIPAddress().ToString() +
-                                                            @"'" +
-                                                            "," + @"to_timestamp('" + yyyymmddhhmmss +
-                                                            @"','YYYYMMDDHH24MISS')" +
-                                                            "," + @"to_timestamp('" + yyyymmddhhmmss +
-                                                            @"','YYYYMMDDHH24MISS')";
-                                string cmd = "INSERT INTO custom.cga_event_log (" + table_columns + ") VALUES  (" +
-                                             table_column_value + ")";
-                                sql_client.modify(cmd);
-                                break;
-                            case "Emergency Off":
+                            if (xml_root_tag == "Unsolicited-Location-Report" && htable.ContainsKey("event_info"))
+                            {
+                                switch (htable["event_info"].ToString())
+                                {
+                                    case "Emergency On":
+                                        string sn = "\'" + deviceID + now + cgaEventLogIdCount.ToString("000000000000") + "\'";
+                                        string table_columns =
+                                            "serial_no ,uid ,type ,lat ,lon,altitude ,speed ,course ,radius ,info_time ,server_time ,create_user ,create_ip,start_time,create_time";
+                                        string table_column_value = sn + "," +
+                                                                    gps_log._uid + "," + //gps_log._option3
+                                                                    @"'150'" + "," + gps_log._lat + "," + gps_log._lon + "," +
+                                                                    gps_log._altitude + "," + gps_log._speed + "," +
+                                                                    gps_log._course + "," +
+                                                                    gps_log.j_5 + "," + "to_timestamp(" +
+                                                                    gps_log._option0 + @",'YYYYMMDDHH24MISS')" +
+                                                                    "," + "to_timestamp(" +
+                                                                    gps_log._option1 + @",'YYYYMMDDHH24MISS')" +
+                                                                    "," + @"1" + "," + @"'" + GetLocalIPAddress().ToString() +
+                                                                    @"'" +
+                                                                    "," + @"to_timestamp('" + yyyymmddhhmmss +
+                                                                    @"','YYYYMMDDHH24MISS')" +
+                                                                    "," + @"to_timestamp('" + yyyymmddhhmmss +
+                                                                    @"','YYYYMMDDHH24MISS')";
+                                        string cmd = "INSERT INTO custom.cga_event_log (" + table_columns + ") VALUES  (" +
+                                                     table_column_value + ")";
+                                        while (!sql_client.connect())
+                                        {
+                                            Thread.Sleep(300);
+                                        }
+                                        sql_client.modify(cmd);
+                                        break;
+                                    case "Emergency Off":
 
-                                break;
-                            case "Unit Present":
-                            case "Unit Absent":
+                                        break;
+                                    case "Unit Present":
+                                    case "Unit Absent":
 
-                                break;
-                            case "Ignition Off":
-                            case "Ignition On":
+                                        break;
+                                    case "Ignition Off":
+                                    case "Ignition On":
 
-                                break;
+                                        break;
+
+                                }
+
+                            }
+
 
                         }
-
+                        catch (Exception ex)
+                        {
+                            Console.WriteLine(ex);
+                        }
+                        finally
+                        {
+                            sql_client.disconnect();
+                        }
                     }
-
-
+                    #endregion #region insert into custom.cga_event_log
                 }
-                catch (Exception ex)
-                {
-                    Console.WriteLine(ex);
-                }
-                finally
-                {
-                    sql_client.disconnect();
-                }
-            }
-                htable.Clear();
+            
+            htable.Clear();
                 htable = null;
             sql_client.Dispose();
             //Console.WriteLine("-access_sql_server");
