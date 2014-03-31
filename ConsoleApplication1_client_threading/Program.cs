@@ -1641,7 +1641,6 @@ Select 1-6 then press enter to send package
                 //w.Close();
             }
             Hashtable htable = new Hashtable();
-            IEnumerable<XElement> de;
             List<string> sensor_name = new List<string>();
             List<string> sensor_value = new List<string>();
             List<string> sensor_type = new List<string>();
@@ -1764,7 +1763,7 @@ Select 1-6 then press enter to send package
                             }
                             if (elements.Contains(new XElement("sensor-info").Name))//Sensor Info
                             {
-                                de = from el in xml_data.Descendants("sensor") select el;
+                                IEnumerable<XElement> de = from el in xml_data.Descendants("sensor") select el;
                                 sensor_name = (from e in de.Descendants("sensor-name") select (string)e).Cast<string>().ToList();
                                 sensor_value = (from e in de.Descendants("sensor-value") select (string)e).Cast<string>().ToList();
                                 sensor_type = (from e in de.Descendants("sensor-type") select (string)e).Cast<string>().ToList();
@@ -1811,7 +1810,7 @@ Select 1-6 then press enter to send package
                         if (bool.Parse(ConfigurationManager.AppSettings["SQL_ACCESS"]))
                         {
                             //sqlAccessEvent.Reset();
-                            Thread access_sql = new Thread(() => access_sql_server(xml_root_tag, new Hashtable(htable), sensor_name, sensor_type, sensor_value, XmlGetAllElementsXname(xml_data), logData, getMessage));
+                            Thread access_sql = new Thread(() => access_sql_server(xml_root_tag, new Hashtable(htable), sensor_name.ToList(), sensor_type.ToList(), sensor_value.ToList(), XmlGetAllElementsXname(xml_data), logData, getMessage));
                             access_sql.Start();
                             //access_sql.Join();
                             Console.WriteLine("SQL Access Enable");
@@ -1821,7 +1820,7 @@ Select 1-6 then press enter to send package
                         if (bool.Parse(ConfigurationManager.AppSettings["AVLS_ACCESS"]))
                         {
                             //avlsSendDone.Reset();
-                            Thread access_avls = new Thread(() => access_avls_server(xml_root_tag, new Hashtable(htable), sensor_name, sensor_type, sensor_value, XmlGetAllElementsXname(xml_data), logData, avlsTcpClient, getMessage));
+                            Thread access_avls = new Thread(() => access_avls_server(xml_root_tag, new Hashtable(htable), sensor_name.ToList(), sensor_type.ToList(), sensor_value.ToList(), XmlGetAllElementsXname(xml_data), logData, avlsTcpClient, getMessage));
                             access_avls.Priority = ThreadPriority.BelowNormal;
                             access_avls.Start();
                             //access_avls.Join();
@@ -1928,7 +1927,7 @@ Select 1-6 then press enter to send package
                     }
                     if (bool.Parse(ConfigurationManager.AppSettings["SQL_ACCESS"]))
                     {
-                        Thread access_sql = new Thread(() => access_sql_server(xml_root_tag, new Hashtable(htable), sensor_name, sensor_type, sensor_value, XmlGetAllElementsXname(xml_data), logData, null));
+                        Thread access_sql = new Thread(() => access_sql_server(xml_root_tag, new Hashtable(htable), sensor_name.ToList(), sensor_type.ToList(), sensor_value.ToList(), XmlGetAllElementsXname(xml_data), logData, null));
                         access_sql.Start();
                         //access_sql.Join();
                     }
@@ -2038,6 +2037,13 @@ Select 1-6 then press enter to send package
             }
             htable.Clear();
             htable = null;
+            sensor_name.Clear();
+            sensor_name = null;
+            sensor_value.Clear();
+            sensor_value = null;
+            sensor_type.Clear();
+            sensor_type = null;
+            
             Console.WriteLine("::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::");
         }
 
