@@ -308,6 +308,7 @@ LIMIT 1";
         {
             Console.WriteLine(AppDomain.CurrentDomain.BaseDirectory + "Client.exe");
             Thread.Sleep(5000);
+            AppDomain.CurrentDomain.UnhandledException += new UnhandledExceptionEventHandler(CurrentDomain_UnhandledException);
             string StartupPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
             string datalogicFilePath = Path.Combine(StartupPath, "StayCheck.sdf");
             string connString = string.Format("Data Source={0}", datalogicFilePath);
@@ -497,6 +498,11 @@ SET
 
 
             //unsTcpClient.Close();
+        }
+
+        static void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
+        {
+            Restart();
         }
 
         private static void GCFunction()
