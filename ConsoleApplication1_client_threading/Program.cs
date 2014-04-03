@@ -2050,12 +2050,15 @@ Select 1-6 then press enter to send package
 
         private static void Restart()
         {
-            Process.Start(AppDomain.CurrentDomain.BaseDirectory + "Client.exe");
+            //Process.Start(AppDomain.CurrentDomain.BaseDirectory + "Client.exe");
 
             //some time to start the new instance.
-            Thread.Sleep(2000);
+            //Thread.Sleep(2000);
 
-            Environment.Exit(-1);//Force termination of the current process.
+            //Environment.Exit(-1);//Force termination of the current process.
+            
+            System.Windows.Forms.Application.Restart();
+            Process.GetCurrentProcess().Kill();
         }
 
         private static void GetInitialLocationFromSql(ref string lat, ref string lon, string id)
