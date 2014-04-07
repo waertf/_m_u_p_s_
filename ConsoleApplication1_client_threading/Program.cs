@@ -113,6 +113,7 @@ namespace ConsoleApplication1_client_threading
         private static object getGidAndFullnameLock = new object();
         private static object gpsLogAccessSqlLock = new object();
         private static object cgaEventAccessSqlLock = new object();
+        private static object access_uns_deivce_power_status_Lock = new object();
 
         static string  last_avls_lon = string.Empty,last_avls_lat =string.Empty;
 
@@ -577,8 +578,18 @@ WHERE
             {
                 foreach (DataRow row in dt.Rows)
                 {
+
                     uid = row[0].ToString();
                     string device_uid = uid;
+
+                    //alonso
+                    Thread TSendPackageToAvlsOnlyByUidAndLocGetFromSql =
+                        new Thread(
+                            () =>
+                                SendPackageToAvlsOnlyByUidAndLocGetFromSql(device_uid, "-1", avlsTcpClient,
+                                    avlsNetworkStream));
+                    TSendPackageToAvlsOnlyByUidAndLocGetFromSql.Priority = ThreadPriority.BelowNormal;
+                    TSendPackageToAvlsOnlyByUidAndLocGetFromSql.Start();
 
                     string unsUpdateTimeStamp = DateTime.Now.ToString("yyyyMMdd HHmmss+8");
                     string unsSqlCmd = @"UPDATE 
@@ -592,17 +603,11 @@ WHERE
                     {
                         Thread.Sleep(300);
                     }
+                    lock (access_uns_deivce_power_status_Lock)
                     sqlClient.modify(unsSqlCmd);
                     sqlClient.disconnect();
 
-                    //alonso
-                    Thread TSendPackageToAvlsOnlyByUidAndLocGetFromSql =
-                        new Thread(
-                            () =>
-                                SendPackageToAvlsOnlyByUidAndLocGetFromSql(device_uid, "-1", avlsTcpClient,
-                                    avlsNetworkStream));
-                    TSendPackageToAvlsOnlyByUidAndLocGetFromSql.Priority = ThreadPriority.BelowNormal;
-                    TSendPackageToAvlsOnlyByUidAndLocGetFromSql.Start();
+                    
 
                 }
             }/*
@@ -3386,6 +3391,7 @@ WHERE
                             {
                                 Thread.Sleep(300);
                             }
+                            lock (access_uns_deivce_power_status_Lock)
                             sql_client.modify(unsSqlCmd);
                             sql_client.disconnect();
                         }
@@ -3447,6 +3453,7 @@ WHERE
                             {
                                 Thread.Sleep(300);
                             }
+                            lock (access_uns_deivce_power_status_Lock)
                             sql_client.modify(unsSqlCmd);
                             sql_client.disconnect();
                         }
@@ -3475,6 +3482,7 @@ WHERE
                             {
                                 Thread.Sleep(300);
                             }
+                            lock (access_uns_deivce_power_status_Lock)
                             sql_client.modify(unsSqlCmd);
                             sql_client.disconnect();
                         }
@@ -3503,6 +3511,7 @@ WHERE
                             {
                                 Thread.Sleep(300);
                             }
+                            lock (access_uns_deivce_power_status_Lock)
                             sql_client.modify(unsSqlCmd);
                             sql_client.disconnect();
                         }
@@ -3597,6 +3606,7 @@ WHERE
                                 {
                                     Thread.Sleep(300);
                                 }
+                                lock (access_uns_deivce_power_status_Lock)
                                 sql_client.modify(unsSqlCmd);
                                 sql_client.disconnect();
 
@@ -3691,6 +3701,7 @@ WHERE
                                 {
                                     Thread.Sleep(300);
                                 }
+                                lock (access_uns_deivce_power_status_Lock)
                                 sql_client.modify(unsSqlCmd);
                                 sql_client.disconnect();
                                 /*
