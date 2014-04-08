@@ -409,17 +409,46 @@ LIMIT 1";
 
             deviceCount = uint.Parse(totalDevice);
             //empty power column in table custom.uns_deivce_power_status
-            string emptyPowerStatusTable = @"UPDATE 
-  custom.uns_deivce_power_status
-SET
-  power = NULL,
-  ""updateTime"" = NULL";
+            string emptyPowerStatusTable = @"DELETE FROM custom.uns_deivce_power_status";
             while (!sql_client.connect())
             {
                 Thread.Sleep(300);
             }
             sql_client.modify(emptyPowerStatusTable);
             sql_client.disconnect();
+
+            #region
+            string regSqlCmd = string.Empty;
+            regSqlCmd = @"SELECT
+  sd.equipment.uid
+  FROM
+  sd.equipment
+  ";
+            while (!sql_client.connect())
+            {
+                Thread.Sleep(300);
+            }
+            var dt = sql_client.get_DataTable(regSqlCmd);
+            sql_client.disconnect();
+
+            if (dt != null && dt.Rows.Count != 0)
+            {
+                string uid = string.Empty;
+                foreach (DataRow row in dt.Rows)
+                {
+                    uid = row[0].ToString();
+                    regSqlCmd = "INSERT INTO custom.uns_deivce_power_status (uid) VALUES ("+"\'"+uid+"\'"+")";
+                    while (!sql_client.connect())
+                    {
+                        Thread.Sleep(300);
+                    }
+                    sql_client.modify(regSqlCmd);
+                    sql_client.disconnect();
+                    //Console.WriteLine("find:{0}", uid);
+                }
+
+            }
+            #endregion
             string registration_msg = "<Location-Registration-Request><application>" + ConfigurationManager.AppSettings["application_ID"] + "</application></Location-Registration-Request>";
             UnsTcpWriteLine(netStream, data_append_dataLength(registration_msg), registration_msg);
             //using (StreamWriter w = File.AppendText("log.txt"))
@@ -576,6 +605,8 @@ WHERE
             string uid = string.Empty;
             if (dt != null && dt.Rows.Count != 0)
             {
+                string unsUpdateTimeStamp = string.Empty;
+                string unsSqlCmd = string.Empty;
                 foreach (DataRow row in dt.Rows)
                 {
 
@@ -591,8 +622,8 @@ WHERE
                     TSendPackageToAvlsOnlyByUidAndLocGetFromSql.Priority = ThreadPriority.BelowNormal;
                     TSendPackageToAvlsOnlyByUidAndLocGetFromSql.Start();
 
-                    string unsUpdateTimeStamp = DateTime.Now.ToString("yyyyMMdd HHmmss+8");
-                    string unsSqlCmd = @"UPDATE 
+                    unsUpdateTimeStamp = DateTime.Now.ToString("yyyyMMdd HHmmss+8");
+                    unsSqlCmd = @"UPDATE 
   custom.uns_deivce_power_status
 SET
   power = NULL,
@@ -603,7 +634,7 @@ WHERE
                     {
                         Thread.Sleep(300);
                     }
-                    lock (access_uns_deivce_power_status_Lock)
+                    //lock (access_uns_deivce_power_status_Lock)
                     sqlClient.modify(unsSqlCmd);
                     sqlClient.disconnect();
 
@@ -3362,12 +3393,52 @@ FROM
             //{
             //    gps_log._option3 = "\'"+htable["result_msg"].ToString()+"\'";
             //}
+            #region
 
+                {
+                    string sqlCmd1 = string.Empty;
+                    sqlCmd1 = @"SELECT 
+  DISTINCT sd.equipment.uid
+FROM
+  sd.equipment INNER JOIN
+  custom.uns_deivce_power_status
+ON
+  custom.uns_deivce_power_status.uid != sd.equipment.uid";
+
+                    while (!sql_client.connect())
+                    {
+                        Thread.Sleep(300);
+                    }
+                    var dt1 = sql_client.get_DataTable(sqlCmd1);
+                    sql_client.disconnect();
+
+                    if (dt1 != null && dt1.Rows.Count != 0)
+                    {
+                        string uid = string.Empty;
+                        foreach (DataRow row in dt1.Rows)
+                        {
+                            uid = row[0].ToString();
+                            sqlCmd1 = "INSERT INTO custom.uns_deivce_power_status (uid) VALUES (" + "\'" + uid + "\'" +
+                                      ")";
+                            while (!sql_client.connect())
+                            {
+                                Thread.Sleep(300);
+                            }
+                            sql_client.modify(sqlCmd1);
+                            sql_client.disconnect();
+                            //Console.WriteLine("find:{0}", uid);
+                        }
+                    }
+                }
+
+                #endregion
             if (htable.ContainsKey("result_msg"))
             {
                 //avls_package.Message = htable["result_msg"].ToString();
                 //-999 to -500 :motorola error
                 //-499 to -100 :our error
+                string unsUpdateTimeStamp = string.Empty;
+                string unsSqlCmd = string.Empty;
                 switch (htable["result_msg"].ToString())
                 {
                     case "ABSENT SUBSCRIBER":
@@ -3377,8 +3448,8 @@ FROM
                     {
                         if (!string.IsNullOrEmpty(deviceID))
                         {
-                            string unsUpdateTimeStamp = DateTime.Now.ToString("yyyyMMdd HHmmss+8");
-                            string unsSqlCmd = @"UPDATE 
+                             unsUpdateTimeStamp = DateTime.Now.ToString("yyyyMMdd HHmmss+8");
+                             unsSqlCmd = @"UPDATE 
   custom.uns_deivce_power_status
 SET
   power = 'off',
@@ -3391,7 +3462,7 @@ WHERE
                             {
                                 Thread.Sleep(300);
                             }
-                            lock (access_uns_deivce_power_status_Lock)
+                            //lock (access_uns_deivce_power_status_Lock)
                             sql_client.modify(unsSqlCmd);
                             sql_client.disconnect();
                         }
@@ -3439,8 +3510,8 @@ WHERE
 
                         if (!string.IsNullOrEmpty(deviceID))
                         {
-                            string unsUpdateTimeStamp = DateTime.Now.ToString("yyyyMMdd HHmmss+8");
-                            string unsSqlCmd = @"UPDATE 
+                             unsUpdateTimeStamp = DateTime.Now.ToString("yyyyMMdd HHmmss+8");
+                             unsSqlCmd = @"UPDATE 
   custom.uns_deivce_power_status
 SET
   power = 'on',
@@ -3453,7 +3524,7 @@ WHERE
                             {
                                 Thread.Sleep(300);
                             }
-                            lock (access_uns_deivce_power_status_Lock)
+                            //lock (access_uns_deivce_power_status_Lock)
                             sql_client.modify(unsSqlCmd);
                             sql_client.disconnect();
                         }
@@ -3468,8 +3539,8 @@ WHERE
 
                         if (!string.IsNullOrEmpty(deviceID))
                         {
-                            string unsUpdateTimeStamp = DateTime.Now.ToString("yyyyMMdd HHmmss+8");
-                            string unsSqlCmd = @"UPDATE 
+                             unsUpdateTimeStamp = DateTime.Now.ToString("yyyyMMdd HHmmss+8");
+                             unsSqlCmd = @"UPDATE 
   custom.uns_deivce_power_status
 SET
   power = 'on',
@@ -3482,7 +3553,7 @@ WHERE
                             {
                                 Thread.Sleep(300);
                             }
-                            lock (access_uns_deivce_power_status_Lock)
+                            //lock (access_uns_deivce_power_status_Lock)
                             sql_client.modify(unsSqlCmd);
                             sql_client.disconnect();
                         }
@@ -3497,8 +3568,8 @@ WHERE
 
                         if (!string.IsNullOrEmpty(deviceID))
                         {
-                            string unsUpdateTimeStamp = DateTime.Now.ToString("yyyyMMdd HHmmss+8");
-                            string unsSqlCmd = @"UPDATE 
+                             unsUpdateTimeStamp = DateTime.Now.ToString("yyyyMMdd HHmmss+8");
+                             unsSqlCmd = @"UPDATE 
   custom.uns_deivce_power_status
 SET
   power = 'on',
@@ -3511,7 +3582,7 @@ WHERE
                             {
                                 Thread.Sleep(300);
                             }
-                            lock (access_uns_deivce_power_status_Lock)
+                            //lock (access_uns_deivce_power_status_Lock)
                             sql_client.modify(unsSqlCmd);
                             sql_client.disconnect();
                         }
@@ -3535,7 +3606,8 @@ WHERE
             if (htable.ContainsKey("event_info"))
             {
                 gps_log._option3 = "\'" + htable["event_info"].ToString() + "\'";
-
+                string unsUpdateTimeStamp = string.Empty;
+                string unsSqlCmd = string.Empty;
                 switch (htable["event_info"].ToString())
                 {
                     case "Emergency On":
@@ -3592,8 +3664,8 @@ WHERE
 
 
 
-                                string unsUpdateTimeStamp = DateTime.Now.ToString("yyyyMMdd HHmmss+8");
-                                string unsSqlCmd = @"UPDATE 
+                                 unsUpdateTimeStamp = DateTime.Now.ToString("yyyyMMdd HHmmss+8");
+                                 unsSqlCmd = @"UPDATE 
   custom.uns_deivce_power_status
 SET
   power = 'on',
@@ -3606,7 +3678,7 @@ WHERE
                                 {
                                     Thread.Sleep(300);
                                 }
-                                lock (access_uns_deivce_power_status_Lock)
+                                //lock (access_uns_deivce_power_status_Lock)
                                 sql_client.modify(unsSqlCmd);
                                 sql_client.disconnect();
 
@@ -3686,8 +3758,8 @@ VALUES(
                             sql_client.disconnect();
                             if (dt != null && dt.Rows.Count != 0)
                             {
-                                string unsUpdateTimeStamp = DateTime.Now.ToString("yyyyMMdd HHmmss+8");
-                                string unsSqlCmd = @"UPDATE 
+                                 unsUpdateTimeStamp = DateTime.Now.ToString("yyyyMMdd HHmmss+8");
+                                 unsSqlCmd = @"UPDATE 
   custom.uns_deivce_power_status
 SET
   power = 'off',
@@ -3701,7 +3773,7 @@ WHERE
                                 {
                                     Thread.Sleep(300);
                                 }
-                                lock (access_uns_deivce_power_status_Lock)
+                                //lock (access_uns_deivce_power_status_Lock)
                                 sql_client.modify(unsSqlCmd);
                                 sql_client.disconnect();
                                 /*
