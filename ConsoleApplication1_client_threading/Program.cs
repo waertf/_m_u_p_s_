@@ -532,6 +532,9 @@ LIMIT 1";
 
         static void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
         {
+            var exception = e.ExceptionObject as Exception;
+            if (exception != null)
+                log.Error("call restart:"+exception.ToString());
             Restart();
         }
 
@@ -1731,6 +1734,7 @@ Select 1-6 then press enter to send package
                              htable.Add("result_msg", ConfigurationManager.AppSettings["RESULT_CODE_" + htable["result_code"]]);
                              if (htable["result_code"].Equals("3"))//UNAUTHORIZED APPLICATION
                              {
+                                 log.Info("UNAUTHORIZED APPLICATION call restart");
                                  Restart();
                              }
                              Console.WriteLine("result_code:{0}", htable["result_code"]);
@@ -2633,7 +2637,7 @@ LIMIT 1";
             avlsFlag = true;
 
             var deviceChar = deviceID.ToCharArray();
-            if (!deviceChar[3].Equals('0'))
+            if (!deviceChar[3].Equals('0') && avls_package.Event != "182,")
             {
                 #region send specific msg
                 //check range of initialLat/initialLon in exclusion_area_boundary then send event by avls_package.Event
