@@ -3394,16 +3394,15 @@ FROM
             //    gps_log._option3 = "\'"+htable["result_msg"].ToString()+"\'";
             //}
             #region
-
+            if (!string.IsNullOrEmpty(deviceID) && CheckIfUidExist(deviceID))
                 {
                     string sqlCmd1 = string.Empty;
                     sqlCmd1 = @"SELECT 
-  DISTINCT sd.equipment.uid
+  custom.uns_deivce_power_status.uid
 FROM
-  sd.equipment INNER JOIN
-  custom.uns_deivce_power_status
-ON
-  custom.uns_deivce_power_status.uid != sd.equipment.uid";
+   custom.uns_deivce_power_status
+WHERE
+  custom.uns_deivce_power_status.uid = " + @"'" + deviceID+@"'";
 
                     while (!sql_client.connect())
                     {
@@ -3414,11 +3413,13 @@ ON
 
                     if (dt1 != null && dt1.Rows.Count != 0)
                     {
-                        string uid = string.Empty;
-                        foreach (DataRow row in dt1.Rows)
-                        {
-                            uid = row[0].ToString();
-                            sqlCmd1 = "INSERT INTO custom.uns_deivce_power_status (uid) VALUES (" + "\'" + uid + "\'" +
+                        
+                    }
+                    else
+                    {
+                        
+
+                            sqlCmd1 = "INSERT INTO custom.uns_deivce_power_status (uid) VALUES (" + "\'" + deviceID + "\'" +
                                       ")";
                             while (!sql_client.connect())
                             {
@@ -3426,8 +3427,7 @@ ON
                             }
                             sql_client.modify(sqlCmd1);
                             sql_client.disconnect();
-                            //Console.WriteLine("find:{0}", uid);
-                        }
+
                     }
                 }
 
@@ -3446,7 +3446,7 @@ ON
                         #region access power status
 
                     {
-                        if (!string.IsNullOrEmpty(deviceID))
+                        if (!string.IsNullOrEmpty(deviceID) && CheckIfUidExist(deviceID))
                         {
                              unsUpdateTimeStamp = DateTime.Now.ToString("yyyyMMdd HHmmss+8");
                              unsSqlCmd = @"UPDATE 
@@ -3508,7 +3508,7 @@ WHERE
 
                         #region access power status
 
-                        if (!string.IsNullOrEmpty(deviceID))
+                        if (!string.IsNullOrEmpty(deviceID) && CheckIfUidExist(deviceID))
                         {
                              unsUpdateTimeStamp = DateTime.Now.ToString("yyyyMMdd HHmmss+8");
                              unsSqlCmd = @"UPDATE 
@@ -3537,7 +3537,7 @@ WHERE
 
                         #region access power status
 
-                        if (!string.IsNullOrEmpty(deviceID))
+                        if (!string.IsNullOrEmpty(deviceID) && CheckIfUidExist(deviceID))
                         {
                              unsUpdateTimeStamp = DateTime.Now.ToString("yyyyMMdd HHmmss+8");
                              unsSqlCmd = @"UPDATE 
@@ -3566,7 +3566,7 @@ WHERE
 
                         #region access power status
 
-                        if (!string.IsNullOrEmpty(deviceID))
+                        if (!string.IsNullOrEmpty(deviceID) && CheckIfUidExist(deviceID))
                         {
                              unsUpdateTimeStamp = DateTime.Now.ToString("yyyyMMdd HHmmss+8");
                              unsSqlCmd = @"UPDATE 
@@ -3619,7 +3619,7 @@ WHERE
                                                  operationLogIdCount.ToString("000000000000") + "\'";
                         break;
                     case "Unit Present":
-                        if (!string.IsNullOrEmpty(deviceID))
+                        if (!string.IsNullOrEmpty(deviceID) && CheckIfUidExist(deviceID))
                         {
                             /*
                             while (!sql_client.connect())
@@ -3630,21 +3630,7 @@ WHERE
                             sql_client.disconnect();
                             */
                             //string reg_sn = "\'" + deviceID + "_" + now + "_" + reg_countUid + "\'";
-                            string reg_uid = "\'" + deviceID + "\'";
-                            string regSqlCmd = string.Empty;
-                            regSqlCmd = @"SELECT
-  sd.equipment.uid
-  FROM
-  sd.equipment
-  where
-  sd.equipment.uid = '" + deviceID + @"'";
-                            while (!sql_client.connect())
-                            {
-                                Thread.Sleep(300);
-                            }
-                            var dt = sql_client.get_DataTable(regSqlCmd);
-                            sql_client.disconnect();
-                            if (dt != null && dt.Rows.Count != 0)
+                            
                             {
                                 /*
                                 regSqlCmd = @"INSERT INTO
@@ -3742,21 +3728,9 @@ VALUES(
                         #region access power status
 
                     {
-                        if (!string.IsNullOrEmpty(deviceID))
+                        if (!string.IsNullOrEmpty(deviceID) && CheckIfUidExist(deviceID))
                         {
-                            string regSqlCmd = @"SELECT
-  sd.equipment.uid
-  FROM
-  sd.equipment
-  where
-  sd.equipment.uid = '" + deviceID + @"'";
-                            while (!sql_client.connect())
-                            {
-                                Thread.Sleep(300);
-                            }
-                            var dt = sql_client.get_DataTable(regSqlCmd);
-                            sql_client.disconnect();
-                            if (dt != null && dt.Rows.Count != 0)
+                            
                             {
                                  unsUpdateTimeStamp = DateTime.Now.ToString("yyyyMMdd HHmmss+8");
                                  unsSqlCmd = @"UPDATE 
