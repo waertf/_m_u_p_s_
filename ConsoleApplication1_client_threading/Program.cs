@@ -2619,7 +2619,7 @@ LIMIT 1";
             avls_package.ID += ",";
 
             var deviceChar = deviceID.ToCharArray();
-            if (!deviceChar[3].Equals('0'))
+            if (!deviceChar[3].Equals('0') && avls_package.Event != "182,")
             {
                 #region send specific msg
                 //check range of initialLat/initialLon in exclusion_area_boundary then send event by avls_package.Event
