@@ -2636,7 +2636,7 @@ LIMIT 1";
                 //string getMessage = string.Empty;
                 lock (getGidAndFullnameLock)
                 {
-                    send_string = "%%" + avls_package.ID + avls_package.GPS_Valid + avls_package.Date_Time + avls_package.Loc + avls_package.Speed + avls_package.Dir + avls_package.Temp + avls_package.Status + avls_package.Event;
+                    send_string = "%%" + avls_package.ID + avls_package.GPS_Valid + avls_package.Date_Time + avls_package.Loc + avls_package.Speed + avls_package.Dir + avls_package.Temp + avls_package.Status + "0,";
                     //getMessage = GetGidAndFullnameFromP_prohibitedAndPatrol_locationFromSql(prohibitedTableName,
                     //locationTableName,
                     //initialLat, initialLon, deviceID, false);
@@ -2651,7 +2651,7 @@ LIMIT 1";
                         avls_WriteLine(netStream, System.Text.Encoding.UTF8.GetBytes(send_string), send_string);
                     }
 
-                    send_string = "%%" + avls_package.ID + avls_package.GPS_Valid + avls_package.Date_Time + avls_package.Loc + avls_package.Speed + avls_package.Dir + avls_package.Temp + avls_package.Status + avls_package.Event;
+                    send_string = "%%" + avls_package.ID + avls_package.GPS_Valid + avls_package.Date_Time + avls_package.Loc + avls_package.Speed + avls_package.Dir + avls_package.Temp + avls_package.Status + "0,";
                     getMessage = CheckIfStayOverTime(initialLat, initialLon, deviceID);
                     if (!string.IsNullOrEmpty(getMessage))
                     {
