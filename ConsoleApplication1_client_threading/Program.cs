@@ -2618,6 +2618,11 @@ LIMIT 1";
             deviceID = avls_package.ID;
             avls_package.ID += ",";
 
+            send_string = "%%" + avls_package.ID + avls_package.GPS_Valid + avls_package.Date_Time + avls_package.Loc + avls_package.Speed + avls_package.Dir + avls_package.Temp + avls_package.Status + avls_package.Event + avls_package.Message + "\r\n";
+            avlsSendPackage = send_string;
+            avls_WriteLine(netStream, System.Text.Encoding.UTF8.GetBytes(send_string), send_string);
+            avlsFlag = true;
+
             var deviceChar = deviceID.ToCharArray();
             if (!deviceChar[3].Equals('0') && avls_package.Event != "182,")
             {
@@ -2668,10 +2673,7 @@ LIMIT 1";
                 #endregion  send specific msg
             }
 
-            send_string = "%%"+avls_package.ID+avls_package.GPS_Valid+avls_package.Date_Time+avls_package.Loc+avls_package.Speed+avls_package.Dir+avls_package.Temp+avls_package.Status+avls_package.Event+avls_package.Message+"\r\n";
-            avlsSendPackage = send_string;
-            avls_WriteLine(netStream, System.Text.Encoding.UTF8.GetBytes(send_string), send_string);
-            avlsFlag = true;
+            
 
             
             /*
