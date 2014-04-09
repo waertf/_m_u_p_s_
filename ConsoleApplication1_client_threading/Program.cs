@@ -2616,28 +2616,10 @@ LIMIT 1";
             }
             string deviceID = string.Empty;
             deviceID = avls_package.ID;
-            avls_package.ID += ",";    
-            send_string = "%%"+avls_package.ID+avls_package.GPS_Valid+avls_package.Date_Time+avls_package.Loc+avls_package.Speed+avls_package.Dir+avls_package.Temp+avls_package.Status+avls_package.Event+avls_package.Message+"\r\n";
-            /*
-            netStream.Write(System.Text.Encoding.Default.GetBytes(send_string), 0, send_string.Length);
-            Console.WriteLine("S----------------------------------------------------------------------------");
-            Console.WriteLine("Write:\r\n" + send_string);
-            Console.WriteLine("E----------------------------------------------------------------------------");
-            using (StreamWriter w = File.AppendText("log.txt"))
-            {
-                Log("Write:\r\n", send_string, w);
-                // Close the writer and underlying file.
-                w.Close();
-            }
-            */
-            //avlsSendDone.Reset();
-            avlsSendPackage = send_string;
-
-            avls_WriteLine(netStream, System.Text.Encoding.UTF8.GetBytes(send_string), send_string);
-            avlsFlag = true;
+            avls_package.ID += ",";
 
             var deviceChar = deviceID.ToCharArray();
-            if (!deviceChar[3].Equals('0') && avls_package.Event != "182,")
+            if (!deviceChar[3].Equals('0'))
             {
                 #region send specific msg
                 //check range of initialLat/initialLon in exclusion_area_boundary then send event by avls_package.Event
@@ -2685,6 +2667,13 @@ LIMIT 1";
                 }
                 #endregion  send specific msg
             }
+
+            send_string = "%%"+avls_package.ID+avls_package.GPS_Valid+avls_package.Date_Time+avls_package.Loc+avls_package.Speed+avls_package.Dir+avls_package.Temp+avls_package.Status+avls_package.Event+avls_package.Message+"\r\n";
+            avlsSendPackage = send_string;
+            avls_WriteLine(netStream, System.Text.Encoding.UTF8.GetBytes(send_string), send_string);
+            avlsFlag = true;
+
+            
             /*
             if (avlsAccessCount > deviceCount || avlsFlag)
             {
