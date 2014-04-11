@@ -2626,6 +2626,7 @@ LIMIT 1";
             var deviceChar = deviceID.ToCharArray();
             if (!deviceChar[3].Equals('0') && avls_package.Event != "182,")
             {
+                string now = string.Format("{0:yyMMddHHmmss}", DateTime.Now.ToUniversalTime()) + ",";
                 #region send specific msg
                 //check range of initialLat/initialLon in exclusion_area_boundary then send event by avls_package.Event
 
@@ -2641,7 +2642,7 @@ LIMIT 1";
                 //string getMessage = string.Empty;
                 lock (getGidAndFullnameLock)
                 {
-                    send_string = "%%" + avls_package.ID + avls_package.GPS_Valid + avls_package.Date_Time + avls_package.Loc + avls_package.Speed + avls_package.Dir + avls_package.Temp + avls_package.Status + "0,";
+                    send_string = "%%" + avls_package.ID + avls_package.GPS_Valid + now + avls_package.Loc + avls_package.Speed + avls_package.Dir + avls_package.Temp + avls_package.Status + "0,";
                     //getMessage = GetGidAndFullnameFromP_prohibitedAndPatrol_locationFromSql(prohibitedTableName,
                     //locationTableName,
                     //initialLat, initialLon, deviceID, false);
@@ -2656,7 +2657,7 @@ LIMIT 1";
                         avls_WriteLine(netStream, System.Text.Encoding.UTF8.GetBytes(send_string), send_string);
                     }
 
-                    send_string = "%%" + avls_package.ID + avls_package.GPS_Valid + avls_package.Date_Time + avls_package.Loc + avls_package.Speed + avls_package.Dir + avls_package.Temp + avls_package.Status + "0,";
+                    send_string = "%%" + avls_package.ID + avls_package.GPS_Valid + now + avls_package.Loc + avls_package.Speed + avls_package.Dir + avls_package.Temp + avls_package.Status + "0,";
                     getMessage = CheckIfStayOverTime(initialLat, initialLon, deviceID);
                     if (!string.IsNullOrEmpty(getMessage))
                     {
