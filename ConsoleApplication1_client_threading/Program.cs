@@ -2640,7 +2640,7 @@ LIMIT 1";
                 prohibitedTableName = "public.p_prohibited";
                 locationTableName = "public.patrol_location";
                 //string getMessage = string.Empty;
-                lock (getGidAndFullnameLock)
+                //lock (getGidAndFullnameLock)
                 {
                     send_string = "%%" + avls_package.ID + avls_package.GPS_Valid + now + avls_package.Loc + avls_package.Speed + avls_package.Dir + avls_package.Temp + avls_package.Status + "0,";
                     //getMessage = GetGidAndFullnameFromP_prohibitedAndPatrol_locationFromSql(prohibitedTableName,
