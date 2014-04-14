@@ -2624,7 +2624,7 @@ LIMIT 1";
             avlsFlag = true;
 
             var deviceChar = deviceID.ToCharArray();
-            if (!deviceChar[3].Equals('0') && avls_package.Event != "182,")
+            if (!deviceChar[3].Equals('0')  && avls_package.Event == "0,")
             {
                 string now = string.Format("{0:yyMMddHHmmss}", DateTime.Now.ToUniversalTime()) + ",";
                 #region send specific msg
