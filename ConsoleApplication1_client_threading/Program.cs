@@ -352,7 +352,7 @@ LIMIT 1";
 
             SiAuto.Si.Enabled = true;
             SiAuto.Si.Level = Level.Debug;
-            SiAuto.Si.Connections = @"file(filename=" + Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) + "\\log.sil,rotate=weekly,append=true,maxparts=5)";
+            SiAuto.Si.Connections = @"file(filename=" + Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) + "\\log.sil,rotate=weekly,append=true,maxparts=5,maxsize=500MB)";
             //SiAuto.Main.LogMessage("This is my first SmartInspect message!");
             //SiAuto.Main.LogText(Level.Debug,"test","hahaha");
             
@@ -2845,8 +2845,8 @@ where st_intersects(st_buffer(the_geom, 0.0009009/100*raidus), st_geomfromtext('
 now() >= start_time::timestamp AND
 now() <= end_time::timestamp ";
 
-            log.Debug(deviceID+":p_prohibited sql cmd:" + Environment.NewLine + regSqlCmdForProhibitedTable);
-            log.Debug(deviceID + ":patrol_location sql cmd:" + Environment.NewLine + regSqlCmdForLocationTable);
+            log.Info(deviceID+":p_prohibited:sql cmd:" + Environment.NewLine + regSqlCmdForProhibitedTable);
+            log.Info(deviceID + ":patrol_location:sql cmd:" + Environment.NewLine + regSqlCmdForLocationTable);
             while (!sql_client.connect())
             {
                 Thread.Sleep(300);
