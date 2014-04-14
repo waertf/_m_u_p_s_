@@ -1852,7 +1852,7 @@ Select 1-6 then press enter to send package
                             if (htable.ContainsKey("lat_value") && htable.ContainsKey("long_value") && htable.ContainsKey("suaddr"))
                             getMessage = GetGidAndFullnameFromP_prohibitedAndPatrol_locationFromSql(prohibitedTableName,
                                 locationTableName,
-                                htable["lat_value"] as string, htable["long_value"] as string, htable["suaddr"] as string, false);
+                                htable["lat_value"] as string, htable["long_value"] as string, htable["suaddr"] as string, false, htable["suaddr"].ToString());
                         }
                         if (bool.Parse(ConfigurationManager.AppSettings["SQL_ACCESS"]))
                         {
@@ -2774,7 +2774,7 @@ LIMIT 1";
             Console.WriteLine("-access_avls_server");
         }
 
-        private static string GetGidAndFullnameFromP_prohibitedAndPatrol_locationFromSql(string prohibitedTableName, string locationTableName, string initialLat, string initialLon,string id,bool isStayTimeEnable)
+        private static string GetGidAndFullnameFromP_prohibitedAndPatrol_locationFromSql(string prohibitedTableName, string locationTableName, string initialLat, string initialLon,string id,bool isStayTimeEnable,string deviceID)
         {
             object mylock = new object();
             string startupPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
@@ -2845,6 +2845,8 @@ where st_intersects(st_buffer(the_geom, 0.0009009/100*raidus), st_geomfromtext('
 now() >= start_time::timestamp AND
 now() <= end_time::timestamp ";
 
+            log.Debug(deviceID+":p_prohibited sql cmd:" + Environment.NewLine + regSqlCmdForProhibitedTable);
+            log.Debug(deviceID + ":patrol_location sql cmd:" + Environment.NewLine + regSqlCmdForLocationTable);
             while (!sql_client.connect())
             {
                 Thread.Sleep(300);
