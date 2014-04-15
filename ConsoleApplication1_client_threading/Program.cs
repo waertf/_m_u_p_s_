@@ -309,7 +309,7 @@ LIMIT 1";
         {
             Console.WriteLine(AppDomain.CurrentDomain.BaseDirectory + "Client.exe");
             Thread.Sleep(5000);
-            AppDomain.CurrentDomain.UnhandledException += new UnhandledExceptionEventHandler(CurrentDomain_UnhandledException);
+            //AppDomain.CurrentDomain.UnhandledException += new UnhandledExceptionEventHandler(CurrentDomain_UnhandledException);
             string StartupPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
             string datalogicFilePath = Path.Combine(StartupPath, "StayCheck.sdf");
             string connString = string.Format("Data Source={0}", datalogicFilePath);
@@ -1735,7 +1735,8 @@ Select 1-6 then press enter to send package
                              if (htable["result_code"].Equals("3"))//UNAUTHORIZED APPLICATION
                              {
                                  log.Info("UNAUTHORIZED APPLICATION call restart");
-                                 Restart();
+                                 //Restart();
+                                 Environment.Exit(1);
                              }
                              Console.WriteLine("result_code:{0}", htable["result_code"]);
                              Console.WriteLine("result_msg:{0}", htable["result_msg"]);
