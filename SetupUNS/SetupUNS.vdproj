@@ -605,7 +605,7 @@
             }
             "{3C67513D-01DD-4637-8A68-80971EB9504F}:_D90F17677968442A92A8C31221DE7423"
             {
-            "DefaultLocation" = "8:[ProgramFilesFolder][Manufacturer]\\[uns]"
+            "DefaultLocation" = "8:[ProgramFilesFolder][Manufacturer]\\[ProductName]"
             "Name" = "8:#1925"
             "AlwaysCreate" = "11:FALSE"
             "Condition" = "8:"
@@ -632,7 +632,7 @@
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:SetupUNS"
         "ProductCode" = "8:{C342EA64-745C-41F0-9695-A93FD4BCECD5}"
-        "PackageCode" = "8:{0D76EFCC-4731-47FD-8384-8F92DC30835D}"
+        "PackageCode" = "8:{035F4338-D0C3-4F34-BC41-4B2960660F22}"
         "UpgradeCode" = "8:{DF75154D-44AE-49C7-B9B1-D21DE9C03FB6}"
         "RestartWWWService" = "11:FALSE"
         "RemovePreviousVersions" = "11:FALSE"
