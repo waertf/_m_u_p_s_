@@ -92,7 +92,6 @@ AppPackages/
 [Bb]in
 [Oo]bj
 sql
-TestResults
 [Tt]est[Rr]esult*
 *.Cache
 ClientBin
@@ -121,3 +120,4 @@ server_syn_console/bin/server_Release - 複製/Server.exe.config
 server_syn_console/bin/server_Release - 複製/Server.pdb
 server_syn_console/obj/Release/Server.exe
 server_syn_console/obj/Release/Server.pdb
+*.aip
