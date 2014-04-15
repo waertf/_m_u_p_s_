@@ -15,25 +15,13 @@
     {
         "Entry"
         {
-        "MsmKey" = "8:_01AB9FAD4A0988770C09CA9F8D13AA11"
+        "MsmKey" = "8:_150FCEFD45011FA8F76907E9957037CC"
         "OwnerKey" = "8:_BE77FBBC3B1844E4AC871717DADAC800"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
-        "MsmKey" = "8:_01AB9FAD4A0988770C09CA9F8D13AA11"
-        "OwnerKey" = "8:_87AFCB8942F7BB4E44392C2074B46832"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_05FFAEAF9FAA60E5AC69D312DCDE2455"
-        "OwnerKey" = "8:_BE77FBBC3B1844E4AC871717DADAC800"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_1F7D9897DCEBF05B817E0B419A6C860E"
+        "MsmKey" = "8:_20F003315DC84AF0CD008AE4974754AB"
         "OwnerKey" = "8:_BE77FBBC3B1844E4AC871717DADAC800"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -45,20 +33,56 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_2C54752B464D836113213423570DBC47"
-        "OwnerKey" = "8:_BE77FBBC3B1844E4AC871717DADAC800"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
         "MsmKey" = "8:_2C971940C50B4662B28DCECB505DFF88"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
-        "MsmKey" = "8:_87AFCB8942F7BB4E44392C2074B46832"
+        "MsmKey" = "8:_35B5B5D2A562496B9DC02A6D81C2659E"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_4619EB01DB766B7E0387EB5F4D659F18"
         "OwnerKey" = "8:_BE77FBBC3B1844E4AC871717DADAC800"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_4619EB01DB766B7E0387EB5F4D659F18"
+        "OwnerKey" = "8:_57DD260B1EB6988E60CC898A9191FD32"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_57DD260B1EB6988E60CC898A9191FD32"
+        "OwnerKey" = "8:_BE77FBBC3B1844E4AC871717DADAC800"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_595B55D387C54A8CB43F6E60A3E59C84"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_67239E9ECD572EA029E02DCC1075AD3E"
+        "OwnerKey" = "8:_BE77FBBC3B1844E4AC871717DADAC800"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_73C97409CDA64A3F8E25CE3F886231BB"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_B3BF9E8AF7244D66AFC4BE81448BFDE2"
+        "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -76,43 +100,43 @@
         "Entry"
         {
         "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_01AB9FAD4A0988770C09CA9F8D13AA11"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_2C971940C50B4662B28DCECB505DFF88"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_UNDEFINED"
         "OwnerKey" = "8:_BE77FBBC3B1844E4AC871717DADAC800"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
         "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_05FFAEAF9FAA60E5AC69D312DCDE2455"
+        "OwnerKey" = "8:_150FCEFD45011FA8F76907E9957037CC"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
         "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_2C54752B464D836113213423570DBC47"
+        "OwnerKey" = "8:_67239E9ECD572EA029E02DCC1075AD3E"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
         "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_1F7D9897DCEBF05B817E0B419A6C860E"
+        "OwnerKey" = "8:_20F003315DC84AF0CD008AE4974754AB"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
         "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_87AFCB8942F7BB4E44392C2074B46832"
+        "OwnerKey" = "8:_57DD260B1EB6988E60CC898A9191FD32"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_UNDEFINED"
+        "OwnerKey" = "8:_4619EB01DB766B7E0387EB5F4D659F18"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_UNDEFINED"
+        "OwnerKey" = "8:_2C971940C50B4662B28DCECB505DFF88"
         "MsmSig" = "8:_UNDEFINED"
         }
     }
@@ -133,6 +157,27 @@
         "PrivateKeyFile" = "8:"
         "TimeStampServer" = "8:"
         "InstallerBootstrapper" = "3:2"
+            "BootstrapperCfg:{63ACBE69-63AA-4F98-B2B6-99F9E24495F2}"
+            {
+            "Enabled" = "11:TRUE"
+            "PromptEnabled" = "11:TRUE"
+            "PrerequisitesLocation" = "2:1"
+            "Url" = "8:"
+            "ComponentsUrl" = "8:"
+                "Items"
+                {
+                    "{EDC2488A-8267-493A-A98E-7D9C3B36CDF3}:Microsoft.Net.Framework.3.5.SP1"
+                    {
+                    "Name" = "8:.NET Framework 3.5 SP1"
+                    "ProductCode" = "8:Microsoft.Net.Framework.3.5.SP1"
+                    }
+                    "{EDC2488A-8267-493A-A98E-7D9C3B36CDF3}:Microsoft.Windows.Installer.3.1"
+                    {
+                    "Name" = "8:Windows Installer 3.1"
+                    "ProductCode" = "8:Microsoft.Windows.Installer.3.1"
+                    }
+                }
+            }
         }
         "Release"
         {
@@ -149,6 +194,27 @@
         "PrivateKeyFile" = "8:"
         "TimeStampServer" = "8:"
         "InstallerBootstrapper" = "3:2"
+            "BootstrapperCfg:{63ACBE69-63AA-4F98-B2B6-99F9E24495F2}"
+            {
+            "Enabled" = "11:TRUE"
+            "PromptEnabled" = "11:TRUE"
+            "PrerequisitesLocation" = "2:1"
+            "Url" = "8:"
+            "ComponentsUrl" = "8:"
+                "Items"
+                {
+                    "{EDC2488A-8267-493A-A98E-7D9C3B36CDF3}:Microsoft.Net.Framework.3.5.SP1"
+                    {
+                    "Name" = "8:.NET Framework 3.5 SP1"
+                    "ProductCode" = "8:Microsoft.Net.Framework.3.5.SP1"
+                    }
+                    "{EDC2488A-8267-493A-A98E-7D9C3B36CDF3}:Microsoft.Windows.Installer.3.1"
+                    {
+                    "Name" = "8:Windows Installer 3.1"
+                    "ProductCode" = "8:Microsoft.Windows.Installer.3.1"
+                    }
+                }
+            }
         }
     }
     "Deployable"
@@ -234,45 +300,14 @@
         }
         "File"
         {
-            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_01AB9FAD4A0988770C09CA9F8D13AA11"
-            {
-            "AssemblyRegister" = "3:1"
-            "AssemblyIsInGAC" = "11:FALSE"
-            "AssemblyAsmDisplayName" = "8:Devart.Data, Version=5.0.857.0, Culture=neutral, PublicKeyToken=09af7300eec23701, processorArchitecture=MSIL"
-                "ScatterAssemblies"
-                {
-                    "_01AB9FAD4A0988770C09CA9F8D13AA11"
-                    {
-                    "Name" = "8:Devart.Data.dll"
-                    "Attributes" = "3:512"
-                    }
-                }
-            "SourcePath" = "8:Devart.Data.dll"
-            "TargetName" = "8:"
-            "Tag" = "8:"
-            "Folder" = "8:_D90F17677968442A92A8C31221DE7423"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:TRUE"
-            "IsolateTo" = "8:"
-            }
-            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_05FFAEAF9FAA60E5AC69D312DCDE2455"
+            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_150FCEFD45011FA8F76907E9957037CC"
             {
             "AssemblyRegister" = "3:1"
             "AssemblyIsInGAC" = "11:FALSE"
             "AssemblyAsmDisplayName" = "8:log4net, Version=1.2.11.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
-                    "_05FFAEAF9FAA60E5AC69D312DCDE2455"
+                    "_150FCEFD45011FA8F76907E9957037CC"
                     {
                     "Name" = "8:log4net.dll"
                     "Attributes" = "3:512"
@@ -296,14 +331,14 @@
             "IsDependency" = "11:TRUE"
             "IsolateTo" = "8:"
             }
-            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_1F7D9897DCEBF05B817E0B419A6C860E"
+            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_20F003315DC84AF0CD008AE4974754AB"
             {
             "AssemblyRegister" = "3:1"
             "AssemblyIsInGAC" = "11:FALSE"
             "AssemblyAsmDisplayName" = "8:Gurock.SmartInspect, Version=3.3.4.102, Culture=neutral, PublicKeyToken=a78b0a9303ab7a7c, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
-                    "_1F7D9897DCEBF05B817E0B419A6C860E"
+                    "_20F003315DC84AF0CD008AE4974754AB"
                     {
                     "Name" = "8:Gurock.SmartInspect.dll"
                     "Attributes" = "3:512"
@@ -347,14 +382,116 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
-            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_2C54752B464D836113213423570DBC47"
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_35B5B5D2A562496B9DC02A6D81C2659E"
+            {
+            "SourcePath" = "8:..\\ConsoleApplication1_client_threading\\bin\\x64\\Release\\StayCheck.sdf"
+            "TargetName" = "8:StayCheck.sdf"
+            "Tag" = "8:"
+            "Folder" = "8:_D90F17677968442A92A8C31221DE7423"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_4619EB01DB766B7E0387EB5F4D659F18"
+            {
+            "AssemblyRegister" = "3:1"
+            "AssemblyIsInGAC" = "11:FALSE"
+            "AssemblyAsmDisplayName" = "8:Devart.Data, Version=5.0.857.0, Culture=neutral, PublicKeyToken=09af7300eec23701, processorArchitecture=MSIL"
+                "ScatterAssemblies"
+                {
+                    "_4619EB01DB766B7E0387EB5F4D659F18"
+                    {
+                    "Name" = "8:Devart.Data.dll"
+                    "Attributes" = "3:512"
+                    }
+                }
+            "SourcePath" = "8:Devart.Data.dll"
+            "TargetName" = "8:"
+            "Tag" = "8:"
+            "Folder" = "8:_D90F17677968442A92A8C31221DE7423"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:TRUE"
+            "IsolateTo" = "8:"
+            }
+            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_57DD260B1EB6988E60CC898A9191FD32"
+            {
+            "AssemblyRegister" = "3:1"
+            "AssemblyIsInGAC" = "11:FALSE"
+            "AssemblyAsmDisplayName" = "8:Devart.Data.PostgreSql, Version=7.2.65.0, Culture=neutral, PublicKeyToken=09af7300eec23701, processorArchitecture=MSIL"
+                "ScatterAssemblies"
+                {
+                    "_57DD260B1EB6988E60CC898A9191FD32"
+                    {
+                    "Name" = "8:Devart.Data.PostgreSql.dll"
+                    "Attributes" = "3:512"
+                    }
+                }
+            "SourcePath" = "8:Devart.Data.PostgreSql.dll"
+            "TargetName" = "8:"
+            "Tag" = "8:"
+            "Folder" = "8:_D90F17677968442A92A8C31221DE7423"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:TRUE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_595B55D387C54A8CB43F6E60A3E59C84"
+            {
+            "SourcePath" = "8:..\\ConsoleApplication1_client_threading\\bin\\x64\\Release\\StayCheck.designer.cs"
+            "TargetName" = "8:StayCheck.designer.cs"
+            "Tag" = "8:"
+            "Folder" = "8:_D90F17677968442A92A8C31221DE7423"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_67239E9ECD572EA029E02DCC1075AD3E"
             {
             "AssemblyRegister" = "3:1"
             "AssemblyIsInGAC" = "11:FALSE"
             "AssemblyAsmDisplayName" = "8:keeplive, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
-                    "_2C54752B464D836113213423570DBC47"
+                    "_67239E9ECD572EA029E02DCC1075AD3E"
                     {
                     "Name" = "8:keeplive.dll"
                     "Attributes" = "3:512"
@@ -378,21 +515,10 @@
             "IsDependency" = "11:TRUE"
             "IsolateTo" = "8:"
             }
-            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_87AFCB8942F7BB4E44392C2074B46832"
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_73C97409CDA64A3F8E25CE3F886231BB"
             {
-            "AssemblyRegister" = "3:1"
-            "AssemblyIsInGAC" = "11:FALSE"
-            "AssemblyAsmDisplayName" = "8:Devart.Data.PostgreSql, Version=7.2.65.0, Culture=neutral, PublicKeyToken=09af7300eec23701, processorArchitecture=MSIL"
-                "ScatterAssemblies"
-                {
-                    "_87AFCB8942F7BB4E44392C2074B46832"
-                    {
-                    "Name" = "8:Devart.Data.PostgreSql.dll"
-                    "Attributes" = "3:512"
-                    }
-                }
-            "SourcePath" = "8:Devart.Data.PostgreSql.dll"
-            "TargetName" = "8:"
+            "SourcePath" = "8:..\\ConsoleApplication1_client_threading\\bin\\x64\\Release\\StayCheck.dbml.layout"
+            "TargetName" = "8:StayCheck.dbml.layout"
             "Tag" = "8:"
             "Folder" = "8:_D90F17677968442A92A8C31221DE7423"
             "Condition" = "8:"
@@ -406,7 +532,27 @@
             "PackageAs" = "3:1"
             "Register" = "3:1"
             "Exclude" = "11:FALSE"
-            "IsDependency" = "11:TRUE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_B3BF9E8AF7244D66AFC4BE81448BFDE2"
+            {
+            "SourcePath" = "8:..\\ConsoleApplication1_client_threading\\bin\\x64\\Release\\StayCheck.dbml"
+            "TargetName" = "8:StayCheck.dbml"
+            "Tag" = "8:"
+            "Folder" = "8:_D90F17677968442A92A8C31221DE7423"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_B3DED233A058493994C4A2AFDC115761"
@@ -486,7 +632,7 @@
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:SetupUNS"
         "ProductCode" = "8:{C342EA64-745C-41F0-9695-A93FD4BCECD5}"
-        "PackageCode" = "8:{7DB82B4C-A175-490A-B207-4A45D200E844}"
+        "PackageCode" = "8:{0D76EFCC-4731-47FD-8384-8F92DC30835D}"
         "UpgradeCode" = "8:{DF75154D-44AE-49C7-B9B1-D21DE9C03FB6}"
         "RestartWWWService" = "11:FALSE"
         "RemovePreviousVersions" = "11:FALSE"
