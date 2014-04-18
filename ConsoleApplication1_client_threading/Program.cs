@@ -3669,6 +3669,23 @@ WHERE
 
 
                                 #endregion
+
+                                #region insert into unsPowerStatusHistory
+                                unsSqlCmd = @"INSERT INTO
+  custom.""unsPowerStatusHistory""(
+  uid,
+  status)
+VALUES(
+  '" + deviceID + @"',
+  'on')";
+                                
+                                while (!sql_client.connect())
+                                {
+                                    Thread.Sleep(300);
+                                }
+                                sql_client.modify(unsSqlCmd);
+                                sql_client.disconnect();
+                                #endregion insert into unsPowerStatusHistory
                                 /*
                                 #region access custom.unsPowerStatusHistory
 
@@ -3749,6 +3766,23 @@ WHERE
                                 //lock (access_uns_deivce_power_status_Lock)
                                 sql_client.modify(unsSqlCmd);
                                 sql_client.disconnect();
+
+                                #region insert into unsPowerStatusHistory
+                                unsSqlCmd = @"INSERT INTO
+  custom.""unsPowerStatusHistory""(
+  uid,
+  status)
+VALUES(
+  '" + deviceID + @"',
+  'off')";
+
+                                while (!sql_client.connect())
+                                {
+                                    Thread.Sleep(300);
+                                }
+                                sql_client.modify(unsSqlCmd);
+                                sql_client.disconnect();
+                                #endregion insert into unsPowerStatusHistory
                                 /*
                                 #region access custom.unsPowerStatusHistory
 
