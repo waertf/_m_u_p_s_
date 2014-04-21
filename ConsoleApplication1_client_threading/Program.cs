@@ -534,9 +534,9 @@ LIMIT 1";
         {
             var exception = e.ExceptionObject as Exception;
             if (exception != null)
-                log.Error(exception.ToString());
-            Environment.Exit(1);
-            //Restart();
+                SiAuto.Main.LogError("crash",exception.ToString());
+            //Environment.Exit(1);
+            Restart();
         }
 
         private static void GCFunction()
