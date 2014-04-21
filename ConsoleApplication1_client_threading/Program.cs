@@ -512,7 +512,7 @@ LIMIT 1";
                 var every30SecondSendUidEqlSixZeroToAvls = new System.Timers.Timer(30 * 1000);
                 every30SecondSendUidEqlSixZeroToAvls.Elapsed +=
                     (sender, e) => { every30SecondSendUidEqlSixZeroToAvls_Elapsed(avlsTcpClient, avlsNetworkStream); };
-                every30SecondSendUidEqlSixZeroToAvls.Enabled = true;
+                //every30SecondSendUidEqlSixZeroToAvls.Enabled = true;
             }
             
             //GC
@@ -1301,6 +1301,7 @@ Select 1-6 then press enter to send package
                 {
                     avlsNetworkStream = avlsTcpClient.GetStream();
                     avls_WriteLine(avlsNetworkStream, System.Text.Encoding.UTF8.GetBytes(avlsSendPackage), avlsSendPackage);
+                    SiAuto.Main.LogMessage(avlsSendPackage);
                 }
                 
             }
@@ -2384,6 +2385,7 @@ LIMIT 1";
                     var sql_client = new SqlClient(ConfigurationManager.AppSettings["SQL_SERVER_IP"], ConfigurationManager.AppSettings["SQL_SERVER_PORT"], ConfigurationManager.AppSettings["SQL_SERVER_USER_ID"], ConfigurationManager.AppSettings["SQL_SERVER_PASSWORD"], ConfigurationManager.AppSettings["SQL_SERVER_DATABASE"], ConfigurationManager.AppSettings["Pooling"], ConfigurationManager.AppSettings["MinPoolSize"], ConfigurationManager.AppSettings["MaxPoolSize"], ConfigurationManager.AppSettings["ConnectionLifetime"]);
                     avlsSendPackage = send_string;
                     avls_WriteLine(netStream, System.Text.Encoding.UTF8.GetBytes(send_string), send_string);
+                    SiAuto.Main.LogMessage(send_string);
                     //avlsSendDone.WaitOne();
 
                     //ReadLine(avls_tcpClient, netStream, send_string.Length);
@@ -2625,6 +2627,7 @@ LIMIT 1";
             send_string = "%%" + avls_package.ID + avls_package.GPS_Valid + avls_package.Date_Time + avls_package.Loc + avls_package.Speed + avls_package.Dir + avls_package.Temp + avls_package.Status + avls_package.Event + avls_package.Message + "\r\n";
             avlsSendPackage = send_string;
             avls_WriteLine(netStream, System.Text.Encoding.UTF8.GetBytes(send_string), send_string);
+            SiAuto.Main.LogMessage(send_string);
             avlsFlag = true;
 
             var deviceChar = deviceID.ToCharArray();
@@ -2656,9 +2659,10 @@ LIMIT 1";
                     if (!string.IsNullOrEmpty(getMessage))
                     {
                         send_string += getMessage + "\r\n";
-                        if (getMessage.Contains("p_prohibited"))
-                            SiAuto.Main.LogMessage(send_string);
+                        //if (getMessage.Contains("p_prohibited"))
+                            //SiAuto.Main.LogMessage(send_string);
                         avls_WriteLine(netStream, System.Text.Encoding.UTF8.GetBytes(send_string), send_string);
+                        SiAuto.Main.LogMessage(send_string);
                     }
 
                     send_string = "%%" + avls_package.ID + avls_package.GPS_Valid + now + avls_package.Loc + avls_package.Speed + avls_package.Dir + avls_package.Temp + avls_package.Status + "0,";
@@ -2669,8 +2673,9 @@ LIMIT 1";
                         {
                             case "in": //stay over time
                                 send_string += @";stay_over_specific_time" + "\r\n";
-                                SiAuto.Main.LogMessage(send_string);
+                                
                                 avls_WriteLine(netStream, System.Text.Encoding.UTF8.GetBytes(send_string), send_string);
+                                SiAuto.Main.LogMessage(send_string);
                                 break;
                         }
 
@@ -3229,6 +3234,7 @@ FROM
                     {
                         avlsNetworkStream = avlsTcpClient.GetStream();
                         avls_WriteLine(avlsNetworkStream, System.Text.Encoding.UTF8.GetBytes(avlsSendPackage), avlsSendPackage);
+                        SiAuto.Main.LogMessage(avlsSendPackage);
                     }
                 }
 
