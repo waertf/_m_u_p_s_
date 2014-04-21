@@ -534,7 +534,7 @@ LIMIT 1";
         {
             var exception = e.ExceptionObject as Exception;
             if (exception != null)
-                SiAuto.Main.LogError("crash",exception.ToString());
+                SiAuto.Main.LogError("Restart",exception.ToString());
             //Environment.Exit(1);
             Restart();
         }
