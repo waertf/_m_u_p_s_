@@ -587,7 +587,7 @@ WHERE
 
         private static void SendToAvlsEventColumnSetNegativeOneIfPowerOff(TcpClient avlsTcpClient,NetworkStream avlsNetworkStream)
         {
-            SiAuto.Main.EnterMethod(Level.Debug, "SendToAvlsEventColumnSetNegativeOneIfPowerOff");
+            //SiAuto.Main.EnterMethod(Level.Debug, "SendToAvlsEventColumnSetNegativeOneIfPowerOff");
             var sqlClient = new SqlClient(ConfigurationManager.AppSettings["SQL_SERVER_IP"], ConfigurationManager.AppSettings["SQL_SERVER_PORT"], ConfigurationManager.AppSettings["SQL_SERVER_USER_ID"], ConfigurationManager.AppSettings["SQL_SERVER_PASSWORD"], ConfigurationManager.AppSettings["SQL_SERVER_DATABASE"], ConfigurationManager.AppSettings["Pooling"], ConfigurationManager.AppSettings["MinPoolSize"], ConfigurationManager.AppSettings["MaxPoolSize"], ConfigurationManager.AppSettings["ConnectionLifetime"]);
             DataTable dt = new DataTable();
             var sqlCmd =@"SELECT 
@@ -679,11 +679,11 @@ WHERE
                     }
                 }
             }*/
-            SiAuto.Main.LeaveMethod(Level.Debug, "SendToAvlsEventColumnSetNegativeOneIfPowerOff");
+            //SiAuto.Main.LeaveMethod(Level.Debug, "SendToAvlsEventColumnSetNegativeOneIfPowerOff");
         }
         private static void SendPackageToAvlsOnlyByUidAndLocGetFromSql(string uid, string eventStatus, TcpClient avlsTcpClient, NetworkStream avlsNetworkStream)
         {
-            SiAuto.Main.EnterMethod(Level.Debug, "SendPackageToAvlsOnlyByUidAndLocGetFromSql");
+            //SiAuto.Main.EnterMethod(Level.Debug, "SendPackageToAvlsOnlyByUidAndLocGetFromSql");
             //TcpClient avls_tcpClient;
             string send_string = string.Empty;
             AVLS_UNIT_Report_Packet avls_package = new AVLS_UNIT_Report_Packet();
@@ -803,7 +803,7 @@ LIMIT 1";
             //}
             avls_package.ID += ",";
             send_string = "%%" + avls_package.ID + avls_package.GPS_Valid + avls_package.Date_Time + avls_package.Loc + avls_package.Speed + avls_package.Dir + avls_package.Temp + avls_package.Status + avls_package.Event + avls_package.Message + "\r\n";
-            SiAuto.Main.LogText(Level.Debug, "send_string", send_string);
+            //SiAuto.Main.LogText(Level.Debug, "send_string", send_string);
             avlsSendPackage = send_string;
             //avlsSendDone.Reset();
             avls_WriteLine(avlsNetworkStream, System.Text.Encoding.UTF8.GetBytes(send_string), send_string);
@@ -812,7 +812,7 @@ LIMIT 1";
             //ReadLine(avls_tcpClient, netStream, send_string.Length);
             //netStream.Close();
             //avls_tcpClient.Close();
-            SiAuto.Main.LeaveMethod(Level.Debug, "SendPackageToAvlsOnlyByUidAndLocGetFromSql");
+            //SiAuto.Main.LeaveMethod(Level.Debug, "SendPackageToAvlsOnlyByUidAndLocGetFromSql");
 
         }
         private static void AutoSend(NetworkStream netStream)
@@ -1355,7 +1355,7 @@ Select 1-6 then press enter to send package
                 }
                 catch (Exception exx)
                 {
-                    SiAuto.Main.LogText(Level.Error, "ReadRecovery",exx.Message);
+                    SiAuto.Main.LogError("ReadRecovery",exx.ToString());
                     log.Error("ReadRecovery"+exx.Message);
                     Console.WriteLine("ReadRecovery" + exx.Message);
                 }
@@ -1399,7 +1399,7 @@ Select 1-6 then press enter to send package
                 catch (Exception exx)
                 {
 
-                    SiAuto.Main.LogText(Level.Error, "ReadRecovery", exx.Message);
+                    SiAuto.Main.LogError("ReadRecovery", exx.ToString());
                     log.Error("ReadRecovery" + exx.Message);
                     Console.WriteLine("ReadRecovery" + exx.Message);
                 }
@@ -1586,7 +1586,7 @@ Select 1-6 then press enter to send package
                 catch (Exception exx)
                 {
 
-                    SiAuto.Main.LogText(Level.Error, "ReadRecovery", exx.Message);
+                    SiAuto.Main.LogError("ReadRecovery", exx.ToString());
                     log.Error("ReadRecovery" + exx.Message);
                     Console.WriteLine("ReadRecovery" + exx.Message);
                 }
@@ -2073,6 +2073,7 @@ Select 1-6 then press enter to send package
             
             Console.WriteLine("::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::");
             //using (StreamWriter w = File.AppendText("log.txt"))
+            /*
             {
                 foreach (DictionaryEntry ht in htable)
                 {
@@ -2084,6 +2085,7 @@ Select 1-6 then press enter to send package
                 }
                 //w.Close();
             }
+            */
             htable.Clear();
             htable = null;
             sensor_name.Clear();
@@ -2648,8 +2650,8 @@ LIMIT 1";
                     //getMessage = GetGidAndFullnameFromP_prohibitedAndPatrol_locationFromSql(prohibitedTableName,
                     //locationTableName,
                     //initialLat, initialLon, deviceID, false);
-                    if (getMessage.Contains("p_prohibited"))
-                        SiAuto.Main.LogMessage(getMessage);
+                    //if (getMessage.Contains("p_prohibited"))
+                        //SiAuto.Main.LogMessage(getMessage);
 
                     if (!string.IsNullOrEmpty(getMessage))
                     {
@@ -2667,6 +2669,7 @@ LIMIT 1";
                         {
                             case "in": //stay over time
                                 send_string += @";stay_over_specific_time" + "\r\n";
+                                SiAuto.Main.LogMessage(send_string);
                                 avls_WriteLine(netStream, System.Text.Encoding.UTF8.GetBytes(send_string), send_string);
                                 break;
                         }
@@ -2858,13 +2861,13 @@ now() <= end_time::timestamp ";
             //List<EAB2> prohibitedEab2s= new List<EAB2>();
             if (dt != null && dt.Rows.Count != 0)
             {
-                SiAuto.Main.AddCheckpoint(Level.Debug,id+"-find data from sql", regSqlCmdForProhibitedTable);
+                //SiAuto.Main.AddCheckpoint(Level.Debug,id+"-find data from sql", regSqlCmdForProhibitedTable);
                 try
                 {
                     CheckIfOverTime getRow = sqlCEdb.CheckIfOverTime.FirstOrDefault(p => p.CreateTime == null && p.Uid == id);
                     if (getRow != null)
                     {
-                        SiAuto.Main.AddCheckpoint(Level.Debug, id+" assign time");
+                        //SiAuto.Main.AddCheckpoint(Level.Debug, id+" assign time");
                         getRow.CreateTime = DateTime.Now;
                         sqlCEdb.SubmitChanges();
                         #region send with prohibite data
@@ -2884,7 +2887,7 @@ now() <= end_time::timestamp ";
                     }
                     else
                     {
-                        SiAuto.Main.AddCheckpoint(Level.Debug, id+" has time");
+                        //SiAuto.Main.AddCheckpoint(Level.Debug, id+" has time");
                         //table:p_config
                         //column:stay_time
                         //unit:min
@@ -2907,16 +2910,16 @@ now() <= end_time::timestamp ";
                                 stayTimeInMin = double .Parse(row[0].ToString());
                             }
                         }
-                        SiAuto.Main.WatchDouble(Level.Debug, "stayTimeInMin", stayTimeInMin);
+                        //SiAuto.Main.WatchDouble(Level.Debug, "stayTimeInMin", stayTimeInMin);
                         DateTime getTime = new DateTime();
                         var dateTime = (from p in sqlCEdb.CheckIfOverTime where p.Uid == id select p.CreateTime).FirstOrDefault();
                         if (dateTime != default(DateTime))
                             getTime = dateTime.Value;
-                        SiAuto.Main.WatchDateTime(Level.Debug, "getTime", getTime);
+                        //SiAuto.Main.WatchDateTime(Level.Debug, "getTime", getTime);
                         int result;
                         result = DateTime.Compare(DateTime.Now, getTime.AddMinutes(stayTimeInMin));
-                        SiAuto.Main.LogText(Level.Debug, id + "-result-" + result,
-                            DateTime.Now + "--" + getTime.AddMinutes(stayTimeInMin));
+                        //SiAuto.Main.LogText(Level.Debug, id + "-result-" + result,
+                            //DateTime.Now + "--" + getTime.AddMinutes(stayTimeInMin));
                         if (isStayTimeEnable)
                         {
                             if (result > 0)
@@ -2976,7 +2979,7 @@ now() <= end_time::timestamp ";
                     CheckIfOverTime getRow = sqlCEdb.CheckIfOverTime.FirstOrDefault(p => p.CreateTime != null && p.Uid == id);
                     if (getRow != null)
                     {
-                        SiAuto.Main.AddCheckpoint(Level.Debug,id+" remove time");
+                        //SiAuto.Main.AddCheckpoint(Level.Debug,id+" remove time");
                         getRow.CreateTime = null;
                         sqlCEdb.SubmitChanges();
 
@@ -2990,7 +2993,7 @@ now() <= end_time::timestamp ";
                             lock (mylock)
                             {
                                 message += ";" + "p_prohibited_out";
-                                SiAuto.Main.LogMessage(message);
+                                //SiAuto.Main.LogMessage(message);
                             }
 
                         }
@@ -3000,7 +3003,7 @@ now() <= end_time::timestamp ";
                 catch (Exception ex)
                 {
 
-                    //SiAuto.Main.LogText(Level.Debug, id + "sqlce excep", ex.ToString());
+                    SiAuto.Main.LogError(id + "sqlce excep 1", ex.ToString());
                 }
                 
             }
@@ -3014,13 +3017,13 @@ now() <= end_time::timestamp ";
             //List<EAB2> locationEab2s = new List<EAB2>();
             if (dt != null && dt.Rows.Count != 0)
             {
-                SiAuto.Main.AddCheckpoint(Level.Debug, id + "-find data from sql", regSqlCmdForLocationTable);
+                //SiAuto.Main.AddCheckpoint(Level.Debug, id + "-find data from sql", regSqlCmdForLocationTable);
                 try
                 {
                     CheckIfOverTime2 getRow = sqlCEdb.CheckIfOverTime2.FirstOrDefault(p => p.CreateTime == null && p.Uid == id);
                     if (getRow != null)
                     {
-                        SiAuto.Main.AddCheckpoint(Level.Debug, id + " assign time");
+                        //SiAuto.Main.AddCheckpoint(Level.Debug, id + " assign time");
                         getRow.CreateTime = DateTime.Now;
                         sqlCEdb.SubmitChanges();
                         #region send with location data
@@ -3037,7 +3040,7 @@ now() <= end_time::timestamp ";
                     }
                     else
                     {
-                        SiAuto.Main.AddCheckpoint(Level.Debug, id + " has time");
+                        //SiAuto.Main.AddCheckpoint(Level.Debug, id + " has time");
                         //table:p_config
                         //column:stay_time
                         //unit:min
@@ -3061,16 +3064,16 @@ now() <= end_time::timestamp ";
                                 stayTimeInMin = double.Parse(row[0].ToString());
                             }
                         }
-                        SiAuto.Main.WatchDouble(Level.Debug, "stayTimeInMin", stayTimeInMin);
+                        //SiAuto.Main.WatchDouble(Level.Debug, "stayTimeInMin", stayTimeInMin);
                         DateTime getTime = new DateTime();
                         var dateTime = (from p in sqlCEdb.CheckIfOverTime2 where p.Uid == id select p.CreateTime).FirstOrDefault();
                         if (dateTime != default(DateTime))
                             getTime = dateTime.Value;
-                        SiAuto.Main.WatchDateTime(Level.Debug, "getTime", getTime);
+                        //SiAuto.Main.WatchDateTime(Level.Debug, "getTime", getTime);
                         int result;
                         result = DateTime.Compare(DateTime.Now, getTime.AddMinutes(stayTimeInMin));
-                        SiAuto.Main.LogText(Level.Debug, id + "-result-" + result,
-                            DateTime.Now + "--" + getTime.AddMinutes(stayTimeInMin));
+                        //SiAuto.Main.LogText(Level.Debug, id + "-result-" + result,
+                            //DateTime.Now + "--" + getTime.AddMinutes(stayTimeInMin));
                         if (isStayTimeEnable)
                         {
                             if (result > 0)
@@ -3110,7 +3113,7 @@ now() <= end_time::timestamp ";
                 catch (Exception ex)
                 {
 
-                    SiAuto.Main.LogText(Level.Debug, id + ":sqlCEException", ex.ToString() );
+                    SiAuto.Main.LogError(id + ":sqlce excep 3", ex.ToString() );
                 }
                 
             }
@@ -3121,7 +3124,7 @@ now() <= end_time::timestamp ";
                     CheckIfOverTime2 getRow = sqlCEdb.CheckIfOverTime2.FirstOrDefault(p => p.CreateTime != null && p.Uid == id);
                     if (getRow != null)
                     {
-                        SiAuto.Main.AddCheckpoint(Level.Debug, id + " remove time");
+                        //SiAuto.Main.AddCheckpoint(Level.Debug, id + " remove time");
                         getRow.CreateTime = null;
                         sqlCEdb.SubmitChanges();
 
@@ -3141,14 +3144,14 @@ now() <= end_time::timestamp ";
                 catch (Exception ex)
                 {
 
-                    //SiAuto.Main.LogText(Level.Debug, id + "sqlce excep", ex.ToString() );
+                    SiAuto.Main.LogError(id + "sqlce excep 2", ex.ToString() );
                 }
                 
             }
             
             sql_client.Dispose();
-            if (message.Contains("p_prohibited"))
-                SiAuto.Main.LogMessage(message);
+            //if (message.Contains("p_prohibited"))
+                //SiAuto.Main.LogMessage(message);
             return message;
         }
 
