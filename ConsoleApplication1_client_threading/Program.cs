@@ -309,7 +309,7 @@ LIMIT 1";
         {
             Console.WriteLine(AppDomain.CurrentDomain.BaseDirectory + "Client.exe");
             Thread.Sleep(5000);
-            //AppDomain.CurrentDomain.UnhandledException += new UnhandledExceptionEventHandler(CurrentDomain_UnhandledException);
+            AppDomain.CurrentDomain.UnhandledException += new UnhandledExceptionEventHandler(CurrentDomain_UnhandledException);
             string StartupPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
             string datalogicFilePath = Path.Combine(StartupPath, "StayCheck.sdf");
             string connString = string.Format("Data Source={0}", datalogicFilePath);
@@ -534,8 +534,9 @@ LIMIT 1";
         {
             var exception = e.ExceptionObject as Exception;
             if (exception != null)
-                log.Error("call restart:"+exception.ToString());
-            Restart();
+                log.Error(exception.ToString());
+            Environment.Exit(1);
+            //Restart();
         }
 
         private static void GCFunction()
