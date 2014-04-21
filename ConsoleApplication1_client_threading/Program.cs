@@ -208,8 +208,8 @@ each set of the byte. To display a four-byte string, there will be 8 digits stri
                 //unsTcpClient.GetStream().Close();
                 //unsTcpClient.Close();
                 Console.WriteLine(ex);
-                Console.WriteLine(System.Reflection.MethodBase.GetCurrentMethod().Name +"_errorline:" + ex.LineNumber());
-                log.Error(System.Reflection.MethodBase.GetCurrentMethod().Name + "_errorline:" + ex.LineNumber());
+                //Console.WriteLine(System.Reflection.MethodBase.GetCurrentMethod().Name +"_errorline:" + ex.LineNumber());
+                //log.Error(System.Reflection.MethodBase.GetCurrentMethod().Name + "_errorline:" + ex.LineNumber());
                 log.Error(ex);
                 if(unsNetworkStream!=null)
                     unsNetworkStream.Close();
@@ -245,8 +245,8 @@ each set of the byte. To display a four-byte string, there will be 8 digits stri
                 //unsTcpClient.GetStream().Close();
                 //unsTcpClient.Close();
                 Console.WriteLine(ex);
-                Console.WriteLine(System.Reflection.MethodBase.GetCurrentMethod().Name + "_errorline:" + ex.LineNumber());
-                log.Error(System.Reflection.MethodBase.GetCurrentMethod().Name + "_errorline:" + ex.LineNumber());
+                //Console.WriteLine(System.Reflection.MethodBase.GetCurrentMethod().Name + "_errorline:" + ex.LineNumber());
+                //log.Error(System.Reflection.MethodBase.GetCurrentMethod().Name + "_errorline:" + ex.LineNumber());
                 log.Error(ex);
                 if(avlsNetworkStream!=null)
                     avlsNetworkStream.Close();
@@ -307,13 +307,13 @@ LIMIT 1";
 
         static void Main(string[] args)
         {
-            Console.WriteLine(AppDomain.CurrentDomain.BaseDirectory + "Client.exe");
+            //Console.WriteLine(AppDomain.CurrentDomain.BaseDirectory + "Client.exe");
             Thread.Sleep(5000);
             AppDomain.CurrentDomain.UnhandledException += new UnhandledExceptionEventHandler(CurrentDomain_UnhandledException);
             string StartupPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
             string datalogicFilePath = Path.Combine(StartupPath, "StayCheck.sdf");
             string connString = string.Format("Data Source={0}", datalogicFilePath);
-            Console.WriteLine(connString);
+            //Console.WriteLine(connString);
 
             /*
             //string connString = "Data Source = 'StayCheck.sdf'";
@@ -357,12 +357,12 @@ LIMIT 1";
             //SiAuto.Main.LogText(Level.Debug,"test","hahaha");
             
             
-            Console.WriteLine(GetLocalIPAddress());//current ip address
-            Console.WriteLine(System.Environment.UserName);//current username
-            Console.WriteLine(string.Format("{0:yyMMddHHmmss}", DateTime.Now));
-            Console.WriteLine(DateTime.Now.ToString("yyyyMMdd HHmmss+8"));
-            Console.WriteLine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location));
-            test();
+            //Console.WriteLine(GetLocalIPAddress());//current ip address
+            //Console.WriteLine(System.Environment.UserName);//current username
+            //Console.WriteLine(string.Format("{0:yyMMddHHmmss}", DateTime.Now));
+            //Console.WriteLine(DateTime.Now.ToString("yyyyMMdd HHmmss+8"));
+            //Console.WriteLine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location));
+            //test();
             unsTcpClient = new TcpClient();
             
             avlsTcpClient = new TcpClient();
@@ -1208,8 +1208,8 @@ Select 1-6 then press enter to send package
                 catch (Exception ex)
                 {
                     Console.WriteLine("WriteLineError:\r\n" + ex);
-                    Console.WriteLine(System.Reflection.MethodBase.GetCurrentMethod().Name + "_errorline:" + ex.LineNumber());
-                    log.Error(System.Reflection.MethodBase.GetCurrentMethod().Name + "_errorline:" + ex.LineNumber());
+                    //Console.WriteLine(System.Reflection.MethodBase.GetCurrentMethod().Name + "_errorline:" + ex.LineNumber());
+                    //log.Error(System.Reflection.MethodBase.GetCurrentMethod().Name + "_errorline:" + ex.LineNumber());
                     log.Error("WriteLineError:\r\n" + ex);
 
                     if (unsTcpClient != null)
@@ -1248,8 +1248,8 @@ Select 1-6 then press enter to send package
             {
 
                 Console.WriteLine("UnsTcpWriteCallBack:\r\n" + ex);
-                Console.WriteLine(System.Reflection.MethodBase.GetCurrentMethod().Name + "_errorline:" + ex.LineNumber());
-                log.Error(System.Reflection.MethodBase.GetCurrentMethod().Name + "_errorline:" + ex.LineNumber());
+                //Console.WriteLine(System.Reflection.MethodBase.GetCurrentMethod().Name + "_errorline:" + ex.LineNumber());
+                //log.Error(System.Reflection.MethodBase.GetCurrentMethod().Name + "_errorline:" + ex.LineNumber());
                 log.Error("UnsTcpWriteCallBack:\r\n" + ex);
 
                 if (unsTcpClient != null)
@@ -1285,8 +1285,8 @@ Select 1-6 then press enter to send package
             {
 
                 Console.WriteLine("avls_myWriteCallBack:\r\n" + ex);
-                Console.WriteLine(System.Reflection.MethodBase.GetCurrentMethod().Name + "_errorline:" + ex.LineNumber());
-                log.Error(System.Reflection.MethodBase.GetCurrentMethod().Name + "_errorline:" + ex.LineNumber());
+                //Console.WriteLine(System.Reflection.MethodBase.GetCurrentMethod().Name + "_errorline:" + ex.LineNumber());
+                //log.Error(System.Reflection.MethodBase.GetCurrentMethod().Name + "_errorline:" + ex.LineNumber());
                 log.Error("avls_myWriteCallBack:\r\n" + ex);
                 if (avlsNetworkStream != null)
                     avlsNetworkStream.Close();
@@ -1346,8 +1346,8 @@ Select 1-6 then press enter to send package
             catch (Exception ex)
             {
                 Console.WriteLine("ReadLineError:\r\n" + ex);
-                Console.WriteLine(System.Reflection.MethodBase.GetCurrentMethod().Name + "_errorline:" + ex.LineNumber());
-                log.Error(System.Reflection.MethodBase.GetCurrentMethod().Name + "_errorline:" + ex.LineNumber());
+                //Console.WriteLine(System.Reflection.MethodBase.GetCurrentMethod().Name + "_errorline:" + ex.LineNumber());
+                //log.Error(System.Reflection.MethodBase.GetCurrentMethod().Name + "_errorline:" + ex.LineNumber());
                 log.Error("ReadLineError:\r\n" + ex);
                 try
                 {
@@ -1389,8 +1389,8 @@ Select 1-6 then press enter to send package
             catch (Exception ex)
             {
                 Console.WriteLine("myReadSizeCallBackError:"+Environment.NewLine+ex);
-                Console.WriteLine(System.Reflection.MethodBase.GetCurrentMethod().Name + "_errorline:" + ex.LineNumber());
-                log.Error(System.Reflection.MethodBase.GetCurrentMethod().Name + "_errorline:" + ex.LineNumber());
+                //Console.WriteLine(System.Reflection.MethodBase.GetCurrentMethod().Name + "_errorline:" + ex.LineNumber());
+                //log.Error(System.Reflection.MethodBase.GetCurrentMethod().Name + "_errorline:" + ex.LineNumber());
                 log.Error("myReadSizeCallBackError:" + Environment.NewLine + ex);
                 try
                 {
@@ -1515,7 +1515,7 @@ Select 1-6 then press enter to send package
                 string output = String.Format("Read: Length: {0}, Data: {1}", returndata.Length, returndata);
                 //XDocument xml_data = XDocument.Parse(returndata);
                 //string xml_root_tag = xml_data.Root.Name.ToString();
-                Console.WriteLine();
+                //Console.WriteLine();
                 string ouput2 = string.Empty;
                 try
                 {
@@ -1576,8 +1576,8 @@ Select 1-6 then press enter to send package
             catch (Exception ex)
             {
                 Console.WriteLine("FinishReadError:\r\n" + ex);
-                Console.WriteLine(System.Reflection.MethodBase.GetCurrentMethod().Name + "_errorline:" + ex.LineNumber());
-                log.Error(System.Reflection.MethodBase.GetCurrentMethod().Name + "_errorline:" + ex.LineNumber());
+                //Console.WriteLine(System.Reflection.MethodBase.GetCurrentMethod().Name + "_errorline:" + ex.LineNumber());
+                //log.Error(System.Reflection.MethodBase.GetCurrentMethod().Name + "_errorline:" + ex.LineNumber());
                 log.Error("FinishReadError:\r\n" + ex);
                 try
                 {
@@ -1713,7 +1713,7 @@ Select 1-6 then press enter to send package
                             else
                             {
                                 htable.Add("suaddr", id);
-                                Console.WriteLine("suaddr:{0}", htable["suaddr"]);
+                                //Console.WriteLine("suaddr:{0}", htable["suaddr"]);
                             }
                             
                             
@@ -1727,7 +1727,7 @@ Select 1-6 then press enter to send package
                         if (elements.Contains(new XElement("event-info").Name) && xml_root_tag == "Unsolicited-Location-Report")
                         {
                             htable.Add("event_info", XmlGetTagValue(xml_data, "event-info"));
-                            Console.WriteLine("event_info:{0}", htable["event_info"]);
+                            //Console.WriteLine("event_info:{0}", htable["event_info"]);
                         }
                         if (elements.Contains(new XElement("operation-error").Name))
                         {
@@ -1740,8 +1740,8 @@ Select 1-6 then press enter to send package
                                  //Restart();
                                  Environment.Exit(1);
                              }
-                             Console.WriteLine("result_code:{0}", htable["result_code"]);
-                             Console.WriteLine("result_msg:{0}", htable["result_msg"]);
+                             //Console.WriteLine("result_code:{0}", htable["result_code"]);
+                             //Console.WriteLine("result_msg:{0}", htable["result_msg"]);
                         }
                         if (elements.Contains(new XElement("info-data").Name))
                         {
@@ -1818,6 +1818,7 @@ Select 1-6 then press enter to send package
                                 sensor_value = (from e in de.Descendants("sensor-value") select (string)e).Cast<string>().ToList();
                                 sensor_type = (from e in de.Descendants("sensor-type") select (string)e).Cast<string>().ToList();
                                 int i = 0;
+                                /*
                                 foreach (string e in sensor_name)
                                 {
                                     Console.WriteLine("sensor_name"+ i++ +":{0}", e);
@@ -1832,6 +1833,7 @@ Select 1-6 then press enter to send package
                                 {
                                     Console.WriteLine("sensor_type" + i++ + ":{0}", e);
                                 }
+                                */
                             }
                             if (elements.Contains(new XElement("vehicle-info").Name))//Vehicle Info
                             {
@@ -1863,7 +1865,7 @@ Select 1-6 then press enter to send package
                             Thread access_sql = new Thread(() => access_sql_server(xml_root_tag, new Hashtable(htable), sensor_name.ToList(), sensor_type.ToList(), sensor_value.ToList(), XmlGetAllElementsXname(xml_data), logData, getMessage));
                             access_sql.Start();
                             //access_sql.Join();
-                            Console.WriteLine("SQL Access Enable");
+                            //Console.WriteLine("SQL Access Enable");
                             //sqlAccessEvent.WaitOne();
                         }
 
@@ -1874,7 +1876,7 @@ Select 1-6 then press enter to send package
                             access_avls.Priority = ThreadPriority.BelowNormal;
                             access_avls.Start();
                             //access_avls.Join();
-                            Console.WriteLine("AVLS Access Enable");
+                            //Console.WriteLine("AVLS Access Enable");
                             //avlsSendDone.WaitOne();
                         }
 
@@ -1999,7 +2001,7 @@ Select 1-6 then press enter to send package
                             else
                             {
                                 htable.Add("suaddr", id);
-                                Console.WriteLine("suaddr:{0}", htable["suaddr"]);
+                                //Console.WriteLine("suaddr:{0}", htable["suaddr"]);
                             }
 
                             
@@ -2047,7 +2049,7 @@ Select 1-6 then press enter to send package
                             else
                             {
                                 htable.Add("suaddr", id);
-                                Console.WriteLine("suaddr:{0}", htable["suaddr"]);
+                                //Console.WriteLine("suaddr:{0}", htable["suaddr"]);
                             }
                             if (CheckIfUidExist(htable["suaddr"].ToString()))
                             { }
@@ -2179,7 +2181,7 @@ WHERE
         */
         private static void access_avls_server(string xml_root_tag, Hashtable htable, List<string> sensor_name, List<string> sensor_type, List<string> sensor_value, IEnumerable<XName> iEnumerable, string log, TcpClient avlsTcpClient, string getMessage)
         {
-            Console.WriteLine("+access_avls_server");
+            //Console.WriteLine("+access_avls_server");
             Thread.CurrentThread.CurrentUICulture = new CultureInfo("en-us");
             string send_string = string.Empty;
             string initialLat = string.Empty, initialLon = string.Empty;
@@ -2391,7 +2393,7 @@ LIMIT 1";
                     //ReadLine(avls_tcpClient, netStream, send_string.Length);
                     //netStream.Close();
                     //avlsTcpClient.Close();
-                    Console.WriteLine("-access_avls_server");
+                    //Console.WriteLine("-access_avls_server");
                     return;
                 }
                 else
@@ -2429,10 +2431,10 @@ LIMIT 1";
                     avls_package.GPS_Valid = "A,";
                 if (htable.ContainsKey("info_time"))
                 {
-                    Console.WriteLine(@"+if (htable.ContainsKey(""info_time""))");
-                    Console.WriteLine(htable["info_time"].ToString());
+                    //Console.WriteLine(@"+if (htable.ContainsKey(""info_time""))");
+                    //Console.WriteLine(htable["info_time"].ToString());
                     avls_package.Date_Time = htable["info_time"].ToString().Substring(2) + ",";
-                    Console.WriteLine(@"-if (htable.ContainsKey(""info_time""))");
+                    //Console.WriteLine(@"-if (htable.ContainsKey(""info_time""))");
                 }
                 else
                 {
@@ -2781,7 +2783,7 @@ LIMIT 1";
             //avlsTcpClient.Close();
             htable.Clear();
             htable = null;
-            Console.WriteLine("-access_avls_server");
+            //Console.WriteLine("-access_avls_server");
         }
 
         private static string GetGidAndFullnameFromP_prohibitedAndPatrol_locationFromSql(string prohibitedTableName, string locationTableName, string initialLat, string initialLon,string id,bool isStayTimeEnable,string deviceID)
@@ -3217,8 +3219,8 @@ FROM
                 catch (Exception ex)
                 {
                     Console.WriteLine("avls_WriteLineError:\r\n" + ex);
-                    Console.WriteLine(System.Reflection.MethodBase.GetCurrentMethod().Name + "_errorline:" + ex.LineNumber());
-                    log.Error(System.Reflection.MethodBase.GetCurrentMethod().Name + "_errorline:" + ex.LineNumber());
+                    //Console.WriteLine(System.Reflection.MethodBase.GetCurrentMethod().Name + "_errorline:" + ex.LineNumber());
+                    //log.Error(System.Reflection.MethodBase.GetCurrentMethod().Name + "_errorline:" + ex.LineNumber());
                     log.Error("avls_WriteLineError:\r\n" + ex);
 
                     if (avlsNetworkStream != null)
@@ -4394,9 +4396,9 @@ LIMIT 1";
                 catch (Exception ex)
                 {
                     Console.WriteLine("access_sql_serverError:" + Environment.NewLine + ex);
-                    Console.WriteLine(System.Reflection.MethodBase.GetCurrentMethod().Name + "_errorline:" +
-                                      ex.LineNumber());
-                    log.Error(System.Reflection.MethodBase.GetCurrentMethod().Name + "_errorline:" + ex.LineNumber());
+                    //Console.WriteLine(System.Reflection.MethodBase.GetCurrentMethod().Name + "_errorline:" +
+                                      //ex.LineNumber());
+                    //log.Error(System.Reflection.MethodBase.GetCurrentMethod().Name + "_errorline:" + ex.LineNumber());
                     log.Error("access_sql_serverError:" + Environment.NewLine + ex);
                 }
                 finally
@@ -4816,8 +4818,8 @@ public._gps_log._uid = '"+deviceID+@"'
             catch (Exception ex)
             {
                 Console.WriteLine("XmlGetTagAttributeValue:"+tag_name + ":" + tag_attribute_name+":"+ex);
-                Console.WriteLine(System.Reflection.MethodBase.GetCurrentMethod().Name + "_errorline:" + ex.LineNumber());
-                log.Error(System.Reflection.MethodBase.GetCurrentMethod().Name + "_errorline:" + ex.LineNumber());
+                //Console.WriteLine(System.Reflection.MethodBase.GetCurrentMethod().Name + "_errorline:" + ex.LineNumber());
+                log.Error("XmlGetTagAttributeValue:" + tag_name + ":" + tag_attribute_name + ":" + ex);
                 result = "";
             }
 
@@ -4834,8 +4836,8 @@ public._gps_log._uid = '"+deviceID+@"'
             catch (Exception ex)
             {
                 Console.WriteLine("XmlGetTagValue:"+tag_name+":"+ex);
-                Console.WriteLine(System.Reflection.MethodBase.GetCurrentMethod().Name + "_errorline:" + ex.LineNumber());
-                log.Error(System.Reflection.MethodBase.GetCurrentMethod().Name + "_errorline:" + ex.LineNumber());
+                //Console.WriteLine(System.Reflection.MethodBase.GetCurrentMethod().Name + "_errorline:" + ex.LineNumber());
+                //log.Error(System.Reflection.MethodBase.GetCurrentMethod().Name + "_errorline:" + ex.LineNumber());
                 log.Error("XmlGetTagValue:" + tag_name + ":" + ex);
                 result = "";
             }
@@ -4859,8 +4861,8 @@ public._gps_log._uid = '"+deviceID+@"'
             catch (Exception ex)
             {
                 Console.WriteLine("XmlGetFirstChildTagName:"+parent_tag_name+":"+ex);
-                Console.WriteLine(System.Reflection.MethodBase.GetCurrentMethod().Name + "_errorline:" + ex.LineNumber());
-                log.Error(System.Reflection.MethodBase.GetCurrentMethod().Name + "_errorline:" + ex.LineNumber());
+                //Console.WriteLine(System.Reflection.MethodBase.GetCurrentMethod().Name + "_errorline:" + ex.LineNumber());
+                //log.Error(System.Reflection.MethodBase.GetCurrentMethod().Name + "_errorline:" + ex.LineNumber());
                 log.Error("XmlGetFirstChildTagName:" + parent_tag_name + ":" + ex);
                 result = "";
             }
@@ -4874,11 +4876,11 @@ public._gps_log._uid = '"+deviceID+@"'
         }
         static int GetLittleEndianIntegerFromByteArray(byte[] data, int startIndex)
         {
-            Console.WriteLine("+GetLittleEndianIntegerFromByteArray");
-            Console.WriteLine("date="+data);
-            Console.WriteLine("date.length=" + data.Length);
-            Console.WriteLine("startIndex=" + startIndex);
-            Console.WriteLine("-GetLittleEndianIntegerFromByteArray");
+            //Console.WriteLine("+GetLittleEndianIntegerFromByteArray");
+            //Console.WriteLine("date="+data);
+            //Console.WriteLine("date.length=" + data.Length);
+            //Console.WriteLine("startIndex=" + startIndex);
+            //Console.WriteLine("-GetLittleEndianIntegerFromByteArray");
             return (data[startIndex])
                  | (data[startIndex + 1] << 8);
             //| (data[startIndex + 2] << 8)
@@ -4964,12 +4966,12 @@ public._gps_log._uid = '"+deviceID+@"'
             // Check whether the document is valid or invalid.
             if (isValid)
             {
-                Console.WriteLine("Document is valid");
+                //Console.WriteLine("Document is valid");
                 return true;
             }
             else
             {
-                Console.WriteLine("Document is invalid");
+                //Console.WriteLine("Document is invalid");
                 return false;
             }
         }
@@ -4977,7 +4979,7 @@ public._gps_log._uid = '"+deviceID+@"'
         private static void ValidationCallBack(object sender, ValidationEventArgs e)
         {
             isValid = false;
-            Console.WriteLine("Validation Error: {0}", e.Message);
+            Console.WriteLine("Validation Error: {0}", e.ToString());
         }
 
         private static IPAddress GetLocalIPAddress()
