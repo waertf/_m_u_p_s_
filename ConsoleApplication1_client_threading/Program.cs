@@ -4433,9 +4433,7 @@ LIMIT 1";
             {
                 Thread.Sleep(300);
             }
-            double cgaEventLogIdCount =
-                Convert.ToDouble(
-                    sql_client.get_DataTable("SELECT COUNT(uid)   FROM custom.cga_event_log WHERE uid = '"+deviceID+"\'").Rows[0].ItemArray[0]);
+                double cgaEventLogIdCount = 0;
             sql_client.disconnect();
             string yyyymmddhhmmss = DateTime.Now.ToString("yyyyMMddHHmmss");
 
@@ -4446,7 +4444,7 @@ LIMIT 1";
             locationTableName = "public.patrol_location";
             //string getMessage = string.Empty,bundaryEventNumber = string.Empty;
                 string bundaryEventNumber = string.Empty;
-            lock (getGidAndFullnameLock)
+                lock (cgaEventAccessSqlLock)
             {
 
                 /* 
@@ -4496,6 +4494,9 @@ LIMIT 1";
                     {
                         Thread.Sleep(300);
                     }
+                    cgaEventLogIdCount =
+                Convert.ToDouble(
+                    sql_client.get_DataTable("SELECT COUNT(uid)   FROM custom.cga_event_log WHERE uid = '" + deviceID + "\'").Rows[0].ItemArray[0]);
                     string sn = "\'" + deviceID + now + cgaEventLogIdCount.ToString("000000000000") + "\'";
                     string table_columns =
                         "serial_no ,uid ,type ,lat ,lon,altitude ,speed ,course ,radius ,info_time ,server_time ,create_user ,create_ip,start_time,create_time";
@@ -4596,7 +4597,7 @@ LIMIT 1";
                 */
             #endregion access GetGidAndFullnameFromP_prohibitedAndPatrol_locationFromSql
 
-                lock (getGidAndFullnameLock)
+                lock (cgaEventAccessSqlLock)
                 {
                     #region checkIfOverTime
                     //event:5->stay over specific time within 0.1 km
