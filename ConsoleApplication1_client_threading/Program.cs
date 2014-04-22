@@ -2075,7 +2075,7 @@ Select 1-6 then press enter to send package
                     break;
             }
             
-            Console.WriteLine("::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::");
+            //Console.WriteLine("::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::");
             //using (StreamWriter w = File.AppendText("log.txt"))
             /*
             {
@@ -2099,7 +2099,7 @@ Select 1-6 then press enter to send package
             sensor_type.Clear();
             sensor_type = null;
             
-            Console.WriteLine("::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::");
+            Console.WriteLine();
         }
 
         private static void Restart()
