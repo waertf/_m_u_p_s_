@@ -1862,8 +1862,8 @@ Select 1-6 then press enter to send package
                         if (bool.Parse(ConfigurationManager.AppSettings["SQL_ACCESS"]))
                         {
                             //sqlAccessEvent.Reset();
-                            Thread access_sql = new Thread(() => access_sql_server(xml_root_tag, new Hashtable(htable), sensor_name.ToList(), sensor_type.ToList(), sensor_value.ToList(), XmlGetAllElementsXname(xml_data), logData, getMessage));
-                            access_sql.Start();
+                            Thread access_sql = new Thread(access_sql_server);
+                            access_sql.Start(new SqlClass(xml_root_tag, htable, sensor_name.ToList(), sensor_type.ToList(), sensor_value.ToList(), XmlGetAllElementsXname(xml_data), logData, getMessage));
                             //access_sql.Join();
                             //Console.WriteLine("SQL Access Enable");
                             //sqlAccessEvent.WaitOne();
@@ -1872,9 +1872,9 @@ Select 1-6 then press enter to send package
                         if (bool.Parse(ConfigurationManager.AppSettings["AVLS_ACCESS"]))
                         {
                             //avlsSendDone.Reset();
-                            Thread access_avls = new Thread(() => access_avls_server(xml_root_tag, new Hashtable(htable), sensor_name.ToList(), sensor_type.ToList(), sensor_value.ToList(), XmlGetAllElementsXname(xml_data), logData, avlsTcpClient, getMessage));
+                            Thread access_avls = new Thread(access_avls_server);
                             access_avls.Priority = ThreadPriority.BelowNormal;
-                            access_avls.Start();
+                            access_avls.Start(new AvlsClass(xml_root_tag, htable, sensor_name.ToList(), sensor_type.ToList(), sensor_value.ToList(), XmlGetAllElementsXname(xml_data), logData, getMessage));
                             //access_avls.Join();
                             //Console.WriteLine("AVLS Access Enable");
                             //avlsSendDone.WaitOne();
@@ -1979,8 +1979,9 @@ Select 1-6 then press enter to send package
                     }
                     if (bool.Parse(ConfigurationManager.AppSettings["SQL_ACCESS"]))
                     {
-                        Thread access_sql = new Thread(() => access_sql_server(xml_root_tag, new Hashtable(htable), sensor_name.ToList(), sensor_type.ToList(), sensor_value.ToList(), XmlGetAllElementsXname(xml_data), logData, null));
-                        access_sql.Start();
+                        Thread access_sql = new Thread(access_sql_server);
+                        access_sql.Start(new SqlClass(xml_root_tag, htable, sensor_name.ToList(), sensor_type.ToList(), sensor_value.ToList(), XmlGetAllElementsXname(xml_data), logData, null));
+                            
                         //access_sql.Join();
                     }
                     break;
@@ -2179,8 +2180,18 @@ WHERE
          * event:x.5->x stay over specific time
          * event:5->stay over specific time within 0.1 km
         */
-        private static void access_avls_server(string xml_root_tag, Hashtable htable, List<string> sensor_name, List<string> sensor_type, List<string> sensor_value, IEnumerable<XName> iEnumerable, string log, TcpClient avlsTcpClient, string getMessage)
+        private static void access_avls_server(object o)
         {
+            var oo = o as AvlsClass;
+
+            string xml_root_tag = oo.XmlRootTag;
+            Hashtable htable = oo.Htable;
+            List<string> sensor_name = oo.SensorName;
+            List<string> sensor_type = oo.SensorType;
+            List<string> sensor_value = oo.SensorValue;
+            IEnumerable<XName> iEnumerable = oo.Elements;
+            string log = oo.Log;
+            string getMessage = oo.GetMessage;
             //Console.WriteLine("+access_avls_server");
             Thread.CurrentThread.CurrentUICulture = new CultureInfo("en-us");
             string send_string = string.Empty;
@@ -3304,12 +3315,21 @@ FROM
             MV,TK,EM,PE,UL
         }
 
-        private static void access_sql_server(string xml_root_tag, Hashtable htable, List<string> sensor_name,
-            List<string> sensor_type, List<string> sensor_value, IEnumerable<XName> elements, string log1, string getMessage)
+        private static void access_sql_server(object o)
         {
             
             {
             //Console.WriteLine("+access_sql_server");
+                var oo = o as SqlClass;
+
+                string xml_root_tag = oo.XmlRootTag;
+                Hashtable htable = oo.Htable;
+                List<string> sensor_name = oo.SensorName;
+                List<string> sensor_type = oo.SensorType;
+                List<string> sensor_value = oo.SensorValue;
+                IEnumerable<XName> elements = oo.Elements;
+                string log1 = oo.Log1;
+                string getMessage = oo.GetMessage;
             Thread.CurrentThread.CurrentUICulture = new CultureInfo("en-us");
             SqlClient sql_client = new SqlClient(ConfigurationManager.AppSettings["SQL_SERVER_IP"],
                 ConfigurationManager.AppSettings["SQL_SERVER_PORT"],
@@ -5009,7 +5029,66 @@ public._gps_log._uid = '"+deviceID+@"'
             return null;
         }
     }
+    /*
+     * private static void access_sql_server(string xml_root_tag, Hashtable htable, List<string> sensor_name,
+            List<string> sensor_type, List<string> sensor_value, IEnumerable<XName> elements, string log1, string getMessage)
+     */
+    public class SqlClass
+    {
+        public string XmlRootTag;
+        public Hashtable Htable;
+        public List<string> SensorName;
+        public List<string> SensorType;
+        public List<string> SensorValue;
+        public IEnumerable<XName> Elements;
+        public string Log1;
+        public string GetMessage;
 
+        public SqlClass(string xml_root_tag, Hashtable htable, List<string> sensor_name,
+            List<string> sensor_type, List<string> sensor_value, IEnumerable<XName> elements, string log1,
+            string getMessage)
+        {
+            XmlRootTag = xml_root_tag;
+            Htable = new Hashtable(htable);
+            SensorName = new List<string>(sensor_name);
+            SensorType = new List<string>(sensor_type);
+            SensorValue = new List<string>(sensor_value);
+            Elements = elements;
+            Log1 = log1;
+            GetMessage = getMessage;
+        }
+    }
+    /*
+     * private static void access_avls_server(string xml_root_tag, Hashtable htable, List<string> sensor_name,
+            List<string> sensor_type, List<string> sensor_value, IEnumerable<XName> iEnumerable, string log, 
+            TcpClient avlsTcpClient, string getMessage)
+     */
+
+    public class AvlsClass
+    {
+        public string XmlRootTag;
+        public Hashtable Htable;
+        public List<string> SensorName;
+        public List<string> SensorType;
+        public List<string> SensorValue;
+        public IEnumerable<XName> Elements;
+        public string Log;
+        public string GetMessage;
+
+        public AvlsClass(string xml_root_tag, Hashtable htable, List<string> sensor_name,
+            List<string> sensor_type, List<string> sensor_value, IEnumerable<XName> iEnumerable, string log,
+             string getMessage)
+        {
+            XmlRootTag = xml_root_tag;
+            Htable = new Hashtable(htable);
+            SensorName = new List<string>(sensor_name);
+            SensorType = new List<string>(sensor_type);
+            SensorValue = new List<string>(sensor_value);
+            Elements = iEnumerable;
+            Log = log;
+            GetMessage = getMessage;
+        }
+    }
     public class GeoAngle
     {
         public bool IsNegative { get; set; }
