@@ -309,6 +309,7 @@ LIMIT 1";
         {
             //Console.WriteLine(AppDomain.CurrentDomain.BaseDirectory + "Client.exe");
             Thread.Sleep(5000);
+            ThreadPool.SetMaxThreads(500, 500);
             AppDomain.CurrentDomain.UnhandledException += new UnhandledExceptionEventHandler(CurrentDomain_UnhandledException);
             string StartupPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
             string datalogicFilePath = Path.Combine(StartupPath, "StayCheck.sdf");
@@ -1530,8 +1531,10 @@ Select 1-6 then press enter to send package
                 Console.WriteLine("Read:\r\n" + ouput2);
                 //Console.WriteLine("First node:[" + xml_root_tag + "]");
                 Console.WriteLine("E############################################################################");
-                Thread xmlParseThread = new Thread(() => xml_parse(unsTcpClient, fStream, returndata, avlsTcpClient));
-                xmlParseThread.Start();
+                //Thread xmlParseThread = new Thread(() => xml_parse(unsTcpClient, fStream, returndata, avlsTcpClient));
+                //xmlParseThread.Start();
+
+                ThreadPool.QueueUserWorkItem(new WaitCallback(xml_parse), new XmlClass(unsTcpClient, fStream, returndata, avlsTcpClient));
                 //xml_parse(unsTcpClient, fStream, returndata, avlsTcpClient);
                 //xml_parse(unsTcpClient, fStream, returndata, avlsTcpClient);
                 //Console.ReadLine();
@@ -1677,8 +1680,14 @@ Select 1-6 then press enter to send package
             Console.WriteLine("out read thread");
         }
 
-        private static void xml_parse(TcpClient tcpClient, NetworkStream netStream, string returndata, TcpClient avlsTcpClient)
+        //private static void xml_parse(TcpClient tcpClient, NetworkStream netStream, string returndata, TcpClient avlsTcpClient)
+        private static void xml_parse(object o)
         {
+            XmlClass xmlObject = (XmlClass) o;
+            TcpClient tcpClient = xmlObject.TcpClient;
+            NetworkStream netStream = xmlObject.NetStream;
+            string returndata = xmlObject.Returndata;
+            TcpClient avlsTcpClient = xmlObject.AvlsTcpClient;
             XDocument xml_data = XDocument.Parse(returndata);
             string xml_root_tag = xml_data.Root.Name.ToString();
             string logData = xml_data.ToString();
@@ -1862,8 +1871,10 @@ Select 1-6 then press enter to send package
                         if (bool.Parse(ConfigurationManager.AppSettings["SQL_ACCESS"]))
                         {
                             //sqlAccessEvent.Reset();
-                            Thread access_sql = new Thread(access_sql_server);
-                            access_sql.Start(new SqlClass(xml_root_tag, htable, sensor_name.ToList(), sensor_type.ToList(), sensor_value.ToList(), XmlGetAllElementsXname(xml_data), logData, getMessage));
+                            //Thread access_sql = new Thread(access_sql_server);
+                            //access_sql.Start(new SqlClass(xml_root_tag, htable, sensor_name.ToList(), sensor_type.ToList(), sensor_value.ToList(), XmlGetAllElementsXname(xml_data), logData, getMessage));
+
+                            ThreadPool.QueueUserWorkItem(new WaitCallback(access_sql_server), new SqlClass(xml_root_tag, htable, sensor_name.ToList(), sensor_type.ToList(), sensor_value.ToList(), XmlGetAllElementsXname(xml_data), logData, getMessage));
                             //access_sql.Join();
                             //Console.WriteLine("SQL Access Enable");
                             //sqlAccessEvent.WaitOne();
@@ -1872,9 +1883,11 @@ Select 1-6 then press enter to send package
                         if (bool.Parse(ConfigurationManager.AppSettings["AVLS_ACCESS"]))
                         {
                             //avlsSendDone.Reset();
-                            Thread access_avls = new Thread(access_avls_server);
-                            access_avls.Priority = ThreadPriority.BelowNormal;
-                            access_avls.Start(new AvlsClass(xml_root_tag, htable, sensor_name.ToList(), sensor_type.ToList(), sensor_value.ToList(), XmlGetAllElementsXname(xml_data), logData, getMessage));
+                            //Thread access_avls = new Thread(access_avls_server);
+                            //access_avls.Priority = ThreadPriority.BelowNormal;
+                            //access_avls.Start(new AvlsClass(xml_root_tag, htable, sensor_name.ToList(), sensor_type.ToList(), sensor_value.ToList(), XmlGetAllElementsXname(xml_data), logData, getMessage));
+
+                            ThreadPool.QueueUserWorkItem(new WaitCallback(access_avls_server), new AvlsClass(xml_root_tag, htable, sensor_name.ToList(), sensor_type.ToList(), sensor_value.ToList(), XmlGetAllElementsXname(xml_data), logData, getMessage));
                             //access_avls.Join();
                             //Console.WriteLine("AVLS Access Enable");
                             //avlsSendDone.WaitOne();
@@ -1979,8 +1992,10 @@ Select 1-6 then press enter to send package
                     }
                     if (bool.Parse(ConfigurationManager.AppSettings["SQL_ACCESS"]))
                     {
-                        Thread access_sql = new Thread(access_sql_server);
-                        access_sql.Start(new SqlClass(xml_root_tag, htable, sensor_name.ToList(), sensor_type.ToList(), sensor_value.ToList(), XmlGetAllElementsXname(xml_data), logData, null));
+                        //Thread access_sql = new Thread(access_sql_server);
+                        //access_sql.Start(new SqlClass(xml_root_tag, htable, sensor_name.ToList(), sensor_type.ToList(), sensor_value.ToList(), XmlGetAllElementsXname(xml_data), logData, null));
+
+                        ThreadPool.QueueUserWorkItem(new WaitCallback(access_sql_server), new SqlClass(xml_root_tag, htable, sensor_name.ToList(), sensor_type.ToList(), sensor_value.ToList(), XmlGetAllElementsXname(xml_data), logData, null));
                             
                         //access_sql.Join();
                     }
@@ -5088,6 +5103,22 @@ public._gps_log._uid = '"+deviceID+@"'
             Elements = iEnumerable;
             Log = log;
             GetMessage = getMessage;
+        }
+    }
+    //private static void xml_parse(TcpClient tcpClient, NetworkStream netStream, string returndata, TcpClient avlsTcpClient)
+    public class XmlClass
+    {
+        public TcpClient TcpClient;
+        public NetworkStream NetStream;
+        public string Returndata;
+        public TcpClient AvlsTcpClient;
+
+        public XmlClass(TcpClient tcpClient, NetworkStream netStream, string returndata, TcpClient avlsTcpClient)
+        {
+            this.TcpClient = tcpClient;
+            this.NetStream = netStream;
+            this.Returndata = returndata;
+            this.AvlsTcpClient = avlsTcpClient;
         }
     }
     public class GeoAngle
