@@ -1678,6 +1678,7 @@ Select 1-6 then press enter to send package
                 }
             }
             Console.WriteLine("out read thread");
+            Restart();
         }
 
         //private static void xml_parse(TcpClient tcpClient, NetworkStream netStream, string returndata, TcpClient avlsTcpClient)
