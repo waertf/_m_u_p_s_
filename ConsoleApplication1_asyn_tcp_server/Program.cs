@@ -71,6 +71,7 @@ namespace ConsoleApplication1_asyn_tcp_server
                 // The DNS name of the computer
                 // running the listener is "host.contoso.com".
                 //IPHostEntry ipHostInfo = Dns.Resolve(Dns.GetHostName());
+                /*
                 IPAddress ipAddress;
                 if (bool.Parse(ConfigurationManager.AppSettings["set_local_ip_address"]))
                 {
@@ -80,8 +81,8 @@ namespace ConsoleApplication1_asyn_tcp_server
                 {
                     ipAddress = GetLocalIPAddress();
                 }
-                
-                IPEndPoint localEndPoint = new IPEndPoint(ipAddress, Port);
+                */
+                IPEndPoint localEndPoint = new IPEndPoint(IPAddress.Any, Port);
 
                 // Create a TCP/IP socket.
                 Socket listener = new Socket(AddressFamily.InterNetwork,
