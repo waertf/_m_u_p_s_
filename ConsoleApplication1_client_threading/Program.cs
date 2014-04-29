@@ -308,8 +308,17 @@ LIMIT 1";
         static void Main(string[] args)
         {
             //Console.WriteLine(AppDomain.CurrentDomain.BaseDirectory + "Client.exe");
+            int work, complete;
+            
+            ThreadPool.GetMinThreads(out work,out complete);
+            Console.WriteLine("min workerThreads={0}:min completionPortThreads={1}", work, complete);
+
+            ThreadPool.GetMaxThreads(out work, out complete);
+            Console.WriteLine("max workerThreads={0}:max completionPortThreads={1}", work, complete);
+
             Thread.Sleep(5000);
-            ThreadPool.SetMaxThreads(500, 500);
+            ThreadPool.SetMinThreads(int.Parse(ConfigurationManager.AppSettings["MinWorkerThreads"]), int.Parse(ConfigurationManager.AppSettings["MinCompletionPortThreads"]));
+            ThreadPool.SetMaxThreads(int.Parse(ConfigurationManager.AppSettings["MaxWorkerThreads"]), int.Parse(ConfigurationManager.AppSettings["MaxCompletionPortThreads"]));
             AppDomain.CurrentDomain.UnhandledException += new UnhandledExceptionEventHandler(CurrentDomain_UnhandledException);
             string StartupPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
             string datalogicFilePath = Path.Combine(StartupPath, "StayCheck.sdf");
