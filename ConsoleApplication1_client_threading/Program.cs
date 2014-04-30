@@ -494,8 +494,10 @@ LIMIT 1";
             //sendtest(netStream);
 
             //alonso
-            Thread read_thread = new Thread(() => read_thread_method(unsTcpClient));
-            read_thread.Start();
+            //Thread read_thread = new Thread(read_thread_method);
+            //read_thread.Start(unsTcpClient);
+            //ThreadPool.QueueUserWorkItem(new WaitCallback(read_thread_method), unsTcpClient);
+            ThreadPool.QueueUserWorkItem(new WaitCallback(ReadLine), unsTcpClient);
             if (bool.Parse(ConfigurationManager.AppSettings["ManualSend"]))
             {
                 Thread send_test_thread = new Thread(() => ManualSend(netStream));
@@ -1318,8 +1320,9 @@ Select 1-6 then press enter to send package
             
 
         }
-        private static void ReadLine(TcpClient tcpClient, int prefix_length)
+        private static void ReadLine(object TtcpClient)
         {
+            var tcpClient = TtcpClient as TcpClient;
             NetworkStream netStream = tcpClient.GetStream();
             try
             {
@@ -1489,7 +1492,8 @@ Select 1-6 then press enter to send package
                     sql_client.modify(cmd);
                     sql_client.disconnect();
                 }
-                ReadLine(unsTcpClient, 2);          
+                //ReadLine(unsTcpClient, 2);
+                ThreadPool.QueueUserWorkItem(new WaitCallback(ReadLine), unsTcpClient);
         }
 
         private static void FinishRead(IAsyncResult result)
@@ -1580,9 +1584,12 @@ Select 1-6 then press enter to send package
                 }
                 avlsConnectDone.WaitOne();
                 //OnMessageRead(fBuffer);
+                /*
                 fStream.BeginRead(myReadBuffer, 0, myReadBuffer.Length,
                                                                  new AsyncCallback(myReadSizeCallBack),
                                                                  fStream);
+                */
+                ThreadPool.QueueUserWorkItem(new WaitCallback(ReadLine), unsTcpClient);
                // fStream.BeginRead(fSizeBuffer, 0, fSizeBuffer.Length, FinishReadSize, null);
             }
             catch (Exception ex)
@@ -1610,12 +1617,14 @@ Select 1-6 then press enter to send package
                 
             }
         }
-        static void read_thread_method(TcpClient tcpClient)
+        static void read_thread_method(object tcpClientObject)
         {
+            var tcpClient = tcpClientObject as TcpClient;
             Console.WriteLine("in read thread");
             Thread.CurrentThread.CurrentUICulture = new CultureInfo("en-us");
             //asyn read
-            ReadLine(tcpClient, 2);
+            ThreadPool.QueueUserWorkItem(new WaitCallback(ReadLine), tcpClient);
+            //ReadLine(tcpClient);
             //syn read
             //while (true)
             {
@@ -1687,7 +1696,7 @@ Select 1-6 then press enter to send package
                 }
             }
             Console.WriteLine("out read thread");
-            Restart();
+            //Restart();
         }
 
         //private static void xml_parse(TcpClient tcpClient, NetworkStream netStream, string returndata, TcpClient avlsTcpClient)
