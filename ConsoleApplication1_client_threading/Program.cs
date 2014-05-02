@@ -494,10 +494,8 @@ LIMIT 1";
             //sendtest(netStream);
 
             //alonso
-            //Thread read_thread = new Thread(read_thread_method);
-            //read_thread.Start(unsTcpClient);
-            //ThreadPool.QueueUserWorkItem(new WaitCallback(read_thread_method), unsTcpClient);
-            ThreadPool.QueueUserWorkItem(new WaitCallback(ReadLine), unsTcpClient);
+            Thread read_thread = new Thread(() => read_thread_method(unsTcpClient));
+            read_thread.Start();
             if (bool.Parse(ConfigurationManager.AppSettings["ManualSend"]))
             {
                 Thread send_test_thread = new Thread(() => ManualSend(netStream));
@@ -529,7 +527,7 @@ LIMIT 1";
             
             //GC
             var GC =
-                    new System.Timers.Timer(60*60 * 1000);
+                    new System.Timers.Timer(60 * 1000);
             GC.Elapsed += (sender, e) => { GCFunction(); };
             GC.Enabled = true;
             Console.ReadLine();
@@ -1320,9 +1318,8 @@ Select 1-6 then press enter to send package
             
 
         }
-        private static void ReadLine(object TtcpClient)
+        private static void ReadLine(TcpClient tcpClient, int prefix_length)
         {
-            var tcpClient = TtcpClient as TcpClient;
             NetworkStream netStream = tcpClient.GetStream();
             try
             {
@@ -1492,8 +1489,7 @@ Select 1-6 then press enter to send package
                     sql_client.modify(cmd);
                     sql_client.disconnect();
                 }
-                //ReadLine(unsTcpClient, 2);
-                ThreadPool.QueueUserWorkItem(new WaitCallback(ReadLine), unsTcpClient);
+                ReadLine(unsTcpClient, 2);          
         }
 
         private static void FinishRead(IAsyncResult result)
@@ -1544,12 +1540,12 @@ Select 1-6 then press enter to send package
                 Console.WriteLine("Read:\r\n" + ouput2);
                 //Console.WriteLine("First node:[" + xml_root_tag + "]");
                 Console.WriteLine("E############################################################################");
-                //Thread xmlParseThread = new Thread(() => xml_parse(unsTcpClient, fStream, returndata, avlsTcpClient));
-                //xmlParseThread.Start();
+                
+				Thread xmlParseThread = new Thread(xml_parse);
+                xmlParseThread.Start(new XmlClass(unsTcpClient, fStream, returndata, avlsTcpClient));
+				//xml_parse(new XmlClass(unsTcpClient, fStream, returndata, avlsTcpClient));
+                //ThreadPool.QueueUserWorkItem(new WaitCallback(xml_parse), new XmlClass(unsTcpClient, fStream, returndata, avlsTcpClient));
 
-                ThreadPool.QueueUserWorkItem(new WaitCallback(xml_parse), new XmlClass(unsTcpClient, fStream, returndata, avlsTcpClient));
-                //xml_parse(unsTcpClient, fStream, returndata, avlsTcpClient);
-                //xml_parse(unsTcpClient, fStream, returndata, avlsTcpClient);
                 //Console.ReadLine();
 
                 //byte[] bytes = new byte[unsTcpClient.ReceiveBufferSize];test
@@ -1584,12 +1580,9 @@ Select 1-6 then press enter to send package
                 }
                 avlsConnectDone.WaitOne();
                 //OnMessageRead(fBuffer);
-                /*
                 fStream.BeginRead(myReadBuffer, 0, myReadBuffer.Length,
                                                                  new AsyncCallback(myReadSizeCallBack),
                                                                  fStream);
-                */
-                ThreadPool.QueueUserWorkItem(new WaitCallback(ReadLine), unsTcpClient);
                // fStream.BeginRead(fSizeBuffer, 0, fSizeBuffer.Length, FinishReadSize, null);
             }
             catch (Exception ex)
@@ -1598,33 +1591,41 @@ Select 1-6 then press enter to send package
                 //Console.WriteLine(System.Reflection.MethodBase.GetCurrentMethod().Name + "_errorline:" + ex.LineNumber());
                 //log.Error(System.Reflection.MethodBase.GetCurrentMethod().Name + "_errorline:" + ex.LineNumber());
                 log.Error("FinishReadError:\r\n" + ex);
-                try
+                if (ex.GetType() == typeof(OutOfMemoryException))
                 {
-                    Monitor.Enter(readRecoveryLock);
-                    ReadRecovery(fStream);
+                    log.Error("memory usage" + GC.GetTotalMemory(true));
+                    Restart();
                 }
-                catch (Exception exx)
+                else
                 {
+                    try
+                    {
+                        Monitor.Enter(readRecoveryLock);
+                        ReadRecovery(fStream);
+                    }
+                    catch (Exception exx)
+                    {
 
-                    SiAuto.Main.LogError("ReadRecovery", exx.ToString());
-                    log.Error("ReadRecovery" + exx.Message);
-                    Console.WriteLine("ReadRecovery" + exx.Message);
+                        SiAuto.Main.LogError("ReadRecovery", exx.ToString());
+                        log.Error("ReadRecovery" + exx.Message);
+                        Console.WriteLine("ReadRecovery" + exx.Message);
+                    }
+                    finally
+                    {
+                        Monitor.Exit(readRecoveryLock);
+                    } 
                 }
-                finally
-                {
-                    Monitor.Exit(readRecoveryLock);
-                }
+                
                 
             }
         }
-        static void read_thread_method(object tcpClientObject)
+        static void read_thread_method(TcpClient tcpClient)
         {
-            var tcpClient = tcpClientObject as TcpClient;
             Console.WriteLine("in read thread");
             Thread.CurrentThread.CurrentUICulture = new CultureInfo("en-us");
             //asyn read
-            ThreadPool.QueueUserWorkItem(new WaitCallback(ReadLine), tcpClient);
-            //ReadLine(tcpClient);
+            ReadLine(tcpClient, 2);
+			
             //syn read
             //while (true)
             {
@@ -1890,10 +1891,10 @@ Select 1-6 then press enter to send package
                         if (bool.Parse(ConfigurationManager.AppSettings["SQL_ACCESS"]))
                         {
                             //sqlAccessEvent.Reset();
-                            //Thread access_sql = new Thread(access_sql_server);
-                            //access_sql.Start(new SqlClass(xml_root_tag, htable, sensor_name.ToList(), sensor_type.ToList(), sensor_value.ToList(), XmlGetAllElementsXname(xml_data), logData, getMessage));
+                            Thread access_sql = new Thread(access_sql_server);
+                            access_sql.Start(new SqlClass(xml_root_tag, htable, sensor_name.ToList(), sensor_type.ToList(), sensor_value.ToList(), XmlGetAllElementsXname(xml_data), logData, getMessage));
 
-                            ThreadPool.QueueUserWorkItem(new WaitCallback(access_sql_server), new SqlClass(xml_root_tag, htable, sensor_name.ToList(), sensor_type.ToList(), sensor_value.ToList(), XmlGetAllElementsXname(xml_data), logData, getMessage));
+                            //ThreadPool.QueueUserWorkItem(new WaitCallback(access_sql_server), new SqlClass(xml_root_tag, htable, sensor_name.ToList(), sensor_type.ToList(), sensor_value.ToList(), XmlGetAllElementsXname(xml_data), logData, getMessage));
                             //access_sql.Join();
                             //Console.WriteLine("SQL Access Enable");
                             //sqlAccessEvent.WaitOne();
@@ -1902,11 +1903,11 @@ Select 1-6 then press enter to send package
                         if (bool.Parse(ConfigurationManager.AppSettings["AVLS_ACCESS"]))
                         {
                             //avlsSendDone.Reset();
-                            //Thread access_avls = new Thread(access_avls_server);
-                            //access_avls.Priority = ThreadPriority.BelowNormal;
-                            //access_avls.Start(new AvlsClass(xml_root_tag, htable, sensor_name.ToList(), sensor_type.ToList(), sensor_value.ToList(), XmlGetAllElementsXname(xml_data), logData, getMessage));
+                            Thread access_avls = new Thread(access_avls_server);
+                            access_avls.Priority = ThreadPriority.BelowNormal;
+                            access_avls.Start(new AvlsClass(xml_root_tag, htable, sensor_name.ToList(), sensor_type.ToList(), sensor_value.ToList(), XmlGetAllElementsXname(xml_data), logData, getMessage));
 
-                            ThreadPool.QueueUserWorkItem(new WaitCallback(access_avls_server), new AvlsClass(xml_root_tag, htable, sensor_name.ToList(), sensor_type.ToList(), sensor_value.ToList(), XmlGetAllElementsXname(xml_data), logData, getMessage));
+                            //ThreadPool.QueueUserWorkItem(new WaitCallback(access_avls_server), new AvlsClass(xml_root_tag, htable, sensor_name.ToList(), sensor_type.ToList(), sensor_value.ToList(), XmlGetAllElementsXname(xml_data), logData, getMessage));
                             //access_avls.Join();
                             //Console.WriteLine("AVLS Access Enable");
                             //avlsSendDone.WaitOne();
@@ -2011,10 +2012,10 @@ Select 1-6 then press enter to send package
                     }
                     if (bool.Parse(ConfigurationManager.AppSettings["SQL_ACCESS"]))
                     {
-                        //Thread access_sql = new Thread(access_sql_server);
-                        //access_sql.Start(new SqlClass(xml_root_tag, htable, sensor_name.ToList(), sensor_type.ToList(), sensor_value.ToList(), XmlGetAllElementsXname(xml_data), logData, null));
+                        Thread access_sql = new Thread(access_sql_server);
+                        access_sql.Start(new SqlClass(xml_root_tag, htable, sensor_name.ToList(), sensor_type.ToList(), sensor_value.ToList(), XmlGetAllElementsXname(xml_data), logData, null));
 
-                        ThreadPool.QueueUserWorkItem(new WaitCallback(access_sql_server), new SqlClass(xml_root_tag, htable, sensor_name.ToList(), sensor_type.ToList(), sensor_value.ToList(), XmlGetAllElementsXname(xml_data), logData, null));
+                        //ThreadPool.QueueUserWorkItem(new WaitCallback(access_sql_server), new SqlClass(xml_root_tag, htable, sensor_name.ToList(), sensor_type.ToList(), sensor_value.ToList(), XmlGetAllElementsXname(xml_data), logData, null));
                             
                         //access_sql.Join();
                     }
