@@ -494,8 +494,9 @@ LIMIT 1";
             //sendtest(netStream);
 
             //alonso
-            Thread read_thread = new Thread(() => read_thread_method(unsTcpClient));
-            read_thread.Start();
+            Thread read_thread = new Thread(read_thread_method);
+            read_thread.Start(unsTcpClient);
+            //ThreadPool.QueueUserWorkItem(new WaitCallback(read_thread_method), unsTcpClient);
             if (bool.Parse(ConfigurationManager.AppSettings["ManualSend"]))
             {
                 Thread send_test_thread = new Thread(() => ManualSend(netStream));
@@ -1318,8 +1319,9 @@ Select 1-6 then press enter to send package
             
 
         }
-        private static void ReadLine(TcpClient tcpClient, int prefix_length)
+        private static void ReadLine(object TtcpClient)
         {
+            var tcpClient = TtcpClient as TcpClient;
             NetworkStream netStream = tcpClient.GetStream();
             try
             {
@@ -1489,7 +1491,9 @@ Select 1-6 then press enter to send package
                     sql_client.modify(cmd);
                     sql_client.disconnect();
                 }
-                ReadLine(unsTcpClient, 2);          
+            Thread readlineThread = new Thread(ReadLine);
+            readlineThread.Start(unsTcpClient);
+                //ReadLine(unsTcpClient, 2);          
         }
 
         private static void FinishRead(IAsyncResult result)
@@ -1619,12 +1623,15 @@ Select 1-6 then press enter to send package
                 
             }
         }
-        static void read_thread_method(TcpClient tcpClient)
+        static void read_thread_method(object tcpClientObject)
         {
+            var tcpClient = tcpClientObject as TcpClient;
             Console.WriteLine("in read thread");
             Thread.CurrentThread.CurrentUICulture = new CultureInfo("en-us");
             //asyn read
-            ReadLine(tcpClient, 2);
+            Thread readlineThread = new Thread(ReadLine);
+            readlineThread.Start(unsTcpClient);
+            //ReadLine(tcpClient, 2);
 			
             //syn read
             //while (true)
