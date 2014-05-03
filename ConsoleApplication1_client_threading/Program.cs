@@ -1290,6 +1290,15 @@ Select 1-6 then press enter to send package
             {
                 NetworkStream myNetworkStream = (NetworkStream)ar.AsyncState;
                 myNetworkStream.EndWrite(ar);
+                ThreadPool.QueueUserWorkItem(callback =>
+                {
+                    Console.ForegroundColor = ConsoleColor.Green;
+                    Console.WriteLine("S----------------------------------------------------------------------------");
+                    Console.WriteLine("Write:\r\n" + avlsSendPackage);
+                    Console.WriteLine("E----------------------------------------------------------------------------");
+                    Console.ResetColor();
+                });
+               
                 //avlsSendDone.Set();
             }
             catch (Exception ex)
@@ -2746,6 +2755,7 @@ LIMIT 1";
                         send_string += getMessage + "\r\n";
                         //if (getMessage.Contains("p_prohibited"))
                             //SiAuto.Main.LogMessage(send_string);
+                        avlsSendPackage = send_string;
                         avls_WriteLine(avlsNetworkStream, System.Text.Encoding.UTF8.GetBytes(send_string), send_string);
                         SiAuto.Main.LogMessage(send_string);
                     }
@@ -2758,7 +2768,7 @@ LIMIT 1";
                         {
                             case "in": //stay over time
                                 send_string += @";stay_over_specific_time" + "\r\n";
-
+                                avlsSendPackage = send_string;
                                 avls_WriteLine(avlsNetworkStream, System.Text.Encoding.UTF8.GetBytes(send_string), send_string);
                                 SiAuto.Main.LogMessage(send_string);
                                 break;
@@ -3285,9 +3295,9 @@ FROM
                 try
                 {
                     
-                    Console.WriteLine("S----------------------------------------------------------------------------");
-                    Console.WriteLine("Write:\r\n" + write);
-                    Console.WriteLine("E----------------------------------------------------------------------------");
+                    //Console.WriteLine("S----------------------------------------------------------------------------");
+                    //Console.WriteLine("Write:\r\n" + write);
+                    //Console.WriteLine("E----------------------------------------------------------------------------");
 
                     //using (StreamWriter w = File.AppendText("log.txt"))
                     {
