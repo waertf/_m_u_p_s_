@@ -1540,10 +1540,14 @@ Select 1-6 then press enter to send package
                     Console.WriteLine("FinishReadError1:\r\n" + ex);
                     log.Error("FinishReadError1:\r\n" + ex);
                 }
-                Console.WriteLine("S############################################################################");
-                Console.WriteLine("Read:\r\n" + ouput2);
-                //Console.WriteLine("First node:[" + xml_root_tag + "]");
-                Console.WriteLine("E############################################################################");
+                ThreadPool.QueueUserWorkItem(callback =>
+                {
+                    Console.WriteLine("S############################################################################");
+                    Console.WriteLine("Read:\r\n" + ouput2);
+                    //Console.WriteLine("First node:[" + xml_root_tag + "]");
+                    Console.WriteLine("E############################################################################");
+                });
+                
                 
 				Thread xmlParseThread = new Thread(xml_parse);
                 xmlParseThread.Start(new XmlClass(unsTcpClient, fStream, returndata, avlsTcpClient));
