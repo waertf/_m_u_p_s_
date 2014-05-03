@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using Devart.Data.PostgreSql;
 using System.Data;
 using Gurock.SmartInspect;
@@ -116,6 +117,14 @@ namespace ConsoleApplication1_client_threading
                      * 
                      */
                     pgSqlConnection.Commit();
+                    ThreadPool.QueueUserWorkItem(callback =>
+                    {
+                        Console.ForegroundColor = ConsoleColor.Cyan;
+                        Console.WriteLine("S++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
+                        Console.WriteLine("sql Write:\r\n" + cmd);
+                        Console.WriteLine("E++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
+                        Console.ResetColor();
+                    });
                     return true;
                 }
                 else
