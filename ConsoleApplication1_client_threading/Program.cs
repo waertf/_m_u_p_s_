@@ -1542,10 +1542,12 @@ Select 1-6 then press enter to send package
                 }
                 ThreadPool.QueueUserWorkItem(callback =>
                 {
+                    Console.ForegroundColor = ConsoleColor.DarkGray;
                     Console.WriteLine("S############################################################################");
                     Console.WriteLine("Read:\r\n" + ouput2);
                     //Console.WriteLine("First node:[" + xml_root_tag + "]");
                     Console.WriteLine("E############################################################################");
+                    Console.ResetColor();
                 });
                 
                 
@@ -2228,6 +2230,12 @@ WHERE
         */
         private static void access_avls_server(object o)
         {
+            ThreadPool.QueueUserWorkItem(callback =>
+            {
+                Console.ForegroundColor = ConsoleColor.DarkGreen;
+                Console.WriteLine("+access_avls_server");
+                Console.ResetColor();
+            });
             var oo = o as AvlsClass;
 
             string xml_root_tag = oo.XmlRootTag;
@@ -2451,12 +2459,24 @@ LIMIT 1";
                     //netStream.Close();
                     //avlsTcpClient.Close();
                     //Console.WriteLine("-access_avls_server");
+                    ThreadPool.QueueUserWorkItem(callback =>
+                    {
+                        Console.ForegroundColor = ConsoleColor.DarkGreen;
+                        Console.WriteLine("-access_avls_server");
+                        Console.ResetColor();
+                    });
                     return;
                 }
                 else
                 {
                     //netStream.Close();
                     //avlsTcpClient.Close();
+                    ThreadPool.QueueUserWorkItem(callback =>
+                    {
+                        Console.ForegroundColor = ConsoleColor.DarkGreen;
+                        Console.WriteLine("-access_avls_server");
+                        Console.ResetColor();
+                    });
                     return;
                 }
 
@@ -2473,6 +2493,12 @@ LIMIT 1";
                 {
                    // netStream.Close();
                     //avlsTcpClient.Close();
+                    ThreadPool.QueueUserWorkItem(callback =>
+                    {
+                        Console.ForegroundColor = ConsoleColor.DarkGreen;
+                        Console.WriteLine("-access_avls_server");
+                        Console.ResetColor();
+                    });
                     return;
                 }
                 if (htable.ContainsKey("result_code"))
@@ -2841,6 +2867,12 @@ LIMIT 1";
             htable.Clear();
             htable = null;
             //Console.WriteLine("-access_avls_server");
+            ThreadPool.QueueUserWorkItem(callback =>
+            {
+                Console.ForegroundColor = ConsoleColor.DarkGreen;
+                Console.WriteLine("-access_avls_server");
+                Console.ResetColor();
+            });
         }
 
         private static string GetGidAndFullnameFromP_prohibitedAndPatrol_locationFromSql(string prohibitedTableName, string locationTableName, string initialLat, string initialLon,string id,bool isStayTimeEnable,string deviceID)
@@ -3365,6 +3397,12 @@ FROM
         {
             
             {
+                ThreadPool.QueueUserWorkItem(callback =>
+                {
+                    Console.ForegroundColor = ConsoleColor.DarkCyan;
+                    Console.WriteLine("+access_sql_server");
+                    Console.ResetColor();
+                });
             //Console.WriteLine("+access_sql_server");
                 var oo = o as SqlClass;
 
@@ -3944,6 +3982,12 @@ VALUES(
                     else
                     {
                         log.Error("access_sql_server:1:deviceID is null");
+                        ThreadPool.QueueUserWorkItem(callback =>
+                        {
+                            Console.ForegroundColor = ConsoleColor.DarkCyan;
+                            Console.WriteLine("-access_sql_server");
+                            Console.ResetColor();
+                        });
                         return;
                     }
                     string sqlCmd = @"SELECT 
@@ -4004,6 +4048,12 @@ LIMIT 1";
                     else
                     {
                         log.Error("access_sql_server:2:deviceID is null");
+                        ThreadPool.QueueUserWorkItem(callback =>
+                        {
+                            Console.ForegroundColor = ConsoleColor.DarkCyan;
+                            Console.WriteLine("-access_sql_server");
+                            Console.ResetColor();
+                        });
                         return;
                     }
                     string lat = string.Empty, lon = string.Empty;
@@ -4775,6 +4825,12 @@ LIMIT 1";
             htable.Clear();
                 htable = null;
             sql_client.Dispose();
+            ThreadPool.QueueUserWorkItem(callback =>
+            {
+                Console.ForegroundColor = ConsoleColor.DarkCyan;
+                Console.WriteLine("-access_sql_server");
+                Console.ResetColor();
+            });
             //Console.WriteLine("-access_sql_server");
             //sqlAccessEvent.Set();
         }
