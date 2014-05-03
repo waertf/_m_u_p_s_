@@ -1203,9 +1203,8 @@ Select 1-6 then press enter to send package
                 {
                     XDocument xml = XDocument.Parse(write);
                     write = xml.ToString();
-                    Console.WriteLine("S----------------------------------------------------------------------------");
-                    Console.WriteLine("Write:\r\n" + write);
-                    Console.WriteLine("E----------------------------------------------------------------------------");
+                    
+                    
 
                     //send method1
                     //netStream.Write(writeData, 0, writeData.Length);
@@ -1215,6 +1214,15 @@ Select 1-6 then press enter to send package
                     //send method2
                     IAsyncResult result = netStream.BeginWrite(writeData, 0, writeData.Length, new AsyncCallback(UnsTcpWriteCallBack), netStream);
                     result.AsyncWaitHandle.WaitOne();
+                    result.AsyncWaitHandle.Close();
+                    ThreadPool.QueueUserWorkItem(callback =>
+                    {
+                        Console.ForegroundColor = ConsoleColor.Magenta;
+                        Console.WriteLine("S****************************************************************************");
+                        Console.WriteLine("uns write:\r\n" + write);
+                        Console.WriteLine("E****************************************************************************");
+                        Console.ResetColor();
+                    });
                 }
                 catch (Exception ex)
                 {
@@ -1290,14 +1298,7 @@ Select 1-6 then press enter to send package
             {
                 NetworkStream myNetworkStream = (NetworkStream)ar.AsyncState;
                 myNetworkStream.EndWrite(ar);
-                ThreadPool.QueueUserWorkItem(callback =>
-                {
-                    Console.ForegroundColor = ConsoleColor.Green;
-                    Console.WriteLine("S----------------------------------------------------------------------------");
-                    Console.WriteLine("Write:\r\n" + avlsSendPackage);
-                    Console.WriteLine("E----------------------------------------------------------------------------");
-                    Console.ResetColor();
-                });
+                
                
                 //avlsSendDone.Set();
             }
@@ -3314,6 +3315,15 @@ FROM
                     //send method2
                     IAsyncResult result = netStream.BeginWrite(writeData, 0, writeData.Length, new AsyncCallback(avls_myWriteCallBack), netStream);
                     result.AsyncWaitHandle.WaitOne();
+                    result.AsyncWaitHandle.Close();
+                    ThreadPool.QueueUserWorkItem(callback =>
+                    {
+                        Console.ForegroundColor = ConsoleColor.Green;
+                        Console.WriteLine("S----------------------------------------------------------------------------");
+                        Console.WriteLine("avls write:\r\n" + write);
+                        Console.WriteLine("E----------------------------------------------------------------------------");
+                        Console.ResetColor();
+                    });
                 }
                 catch (Exception ex)
                 {
