@@ -222,6 +222,7 @@ namespace ConsoleApplication1_client_threading
 
         public void Dispose()
         {
+            PgSqlConnection.ClearPool(pgSqlConnection);
             pgSqlConnection.Dispose();
         }
     }
