@@ -494,9 +494,9 @@ LIMIT 1";
             //sendtest(netStream);
 
             //alonso
-            Thread read_thread = new Thread(read_thread_method);
-            read_thread.Start(unsTcpClient);
-            //ThreadPool.QueueUserWorkItem(new WaitCallback(read_thread_method), unsTcpClient);
+            //Thread read_thread = new Thread(read_thread_method);
+            //read_thread.Start(unsTcpClient);
+            ThreadPool.QueueUserWorkItem(new WaitCallback(read_thread_method), unsTcpClient);
             if (bool.Parse(ConfigurationManager.AppSettings["ManualSend"]))
             {
                 Thread send_test_thread = new Thread(() => ManualSend(netStream));
@@ -1501,8 +1501,9 @@ Select 1-6 then press enter to send package
                     sql_client.modify(cmd);
                     sql_client.disconnect();
                 }
-            Thread readlineThread = new Thread(ReadLine);
-            readlineThread.Start(unsTcpClient);
+            //Thread readlineThread = new Thread(ReadLine);
+            //readlineThread.Start(unsTcpClient);
+                ThreadPool.QueueUserWorkItem(new WaitCallback(ReadLine), unsTcpClient);
                 //ReadLine(unsTcpClient, 2);          
         }
 
@@ -1561,10 +1562,10 @@ Select 1-6 then press enter to send package
                 });
                 
                 
-				Thread xmlParseThread = new Thread(xml_parse);
-                xmlParseThread.Start(new XmlClass(unsTcpClient, fStream, returndata, avlsTcpClient));
+				//Thread xmlParseThread = new Thread(xml_parse);
+                //xmlParseThread.Start(new XmlClass(unsTcpClient, fStream, returndata, avlsTcpClient));
 				//xml_parse(new XmlClass(unsTcpClient, fStream, returndata, avlsTcpClient));
-                //ThreadPool.QueueUserWorkItem(new WaitCallback(xml_parse), new XmlClass(unsTcpClient, fStream, returndata, avlsTcpClient));
+                ThreadPool.QueueUserWorkItem(new WaitCallback(xml_parse), new XmlClass(unsTcpClient, fStream, returndata, avlsTcpClient));
 
                 //Console.ReadLine();
 
@@ -1645,8 +1646,9 @@ Select 1-6 then press enter to send package
             Console.WriteLine("in read thread");
             Thread.CurrentThread.CurrentUICulture = new CultureInfo("en-us");
             //asyn read
-            Thread readlineThread = new Thread(ReadLine);
-            readlineThread.Start(unsTcpClient);
+            //Thread readlineThread = new Thread(ReadLine);
+            //readlineThread.Start(unsTcpClient);
+            ThreadPool.QueueUserWorkItem(new WaitCallback(ReadLine), unsTcpClient);
             //ReadLine(tcpClient, 2);
 			
             //syn read
@@ -1914,10 +1916,10 @@ Select 1-6 then press enter to send package
                         if (bool.Parse(ConfigurationManager.AppSettings["SQL_ACCESS"]))
                         {
                             //sqlAccessEvent.Reset();
-                            Thread access_sql = new Thread(access_sql_server);
-                            access_sql.Start(new SqlClass(xml_root_tag, htable, sensor_name.ToList(), sensor_type.ToList(), sensor_value.ToList(), XmlGetAllElementsXname(xml_data), logData, getMessage));
+                            //Thread access_sql = new Thread(access_sql_server);
+                            //access_sql.Start(new SqlClass(xml_root_tag, htable, sensor_name.ToList(), sensor_type.ToList(), sensor_value.ToList(), XmlGetAllElementsXname(xml_data), logData, getMessage));
 
-                            //ThreadPool.QueueUserWorkItem(new WaitCallback(access_sql_server), new SqlClass(xml_root_tag, htable, sensor_name.ToList(), sensor_type.ToList(), sensor_value.ToList(), XmlGetAllElementsXname(xml_data), logData, getMessage));
+                            ThreadPool.QueueUserWorkItem(new WaitCallback(access_sql_server), new SqlClass(xml_root_tag, htable, sensor_name.ToList(), sensor_type.ToList(), sensor_value.ToList(), XmlGetAllElementsXname(xml_data), logData, getMessage));
                             //access_sql.Join();
                             //Console.WriteLine("SQL Access Enable");
                             //sqlAccessEvent.WaitOne();
@@ -1926,11 +1928,11 @@ Select 1-6 then press enter to send package
                         if (bool.Parse(ConfigurationManager.AppSettings["AVLS_ACCESS"]))
                         {
                             //avlsSendDone.Reset();
-                            Thread access_avls = new Thread(access_avls_server);
-                            access_avls.Priority = ThreadPriority.BelowNormal;
-                            access_avls.Start(new AvlsClass(xml_root_tag, htable, sensor_name.ToList(), sensor_type.ToList(), sensor_value.ToList(), XmlGetAllElementsXname(xml_data), logData, getMessage));
+                            //Thread access_avls = new Thread(access_avls_server);
+                            //access_avls.Priority = ThreadPriority.BelowNormal;
+                            //access_avls.Start(new AvlsClass(xml_root_tag, htable, sensor_name.ToList(), sensor_type.ToList(), sensor_value.ToList(), XmlGetAllElementsXname(xml_data), logData, getMessage));
 
-                            //ThreadPool.QueueUserWorkItem(new WaitCallback(access_avls_server), new AvlsClass(xml_root_tag, htable, sensor_name.ToList(), sensor_type.ToList(), sensor_value.ToList(), XmlGetAllElementsXname(xml_data), logData, getMessage));
+                            ThreadPool.QueueUserWorkItem(new WaitCallback(access_avls_server), new AvlsClass(xml_root_tag, htable, sensor_name.ToList(), sensor_type.ToList(), sensor_value.ToList(), XmlGetAllElementsXname(xml_data), logData, getMessage));
                             //access_avls.Join();
                             //Console.WriteLine("AVLS Access Enable");
                             //avlsSendDone.WaitOne();
@@ -2035,10 +2037,10 @@ Select 1-6 then press enter to send package
                     }
                     if (bool.Parse(ConfigurationManager.AppSettings["SQL_ACCESS"]))
                     {
-                        Thread access_sql = new Thread(access_sql_server);
-                        access_sql.Start(new SqlClass(xml_root_tag, htable, sensor_name.ToList(), sensor_type.ToList(), sensor_value.ToList(), XmlGetAllElementsXname(xml_data), logData, null));
+                        //Thread access_sql = new Thread(access_sql_server);
+                        //access_sql.Start(new SqlClass(xml_root_tag, htable, sensor_name.ToList(), sensor_type.ToList(), sensor_value.ToList(), XmlGetAllElementsXname(xml_data), logData, null));
 
-                        //ThreadPool.QueueUserWorkItem(new WaitCallback(access_sql_server), new SqlClass(xml_root_tag, htable, sensor_name.ToList(), sensor_type.ToList(), sensor_value.ToList(), XmlGetAllElementsXname(xml_data), logData, null));
+                        ThreadPool.QueueUserWorkItem(new WaitCallback(access_sql_server), new SqlClass(xml_root_tag, htable, sensor_name.ToList(), sensor_type.ToList(), sensor_value.ToList(), XmlGetAllElementsXname(xml_data), logData, null));
                             
                         //access_sql.Join();
                     }
