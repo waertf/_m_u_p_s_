@@ -2248,7 +2248,7 @@ WHERE
             //avls_tcpClient.NoDelay = false;
 
             //Keeplive.keep(avls_tcpClient.Client);
-            NetworkStream netStream = avlsNetworkStream;
+            //NetworkStream netStream = avlsNetworkStream;
             /*
             if (htable.ContainsKey("event_info"))
                 if (htable["event_info"].ToString().Equals("Unit Absent"))
@@ -2437,9 +2437,9 @@ LIMIT 1";
                     send_string = "%%" + avls_package.ID + avls_package.GPS_Valid + avls_package.Date_Time + avls_package.Loc + avls_package.Speed + avls_package.Dir + avls_package.Temp + avls_package.Status + avls_package.Event + avls_package.Message + "\r\n";
 
                     //avlsSendDone.Reset();
-                    var sql_client = new SqlClient(ConfigurationManager.AppSettings["SQL_SERVER_IP"], ConfigurationManager.AppSettings["SQL_SERVER_PORT"], ConfigurationManager.AppSettings["SQL_SERVER_USER_ID"], ConfigurationManager.AppSettings["SQL_SERVER_PASSWORD"], ConfigurationManager.AppSettings["SQL_SERVER_DATABASE"], ConfigurationManager.AppSettings["Pooling"], ConfigurationManager.AppSettings["MinPoolSize"], ConfigurationManager.AppSettings["MaxPoolSize"], ConfigurationManager.AppSettings["ConnectionLifetime"]);
+                    //var sql_client = new SqlClient(ConfigurationManager.AppSettings["SQL_SERVER_IP"], ConfigurationManager.AppSettings["SQL_SERVER_PORT"], ConfigurationManager.AppSettings["SQL_SERVER_USER_ID"], ConfigurationManager.AppSettings["SQL_SERVER_PASSWORD"], ConfigurationManager.AppSettings["SQL_SERVER_DATABASE"], ConfigurationManager.AppSettings["Pooling"], ConfigurationManager.AppSettings["MinPoolSize"], ConfigurationManager.AppSettings["MaxPoolSize"], ConfigurationManager.AppSettings["ConnectionLifetime"]);
                     avlsSendPackage = send_string;
-                    avls_WriteLine(netStream, System.Text.Encoding.UTF8.GetBytes(send_string), send_string);
+                    avls_WriteLine(avlsNetworkStream, System.Text.Encoding.UTF8.GetBytes(send_string), send_string);
                     SiAuto.Main.LogMessage(send_string);
                     //avlsSendDone.WaitOne();
 
@@ -2681,7 +2681,7 @@ LIMIT 1";
 
             send_string = "%%" + avls_package.ID + avls_package.GPS_Valid + avls_package.Date_Time + avls_package.Loc + avls_package.Speed + avls_package.Dir + avls_package.Temp + avls_package.Status + avls_package.Event + avls_package.Message + "\r\n";
             avlsSendPackage = send_string;
-            avls_WriteLine(netStream, System.Text.Encoding.UTF8.GetBytes(send_string), send_string);
+            avls_WriteLine(avlsNetworkStream, System.Text.Encoding.UTF8.GetBytes(send_string), send_string);
             SiAuto.Main.LogMessage(send_string);
             avlsFlag = true;
 
@@ -2716,7 +2716,7 @@ LIMIT 1";
                         send_string += getMessage + "\r\n";
                         //if (getMessage.Contains("p_prohibited"))
                             //SiAuto.Main.LogMessage(send_string);
-                        avls_WriteLine(netStream, System.Text.Encoding.UTF8.GetBytes(send_string), send_string);
+                        avls_WriteLine(avlsNetworkStream, System.Text.Encoding.UTF8.GetBytes(send_string), send_string);
                         SiAuto.Main.LogMessage(send_string);
                     }
 
@@ -2728,8 +2728,8 @@ LIMIT 1";
                         {
                             case "in": //stay over time
                                 send_string += @";stay_over_specific_time" + "\r\n";
-                                
-                                avls_WriteLine(netStream, System.Text.Encoding.UTF8.GetBytes(send_string), send_string);
+
+                                avls_WriteLine(avlsNetworkStream, System.Text.Encoding.UTF8.GetBytes(send_string), send_string);
                                 SiAuto.Main.LogMessage(send_string);
                                 break;
                         }
