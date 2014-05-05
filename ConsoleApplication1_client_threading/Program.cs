@@ -3264,6 +3264,9 @@ now() <= end_time::timestamp ";
             }
             
             sql_client.Dispose();
+            sql_client = null;
+            GC.Collect();
+            GC.WaitForPendingFinalizers();
             //if (message.Contains("p_prohibited"))
                 //SiAuto.Main.LogMessage(message);
             return message;
@@ -4851,9 +4854,11 @@ LIMIT 1";
             
             htable.Clear();
                 htable = null;
-                GC.Collect();
-                GC.WaitForPendingFinalizers();
+                
             sql_client.Dispose();
+                sql_client = null;
+            GC.Collect();
+            GC.WaitForPendingFinalizers();
             ThreadPool.QueueUserWorkItem(callback =>
             {
                 Console.ForegroundColor = ConsoleColor.DarkCyan;
@@ -4935,6 +4940,9 @@ public._gps_log._uid = '"+deviceID+@"'
                     string result = string.Empty;
                     result = "in";
                     sql_client.Dispose();
+                    sql_client = null;
+                    GC.Collect();
+                    GC.WaitForPendingFinalizers();
                     return result;
                 }
                 else
@@ -4942,12 +4950,18 @@ public._gps_log._uid = '"+deviceID+@"'
                     string result = string.Empty;
                     result = "out";
                     sql_client.Dispose();
+                    sql_client = null;
+                    GC.Collect();
+                    GC.WaitForPendingFinalizers();
                     return result;
                 }
             }
             else
             {
                 sql_client.Dispose();
+                sql_client = null;
+                GC.Collect();
+                GC.WaitForPendingFinalizers();
                 return string.Empty;
             }
         }
