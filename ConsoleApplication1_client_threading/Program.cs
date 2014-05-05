@@ -553,6 +553,7 @@ LIMIT 1";
         private static void GCFunction()
         {
             GC.Collect();
+            GC.WaitForPendingFinalizers();
         }
 
         private static void every30SecondSendUidEqlSixZeroToAvls_Elapsed(TcpClient avlsTcpClient, NetworkStream avlsNetworkStream)
@@ -1536,6 +1537,8 @@ Select 1-6 then press enter to send package
                     fBuffer[i] = 0;
                 }
                 fBuffer = null;
+                GC.Collect();
+                GC.WaitForPendingFinalizers();
                 string output = String.Format("Read: Length: {0}, Data: {1}", returndata.Length, returndata);
                 //XDocument xml_data = XDocument.Parse(returndata);
                 //string xml_root_tag = xml_data.Root.Name.ToString();
@@ -2156,6 +2159,8 @@ Select 1-6 then press enter to send package
             sensor_value = null;
             sensor_type.Clear();
             sensor_type = null;
+            GC.Collect();
+            GC.WaitForPendingFinalizers();
             
             Console.WriteLine();
         }
@@ -2877,6 +2882,8 @@ LIMIT 1";
             //avlsTcpClient.Close();
             htable.Clear();
             htable = null;
+            GC.Collect();
+            GC.WaitForPendingFinalizers();
             //Console.WriteLine("-access_avls_server");
             ThreadPool.QueueUserWorkItem(callback =>
             {
@@ -4844,6 +4851,8 @@ LIMIT 1";
             
             htable.Clear();
                 htable = null;
+                GC.Collect();
+                GC.WaitForPendingFinalizers();
             sql_client.Dispose();
             ThreadPool.QueueUserWorkItem(callback =>
             {
