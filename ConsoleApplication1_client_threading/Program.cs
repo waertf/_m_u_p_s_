@@ -527,11 +527,19 @@ LIMIT 1";
             }
             
             //GC
+            while (true)
+            {
+                Thread.Sleep(5000);
+                GC.Collect();
+                GC.WaitForPendingFinalizers();
+            }
+            /*
             var GC =
                     new System.Timers.Timer(60 * 1000);
             GC.Elapsed += (sender, e) => { GCFunction(); };
             GC.Enabled = true;
             Console.ReadLine();
+            */
             //Thread send_test_thread = new Thread(() => sendtest(netStream, sql_client));
             //send_test_thread.Start();
             //output = ReadLine(unsTcpClient, netStream, output);
@@ -1537,8 +1545,8 @@ Select 1-6 then press enter to send package
                     fBuffer[i] = 0;
                 }
                 fBuffer = null;
-                GC.Collect();
-                GC.WaitForPendingFinalizers();
+                //GC.Collect();
+                //GC.WaitForPendingFinalizers();
                 string output = String.Format("Read: Length: {0}, Data: {1}", returndata.Length, returndata);
                 //XDocument xml_data = XDocument.Parse(returndata);
                 //string xml_root_tag = xml_data.Root.Name.ToString();
@@ -2160,8 +2168,8 @@ Select 1-6 then press enter to send package
             sensor_value = null;
             sensor_type.Clear();
             sensor_type = null;
-            GC.Collect();
-            GC.WaitForPendingFinalizers();
+            //GC.Collect();
+            //GC.WaitForPendingFinalizers();
             
             Console.WriteLine();
         }
@@ -2883,8 +2891,8 @@ LIMIT 1";
             //avlsTcpClient.Close();
             htable.Clear();
             htable = null;
-            GC.Collect();
-            GC.WaitForPendingFinalizers();
+            //GC.Collect();
+            //GC.WaitForPendingFinalizers();
             //Console.WriteLine("-access_avls_server");
             ThreadPool.QueueUserWorkItem(callback =>
             {
@@ -3266,8 +3274,8 @@ now() <= end_time::timestamp ";
             
             sql_client.Dispose();
             sql_client = null;
-            GC.Collect();
-            GC.WaitForPendingFinalizers();
+            //GC.Collect();
+            //GC.WaitForPendingFinalizers();
             //if (message.Contains("p_prohibited"))
                 //SiAuto.Main.LogMessage(message);
             return message;
@@ -4858,8 +4866,8 @@ LIMIT 1";
                 
             sql_client.Dispose();
                 sql_client = null;
-            GC.Collect();
-            GC.WaitForPendingFinalizers();
+            //GC.Collect();
+            //GC.WaitForPendingFinalizers();
             ThreadPool.QueueUserWorkItem(callback =>
             {
                 Console.ForegroundColor = ConsoleColor.DarkCyan;
@@ -4942,8 +4950,8 @@ public._gps_log._uid = '"+deviceID+@"'
                     result = "in";
                     sql_client.Dispose();
                     sql_client = null;
-                    GC.Collect();
-                    GC.WaitForPendingFinalizers();
+                    //GC.Collect();
+                    //GC.WaitForPendingFinalizers();
                     return result;
                 }
                 else
@@ -4952,8 +4960,8 @@ public._gps_log._uid = '"+deviceID+@"'
                     result = "out";
                     sql_client.Dispose();
                     sql_client = null;
-                    GC.Collect();
-                    GC.WaitForPendingFinalizers();
+                    //GC.Collect();
+                    //GC.WaitForPendingFinalizers();
                     return result;
                 }
             }
@@ -4961,8 +4969,8 @@ public._gps_log._uid = '"+deviceID+@"'
             {
                 sql_client.Dispose();
                 sql_client = null;
-                GC.Collect();
-                GC.WaitForPendingFinalizers();
+                //GC.Collect();
+                //GC.WaitForPendingFinalizers();
                 return string.Empty;
             }
         }
