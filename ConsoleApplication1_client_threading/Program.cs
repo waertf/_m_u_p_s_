@@ -1566,6 +1566,7 @@ Select 1-6 then press enter to send package
                 
 				Thread xmlParseThread = new Thread(xml_parse);
                 xmlParseThread.Start(new XmlClass(unsTcpClient, fStream, returndata, avlsTcpClient));
+                xmlParseThread.Join();
 				//xml_parse(new XmlClass(unsTcpClient, fStream, returndata, avlsTcpClient));
                 //ThreadPool.QueueUserWorkItem(new WaitCallback(xml_parse), new XmlClass(unsTcpClient, fStream, returndata, avlsTcpClient));
 
