@@ -491,6 +491,8 @@ LIMIT 1";
                 sql_client.modify(cmd);
                 sql_client.disconnect();
             }
+            sql_client.Dispose();
+            sql_client = null;
             //sendtest(netStream);
 
             //alonso
