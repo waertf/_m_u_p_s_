@@ -1578,6 +1578,7 @@ Select 1-6 then press enter to send package
 				Thread xmlParseThread = new Thread(xml_parse);
                 xmlParseThread.Start(new XmlClass(unsTcpClient, fStream, returndata, avlsTcpClient));
                 xmlParseThread.Join();
+                Thread.Sleep(10);
 				//xml_parse(new XmlClass(unsTcpClient, fStream, returndata, avlsTcpClient));
                 //ThreadPool.QueueUserWorkItem(new WaitCallback(xml_parse), new XmlClass(unsTcpClient, fStream, returndata, avlsTcpClient));
 
@@ -1926,34 +1927,43 @@ Select 1-6 then press enter to send package
                                 locationTableName,
                                 htable["lat_value"] as string, htable["long_value"] as string, htable["suaddr"] as string, false, htable["suaddr"].ToString());
                         }
-                        if (bool.Parse(ConfigurationManager.AppSettings["SQL_ACCESS"]))
                         {
-                            //sqlAccessEvent.Reset();
-                            Thread access_sql = new Thread(access_sql_server);
-                            access_sql.Start(new SqlClass(xml_root_tag, htable, sensor_name.ToList(), sensor_type.ToList(), sensor_value.ToList(), XmlGetAllElementsXname(xml_data), logData, getMessage));
+                            Thread access_sql = null, access_avls = null;
+                            if (bool.Parse(ConfigurationManager.AppSettings["SQL_ACCESS"]))
+                            {
+                                //sqlAccessEvent.Reset();
+                                 access_sql = new Thread(access_sql_server);
+                                access_sql.Start(new SqlClass(xml_root_tag, htable, sensor_name.ToList(),
+                                    sensor_type.ToList(), sensor_value.ToList(), XmlGetAllElementsXname(xml_data),
+                                    logData, getMessage));
 
-                            //ThreadPool.QueueUserWorkItem(new WaitCallback(access_sql_server), new SqlClass(xml_root_tag, htable, sensor_name.ToList(), sensor_type.ToList(), sensor_value.ToList(), XmlGetAllElementsXname(xml_data), logData, getMessage));
-                            //access_sql.Join();
-                            //Console.WriteLine("SQL Access Enable");
-                            //sqlAccessEvent.WaitOne();
+                                //ThreadPool.QueueUserWorkItem(new WaitCallback(access_sql_server), new SqlClass(xml_root_tag, htable, sensor_name.ToList(), sensor_type.ToList(), sensor_value.ToList(), XmlGetAllElementsXname(xml_data), logData, getMessage));
+                                //access_sql.Join();
+                                //Console.WriteLine("SQL Access Enable");
+                                //sqlAccessEvent.WaitOne();
+                            }
+
+                            if (bool.Parse(ConfigurationManager.AppSettings["AVLS_ACCESS"]))
+                            {
+                                //avlsSendDone.Reset();
+                                 access_avls = new Thread(access_avls_server);
+                                //access_avls.Priority = ThreadPriority.BelowNormal;
+                                access_avls.Start(new AvlsClass(xml_root_tag, htable, sensor_name.ToList(),
+                                    sensor_type.ToList(), sensor_value.ToList(), XmlGetAllElementsXname(xml_data),
+                                    logData, getMessage));
+
+                                //ThreadPool.QueueUserWorkItem(new WaitCallback(access_avls_server), new AvlsClass(xml_root_tag, htable, sensor_name.ToList(), sensor_type.ToList(), sensor_value.ToList(), XmlGetAllElementsXname(xml_data), logData, getMessage));
+                                //access_avls.Join();
+                                //Console.WriteLine("AVLS Access Enable");
+                                //avlsSendDone.WaitOne();
+                            }
+                            access_sql.Join();
+                            access_avls.Join();
+                            Thread.Sleep(10);
                         }
 
-                        if (bool.Parse(ConfigurationManager.AppSettings["AVLS_ACCESS"]))
-                        {
-                            //avlsSendDone.Reset();
-                            Thread access_avls = new Thread(access_avls_server);
-                            access_avls.Priority = ThreadPriority.BelowNormal;
-                            access_avls.Start(new AvlsClass(xml_root_tag, htable, sensor_name.ToList(), sensor_type.ToList(), sensor_value.ToList(), XmlGetAllElementsXname(xml_data), logData, getMessage));
 
-                            //ThreadPool.QueueUserWorkItem(new WaitCallback(access_avls_server), new AvlsClass(xml_root_tag, htable, sensor_name.ToList(), sensor_type.ToList(), sensor_value.ToList(), XmlGetAllElementsXname(xml_data), logData, getMessage));
-                            //access_avls.Join();
-                            //Console.WriteLine("AVLS Access Enable");
-                            //avlsSendDone.WaitOne();
-                        }
 
-                        
-
-                        
                         /*
                         Console.Clear();
                         Console.WriteLine("unsAvslPowerOnDeviceCount:"+unsAvslPowerOnDeviceCount);
