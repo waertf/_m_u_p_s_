@@ -663,7 +663,7 @@ WHERE
                     //lock (access_uns_deivce_power_status_Lock)
                     sqlClient.modify(unsSqlCmd);
                     sqlClient.disconnect();
-
+                    Thread.Sleep(10);
                     
 
                 }
@@ -1545,6 +1545,7 @@ Select 1-6 then press enter to send package
                 for (int i = 0; i < fBuffer.Length; i++)
                 {
                     fBuffer[i] = 0;
+                    Thread.Sleep(10);
                 }
                 fBuffer = null;
                 //GC.Collect();
@@ -4943,9 +4944,12 @@ public._gps_log._uid = '"+deviceID+@"'
                     {
                         resultList.Add("out");
                     }
+                    Thread.Sleep(10);
                 }
                 resultList.Sort();
                 int index = resultList.BinarySearch("out");
+                resultList.Clear();
+                resultList = null;
                 if (index<0)
                 {
                     string result = string.Empty;
