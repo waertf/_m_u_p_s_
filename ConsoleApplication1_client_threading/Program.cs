@@ -558,6 +558,7 @@ LIMIT 1";
         private static void GCFunction()
         {
             GC.Collect();
+            GC.WaitForPendingFinalizers();
         }
 
         private static void every30SecondSendUidEqlSixZeroToAvls_Elapsed(TcpClient avlsTcpClient, NetworkStream avlsNetworkStream)
