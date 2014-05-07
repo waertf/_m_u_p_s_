@@ -305,6 +305,11 @@ LIMIT 1";
         private static object IsFirstExecuteLock = new object();
         private static uint deviceCount = 0;
 
+        private static AutoResetEvent consoleOutputEvent = new AutoResetEvent(false);
+        private static AutoResetEvent readLineEvent = new AutoResetEvent(false);
+        private static AutoResetEvent xml_parseEvent = new AutoResetEvent(false);
+        private static AutoResetEvent accessSqlEvent = new AutoResetEvent(false);
+        private static AutoResetEvent accessAvlsEvent = new AutoResetEvent(false);
         static void Main(string[] args)
         {
             //Console.WriteLine(AppDomain.CurrentDomain.BaseDirectory + "Client.exe");
@@ -1222,7 +1227,9 @@ Select 1-6 then press enter to send package
                         Console.WriteLine("uns write:\r\n" + write);
                         Console.WriteLine("E****************************************************************************");
                         Console.ResetColor();
+                        consoleOutputEvent.Set();
                     });
+                    consoleOutputEvent.WaitOne();
                 }
                 catch (Exception ex)
                 {
@@ -1388,6 +1395,7 @@ Select 1-6 then press enter to send package
                 }
                 
             }
+            readLineEvent.Set();
         }
         public static void myReadSizeCallBack(IAsyncResult ar)
         {
@@ -1504,7 +1512,8 @@ Select 1-6 then press enter to send package
             //Thread readlineThread = new Thread(ReadLine);
             //readlineThread.Start(unsTcpClient);
                 ThreadPool.QueueUserWorkItem(new WaitCallback(ReadLine), unsTcpClient);
-                //ReadLine(unsTcpClient, 2);          
+            readLineEvent.WaitOne();
+            //ReadLine(unsTcpClient, 2);          
         }
 
         private static void FinishRead(IAsyncResult result)
@@ -1559,14 +1568,16 @@ Select 1-6 then press enter to send package
                     //Console.WriteLine("First node:[" + xml_root_tag + "]");
                     Console.WriteLine("E############################################################################");
                     Console.ResetColor();
+                    consoleOutputEvent.Set();
                 });
+                consoleOutputEvent.WaitOne();
                 
                 
 				//Thread xmlParseThread = new Thread(xml_parse);
                 //xmlParseThread.Start(new XmlClass(unsTcpClient, fStream, returndata, avlsTcpClient));
 				//xml_parse(new XmlClass(unsTcpClient, fStream, returndata, avlsTcpClient));
                 ThreadPool.QueueUserWorkItem(new WaitCallback(xml_parse), new XmlClass(unsTcpClient, fStream, returndata, avlsTcpClient));
-
+                xml_parseEvent.WaitOne();
                 //Console.ReadLine();
 
                 //byte[] bytes = new byte[unsTcpClient.ReceiveBufferSize];test
@@ -1649,6 +1660,7 @@ Select 1-6 then press enter to send package
             //Thread readlineThread = new Thread(ReadLine);
             //readlineThread.Start(unsTcpClient);
             ThreadPool.QueueUserWorkItem(new WaitCallback(ReadLine), unsTcpClient);
+            readLineEvent.WaitOne();
             //ReadLine(tcpClient, 2);
 			
             //syn read
@@ -1937,10 +1949,11 @@ Select 1-6 then press enter to send package
                             //Console.WriteLine("AVLS Access Enable");
                             //avlsSendDone.WaitOne();
                         }
+                        accessAvlsEvent.WaitOne();
+                        accessSqlEvent.WaitOne();
 
-                        
 
-                        
+
                         /*
                         Console.Clear();
                         Console.WriteLine("unsAvslPowerOnDeviceCount:"+unsAvslPowerOnDeviceCount);
@@ -2041,7 +2054,7 @@ Select 1-6 then press enter to send package
                         //access_sql.Start(new SqlClass(xml_root_tag, htable, sensor_name.ToList(), sensor_type.ToList(), sensor_value.ToList(), XmlGetAllElementsXname(xml_data), logData, null));
 
                         ThreadPool.QueueUserWorkItem(new WaitCallback(access_sql_server), new SqlClass(xml_root_tag, htable, sensor_name.ToList(), sensor_type.ToList(), sensor_value.ToList(), XmlGetAllElementsXname(xml_data), logData, null));
-                            
+                        accessSqlEvent.WaitOne();    
                         //access_sql.Join();
                     }
                     break;
@@ -2160,6 +2173,7 @@ Select 1-6 then press enter to send package
             sensor_type = null;
             
             Console.WriteLine();
+            xml_parseEvent.Set();
         }
 
         private static void Restart()
@@ -2247,7 +2261,9 @@ WHERE
                 Console.ForegroundColor = ConsoleColor.DarkGreen;
                 Console.WriteLine("+access_avls_server");
                 Console.ResetColor();
+                consoleOutputEvent.Set();
             });
+            consoleOutputEvent.WaitOne();
             var oo = o as AvlsClass;
 
             string xml_root_tag = oo.XmlRootTag;
@@ -2476,7 +2492,9 @@ LIMIT 1";
                         Console.ForegroundColor = ConsoleColor.DarkGreen;
                         Console.WriteLine("-access_avls_server");
                         Console.ResetColor();
+                        consoleOutputEvent.Set();
                     });
+                    consoleOutputEvent.WaitOne();
                     return;
                 }
                 else
@@ -2488,7 +2506,9 @@ LIMIT 1";
                         Console.ForegroundColor = ConsoleColor.DarkGreen;
                         Console.WriteLine("-access_avls_server");
                         Console.ResetColor();
+                        consoleOutputEvent.Set();
                     });
+                    consoleOutputEvent.WaitOne();
                     return;
                 }
 
@@ -2510,7 +2530,9 @@ LIMIT 1";
                         Console.ForegroundColor = ConsoleColor.DarkGreen;
                         Console.WriteLine("-access_avls_server");
                         Console.ResetColor();
+                        consoleOutputEvent.Set();
                     });
+                    consoleOutputEvent.WaitOne();
                     return;
                 }
                 if (htable.ContainsKey("result_code"))
@@ -2885,7 +2907,10 @@ LIMIT 1";
                 Console.ForegroundColor = ConsoleColor.DarkGreen;
                 Console.WriteLine("-access_avls_server");
                 Console.ResetColor();
+                consoleOutputEvent.Set();
             });
+            consoleOutputEvent.WaitOne();
+            accessAvlsEvent.Set();
         }
 
         private static string GetGidAndFullnameFromP_prohibitedAndPatrol_locationFromSql(string prohibitedTableName, string locationTableName, string initialLat, string initialLon,string id,bool isStayTimeEnable,string deviceID)
@@ -3325,7 +3350,9 @@ FROM
                         Console.WriteLine("avls write:\r\n" + write);
                         Console.WriteLine("E----------------------------------------------------------------------------");
                         Console.ResetColor();
+                        consoleOutputEvent.Set();
                     });
+                    consoleOutputEvent.WaitOne();
                 }
                 catch (Exception ex)
                 {
@@ -3424,7 +3451,9 @@ FROM
                     Console.ForegroundColor = ConsoleColor.DarkCyan;
                     Console.WriteLine("+access_sql_server");
                     Console.ResetColor();
+                    consoleOutputEvent.Set();
                 });
+                consoleOutputEvent.WaitOne();
             //Console.WriteLine("+access_sql_server");
                 var oo = o as SqlClass;
 
@@ -4009,7 +4038,9 @@ VALUES(
                             Console.ForegroundColor = ConsoleColor.DarkCyan;
                             Console.WriteLine("-access_sql_server");
                             Console.ResetColor();
+                            consoleOutputEvent.Set();
                         });
+                        consoleOutputEvent.WaitOne();
                         return;
                     }
                     string sqlCmd = @"SELECT 
@@ -4075,7 +4106,9 @@ LIMIT 1";
                             Console.ForegroundColor = ConsoleColor.DarkCyan;
                             Console.WriteLine("-access_sql_server");
                             Console.ResetColor();
+                            consoleOutputEvent.Set();
                         });
+                        consoleOutputEvent.WaitOne();
                         return;
                     }
                     string lat = string.Empty, lon = string.Empty;
@@ -4852,11 +4885,14 @@ LIMIT 1";
                 Console.ForegroundColor = ConsoleColor.DarkCyan;
                 Console.WriteLine("-access_sql_server");
                 Console.ResetColor();
+                consoleOutputEvent.Set();
             });
-            //Console.WriteLine("-access_sql_server");
-            //sqlAccessEvent.Set();
+                consoleOutputEvent.WaitOne();
+                //Console.WriteLine("-access_sql_server");
+                //sqlAccessEvent.Set();
+            }
+            accessSqlEvent.Set();
         }
-    }
 
         private static string CheckIfStayOverTime(string lat, string lon, string deviceID)
         {
