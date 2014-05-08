@@ -1575,7 +1575,7 @@ Select 1-6 then press enter to send package
                 
 				Thread xmlParseThread = new Thread(xml_parse);
                 xmlParseThread.Start(new XmlClass(unsTcpClient, fStream, returndata, avlsTcpClient));
-                xmlParseThread.Join();
+                xmlParseThread.Join(int.Parse(ConfigurationManager.AppSettings["xmlParseJoinTimeout"]));
                 //Thread.Sleep(1);
 				//xml_parse(new XmlClass(unsTcpClient, fStream, returndata, avlsTcpClient));
                 //ThreadPool.QueueUserWorkItem(new WaitCallback(xml_parse), new XmlClass(unsTcpClient, fStream, returndata, avlsTcpClient));
@@ -1740,6 +1740,8 @@ Select 1-6 then press enter to send package
         //private static void xml_parse(TcpClient tcpClient, NetworkStream netStream, string returndata, TcpClient avlsTcpClient)
         private static void xml_parse(object o)
         {
+            Stopwatch stopWatch = new Stopwatch();
+            stopWatch.Start();
             XmlClass xmlObject = (XmlClass) o;
             TcpClient tcpClient = xmlObject.TcpClient;
             NetworkStream netStream = xmlObject.NetStream;
@@ -1955,8 +1957,8 @@ Select 1-6 then press enter to send package
                                 //Console.WriteLine("AVLS Access Enable");
                                 //avlsSendDone.WaitOne();
                             }
-                            access_sql.Join();
-                            access_avls.Join();
+                            if (access_sql != null) access_sql.Join(int.Parse(ConfigurationManager.AppSettings["accessSqlJoinTimeout"]));
+                            //access_avls.Join();
                             //Thread.Sleep(1);
                         }
 
@@ -2183,6 +2185,8 @@ Select 1-6 then press enter to send package
             //GC.WaitForPendingFinalizers();
             
             Console.WriteLine();
+            stopWatch.Stop();
+            SiAuto.Main.LogMessage("xml_parse spend time(ms):"+stopWatch.ElapsedMilliseconds);
         }
 
         private static void Restart()
@@ -3427,7 +3431,8 @@ FROM
 
         private static void access_sql_server(object o)
         {
-            
+            Stopwatch stopWatch = new Stopwatch();
+            stopWatch.Start();
             {
                 Console.ForegroundColor = ConsoleColor.DarkCyan;
                 Console.WriteLine("+access_sql_server");
@@ -4857,6 +4862,8 @@ LIMIT 1";
                 Console.ResetColor();
             //Console.WriteLine("-access_sql_server");
             //sqlAccessEvent.Set();
+                stopWatch.Stop();
+                SiAuto.Main.LogMessage("access_sql_server spend time(ms):"+stopWatch.ElapsedMilliseconds);
         }
     }
 
