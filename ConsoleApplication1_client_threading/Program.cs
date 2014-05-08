@@ -1740,8 +1740,7 @@ Select 1-6 then press enter to send package
         //private static void xml_parse(TcpClient tcpClient, NetworkStream netStream, string returndata, TcpClient avlsTcpClient)
         private static void xml_parse(object o)
         {
-            Stopwatch stopWatch = new Stopwatch();
-            stopWatch.Start();
+            Stopwatch stopWatch = Stopwatch.StartNew();
             XmlClass xmlObject = (XmlClass) o;
             TcpClient tcpClient = xmlObject.TcpClient;
             NetworkStream netStream = xmlObject.NetStream;
@@ -3431,8 +3430,7 @@ FROM
 
         private static void access_sql_server(object o)
         {
-            Stopwatch stopWatch = new Stopwatch();
-            stopWatch.Start();
+            Stopwatch stopWatch = Stopwatch.StartNew();
             {
                 Console.ForegroundColor = ConsoleColor.DarkCyan;
                 Console.WriteLine("+access_sql_server");
