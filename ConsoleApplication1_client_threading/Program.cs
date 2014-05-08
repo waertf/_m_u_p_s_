@@ -1576,7 +1576,7 @@ Select 1-6 then press enter to send package
 				Thread xmlParseThread = new Thread(xml_parse);
                 xmlParseThread.Start(new XmlClass(unsTcpClient, fStream, returndata, avlsTcpClient));
                 xmlParseThread.Join();
-                Thread.Sleep(1);
+                //Thread.Sleep(1);
 				//xml_parse(new XmlClass(unsTcpClient, fStream, returndata, avlsTcpClient));
                 //ThreadPool.QueueUserWorkItem(new WaitCallback(xml_parse), new XmlClass(unsTcpClient, fStream, returndata, avlsTcpClient));
 
@@ -1957,7 +1957,7 @@ Select 1-6 then press enter to send package
                             }
                             access_sql.Join();
                             access_avls.Join();
-                            Thread.Sleep(1);
+                            //Thread.Sleep(1);
                         }
 
 
