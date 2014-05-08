@@ -309,7 +309,7 @@ LIMIT 1";
         {
             //Console.WriteLine(AppDomain.CurrentDomain.BaseDirectory + "Client.exe");
             int work, complete;
-            
+            /*
             ThreadPool.GetMinThreads(out work,out complete);
             Console.WriteLine("min workerThreads={0}:min completionPortThreads={1}", work, complete);
 
@@ -319,6 +319,7 @@ LIMIT 1";
             Thread.Sleep(5000);
             ThreadPool.SetMinThreads(int.Parse(ConfigurationManager.AppSettings["MinWorkerThreads"]), int.Parse(ConfigurationManager.AppSettings["MinCompletionPortThreads"]));
             ThreadPool.SetMaxThreads(int.Parse(ConfigurationManager.AppSettings["MaxWorkerThreads"]), int.Parse(ConfigurationManager.AppSettings["MaxCompletionPortThreads"]));
+            */
             AppDomain.CurrentDomain.UnhandledException += new UnhandledExceptionEventHandler(CurrentDomain_UnhandledException);
             string StartupPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
             string datalogicFilePath = Path.Combine(StartupPath, "StayCheck.sdf");
@@ -1229,14 +1230,11 @@ Select 1-6 then press enter to send package
                     IAsyncResult result = netStream.BeginWrite(writeData, 0, writeData.Length, new AsyncCallback(UnsTcpWriteCallBack), netStream);
                     result.AsyncWaitHandle.WaitOne();
                     result.AsyncWaitHandle.Close();
-                    ThreadPool.QueueUserWorkItem(callback =>
-                    {
-                        Console.ForegroundColor = ConsoleColor.Magenta;
-                        Console.WriteLine("S****************************************************************************");
-                        Console.WriteLine("uns write:\r\n" + write);
-                        Console.WriteLine("E****************************************************************************");
-                        Console.ResetColor();
-                    });
+                    Console.ForegroundColor = ConsoleColor.Magenta;
+                    Console.WriteLine("S****************************************************************************");
+                    Console.WriteLine("uns write:\r\n" + write);
+                    Console.WriteLine("E****************************************************************************");
+                    Console.ResetColor();
                 }
                 catch (Exception ex)
                 {
@@ -1567,15 +1565,12 @@ Select 1-6 then press enter to send package
                     Console.WriteLine("FinishReadError1:\r\n" + ex);
                     log.Error("FinishReadError1:\r\n" + ex);
                 }
-                ThreadPool.QueueUserWorkItem(callback =>
-                {
-                    Console.ForegroundColor = ConsoleColor.DarkGray;
-                    Console.WriteLine("S############################################################################");
-                    Console.WriteLine("Read:\r\n" + ouput2);
-                    //Console.WriteLine("First node:[" + xml_root_tag + "]");
-                    Console.WriteLine("E############################################################################");
-                    Console.ResetColor();
-                });
+                Console.ForegroundColor = ConsoleColor.DarkGray;
+                Console.WriteLine("S############################################################################");
+                Console.WriteLine("Read:\r\n" + ouput2);
+                //Console.WriteLine("First node:[" + xml_root_tag + "]");
+                Console.WriteLine("E############################################################################");
+                Console.ResetColor();
                 
                 
 				Thread xmlParseThread = new Thread(xml_parse);
@@ -2270,12 +2265,9 @@ WHERE
         */
         private static void access_avls_server(object o)
         {
-            ThreadPool.QueueUserWorkItem(callback =>
-            {
-                Console.ForegroundColor = ConsoleColor.DarkGreen;
-                Console.WriteLine("+access_avls_server");
-                Console.ResetColor();
-            });
+            Console.ForegroundColor = ConsoleColor.DarkGreen;
+            Console.WriteLine("+access_avls_server");
+            Console.ResetColor();
             var oo = o as AvlsClass;
 
             string xml_root_tag = oo.XmlRootTag;
@@ -2499,24 +2491,18 @@ LIMIT 1";
                     //netStream.Close();
                     //avlsTcpClient.Close();
                     //Console.WriteLine("-access_avls_server");
-                    ThreadPool.QueueUserWorkItem(callback =>
-                    {
-                        Console.ForegroundColor = ConsoleColor.DarkGreen;
-                        Console.WriteLine("-access_avls_server");
-                        Console.ResetColor();
-                    });
+                    Console.ForegroundColor = ConsoleColor.DarkGreen;
+                    Console.WriteLine("-access_avls_server");
+                    Console.ResetColor();
                     return;
                 }
                 else
                 {
                     //netStream.Close();
                     //avlsTcpClient.Close();
-                    ThreadPool.QueueUserWorkItem(callback =>
-                    {
-                        Console.ForegroundColor = ConsoleColor.DarkGreen;
-                        Console.WriteLine("-access_avls_server");
-                        Console.ResetColor();
-                    });
+                    Console.ForegroundColor = ConsoleColor.DarkGreen;
+                    Console.WriteLine("-access_avls_server");
+                    Console.ResetColor();
                     return;
                 }
 
@@ -2533,12 +2519,9 @@ LIMIT 1";
                 {
                    // netStream.Close();
                     //avlsTcpClient.Close();
-                    ThreadPool.QueueUserWorkItem(callback =>
-                    {
-                        Console.ForegroundColor = ConsoleColor.DarkGreen;
-                        Console.WriteLine("-access_avls_server");
-                        Console.ResetColor();
-                    });
+                    Console.ForegroundColor = ConsoleColor.DarkGreen;
+                    Console.WriteLine("-access_avls_server");
+                    Console.ResetColor();
                     return;
                 }
                 if (htable.ContainsKey("result_code"))
@@ -2910,12 +2893,9 @@ LIMIT 1";
             //GC.Collect();
             //GC.WaitForPendingFinalizers();
             //Console.WriteLine("-access_avls_server");
-            ThreadPool.QueueUserWorkItem(callback =>
-            {
-                Console.ForegroundColor = ConsoleColor.DarkGreen;
-                Console.WriteLine("-access_avls_server");
-                Console.ResetColor();
-            });
+            Console.ForegroundColor = ConsoleColor.DarkGreen;
+            Console.WriteLine("-access_avls_server");
+            Console.ResetColor();
         }
 
         private static string GetGidAndFullnameFromP_prohibitedAndPatrol_locationFromSql(string prohibitedTableName, string locationTableName, string initialLat, string initialLon,string id,bool isStayTimeEnable,string deviceID)
@@ -3351,14 +3331,11 @@ FROM
                     IAsyncResult result = netStream.BeginWrite(writeData, 0, writeData.Length, new AsyncCallback(avls_myWriteCallBack), netStream);
                     result.AsyncWaitHandle.WaitOne();
                     result.AsyncWaitHandle.Close();
-                    ThreadPool.QueueUserWorkItem(callback =>
-                    {
-                        Console.ForegroundColor = ConsoleColor.Green;
-                        Console.WriteLine("S----------------------------------------------------------------------------");
-                        Console.WriteLine("avls write:\r\n" + write);
-                        Console.WriteLine("E----------------------------------------------------------------------------");
-                        Console.ResetColor();
-                    });
+                    Console.ForegroundColor = ConsoleColor.Green;
+                    Console.WriteLine("S----------------------------------------------------------------------------");
+                    Console.WriteLine("avls write:\r\n" + write);
+                    Console.WriteLine("E----------------------------------------------------------------------------");
+                    Console.ResetColor();
                 }
                 catch (Exception ex)
                 {
@@ -3452,12 +3429,9 @@ FROM
         {
             
             {
-                ThreadPool.QueueUserWorkItem(callback =>
-                {
-                    Console.ForegroundColor = ConsoleColor.DarkCyan;
-                    Console.WriteLine("+access_sql_server");
-                    Console.ResetColor();
-                });
+                Console.ForegroundColor = ConsoleColor.DarkCyan;
+                Console.WriteLine("+access_sql_server");
+                Console.ResetColor();
             //Console.WriteLine("+access_sql_server");
                 var oo = o as SqlClass;
 
@@ -4037,12 +4011,9 @@ VALUES(
                     else
                     {
                         log.Error("access_sql_server:1:deviceID is null");
-                        ThreadPool.QueueUserWorkItem(callback =>
-                        {
-                            Console.ForegroundColor = ConsoleColor.DarkCyan;
-                            Console.WriteLine("-access_sql_server");
-                            Console.ResetColor();
-                        });
+                        Console.ForegroundColor = ConsoleColor.DarkCyan;
+                        Console.WriteLine("-access_sql_server");
+                        Console.ResetColor();
                         return;
                     }
                     string sqlCmd = @"SELECT 
@@ -4103,12 +4074,9 @@ LIMIT 1";
                     else
                     {
                         log.Error("access_sql_server:2:deviceID is null");
-                        ThreadPool.QueueUserWorkItem(callback =>
-                        {
-                            Console.ForegroundColor = ConsoleColor.DarkCyan;
-                            Console.WriteLine("-access_sql_server");
-                            Console.ResetColor();
-                        });
+                        Console.ForegroundColor = ConsoleColor.DarkCyan;
+                        Console.WriteLine("-access_sql_server");
+                        Console.ResetColor();
                         return;
                     }
                     string lat = string.Empty, lon = string.Empty;
@@ -4884,12 +4852,9 @@ LIMIT 1";
                 sql_client = null;
             //GC.Collect();
             //GC.WaitForPendingFinalizers();
-            ThreadPool.QueueUserWorkItem(callback =>
-            {
                 Console.ForegroundColor = ConsoleColor.DarkCyan;
                 Console.WriteLine("-access_sql_server");
                 Console.ResetColor();
-            });
             //Console.WriteLine("-access_sql_server");
             //sqlAccessEvent.Set();
         }
