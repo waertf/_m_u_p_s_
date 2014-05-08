@@ -529,12 +529,15 @@ LIMIT 1";
             }
             
             //GC
+            /*
             while (true)
             {
                 Thread.Sleep(5000);
-                GC.Collect();
-                GC.WaitForPendingFinalizers();
+                //GC.Collect();
+                //GC.WaitForPendingFinalizers();
             }
+             * */
+            Console.ReadLine();
             /*
             var GC =
                     new System.Timers.Timer(60 * 1000);
@@ -562,8 +565,8 @@ LIMIT 1";
 
         private static void GCFunction()
         {
-            GC.Collect();
-            GC.WaitForPendingFinalizers();
+            //GC.Collect();
+            //GC.WaitForPendingFinalizers();
         }
 
         private static void every30SecondSendUidEqlSixZeroToAvls_Elapsed(TcpClient avlsTcpClient, NetworkStream avlsNetworkStream)
