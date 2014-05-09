@@ -535,7 +535,10 @@ LIMIT 1";
                     (sender, e) => { every30SecondSendUidEqlSixZeroToAvls_Elapsed(avlsTcpClient, avlsNetworkStream); };
                 //every30SecondSendUidEqlSixZeroToAvls.Enabled = true;
             }
-            
+
+            var memoryUsageTimer = new System.Timers.Timer(43200000);
+            memoryUsageTimer.Elapsed += new ElapsedEventHandler(memoryUsageTimer_Elapsed);
+            memoryUsageTimer.Enabled = true;
             //GC
             /*
             while (true)
@@ -560,6 +563,16 @@ LIMIT 1";
 
 
             //unsTcpClient.Close();
+        }
+
+        static void memoryUsageTimer_Elapsed(object sender, ElapsedEventArgs e)
+        {
+            string logMsg = string.Empty;
+            logMsg = DateTime.Now.ToString("G") + Environment.NewLine +
+                  "Memory usage:" +
+                  Process.GetCurrentProcess().WorkingSet64 / 1024.0 / 1024.0;
+            SiAuto.Main.LogError(logMsg);
+            log.Fatal(logMsg);
         }
 
         static void CurrentDomain_ProcessExit(object sender, EventArgs e)
