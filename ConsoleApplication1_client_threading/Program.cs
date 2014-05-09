@@ -310,7 +310,7 @@ LIMIT 1";
         static void Main(string[] args)
         {
             //Console.WriteLine(AppDomain.CurrentDomain.BaseDirectory + "Client.exe");
-            int work, complete;
+            //int work, complete;
             /*
             ThreadPool.GetMinThreads(out work,out complete);
             Console.WriteLine("min workerThreads={0}:min completionPortThreads={1}", work, complete);
@@ -322,6 +322,7 @@ LIMIT 1";
             ThreadPool.SetMinThreads(int.Parse(ConfigurationManager.AppSettings["MinWorkerThreads"]), int.Parse(ConfigurationManager.AppSettings["MinCompletionPortThreads"]));
             ThreadPool.SetMaxThreads(int.Parse(ConfigurationManager.AppSettings["MaxWorkerThreads"]), int.Parse(ConfigurationManager.AppSettings["MaxCompletionPortThreads"]));
             */
+            AppDomain.CurrentDomain.ProcessExit += new EventHandler(CurrentDomain_ProcessExit);
             AppDomain.CurrentDomain.UnhandledException += new UnhandledExceptionEventHandler(CurrentDomain_UnhandledException);
             string StartupPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
             string datalogicFilePath = Path.Combine(StartupPath, "StayCheck.sdf");
@@ -556,11 +557,21 @@ LIMIT 1";
             //unsTcpClient.Close();
         }
 
+        static void CurrentDomain_ProcessExit(object sender, EventArgs e)
+        {
+            SiAuto.Main.LogError("Close time:"+DateTime.Now.ToString("G"));
+            log.Fatal("Close time:" + DateTime.Now.ToString("G"));
+        }
+
         static void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
         {
             var exception = e.ExceptionObject as Exception;
             if (exception != null)
-                SiAuto.Main.LogError("Restart:"+exception.ToString());
+            {
+                SiAuto.Main.LogError("Restart:" + exception.ToString());
+                log.Fatal("Restart:" + exception.ToString());
+            }
+                
             //Environment.Exit(1);
             Restart();
         }
