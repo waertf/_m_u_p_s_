@@ -669,7 +669,7 @@ WHERE
                     sqlClient.modify(unsSqlCmd);
                     sqlClient.disconnect();
                     sqlClient.Dispose();
-                    Thread.Sleep(1);
+                    Thread.Sleep(30);
                     
 
                 }
@@ -1196,7 +1196,7 @@ Select 1-6 then press enter to send package
                         UnsTcpWriteLine(netStream, data_append_dataLength(Digital_Output_Change_Request), Digital_Output_Change_Request);
                         break;
                 }
-                Thread.Sleep(100);
+                Thread.Sleep(30);
             }
             /*                                
             string error = "<error></error>";
@@ -1547,12 +1547,7 @@ Select 1-6 then press enter to send package
 
                 // Handle the message and go get the next one.
                 string returndata = Encoding.ASCII.GetString(fBuffer);
-                for (int i = 0; i < fBuffer.Length; i++)
-                {
-                    fBuffer[i] = 0;
-                    Thread.Sleep(1);
-                }
-                fBuffer = null;
+                Array.Resize<byte>(ref fBuffer, 0);
                 //GC.Collect();
                 //GC.WaitForPendingFinalizers();
                 string output = String.Format("Read: Length: {0}, Data: {1}", returndata.Length, returndata);
@@ -4935,7 +4930,7 @@ public._gps_log._uid = '"+deviceID+@"'
                     {
                         resultList.Add("out");
                     }
-                    Thread.Sleep(1);
+                    Thread.Sleep(30);
                 }
                 resultList.Sort();
                 int index = resultList.BinarySearch("out");
