@@ -594,8 +594,8 @@ LIMIT 1";
                 log.Fatal("Restart:" + exception.ToString());
             }
                 
-            //Environment.Exit(1);
-            Restart();
+            Environment.Exit(1);
+            //Restart();
         }
 
         private static void GCFunction()
@@ -1660,7 +1660,8 @@ Select 1-6 then press enter to send package
                 if (ex.GetType() == typeof(OutOfMemoryException))
                 {
                     log.Error("memory usage" + GC.GetTotalMemory(true));
-                    Restart();
+                    Environment.Exit(1);
+                    //Restart();
                 }
                 else
                 {
