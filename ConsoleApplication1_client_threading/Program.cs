@@ -536,7 +536,7 @@ LIMIT 1";
                 //every30SecondSendUidEqlSixZeroToAvls.Enabled = true;
             }
 
-            var memoryUsageTimer = new System.Timers.Timer(43200000);
+            var memoryUsageTimer = new System.Timers.Timer(3600000);
             memoryUsageTimer.Elapsed += new ElapsedEventHandler(memoryUsageTimer_Elapsed);
             memoryUsageTimer.Enabled = true;
             //GC
