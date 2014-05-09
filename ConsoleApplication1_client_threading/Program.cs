@@ -367,6 +367,10 @@ LIMIT 1";
             SiAuto.Si.Enabled = true;
             SiAuto.Si.Level = Level.Debug;
             SiAuto.Si.Connections = @"file(filename=""" + Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) + "\\log.sil\",rotate=weekly,append=true,maxparts=5,maxsize=500MB)";
+            string logMsg = string.Empty;
+            logMsg = "Start time:" + DateTime.Now.ToString("G");
+            SiAuto.Main.LogError(logMsg);
+            log.Fatal(logMsg);
             //SiAuto.Main.LogMessage("This is my first SmartInspect message!");
             //SiAuto.Main.LogText(Level.Debug,"test","hahaha");
             
@@ -559,8 +563,12 @@ LIMIT 1";
 
         static void CurrentDomain_ProcessExit(object sender, EventArgs e)
         {
-            SiAuto.Main.LogError("Close time:"+DateTime.Now.ToString("G"));
-            log.Fatal("Close time:" + DateTime.Now.ToString("G"));
+            string logMsg = string.Empty;
+            logMsg = "Close time:" + DateTime.Now.ToString("G") + Environment.NewLine +
+                  "Memory usage:" +
+                  Process.GetCurrentProcess().WorkingSet64/1024.0/1024.0;
+            SiAuto.Main.LogError(logMsg);
+            log.Fatal(logMsg);
         }
 
         static void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
