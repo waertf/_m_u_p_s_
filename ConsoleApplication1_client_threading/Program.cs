@@ -322,6 +322,7 @@ LIMIT 1";
             ThreadPool.SetMinThreads(int.Parse(ConfigurationManager.AppSettings["MinWorkerThreads"]), int.Parse(ConfigurationManager.AppSettings["MinCompletionPortThreads"]));
             ThreadPool.SetMaxThreads(int.Parse(ConfigurationManager.AppSettings["MaxWorkerThreads"]), int.Parse(ConfigurationManager.AppSettings["MaxCompletionPortThreads"]));
             */
+            Thread.Sleep(5000);
             AppDomain.CurrentDomain.ProcessExit += new EventHandler(CurrentDomain_ProcessExit);
             AppDomain.CurrentDomain.UnhandledException += new UnhandledExceptionEventHandler(CurrentDomain_UnhandledException);
             string StartupPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
