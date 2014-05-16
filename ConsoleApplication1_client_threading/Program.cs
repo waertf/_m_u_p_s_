@@ -279,7 +279,7 @@ LIMIT 1";
 
             var dt = sql_client.get_DataTable(sqlCmd);
             sql_client.disconnect();
-            sql_client.Dispose();
+            //sql_client.Dispose();
 
             if (dt != null && dt.Rows.Count != 0)
             {
@@ -309,6 +309,7 @@ LIMIT 1";
 
         static void Main(string[] args)
         {
+
             //Console.WriteLine(AppDomain.CurrentDomain.BaseDirectory + "Client.exe");
             //int work, complete;
             /*
@@ -500,7 +501,7 @@ LIMIT 1";
                 sql_client.modify(cmd);
                 sql_client.disconnect();
             }
-            sql_client.Dispose();
+            //sql_client.Dispose();
             //sendtest(netStream);
 
             //alonso
@@ -701,7 +702,7 @@ WHERE
                     //lock (access_uns_deivce_power_status_Lock)
                     sqlClient.modify(unsSqlCmd);
                     sqlClient.disconnect();
-                    sqlClient.Dispose();
+                    //sqlClient.Dispose();
                     Thread.Sleep(30);
                     
 
@@ -789,7 +790,7 @@ LIMIT 1";
                 
                 var dt = avlsSqlClient.get_DataTable(avlsSqlCmd);
                 avlsSqlClient.disconnect();
-                avlsSqlClient.Dispose();
+                //avlsSqlClient.Dispose();
                 if (dt != null && dt.Rows.Count != 0)
                 {
                     string avlsLat = string.Empty, avlsLon = string.Empty;
@@ -1067,7 +1068,7 @@ LIMIT
                         }
                     }
                    
-                    AutosendsqlClient.Dispose();
+                    //AutosendsqlClient.Dispose();
                     //Thread.Sleep((int)uint.Parse(ConfigurationManager.AppSettings["autosend_interval"]) * 1000);
                 }
                 
@@ -1549,7 +1550,7 @@ Select 1-6 then press enter to send package
                     sql_client.modify(cmd);
                     sql_client.disconnect();
                 }
-            sql_client.Dispose();
+            //sql_client.Dispose();
             Thread readlineThread = new Thread(ReadLine);
             readlineThread.Start(unsTcpClient);
                 //ReadLine(unsTcpClient, 2);          
@@ -2256,7 +2257,7 @@ WHERE
             
             var dt = sqlClient.get_DataTable(sqlCmd);
             sqlClient.disconnect();
-            sqlClient.Dispose();
+            //sqlClient.Dispose();
             if (dt != null && dt.Rows.Count != 0)
             {
 
@@ -2463,7 +2464,7 @@ LIMIT 1";
                         
                         var dt = avlsSqlClient.get_DataTable(avlsSqlCmd);
                         avlsSqlClient.disconnect();
-                        avlsSqlClient.Dispose();
+                        //avlsSqlClient.Dispose();
                         if (dt != null && dt.Rows.Count != 0)
                         {
                             string avlsLat = string.Empty, avlsLon = string.Empty;
@@ -2625,7 +2626,7 @@ LIMIT 1";
                         }
                         var dt = avlsSqlClient.get_DataTable(avlsSqlCmd);
                         avlsSqlClient.disconnect();
-                        avlsSqlClient.Dispose();
+                        //avlsSqlClient.Dispose();
                         if (dt != null && dt.Rows.Count != 0)
                         {
                             string avlsLat = string.Empty, avlsLon = string.Empty;
@@ -3307,7 +3308,7 @@ now() <= end_time::timestamp ";
                 
             }
             
-            sql_client.Dispose();
+            //sql_client.Dispose();
             //sql_client = null;
             //GC.Collect();
             //GC.WaitForPendingFinalizers();
@@ -3333,7 +3334,7 @@ FROM
             }
             var dt = sql_client.get_DataTable(regSqlCmd);
                             sql_client.disconnect();
-            sql_client.Dispose();
+            //sql_client.Dispose();
             if (dt != null && dt.Rows.Count != 0)
             {
                 foreach (DataRow row in dt.Rows)
@@ -4888,7 +4889,7 @@ LIMIT 1";
             htable.Clear();
                 htable = null;
                 
-            sql_client.Dispose();
+            //sql_client.Dispose();
                 //sql_client = null;
             //GC.Collect();
             //GC.WaitForPendingFinalizers();
@@ -4974,7 +4975,7 @@ public._gps_log._uid = '"+deviceID+@"'
                 {
                     string result = string.Empty;
                     result = "in";
-                    sql_client.Dispose();
+                    //sql_client.Dispose();
                     //sql_client = null;
                     //GC.Collect();
                     //GC.WaitForPendingFinalizers();
@@ -4984,7 +4985,7 @@ public._gps_log._uid = '"+deviceID+@"'
                 {
                     string result = string.Empty;
                     result = "out";
-                    sql_client.Dispose();
+                    //sql_client.Dispose();
                     //sql_client = null;
                     //GC.Collect();
                     //GC.WaitForPendingFinalizers();
@@ -4993,7 +4994,7 @@ public._gps_log._uid = '"+deviceID+@"'
             }
             else
             {
-                sql_client.Dispose();
+                //sql_client.Dispose();
                 //sql_client = null;
                 //GC.Collect();
                 //GC.WaitForPendingFinalizers();
