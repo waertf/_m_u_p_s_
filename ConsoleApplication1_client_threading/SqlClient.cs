@@ -12,14 +12,15 @@ using log4net.Config;
 
 namespace ConsoleApplication1_client_threading
 {
-    class SqlClient:IDisposable
+    class SqlClient
     {
-        PgSqlConnectionStringBuilder pgCSB = new PgSqlConnectionStringBuilder();
+        
         PgSqlConnection pgSqlConnection;
         public bool IsConnected{get;set;}
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
         public SqlClient(string ip, string port, string user_id, string password, string database, string Pooling, string MinPoolSize, string MaxPoolSize, string ConnectionLifetime)
         {
+            PgSqlConnectionStringBuilder pgCSB = new PgSqlConnectionStringBuilder();
             pgCSB.Host = ip;
             pgCSB.Port = int.Parse(port);
             pgCSB.UserId = user_id;
@@ -30,7 +31,7 @@ namespace ConsoleApplication1_client_threading
             pgCSB.MinPoolSize = int.Parse(MinPoolSize);
             pgCSB.MaxPoolSize = int.Parse(MaxPoolSize);
             pgCSB.ConnectionLifetime = int.Parse(ConnectionLifetime); ;
-
+            
             pgCSB.Unicode = true;
             pgSqlConnection = new PgSqlConnection(pgCSB.ConnectionString);
         }
@@ -85,12 +86,13 @@ namespace ConsoleApplication1_client_threading
         //For UPDATE, INSERT, and DELETE statements
         public bool modify(string cmd)
         {
+            PgSqlCommand command = null;
             try
             {
                 if (pgSqlConnection != null && IsConnected)
                 {
                     //insert
-                    PgSqlCommand command = pgSqlConnection.CreateCommand();
+                    command = pgSqlConnection.CreateCommand();
                     command.CommandText = cmd;
                     //cmd.CommandText = "INSERT INTO public.test (id) VALUES (1)";
                     pgSqlConnection.BeginTransaction();
@@ -120,15 +122,22 @@ namespace ConsoleApplication1_client_threading
                     ThreadPool.QueueUserWorkItem(callback =>
                     {
                         Console.ForegroundColor = ConsoleColor.Cyan;
-                        Console.WriteLine("S++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
+                        Console.WriteLine(
+                            "S++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
                         Console.WriteLine("sql Write:\r\n" + cmd);
-                        Console.WriteLine("E++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
+                        Console.WriteLine(
+                            "E++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
                         Console.ResetColor();
                     });
+                    if (command != null)
+                        command.Dispose();
                     return true;
                 }
                 else
+                {
                     return false;
+                }
+                    
             }
             catch (PgSqlException ex)
             {
@@ -137,6 +146,8 @@ namespace ConsoleApplication1_client_threading
                 log.Error("Modify exception occurs: " + Environment.NewLine + ex.Error + Environment.NewLine + cmd);
                 Console.ResetColor();
                 pgSqlConnection.Rollback();
+                if (command != null)
+                    command.Dispose();
                 return false;
             }
 
@@ -145,13 +156,14 @@ namespace ConsoleApplication1_client_threading
         public DataTable get_DataTable(string cmd)
         {
             Stopwatch stopWatch = new Stopwatch();
+            PgSqlCommand command = null;
             stopWatch.Start();
             try
             {
                 if (pgSqlConnection != null && IsConnected)
                 {
                     DataTable datatable = new DataTable();
-                    PgSqlCommand command = pgSqlConnection.CreateCommand();
+                    command = pgSqlConnection.CreateCommand();
                     command.CommandText = cmd;
                     //Console.WriteLine("Starting asynchronous retrieval of data...");
                     IAsyncResult cres = command.BeginExecuteReader();
@@ -163,9 +175,9 @@ namespace ConsoleApplication1_client_threading
                     }
 
                     //if (cres.IsCompleted)
-                        //Console.WriteLine("Completed.");
+                    //Console.WriteLine("Completed.");
                     //else
-                        //Console.WriteLine("Have to wait for operation to complete...");
+                    //Console.WriteLine("Have to wait for operation to complete...");
                     PgSqlDataReader myReader = command.EndExecuteReader(cres);
                     try
                     {
@@ -173,7 +185,7 @@ namespace ConsoleApplication1_client_threading
                         for (int i = 0; i < myReader.FieldCount; i++)
                         {
                             //Console.Write(myReader.GetName(i).ToString() + "\t");
-                            datatable.Columns.Add(myReader.GetName(i).ToString(), typeof(string));
+                            datatable.Columns.Add(myReader.GetName(i).ToString(), typeof (string));
                         }
                         //Console.Write(Environment.NewLine);
                         while (myReader.Read())
@@ -200,8 +212,8 @@ namespace ConsoleApplication1_client_threading
                         // Format and display the TimeSpan value.
                         string elapsedTime = String.Format("{0:00}:{1:00}:{2:00}.{3:00}",
                             ts.Hours, ts.Minutes, ts.Seconds,
-                            ts.Milliseconds / 10);
-                        SiAuto.Main.AddCheckpoint(Level.Debug,"sql query take time:"+elapsedTime,cmd);
+                            ts.Milliseconds/10);
+                        SiAuto.Main.AddCheckpoint(Level.Debug, "sql query take time:" + elapsedTime, cmd);
                     }
                     /*
                     foreach (DataRow row in datatable.Rows) // Loop over the rows.
@@ -214,10 +226,16 @@ namespace ConsoleApplication1_client_threading
                         }
                     }
                     */
+                    if (command!=null)
+                        command.Dispose();
                     return datatable;
                 }
                 else
+                {
+                    
                     return null;
+                }
+                    
             }
             catch (PgSqlException ex)
             {
@@ -225,14 +243,16 @@ namespace ConsoleApplication1_client_threading
                 Console.WriteLine("GetDataTable exception occurs: {0}"+Environment.NewLine+"{1}", ex.Error,cmd);
                 log.Error("GetDataTable exception occurs: " + Environment.NewLine + ex.Error+Environment.NewLine+ cmd);
                 Console.ResetColor();
+                if (command != null)
+                    command.Dispose();
                 return null;
             }
         }
 
-        public void Dispose()
+        ~SqlClient()
         {
             PgSqlConnection.ClearPool(pgSqlConnection);
             pgSqlConnection.Dispose();
-        }
+        }   
     }
 }
