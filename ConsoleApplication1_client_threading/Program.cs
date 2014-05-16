@@ -120,15 +120,15 @@ namespace ConsoleApplication1_client_threading
         private static string sectionName = "appSettings";
 
         //string ipAddress = "127.0.0.1";
-        static string ipAddress = ConfigurationManager.AppSettings["MUPS_SERVER_IP"];
+        static readonly string ipAddress = ConfigurationManager.AppSettings["MUPS_SERVER_IP"];
         //int port = 23;
-        static int port = int.Parse(ConfigurationManager.AppSettings["MUPS_SERVER_PORT"]);
+        static readonly int port = int.Parse(ConfigurationManager.AppSettings["MUPS_SERVER_PORT"]);
         //bool mups_connected = false;
 
         //string ipAddress = "127.0.0.1";
-        static string avls_ipaddress = ConfigurationManager.AppSettings["AVLS_SERVER_IP"];
+        static readonly string avls_ipaddress = ConfigurationManager.AppSettings["AVLS_SERVER_IP"];
         //int port = 23;
-        static int avls_port = int.Parse(ConfigurationManager.AppSettings["AVLS_SERVER_PORT"]);
+        static readonly int avls_port = int.Parse(ConfigurationManager.AppSettings["AVLS_SERVER_PORT"]);
 
         public class Device_power_status
         {
