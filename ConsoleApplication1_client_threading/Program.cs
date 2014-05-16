@@ -4939,7 +4939,14 @@ WHERE
 public._gps_log._time <= now() AND
 public._gps_log._time >= now() - interval '"+stayTimeInMin+@" minute' AND
 public._gps_log._uid = '"+deviceID+@"'
-"; 
+";
+             sql_client = new SqlClient(ConfigurationManager.AppSettings["SQL_SERVER_IP"],
+                ConfigurationManager.AppSettings["SQL_SERVER_PORT"],
+                ConfigurationManager.AppSettings["SQL_SERVER_USER_ID"],
+                ConfigurationManager.AppSettings["SQL_SERVER_PASSWORD"],
+                ConfigurationManager.AppSettings["SQL_SERVER_DATABASE"], ConfigurationManager.AppSettings["Pooling"],
+                ConfigurationManager.AppSettings["MinPoolSize"], ConfigurationManager.AppSettings["MaxPoolSize"],
+                ConfigurationManager.AppSettings["ConnectionLifetime"]);
             while (!sql_client.connect())
             {
                 Thread.Sleep(30);
