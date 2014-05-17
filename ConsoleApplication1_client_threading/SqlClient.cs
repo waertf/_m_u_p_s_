@@ -131,6 +131,7 @@ namespace ConsoleApplication1_client_threading
                     });
                     if (command != null)
                         command.Dispose();
+                    command = null;
                     return true;
                 }
                 else
@@ -148,6 +149,7 @@ namespace ConsoleApplication1_client_threading
                 pgSqlConnection.Rollback();
                 if (command != null)
                     command.Dispose();
+                command = null;
                 return false;
             }
 
@@ -228,6 +230,7 @@ namespace ConsoleApplication1_client_threading
                     */
                     if (command!=null)
                         command.Dispose();
+                    command = null;
                     return datatable;
                 }
                 else
@@ -245,6 +248,7 @@ namespace ConsoleApplication1_client_threading
                 Console.ResetColor();
                 if (command != null)
                     command.Dispose();
+                command = null;
                 return null;
             }
         }
@@ -253,6 +257,7 @@ namespace ConsoleApplication1_client_threading
         {
             PgSqlConnection.ClearPool(pgSqlConnection);
             pgSqlConnection.Dispose();
+            pgSqlConnection = null;
         }   
     }
 }
