@@ -1607,7 +1607,7 @@ Select 1-6 then press enter to send package
                 
                 
 				Thread xmlParseThread = new Thread(xml_parse);
-                xmlParseThread.Start(new XmlClass(unsTcpClient, fStream, returndata, avlsTcpClient));
+                xmlParseThread.Start(returndata);
                 xmlParseThread.Join(int.Parse(ConfigurationManager.AppSettings["xmlParseJoinTimeout"]));
                 //Thread.Sleep(1);
 				//xml_parse(new XmlClass(unsTcpClient, fStream, returndata, avlsTcpClient));
@@ -1775,11 +1775,8 @@ Select 1-6 then press enter to send package
         private static void xml_parse(object o)
         {
             Stopwatch stopWatch = Stopwatch.StartNew();
-            XmlClass xmlObject = (XmlClass) o;
-            TcpClient tcpClient = xmlObject.TcpClient;
-            NetworkStream netStream = xmlObject.NetStream;
-            string returndata = xmlObject.Returndata;
-            TcpClient avlsTcpClient = xmlObject.AvlsTcpClient;
+            TcpClient tcpClient = unsTcpClient;
+            string returndata = o as string;
             XDocument xml_data = XDocument.Parse(returndata);
             string xml_root_tag = xml_data.Root.Name.ToString();
             string logData = xml_data.ToString();
@@ -2928,8 +2925,8 @@ LIMIT 1";
             //ReadLine(avls_tcpClient, netStream, send_string.Length);
             //netStream.Close();
             //avlsTcpClient.Close();
-            htable.Clear();
-            htable = null;
+            //htable.Clear();
+            //htable = null;
             //GC.Collect();
             //GC.WaitForPendingFinalizers();
             //Console.WriteLine("-access_avls_server");
@@ -3484,6 +3481,7 @@ FROM
                 IEnumerable<XName> elements = oo.Elements;
                 string log1 = oo.Log1;
                 string getMessage = oo.GetMessage;
+                oo = null;
             Thread.CurrentThread.CurrentUICulture = new CultureInfo("en-us");
             SqlClient sql_client = new SqlClient(ConfigurationManager.AppSettings["SQL_SERVER_IP"],
                 ConfigurationManager.AppSettings["SQL_SERVER_PORT"],
@@ -4886,9 +4884,8 @@ LIMIT 1";
                     #endregion #region insert into custom.cga_event_log
                 }
             
-            htable.Clear();
-                htable = null;
-                
+            //htable.Clear();
+                //htable = null;
             //sql_client.Dispose();
                 //sql_client = null;
             //GC.Collect();
@@ -5239,6 +5236,19 @@ public._gps_log._uid = '"+deviceID+@"'
             Log1 = log1;
             GetMessage = getMessage;
         }
+        ~SqlClass()
+        {
+            XmlRootTag = Log1 = GetMessage = string.Empty;
+            Htable.Clear();
+            SensorName.Clear();
+            SensorType.Clear();
+            SensorValue.Clear();
+            Htable = null;
+            SensorName = null;
+            SensorType = null;
+            SensorValue = null;
+            Elements = null;
+        }
     }
     /*
      * private static void access_avls_server(string xml_root_tag, Hashtable htable, List<string> sensor_name,
@@ -5270,23 +5280,21 @@ public._gps_log._uid = '"+deviceID+@"'
             Log = log;
             GetMessage = getMessage;
         }
-    }
-    //private static void xml_parse(TcpClient tcpClient, NetworkStream netStream, string returndata, TcpClient avlsTcpClient)
-    public class XmlClass
-    {
-        public TcpClient TcpClient;
-        public NetworkStream NetStream;
-        public string Returndata;
-        public TcpClient AvlsTcpClient;
-
-        public XmlClass(TcpClient tcpClient, NetworkStream netStream, string returndata, TcpClient avlsTcpClient)
+        ~AvlsClass()
         {
-            this.TcpClient = tcpClient;
-            this.NetStream = netStream;
-            this.Returndata = returndata;
-            this.AvlsTcpClient = avlsTcpClient;
+            XmlRootTag = Log = GetMessage = string.Empty;
+            Htable.Clear();
+            SensorName.Clear();
+            SensorType.Clear();
+            SensorValue.Clear();
+            Htable = null;
+            SensorName = null;
+            SensorType = null;
+            SensorValue = null;
+            Elements = null;
         }
     }
+    
     public class GeoAngle
     {
         public bool IsNegative { get; set; }
