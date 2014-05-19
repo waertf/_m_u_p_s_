@@ -277,16 +277,20 @@ LIMIT 1";
             }
 
 
-            var dt = sql_client.get_DataTable(sqlCmd);
+            DataTable dt = sql_client.get_DataTable(sqlCmd);
             sql_client.disconnect();
-            //sql_client.Dispose();
-
+            sql_client.Dispose();
+			sql_client=null;
             if (dt != null && dt.Rows.Count != 0)
             {
+                dt.Dispose();
+                dt = null;
                 return true;
             }
             else
             {
+                dt.Dispose();
+                dt = null;
                 return false;
             }
         }
@@ -448,7 +452,7 @@ LIMIT 1";
             {
                 Thread.Sleep(30);
             }
-            var dt = sql_client.get_DataTable(regSqlCmd);
+            DataTable dt = sql_client.get_DataTable(regSqlCmd);
             sql_client.disconnect();
 
             if (dt != null && dt.Rows.Count != 0)
@@ -468,6 +472,8 @@ LIMIT 1";
                 }
 
             }
+            dt.Dispose();
+            dt = null;
             #endregion
             string registration_msg = "<Location-Registration-Request><application>" + ConfigurationManager.AppSettings["application_ID"] + "</application></Location-Registration-Request>";
             UnsTcpWriteLine(netStream, data_append_dataLength(registration_msg), registration_msg);
@@ -501,7 +507,8 @@ LIMIT 1";
                 sql_client.modify(cmd);
                 sql_client.disconnect();
             }
-            //sql_client.Dispose();
+            sql_client.Dispose();
+			sql_client=null;
             //sendtest(netStream);
 
             //alonso
@@ -650,7 +657,6 @@ WHERE
         {
             //SiAuto.Main.EnterMethod(Level.Debug, "SendToAvlsEventColumnSetNegativeOneIfPowerOff");
             var sqlClient = new SqlClient(ConfigurationManager.AppSettings["SQL_SERVER_IP"], ConfigurationManager.AppSettings["SQL_SERVER_PORT"], ConfigurationManager.AppSettings["SQL_SERVER_USER_ID"], ConfigurationManager.AppSettings["SQL_SERVER_PASSWORD"], ConfigurationManager.AppSettings["SQL_SERVER_DATABASE"], ConfigurationManager.AppSettings["Pooling"], ConfigurationManager.AppSettings["MinPoolSize"], ConfigurationManager.AppSettings["MaxPoolSize"], ConfigurationManager.AppSettings["ConnectionLifetime"]);
-            DataTable dt = new DataTable();
             var sqlCmd =@"SELECT 
   custom.uns_deivce_power_status.uid
 FROM
@@ -664,8 +670,8 @@ WHERE
             {
                 Thread.Sleep(30);
             }
-            
-            dt = sqlClient.get_DataTable(sqlCmd);
+
+            DataTable dt = sqlClient.get_DataTable(sqlCmd);
             sqlClient.disconnect();
             string uid = string.Empty;
             if (dt != null && dt.Rows.Count != 0)
@@ -702,12 +708,16 @@ WHERE
                     //lock (access_uns_deivce_power_status_Lock)
                     sqlClient.modify(unsSqlCmd);
                     sqlClient.disconnect();
-                    //sqlClient.Dispose();
+                    sqlClient.Dispose();
+					sqlClient=null;
                     Thread.Sleep(30);
                     
 
                 }
-            }/*
+            }
+            dt.Dispose();
+            dt = null;
+            /*
             else
             {
                 //send power on only
@@ -788,9 +798,10 @@ LIMIT 1";
                     Thread.Sleep(30);
                 }
                 
-                var dt = avlsSqlClient.get_DataTable(avlsSqlCmd);
+                DataTable dt = avlsSqlClient.get_DataTable(avlsSqlCmd);
                 avlsSqlClient.disconnect();
-                //avlsSqlClient.Dispose();
+                avlsSqlClient.Dispose();
+				avlsSqlClient=null;
                 if (dt != null && dt.Rows.Count != 0)
                 {
                     string avlsLat = string.Empty, avlsLon = string.Empty;
@@ -827,6 +838,8 @@ LIMIT 1";
                     avls_package.Loc = "N" + lat_str + "E" + long_str + ",";
                     //avls_package.Loc = "N00000.0000E00000.0000,";
                 }
+                dt.Dispose();
+                dt = null;
             }
             else
             {
@@ -1067,8 +1080,10 @@ LIMIT
                             AutosendsqlClient.disconnect();
                         }
                     }
-                   
-                    //AutosendsqlClient.Dispose();
+                    dt.Dispose();
+                    dt = null;
+                    AutosendsqlClient.Dispose();
+					AutosendsqlClient=null;
                     //Thread.Sleep((int)uint.Parse(ConfigurationManager.AppSettings["autosend_interval"]) * 1000);
                 }
                 
@@ -1550,7 +1565,8 @@ Select 1-6 then press enter to send package
                     sql_client.modify(cmd);
                     sql_client.disconnect();
                 }
-            //sql_client.Dispose();
+            sql_client.Dispose();
+			sql_client=null;
             Thread readlineThread = new Thread(ReadLine);
             readlineThread.Start(unsTcpClient);
                 //ReadLine(unsTcpClient, 2);          
@@ -2252,9 +2268,10 @@ WHERE
                 Thread.Sleep(30);
             }
             
-            var dt = sqlClient.get_DataTable(sqlCmd);
+            DataTable dt = sqlClient.get_DataTable(sqlCmd);
             sqlClient.disconnect();
-            //sqlClient.Dispose();
+            sqlClient.Dispose();
+			sqlClient=null;
             if (dt != null && dt.Rows.Count != 0)
             {
 
@@ -2279,6 +2296,8 @@ WHERE
                 }
                 
             }
+            dt.Dispose();
+            dt = null;
         }
         /*
          * avls event list:
@@ -2459,9 +2478,10 @@ LIMIT 1";
                             Thread.Sleep(30);
                         }
                         
-                        var dt = avlsSqlClient.get_DataTable(avlsSqlCmd);
+                        DataTable dt = avlsSqlClient.get_DataTable(avlsSqlCmd);
                         avlsSqlClient.disconnect();
-                        //avlsSqlClient.Dispose();
+                        avlsSqlClient.Dispose();
+						avlsSqlClient=null;
                         if (dt != null && dt.Rows.Count != 0)
                         {
                             string avlsLat = string.Empty, avlsLon = string.Empty;
@@ -2498,6 +2518,8 @@ LIMIT 1";
                             avls_package.Loc = "N" + lat_str + "E" + long_str + ",";
                             //avls_package.Loc = "N00000.0000E00000.0000,";
                         }
+                        dt.Dispose();
+                        dt = null;
                         /*
                          * SELECT 
       public._gps_log._lat,
@@ -2621,9 +2643,10 @@ LIMIT 1";
                         {
                             Thread.Sleep(30);
                         }
-                        var dt = avlsSqlClient.get_DataTable(avlsSqlCmd);
+                        DataTable dt = avlsSqlClient.get_DataTable(avlsSqlCmd);
                         avlsSqlClient.disconnect();
-                        //avlsSqlClient.Dispose();
+                        avlsSqlClient.Dispose();
+						avlsSqlClient=null;
                         if (dt != null && dt.Rows.Count != 0)
                         {
                             string avlsLat = string.Empty, avlsLon = string.Empty;
@@ -2660,6 +2683,8 @@ LIMIT 1";
                             avls_package.Loc = "N" + lat_str + "E" + long_str + ",";
                             //avls_package.Loc = "N00000.0000E00000.0000,";
                         }
+                        dt.Dispose();
+                        dt = null;
                         /*
                          * SELECT 
       public._gps_log._lat,
@@ -2925,8 +2950,8 @@ LIMIT 1";
             //ReadLine(avls_tcpClient, netStream, send_string.Length);
             //netStream.Close();
             //avlsTcpClient.Close();
-            //htable.Clear();
-            //htable = null;
+            htable.Clear();
+            htable = null;
             //GC.Collect();
             //GC.WaitForPendingFinalizers();
             //Console.WriteLine("-access_avls_server");
@@ -3012,7 +3037,7 @@ now() <= end_time::timestamp ";
             {
                 Thread.Sleep(30);
             }
-            var dt = sql_client.get_DataTable(regSqlCmdForProhibitedTable);
+            DataTable dt = sql_client.get_DataTable(regSqlCmdForProhibitedTable);
             sql_client.disconnect();
             //List<EAB2> prohibitedEab2s= new List<EAB2>();
             if (dt != null && dt.Rows.Count != 0)
@@ -3057,7 +3082,7 @@ now() <= end_time::timestamp ";
                         {
                             Thread.Sleep(30);
                         }
-                        var dt2 = sql_client.get_DataTable(sqlCmd);
+                        DataTable dt2 = sql_client.get_DataTable(sqlCmd);
                         sql_client.disconnect();
                         if (dt2 != null && dt2.Rows.Count != 0)
                         {
@@ -3066,6 +3091,8 @@ now() <= end_time::timestamp ";
                                 stayTimeInMin = double .Parse(row[0].ToString());
                             }
                         }
+                        dt2.Dispose();
+                        dt2 = null;
                         //SiAuto.Main.WatchDouble(Level.Debug, "stayTimeInMin", stayTimeInMin);
                         DateTime getTime = new DateTime();
                         var dateTime = (from p in sqlCEdb.CheckIfOverTime where p.Uid == id select p.CreateTime).FirstOrDefault();
@@ -3211,7 +3238,7 @@ now() <= end_time::timestamp ";
                         {
                             Thread.Sleep(30);
                         }
-                        var dt2 = sql_client.get_DataTable(sqlCmd);
+                        DataTable dt2 = sql_client.get_DataTable(sqlCmd);
                         sql_client.disconnect();
                         if (dt2 != null && dt2.Rows.Count != 0)
                         {
@@ -3220,6 +3247,8 @@ now() <= end_time::timestamp ";
                                 stayTimeInMin = double.Parse(row[0].ToString());
                             }
                         }
+                        dt2.Dispose();
+                        dt2 = null;
                         //SiAuto.Main.WatchDouble(Level.Debug, "stayTimeInMin", stayTimeInMin);
                         DateTime getTime = new DateTime();
                         var dateTime = (from p in sqlCEdb.CheckIfOverTime2 where p.Uid == id select p.CreateTime).FirstOrDefault();
@@ -3304,8 +3333,10 @@ now() <= end_time::timestamp ";
                 }
                 
             }
-            
-            //sql_client.Dispose();
+            dt.Dispose();
+            dt = null;
+            sql_client.Dispose();
+			sql_client=null;
             //sql_client = null;
             //GC.Collect();
             //GC.WaitForPendingFinalizers();
@@ -3329,9 +3360,10 @@ FROM
             {
                 Thread.Sleep(30);
             }
-            var dt = sql_client.get_DataTable(regSqlCmd);
+            DataTable dt = sql_client.get_DataTable(regSqlCmd);
                             sql_client.disconnect();
-            //sql_client.Dispose();
+            sql_client.Dispose();
+			sql_client=null;
             if (dt != null && dt.Rows.Count != 0)
             {
                 foreach (DataRow row in dt.Rows)
@@ -3339,6 +3371,8 @@ FROM
                     myList.Add(new EAB(row[0].ToString(), row[1].ToString()));
                 }
             }
+            dt.Dispose();
+            dt = null;
         }
 
         private static void avls_WriteLine(NetworkStream netStream, byte[] writeData, string write)
@@ -3591,7 +3625,7 @@ WHERE
                     {
                         Thread.Sleep(30);
                     }
-                    var dt1 = sql_client.get_DataTable(sqlCmd1);
+                    DataTable dt1 = sql_client.get_DataTable(sqlCmd1);
                     sql_client.disconnect();
 
                     if (dt1 != null && dt1.Rows.Count != 0)
@@ -3612,6 +3646,8 @@ WHERE
                             sql_client.disconnect();
 
                     }
+                dt1.Dispose();
+                    dt1 = null;
                 }
 
                 #endregion
@@ -4070,7 +4106,7 @@ LIMIT 1";
                     {
                         Thread.Sleep(30);
                     }
-                    var sqlDatetable = sql_client.get_DataTable(sqlCmd);
+                    DataTable sqlDatetable = sql_client.get_DataTable(sqlCmd);
                     sql_client.disconnect();
                     if (sqlDatetable != null && sqlDatetable.Rows.Count != 0)
                     {
@@ -4100,6 +4136,8 @@ LIMIT 1";
                         gps_log._lat = gps_log._or_lat = operation_log.eqp_lat = lat;
                         gps_log._lon = gps_log._or_lon = operation_log.eqp_lon = lon;
                     }
+                    sqlDatetable.Dispose();
+                    sqlDatetable = null;
                 }
                 else
                 {
@@ -4884,10 +4922,10 @@ LIMIT 1";
                     #endregion #region insert into custom.cga_event_log
                 }
             
-            //htable.Clear();
-                //htable = null;
-            //sql_client.Dispose();
-                //sql_client = null;
+            htable.Clear();
+                htable = null;
+            sql_client.Dispose();
+                sql_client = null;
             //GC.Collect();
             //GC.WaitForPendingFinalizers();
                 Console.ForegroundColor = ConsoleColor.DarkCyan;
@@ -4906,16 +4944,16 @@ LIMIT 1";
             string DB = string.Empty, stayTimeInMin = string.Empty;
             List<string> resultList= new List<string>();
             DB = "lmap100";
-            SqlClient sql_client = new SqlClient(ConfigurationManager.AppSettings["SQL_SERVER_IP"], ConfigurationManager.AppSettings["SQL_SERVER_PORT"], ConfigurationManager.AppSettings["SQL_SERVER_USER_ID"], ConfigurationManager.AppSettings["SQL_SERVER_PASSWORD"], DB, ConfigurationManager.AppSettings["Pooling"], ConfigurationManager.AppSettings["MinPoolSize"], ConfigurationManager.AppSettings["MaxPoolSize"], ConfigurationManager.AppSettings["ConnectionLifetime"]);
+            SqlClient sqlclient = new SqlClient(ConfigurationManager.AppSettings["SQL_SERVER_IP"], ConfigurationManager.AppSettings["SQL_SERVER_PORT"], ConfigurationManager.AppSettings["SQL_SERVER_USER_ID"], ConfigurationManager.AppSettings["SQL_SERVER_PASSWORD"], DB, ConfigurationManager.AppSettings["Pooling"], ConfigurationManager.AppSettings["MinPoolSize"], ConfigurationManager.AppSettings["MaxPoolSize"], ConfigurationManager.AppSettings["ConnectionLifetime"]);
             
             string sqlCmd = @"select stay_time from p_config LIMIT 1";
 
-            while (!sql_client.connect())
+            while (!sqlclient.connect())
             {
                 Thread.Sleep(30);
             }
-            var dt2 = sql_client.get_DataTable(sqlCmd);
-            sql_client.disconnect();
+            var dt2 = sqlclient.get_DataTable(sqlCmd);
+            sqlclient.disconnect();
             if (dt2 != null && dt2.Rows.Count != 0)
             {
                 foreach (DataRow row in dt2.Rows)
@@ -4927,6 +4965,10 @@ LIMIT 1";
             {
                 stayTimeInMin = "0";
             }
+			dt2.Dispose();
+			dt2=null;
+			sqlclient.Dispose();
+			sqlclient=null;
             sqlCmd = @"SELECT
 public._gps_log._lat,
 public._gps_log._lon
@@ -4937,7 +4979,7 @@ public._gps_log._time <= now() AND
 public._gps_log._time >= now() - interval '"+stayTimeInMin+@" minute' AND
 public._gps_log._uid = '"+deviceID+@"'
 ";
-             sql_client = new SqlClient(ConfigurationManager.AppSettings["SQL_SERVER_IP"],
+             SqlClient sql_client = new SqlClient(ConfigurationManager.AppSettings["SQL_SERVER_IP"],
                 ConfigurationManager.AppSettings["SQL_SERVER_PORT"],
                 ConfigurationManager.AppSettings["SQL_SERVER_USER_ID"],
                 ConfigurationManager.AppSettings["SQL_SERVER_PASSWORD"],
@@ -4948,11 +4990,13 @@ public._gps_log._uid = '"+deviceID+@"'
             {
                 Thread.Sleep(30);
             }
-            dt2 = sql_client.get_DataTable(sqlCmd);
+            var dt3 = sql_client.get_DataTable(sqlCmd);
             sql_client.disconnect();
-            if (dt2 != null && dt2.Rows.Count != 0)
+			sql_client.Dispose();
+                    sql_client = null;
+            if (dt3 != null && dt3.Rows.Count != 0)
             {
-                foreach (DataRow row in dt2.Rows)
+                foreach (DataRow row in dt3.Rows)
                 {
                     double d = GeoCodeCalc.CalcDistance(double.Parse(lat), double.Parse(lon), double.Parse(row[0].ToString()),
                         double.Parse(row[1].ToString()), GeoCodeCalcMeasurement.Kilometers);
@@ -4972,29 +5016,31 @@ public._gps_log._uid = '"+deviceID+@"'
                 {
                     string result = string.Empty;
                     result = "in";
-                    //sql_client.Dispose();
-                    //sql_client = null;
+                    
                     //GC.Collect();
                     //GC.WaitForPendingFinalizers();
+					dt3.Dispose();
+					dt3=null;
                     return result;
                 }
                 else
                 {
                     string result = string.Empty;
                     result = "out";
-                    //sql_client.Dispose();
-                    //sql_client = null;
                     //GC.Collect();
                     //GC.WaitForPendingFinalizers();
+					dt3.Dispose();
+					dt3=null;
                     return result;
                 }
             }
             else
             {
-                //sql_client.Dispose();
-                //sql_client = null;
+
                 //GC.Collect();
                 //GC.WaitForPendingFinalizers();
+				dt3.Dispose();
+				dt3=null;
                 return string.Empty;
             }
         }
