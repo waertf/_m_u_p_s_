@@ -254,15 +254,15 @@ namespace ConsoleApplication1_client_threading
         }
 		public void Dispose()
 		{
-			PgSqlConnection.ClearPool(pgSqlConnection);
-            pgSqlConnection.Dispose();
-            pgSqlConnection = null;
-		}
-        //~SqlClient()
-        //{
-            //PgSqlConnection.ClearPool(pgSqlConnection);
+			//PgSqlConnection.ClearPool(pgSqlConnection);
             //pgSqlConnection.Dispose();
             //pgSqlConnection = null;
-        //}   
+		}
+        ~SqlClient()
+        {
+            PgSqlConnection.ClearPool(pgSqlConnection);
+            pgSqlConnection.Dispose();
+            pgSqlConnection = null;
+        }   
     }
 }
