@@ -1630,7 +1630,19 @@ Select 1-6 then press enter to send package
 				Thread xmlParseThread = new Thread(xml_parse);
                 xmlParseThread.Start(returndata);
                 //xmlParseThread.Join(int.Parse(ConfigurationManager.AppSettings["xmlParseJoinTimeout"]));
-                xmlParseThread.Join();
+                switch (int.Parse(ConfigurationManager.AppSettings["xmlParseJoinType"]))
+                {
+                    case 0://not join
+                        break;
+                    case 1://join with time out
+                        if (xmlParseThread != null)
+                            xmlParseThread.Join(int.Parse(ConfigurationManager.AppSettings["xmlParseJoinTimeout"]));
+                        break;
+                    case 2://join
+                        if (xmlParseThread != null)
+                            xmlParseThread.Join();
+                        break;
+                }
                 //Thread.Sleep(1);
 				//xml_parse(new XmlClass(unsTcpClient, fStream, returndata, avlsTcpClient));
                 //ThreadPool.QueueUserWorkItem(new WaitCallback(xml_parse), new XmlClass(unsTcpClient, fStream, returndata, avlsTcpClient));
