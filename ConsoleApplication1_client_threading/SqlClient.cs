@@ -263,6 +263,7 @@ namespace ConsoleApplication1_client_threading
             PgSqlConnection.ClearPool(pgSqlConnection);
             pgSqlConnection.Dispose();
             pgSqlConnection = null;
+            GC.Collect();
         }   
     }
 }
