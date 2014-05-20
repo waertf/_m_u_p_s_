@@ -306,10 +306,10 @@ LIMIT 1";
             lon = ((lonNumberAfterPoint * 60 / 100 + lonInt) * 100).ToString();
         }
 
-        private static int avlsAccessCount = 0;
-        private static bool avlsFlag = false;
-        private static object IsFirstExecuteLock = new object();
-        private static uint deviceCount = 0;
+        //private static int avlsAccessCount = 0;
+        //private static bool avlsFlag = false;
+        //private static object IsFirstExecuteLock = new object();
+        //private static uint deviceCount = 0;
 
         static void Main(string[] args)
         {
@@ -431,7 +431,7 @@ LIMIT 1";
             string totalDevice = sql_client.get_DataTable(@"SELECT reltuples FROM pg_class WHERE oid = 'sd.equipment'::regclass").Rows[0].ItemArray[0].ToString();
             sql_client.disconnect();
 
-            deviceCount = uint.Parse(totalDevice);
+            //deviceCount = uint.Parse(totalDevice);
             //empty power column in table custom.uns_deivce_power_status
             string emptyPowerStatusTable = @"DELETE FROM custom.uns_deivce_power_status";
             while (!sql_client.connect())
@@ -1985,8 +1985,8 @@ Select 1-6 then press enter to send package
                             {
                                 //sqlAccessEvent.Reset();
                                  access_sql = new Thread(access_sql_server);
-                                access_sql.Start(new SqlClass(xml_root_tag, htable, sensor_name.ToList(),
-                                    sensor_type.ToList(), sensor_value.ToList(), XmlGetAllElementsXname(xml_data),
+                                access_sql.Start(new SqlClass(xml_root_tag, htable, sensor_name,
+                                    sensor_type, sensor_value, XmlGetAllElementsXname(xml_data),
                                     logData, getMessage));
 
                                 //ThreadPool.QueueUserWorkItem(new WaitCallback(access_sql_server), new SqlClass(xml_root_tag, htable, sensor_name.ToList(), sensor_type.ToList(), sensor_value.ToList(), XmlGetAllElementsXname(xml_data), logData, getMessage));
@@ -2000,8 +2000,8 @@ Select 1-6 then press enter to send package
                                 //avlsSendDone.Reset();
                                  access_avls = new Thread(access_avls_server);
                                 //access_avls.Priority = ThreadPriority.BelowNormal;
-                                access_avls.Start(new AvlsClass(xml_root_tag, htable, sensor_name.ToList(),
-                                    sensor_type.ToList(), sensor_value.ToList(), XmlGetAllElementsXname(xml_data),
+                                access_avls.Start(new AvlsClass(xml_root_tag, htable, sensor_name,
+                                    sensor_type, sensor_value, XmlGetAllElementsXname(xml_data),
                                     logData, getMessage));
 
                                 //ThreadPool.QueueUserWorkItem(new WaitCallback(access_avls_server), new AvlsClass(xml_root_tag, htable, sensor_name.ToList(), sensor_type.ToList(), sensor_value.ToList(), XmlGetAllElementsXname(xml_data), logData, getMessage));
@@ -2126,7 +2126,7 @@ Select 1-6 then press enter to send package
                     if (bool.Parse(ConfigurationManager.AppSettings["SQL_ACCESS"]))
                     {
                         Thread access_sql = new Thread(access_sql_server);
-                        access_sql.Start(new SqlClass(xml_root_tag, htable, sensor_name.ToList(), sensor_type.ToList(), sensor_value.ToList(), XmlGetAllElementsXname(xml_data), logData, null));
+                        access_sql.Start(new SqlClass(xml_root_tag, htable, sensor_name, sensor_type, sensor_value, XmlGetAllElementsXname(xml_data), logData, null));
 
                         //ThreadPool.QueueUserWorkItem(new WaitCallback(access_sql_server), new SqlClass(xml_root_tag, htable, sensor_name.ToList(), sensor_type.ToList(), sensor_value.ToList(), XmlGetAllElementsXname(xml_data), logData, null));
                             
@@ -2238,6 +2238,7 @@ Select 1-6 then press enter to send package
                 //w.Close();
             }
             */
+            /*
             htable.Clear();
             htable = null;
             sensor_name.Clear();
@@ -2246,6 +2247,7 @@ Select 1-6 then press enter to send package
             sensor_value = null;
             sensor_type.Clear();
             sensor_type = null;
+            */
             //GC.Collect();
             //GC.WaitForPendingFinalizers();
             
@@ -2771,7 +2773,7 @@ LIMIT 1";
                             avls_package.Event = "181,";
                             avls_package.Status = "00000000,";
                             avls_package.Message = "power_on";
-                            avlsAccessCount++;
+                            //avlsAccessCount++;
                             //netStream.Close();
                             //avls_tcpClient.Close();
                             //return;
@@ -2780,7 +2782,7 @@ LIMIT 1";
                             avls_package.Event = "182,";
                             avls_package.Status = "00000000,";
                             avls_package.Message = "power_off";
-                            avlsAccessCount++;
+                            //avlsAccessCount++;
                             //netStream.Close();
                             //avls_tcpClient.Close();
                             //return;
@@ -2817,7 +2819,7 @@ LIMIT 1";
             avlsSendPackage = send_string;
             avls_WriteLine(avlsNetworkStream, System.Text.Encoding.UTF8.GetBytes(send_string), send_string);
             SiAuto.Main.LogMessage(send_string);
-            avlsFlag = true;
+            //avlsFlag = true;
 
             var deviceChar = deviceID.ToCharArray();
             if (!deviceChar[3].Equals('0')  && avls_package.Event == "0,")
@@ -5310,27 +5312,15 @@ public._gps_log._uid = '"+deviceID+@"'
             string getMessage)
         {
             XmlRootTag = xml_root_tag;
-            Htable = new Hashtable(htable);
-            SensorName = new List<string>(sensor_name);
-            SensorType = new List<string>(sensor_type);
-            SensorValue = new List<string>(sensor_value);
+            Htable = htable;
+            SensorName = sensor_name;
+            SensorType = sensor_type;
+            SensorValue = sensor_value;
             Elements = elements;
             Log1 = log1;
             GetMessage = getMessage;
         }
-        ~SqlClass()
-        {
-            XmlRootTag = Log1 = GetMessage = string.Empty;
-            Htable.Clear();
-            SensorName.Clear();
-            SensorType.Clear();
-            SensorValue.Clear();
-            Htable = null;
-            SensorName = null;
-            SensorType = null;
-            SensorValue = null;
-            Elements = null;
-        }
+        
     }
     /*
      * private static void access_avls_server(string xml_root_tag, Hashtable htable, List<string> sensor_name,
@@ -5354,27 +5344,15 @@ public._gps_log._uid = '"+deviceID+@"'
              string getMessage)
         {
             XmlRootTag = xml_root_tag;
-            Htable = new Hashtable(htable);
-            SensorName = new List<string>(sensor_name);
-            SensorType = new List<string>(sensor_type);
-            SensorValue = new List<string>(sensor_value);
+            Htable = htable;
+            SensorName = sensor_name;
+            SensorType = sensor_type;
+            SensorValue = sensor_value;
             Elements = iEnumerable;
             Log = log;
             GetMessage = getMessage;
         }
-        ~AvlsClass()
-        {
-            XmlRootTag = Log = GetMessage = string.Empty;
-            Htable.Clear();
-            SensorName.Clear();
-            SensorType.Clear();
-            SensorValue.Clear();
-            Htable = null;
-            SensorName = null;
-            SensorType = null;
-            SensorValue = null;
-            Elements = null;
-        }
+        
     }
     
     public class GeoAngle
