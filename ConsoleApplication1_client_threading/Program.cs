@@ -484,15 +484,18 @@ LIMIT 1";
                 //w.Close();
             }
             {//access sql
-                string now = string.Format("{0:yyyyMMdd}", DateTime.Now);
+                string now = string.Format("{0:yyyyMMddHHmmssfffffff}", DateTime.Now);
+                /*
                 while (!sql_client.connect())
                 {
                     Thread.Sleep(30);
                 }
                 string manual_id_serial_command = sql_client.get_DataTable("SELECT COUNT(_id)   FROM public.operation_log").Rows[0].ItemArray[0].ToString();
                 sql_client.disconnect();
+                */
                 MANUAL_SQL_DATA operation_log = new MANUAL_SQL_DATA();
-                operation_log._id = "\'" + "operation" + "_" + now + "_" + manual_id_serial_command + "\'";
+                //operation_log._id = "\'" + "operation" + "_" + now + "_" + manual_id_serial_command + "\'";
+                operation_log._id = "\'" + "op" + "_" + now + "\'";
                 operation_log.event_id = @"'null'";
                 operation_log.application_id = "\'" + ConfigurationManager.AppSettings["application_ID"] + "\'";
                 operation_log.create_user = @"'System'";
@@ -1537,7 +1540,8 @@ Select 1-6 then press enter to send package
                 }
                 {
 //access sql
-                    string now = string.Format("{0:yyyyMMdd}", DateTime.Now);
+                    string now = string.Format("{0:yyyyMMddHHmmssfffffff}", DateTime.Now);
+                    /*
                     while (!sql_client.connect())
                     {
                         Thread.Sleep(30);
@@ -1547,8 +1551,9 @@ Select 1-6 then press enter to send package
                         sql_client.get_DataTable("SELECT COUNT(_id)   FROM public.operation_log").Rows[0].ItemArray[0]
                             .ToString();
                     sql_client.disconnect();
+                    */
                     MANUAL_SQL_DATA operation_log = new MANUAL_SQL_DATA();
-                    operation_log._id = "\'" + "operation" + "_" + now + "_" + manual_id_serial_command + "\'";
+                    operation_log._id = "\'" + "op" + "_" + now + "\'";
                     operation_log.event_id = @"'null'";
                     operation_log.application_id = "\'" + ConfigurationManager.AppSettings["application_ID"] + "\'";
                     operation_log.create_user = @"'System'";
@@ -1624,7 +1629,8 @@ Select 1-6 then press enter to send package
                 
 				Thread xmlParseThread = new Thread(xml_parse);
                 xmlParseThread.Start(returndata);
-                xmlParseThread.Join(int.Parse(ConfigurationManager.AppSettings["xmlParseJoinTimeout"]));
+                //xmlParseThread.Join(int.Parse(ConfigurationManager.AppSettings["xmlParseJoinTimeout"]));
+                xmlParseThread.Join();
                 //Thread.Sleep(1);
 				//xml_parse(new XmlClass(unsTcpClient, fStream, returndata, avlsTcpClient));
                 //ThreadPool.QueueUserWorkItem(new WaitCallback(xml_parse), new XmlClass(unsTcpClient, fStream, returndata, avlsTcpClient));
@@ -2003,7 +2009,20 @@ Select 1-6 then press enter to send package
                                 //Console.WriteLine("AVLS Access Enable");
                                 //avlsSendDone.WaitOne();
                             }
-                            if (access_sql != null) access_sql.Join(int.Parse(ConfigurationManager.AppSettings["accessSqlJoinTimeout"]));
+                            switch (int.Parse(ConfigurationManager.AppSettings["accessSqlJoinType"]))
+                            {
+                                case 0://not join
+                                    break;
+                                case 1://join with time out
+                                    if (access_sql != null) 
+                                        access_sql.Join(int.Parse(ConfigurationManager.AppSettings["accessSqlJoinTimeout"]));
+                                    break;
+                                case 2://join
+                                    if (access_sql != null) 
+                                        access_sql.Join();
+                                    break;
+                            }
+                            
                             //access_avls.Join();
                             //Thread.Sleep(1);
                         }
@@ -3528,7 +3547,7 @@ FROM
             AUTO_SQL_DATA gps_log = new AUTO_SQL_DATA();
             MANUAL_SQL_DATA operation_log = new MANUAL_SQL_DATA();
             gps_log._or_lat = gps_log._or_lon = gps_log._satellites = gps_log._temperature = gps_log._voltage = "0";
-            string now = string.Format("{0:yyyyMMdd}", dtime);
+            string now = string.Format("{0:yyyyMMddHHmmssfffffff}", dtime);
             gps_log._time = "\'" + string.Format("{0:yyyyMMdd HH:mm:ss.fff}", dtime) + "+08" + "\'";
 
             
@@ -3549,10 +3568,11 @@ FROM
             else
                 operation_log.application_id = "\'" + "null" + "\'";
             string deviceID = string.Empty;
-                double operationLogIdCount;
-                lock (gpsLogAccessSqlLock)
+                //double operationLogIdCount;
+                //lock (gpsLogAccessSqlLock)
                 {
                     #region sql get/set id
+                    /*
                     while (!sql_client.connect())
                     {
                         Thread.Sleep(30);
@@ -3565,8 +3585,8 @@ FROM
                     " AND public._gps_log._time::Date = current_date").Rows[0].ItemArray[0].ToString();
                         sql_client.disconnect();
                     }
-
-
+                    */
+                    /*
                     while (!sql_client.connect())
                     {
                         Thread.Sleep(30);
@@ -3576,21 +3596,25 @@ FROM
                             sql_client.get_DataTable("SELECT COUNT(_id)   FROM public.operation_log").Rows[0].ItemArray[0]
                                 .ToString());
                     sql_client.disconnect();
-                    operationLogIdCount.ToString("000000000000");
+                    operationLogIdCount.ToString("000000000000");*/
                     if (htable.ContainsKey("suaddr"))
                     {
                         deviceID = htable["suaddr"] as string;
                         gps_log._uid = operation_log.eqp_id = "\'" + deviceID + "\'";
-                        gps_log._id = "\'" + deviceID + "_" + now + "_" + _gps_logUidCount + "\'";
-                        operation_log._id = "\'" + "operation" + "_" + now + "_" + operationLogIdCount + "\'";
+                        //gps_log._id = "\'" + deviceID + "_" + now + "_" + _gps_logUidCount + "\'";
+                        //operation_log._id = "\'" + "operation" + "_" + now + "_" + operationLogIdCount + "\'";
+                        gps_log._id = "\'" + deviceID + "_" + now  + "\'";
+                        operation_log._id = "\'" + "op" + "_" + now + "\'";
                     }
                     else
                     {
                         gps_log._uid = operation_log.eqp_id = "\'" + "null" + "\'";
-                        gps_log._id = "\'" + Convert.ToBase64String(System.Guid.NewGuid().ToByteArray()) + "_" +
-                                      _gps_logUidCount + "\'";
+                        gps_log._id = "\'" + "null" + "_" + now + "\'";
+                        operation_log._id = "\'" + "op" + "_" + now + "\'";
+                        //gps_log._id = "\'" + Convert.ToBase64String(System.Guid.NewGuid().ToByteArray()) + "_" +
+                                       //"\'";
                         //operation_log._id = "\'" + Convert.ToBase64String(System.Guid.NewGuid().ToByteArray()) + "_" + manual_id_serial_command + "\'";
-                        operation_log._id = "\'" + "operation" + "_" + now + "_" + operationLogIdCount + "\'";
+                        //operation_log._id = "\'" + deviceID + "_" + now + "_"  + "\'";
                     }
                     #endregion sql get/set id
                 }
@@ -3834,8 +3858,10 @@ WHERE
                         gps_log.j_6 = "\'" + htable["event_info"].ToString() + "\'";
                         gps_log.j_7 = "\'" + "null" + "\'";
                         gps_log.j_8 = "\'" + "null" + "\'";
+                        //operation_log.event_id = "\'" + operation_log.eqp_id + now +
+                                                 //operationLogIdCount.ToString("000000000000") + "\'";
                         operation_log.event_id = "\'" + operation_log.eqp_id + now +
-                                                 operationLogIdCount.ToString("000000000000") + "\'";
+                                                "\'";
                         break;
                     case "Unit Present":
                         if (!string.IsNullOrEmpty(deviceID) && CheckIfUidExist(deviceID))
@@ -3958,8 +3984,10 @@ VALUES(
                         gps_log.j_7 = "\'" + htable["event_info"].ToString() + "\'";
                         gps_log.j_6 = "\'" + "null" + "\'";
                         gps_log.j_8 = "\'" + "null" + "\'";
+                        //operation_log.event_id = "\'" + operation_log.eqp_id + now +
+                                                 //operationLogIdCount.ToString("000000000000") + "\'";
                         operation_log.event_id = "\'" + operation_log.eqp_id + now +
-                                                 operationLogIdCount.ToString("000000000000") + "\'";
+                                                 "\'";
 
                         #region access power status
 
@@ -4058,8 +4086,10 @@ VALUES(
                         gps_log.j_8 = "\'" + htable["event_info"].ToString() + "\'";
                         gps_log.j_6 = "\'" + "null" + "\'";
                         gps_log.j_7 = "\'" + "null" + "\'";
+                        //operation_log.event_id = "\'" + operation_log.eqp_id + now +
+                                                 //operationLogIdCount.ToString("000000000000") + "\'";
                         operation_log.event_id = "\'" + operation_log.eqp_id + now +
-                                                 operationLogIdCount.ToString("000000000000") + "\'";
+                                                 "\'";
                         break;
                     default:
                         gps_log.j_6 = gps_log.j_7 = gps_log.j_8 = operation_log.event_id = "\'" + "null" + "\'";
@@ -4629,7 +4659,7 @@ LIMIT 1";
             {
                 Thread.Sleep(30);
             }
-                double cgaEventLogIdCount = 0;
+                //double cgaEventLogIdCount = 0;
             sql_client.disconnect();
             string yyyymmddhhmmss = DateTime.Now.ToString("yyyyMMddHHmmss");
 
@@ -4640,7 +4670,7 @@ LIMIT 1";
             locationTableName = "public.patrol_location";
             //string getMessage = string.Empty,bundaryEventNumber = string.Empty;
                 string bundaryEventNumber = string.Empty;
-                lock (cgaEventAccessSqlLock)
+                //lock (cgaEventAccessSqlLock)
             {
 
                 /* 
@@ -4690,10 +4720,11 @@ LIMIT 1";
                     {
                         Thread.Sleep(30);
                     }
-                    cgaEventLogIdCount =
-                Convert.ToDouble(
-                    sql_client.get_DataTable("SELECT COUNT(uid)   FROM custom.cga_event_log WHERE uid = '" + deviceID + "\'").Rows[0].ItemArray[0]);
-                    string sn = "\'" + deviceID + now + cgaEventLogIdCount.ToString("000000000000") + "\'";
+                    //cgaEventLogIdCount =
+                //Convert.ToDouble(
+                    //sql_client.get_DataTable("SELECT COUNT(uid)   FROM custom.cga_event_log WHERE uid = '" + deviceID + "\'").Rows[0].ItemArray[0]);
+                    //string sn = "\'" + deviceID + now + cgaEventLogIdCount.ToString("000000000000") + "\'";
+                    string sn = "\'" + deviceID + DateTime.Now.ToString("yyyyMMddHHmmssfffffff") + "\'";
                     string table_columns =
                         "serial_no ,uid ,type ,lat ,lon,altitude ,speed ,course ,radius ,info_time ,server_time ,create_user ,create_ip,start_time,create_time";
                     string table_column_value = sn + "," +
@@ -4793,7 +4824,7 @@ LIMIT 1";
                 */
             #endregion access GetGidAndFullnameFromP_prohibitedAndPatrol_locationFromSql
 
-                lock (cgaEventAccessSqlLock)
+                //lock (cgaEventAccessSqlLock)
                 {
                     #region checkIfOverTime
                     //event:5->stay over specific time within 0.1 km
@@ -4804,6 +4835,7 @@ LIMIT 1";
                         {
                             case "in"://stay over time
                                 bundaryEventNumber = "5";
+                                /*
                                 while (!sql_client.connect())
                                 {
                                     Thread.Sleep(30);
@@ -4812,12 +4844,14 @@ LIMIT 1";
                                    Convert.ToDouble(
                                        sql_client.get_DataTable("SELECT COUNT(uid)   FROM custom.cga_event_log WHERE uid = '" + deviceID + "\'").Rows[0].ItemArray[0]);
                                 sql_client.disconnect();
+                                */
                                 //insert into custom.cga_event_log
                                 while (!sql_client.connect())
                                 {
                                     Thread.Sleep(30);
                                 }
-                                string sn = "\'" + deviceID + now + cgaEventLogIdCount.ToString("000000000000") + "\'";
+                                //string sn = "\'" + deviceID + now + cgaEventLogIdCount.ToString("000000000000") + "\'";
+                                string sn = "\'" + deviceID + DateTime.Now.ToString("yyyyMMddHHmmssfffffff") + "\'";
                                 string table_columns =
                                     "serial_no ,uid ,type ,lat ,lon,altitude ,speed ,course ,radius ,info_time ,server_time ,create_user ,create_ip,start_time,create_time";
                                 string table_column_value = sn + "," +
@@ -4846,9 +4880,10 @@ LIMIT 1";
                     }
                     #endregion checkIfOverTime
                 }
-                lock (cgaEventAccessSqlLock)
+                //lock (cgaEventAccessSqlLock)
                 {
                     #region insert into custom.cga_event_log
+                    /*
                     while (!sql_client.connect())
                     {
                         Thread.Sleep(30);
@@ -4857,7 +4892,7 @@ LIMIT 1";
                        Convert.ToDouble(
                            sql_client.get_DataTable("SELECT COUNT(uid)   FROM custom.cga_event_log WHERE uid = '" + deviceID + "\'").Rows[0].ItemArray[0]);
                     sql_client.disconnect();
-
+                    */
                     {
                         try
                         {
@@ -4866,7 +4901,8 @@ LIMIT 1";
                                 switch (htable["event_info"].ToString())
                                 {
                                     case "Emergency On":
-                                        string sn = "\'" + deviceID + now + cgaEventLogIdCount.ToString("000000000000") + "\'";
+                                        //string sn = "\'" + deviceID + now + cgaEventLogIdCount.ToString("000000000000") + "\'";
+                                        string sn = "\'" + deviceID + DateTime.Now.ToString("yyyyMMddHHmmssfffffff") + "\'";
                                         string table_columns =
                                             "serial_no ,uid ,type ,lat ,lon,altitude ,speed ,course ,radius ,info_time ,server_time ,create_user ,create_ip,start_time,create_time";
                                         string table_column_value = sn + "," +
