@@ -2343,7 +2343,7 @@ WHERE
             Console.ForegroundColor = ConsoleColor.DarkGreen;
             Console.WriteLine("+access_avls_server");
             Console.ResetColor();
-            var oo = o as AvlsClass;
+            AvlsClass oo = o as AvlsClass;
 
             string xml_root_tag = oo.XmlRootTag;
             Hashtable htable = oo.Htable;
@@ -2353,6 +2353,7 @@ WHERE
             IEnumerable<XName> iEnumerable = oo.Elements;
             string log = oo.Log;
             string getMessage = oo.GetMessage;
+
             //Console.WriteLine("+access_avls_server");
             Thread.CurrentThread.CurrentUICulture = new CultureInfo("en-us");
             string send_string = string.Empty;
@@ -3526,7 +3527,7 @@ FROM
                 Console.WriteLine("+access_sql_server");
                 Console.ResetColor();
             //Console.WriteLine("+access_sql_server");
-                var oo = o as SqlClass;
+                SqlClass oo = o as SqlClass;
 
                 string xml_root_tag = oo.XmlRootTag;
                 Hashtable htable = oo.Htable;
@@ -3536,7 +3537,7 @@ FROM
                 IEnumerable<XName> elements = oo.Elements;
                 string log1 = oo.Log1;
                 string getMessage = oo.GetMessage;
-                oo = null;
+
             Thread.CurrentThread.CurrentUICulture = new CultureInfo("en-us");
             SqlClient sql_client = new SqlClient(ConfigurationManager.AppSettings["SQL_SERVER_IP"],
                 ConfigurationManager.AppSettings["SQL_SERVER_PORT"],
