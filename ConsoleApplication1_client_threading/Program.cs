@@ -518,6 +518,7 @@ LIMIT 1";
             Thread read_thread = new Thread(read_thread_method);
             read_thread.Start(unsTcpClient);
             //ThreadPool.QueueUserWorkItem(new WaitCallback(read_thread_method), unsTcpClient);
+            
             if (bool.Parse(ConfigurationManager.AppSettings["ManualSend"]))
             {
                 Thread send_test_thread = new Thread(() => ManualSend(netStream));
@@ -550,6 +551,7 @@ LIMIT 1";
             var memoryUsageTimer = new System.Timers.Timer(3600000);
             memoryUsageTimer.Elapsed += new ElapsedEventHandler(memoryUsageTimer_Elapsed);
             memoryUsageTimer.Enabled = true;
+            
             //GC
             /*
             while (true)
@@ -1625,8 +1627,8 @@ Select 1-6 then press enter to send package
                 //Console.WriteLine("First node:[" + xml_root_tag + "]");
                 Console.WriteLine("E############################################################################");
                 Console.ResetColor();
-                
-                
+                xml_parse(returndata);
+                /*
 				Thread xmlParseThread = new Thread(xml_parse);
                 xmlParseThread.Start(returndata);
                 //xmlParseThread.Join(int.Parse(ConfigurationManager.AppSettings["xmlParseJoinTimeout"]));
@@ -1643,6 +1645,7 @@ Select 1-6 then press enter to send package
                             xmlParseThread.Join();
                         break;
                 }
+                */
                 //Thread.Sleep(1);
 				//xml_parse(new XmlClass(unsTcpClient, fStream, returndata, avlsTcpClient));
                 //ThreadPool.QueueUserWorkItem(new WaitCallback(xml_parse), new XmlClass(unsTcpClient, fStream, returndata, avlsTcpClient));
@@ -1820,7 +1823,7 @@ Select 1-6 then press enter to send package
                 // Close the writer and underlying file.
                 //w.Close();
             }
-            Hashtable htable = new Hashtable();
+            Dictionary<string, string> htable = new Dictionary<string, string>();
             List<string> sensor_name = new List<string>();
             List<string> sensor_value = new List<string>();
             List<string> sensor_type = new List<string>();
@@ -1996,11 +1999,18 @@ Select 1-6 then press enter to send package
                             if (bool.Parse(ConfigurationManager.AppSettings["SQL_ACCESS"]))
                             {
                                 //sqlAccessEvent.Reset();
-                                 access_sql = new Thread(access_sql_server);
-                                access_sql.Start(new SqlClass(xml_root_tag, htable, sensor_name,
-                                    sensor_type, sensor_value, XmlGetAllElementsXname(xml_data),
-                                    logData, getMessage));
-
+                                
+                                 //access_sql = new Thread(access_sql_server);
+                                //access_sql.Start(new SqlClass(xml_root_tag, htable, sensor_name,
+                                    //sensor_type, sensor_value, XmlGetAllElementsXname(xml_data),
+                                    //logData, getMessage));
+                                ThreadPool.QueueUserWorkItem(new WaitCallback(access_sql_server),
+                                    new SqlClass(xml_root_tag, htable, sensor_name,
+                                        sensor_type, sensor_value, XmlGetAllElementsXname(xml_data),
+                                        logData, getMessage));
+                                //access_sql_server(new SqlClass(xml_root_tag, htable, sensor_name,
+                                //sensor_type, sensor_value, XmlGetAllElementsXname(xml_data),
+                                //logData, getMessage));
                                 //ThreadPool.QueueUserWorkItem(new WaitCallback(access_sql_server), new SqlClass(xml_root_tag, htable, sensor_name.ToList(), sensor_type.ToList(), sensor_value.ToList(), XmlGetAllElementsXname(xml_data), logData, getMessage));
                                 //access_sql.Join();
                                 //Console.WriteLine("SQL Access Enable");
@@ -2010,12 +2020,20 @@ Select 1-6 then press enter to send package
                             if (bool.Parse(ConfigurationManager.AppSettings["AVLS_ACCESS"]))
                             {
                                 //avlsSendDone.Reset();
-                                 access_avls = new Thread(access_avls_server);
+                                
+                                 //access_avls = new Thread(access_avls_server);
                                 //access_avls.Priority = ThreadPriority.BelowNormal;
-                                access_avls.Start(new AvlsClass(xml_root_tag, htable, sensor_name,
-                                    sensor_type, sensor_value, XmlGetAllElementsXname(xml_data),
-                                    logData, getMessage));
+                                //access_avls.Start(new AvlsClass(xml_root_tag, htable, sensor_name,
+                                   // sensor_type, sensor_value, XmlGetAllElementsXname(xml_data),
+                                    //logData, getMessage));
 
+                                ThreadPool.QueueUserWorkItem(new WaitCallback(access_avls_server),
+                                    new AvlsClass(xml_root_tag, htable, sensor_name,
+                                        sensor_type, sensor_value, XmlGetAllElementsXname(xml_data),
+                                        logData, getMessage));
+                                //access_avls_server(new AvlsClass(xml_root_tag, htable, sensor_name,
+                                    //sensor_type, sensor_value, XmlGetAllElementsXname(xml_data),
+                                    //logData, getMessage));
                                 //ThreadPool.QueueUserWorkItem(new WaitCallback(access_avls_server), new AvlsClass(xml_root_tag, htable, sensor_name.ToList(), sensor_type.ToList(), sensor_value.ToList(), XmlGetAllElementsXname(xml_data), logData, getMessage));
                                 //access_avls.Join();
                                 //Console.WriteLine("AVLS Access Enable");
@@ -2036,6 +2054,7 @@ Select 1-6 then press enter to send package
                             }
                             
                             //access_avls.Join();
+                            //access_sql.Join();
                             //Thread.Sleep(1);
                         }
 
@@ -2358,7 +2377,7 @@ WHERE
             AvlsClass oo = o as AvlsClass;
 
             string xml_root_tag = oo.XmlRootTag;
-            Hashtable htable = oo.Htable;
+            Dictionary<string, string> htable = oo.Htable;
             List<string> sensor_name = oo.SensorName;
             List<string> sensor_type = oo.SensorType;
             List<string> sensor_value = oo.SensorValue;
@@ -3530,7 +3549,12 @@ FROM
         {
             MV,TK,EM,PE,UL
         }
-
+        public static Dictionary<K, V> HashtableToDictionary<K, V>(Hashtable table)
+        {
+            return table
+              .Cast<DictionaryEntry>()
+              .ToDictionary(kvp => (K)kvp.Key, kvp => (V)kvp.Value);
+        }
         private static void access_sql_server(object o)
         {
             Stopwatch stopWatch = Stopwatch.StartNew();
@@ -3542,7 +3566,9 @@ FROM
                 SqlClass oo = o as SqlClass;
 
                 string xml_root_tag = oo.XmlRootTag;
-                Hashtable htable = oo.Htable;
+                Dictionary<string,string> htable = oo.Htable;
+                //var htable = HashtableToDictionary<string,string>(htableh);
+                //htableh = null;
                 List<string> sensor_name = oo.SensorName;
                 List<string> sensor_type = oo.SensorType;
                 List<string> sensor_value = oo.SensorValue;
@@ -3688,6 +3714,10 @@ WHERE
                 dt1.Dispose();
                     dt1 = null;
                 }
+            else
+            {
+                return;
+            }
 
                 #endregion
             if (htable.ContainsKey("result_msg"))
@@ -3704,7 +3734,7 @@ WHERE
                         #region access power status
 
                     {
-                        if (!string.IsNullOrEmpty(deviceID) && CheckIfUidExist(deviceID))
+                        //if (!string.IsNullOrEmpty(deviceID) && CheckIfUidExist(deviceID))
                         {
                              unsUpdateTimeStamp = DateTime.Now.ToString("yyyyMMdd HHmmss+8");
                              unsSqlCmd = @"UPDATE 
@@ -3766,7 +3796,7 @@ WHERE
 
                         #region access power status
 
-                        if (!string.IsNullOrEmpty(deviceID) && CheckIfUidExist(deviceID))
+                        //if (!string.IsNullOrEmpty(deviceID) && CheckIfUidExist(deviceID))
                         {
                              unsUpdateTimeStamp = DateTime.Now.ToString("yyyyMMdd HHmmss+8");
                              unsSqlCmd = @"UPDATE 
@@ -3795,7 +3825,7 @@ WHERE
 
                         #region access power status
 
-                        if (!string.IsNullOrEmpty(deviceID) && CheckIfUidExist(deviceID))
+                        //if (!string.IsNullOrEmpty(deviceID) && CheckIfUidExist(deviceID))
                         {
                              unsUpdateTimeStamp = DateTime.Now.ToString("yyyyMMdd HHmmss+8");
                              unsSqlCmd = @"UPDATE 
@@ -3824,7 +3854,7 @@ WHERE
 
                         #region access power status
 
-                        if (!string.IsNullOrEmpty(deviceID) && CheckIfUidExist(deviceID))
+                        //if (!string.IsNullOrEmpty(deviceID) && CheckIfUidExist(deviceID))
                         {
                              unsUpdateTimeStamp = DateTime.Now.ToString("yyyyMMdd HHmmss+8");
                              unsSqlCmd = @"UPDATE 
@@ -3879,7 +3909,7 @@ WHERE
                                                 "\'";
                         break;
                     case "Unit Present":
-                        if (!string.IsNullOrEmpty(deviceID) && CheckIfUidExist(deviceID))
+                        //if (!string.IsNullOrEmpty(deviceID) && CheckIfUidExist(deviceID))
                         {
                             /*
                             while (!sql_client.connect())
@@ -4007,7 +4037,7 @@ VALUES(
                         #region access power status
 
                     {
-                        if (!string.IsNullOrEmpty(deviceID) && CheckIfUidExist(deviceID))
+                        //if (!string.IsNullOrEmpty(deviceID) && CheckIfUidExist(deviceID))
                         {
                             
                             {
@@ -5312,7 +5342,7 @@ public._gps_log._uid = '"+deviceID+@"'
     public class SqlClass
     {
         public string XmlRootTag;
-        public Hashtable Htable;
+        public Dictionary<string, string> Htable;
         public List<string> SensorName;
         public List<string> SensorType;
         public List<string> SensorValue;
@@ -5320,7 +5350,7 @@ public._gps_log._uid = '"+deviceID+@"'
         public string Log1;
         public string GetMessage;
 
-        public SqlClass(string xml_root_tag, Hashtable htable, List<string> sensor_name,
+        public SqlClass(string xml_root_tag, Dictionary<string, string> htable, List<string> sensor_name,
             List<string> sensor_type, List<string> sensor_value, IEnumerable<XName> elements, string log1,
             string getMessage)
         {
@@ -5344,7 +5374,7 @@ public._gps_log._uid = '"+deviceID+@"'
     public class AvlsClass
     {
         public string XmlRootTag;
-        public Hashtable Htable;
+        public Dictionary<string, string> Htable;
         public List<string> SensorName;
         public List<string> SensorType;
         public List<string> SensorValue;
@@ -5352,7 +5382,7 @@ public._gps_log._uid = '"+deviceID+@"'
         public string Log;
         public string GetMessage;
 
-        public AvlsClass(string xml_root_tag, Hashtable htable, List<string> sensor_name,
+        public AvlsClass(string xml_root_tag, Dictionary<string, string> htable, List<string> sensor_name,
             List<string> sensor_type, List<string> sensor_value, IEnumerable<XName> iEnumerable, string log,
              string getMessage)
         {
