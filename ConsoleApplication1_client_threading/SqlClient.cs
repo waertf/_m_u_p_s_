@@ -86,7 +86,9 @@ namespace ConsoleApplication1_client_threading
         //For UPDATE, INSERT, and DELETE statements
         public bool modify(string cmd)
         {
+            Stopwatch stopWatch = new Stopwatch();
             PgSqlCommand command = null;
+            stopWatch.Start();
             try
             {
                 if (pgSqlConnection != null && IsConnected)
@@ -99,7 +101,7 @@ namespace ConsoleApplication1_client_threading
                     //async
                     IAsyncResult cres = command.BeginExecuteNonQuery(null, null);
                     //Console.Write("In progress...");
-                    while (!cres.IsCompleted)
+                    //while (!cres.IsCompleted)
                     {
                         //Console.Write(".");
                         //Perform here any operation you need
@@ -132,6 +134,15 @@ namespace ConsoleApplication1_client_threading
                     if (command != null)
                         command.Dispose();
                     command = null;
+                    stopWatch.Stop();
+                    // Get the elapsed time as a TimeSpan value.
+                    TimeSpan ts = stopWatch.Elapsed;
+
+                    // Format and display the TimeSpan value.
+                    string elapsedTime = String.Format("{0:00}:{1:00}:{2:00}.{3:00}",
+                        ts.Hours, ts.Minutes, ts.Seconds,
+                        ts.Milliseconds / 10);
+                    SiAuto.Main.AddCheckpoint(Level.Debug, "sql modify take time:" + elapsedTime, cmd);
                     return true;
                 }
                 else
@@ -170,7 +181,7 @@ namespace ConsoleApplication1_client_threading
                     //Console.WriteLine("Starting asynchronous retrieval of data...");
                     IAsyncResult cres = command.BeginExecuteReader();
                     //Console.Write("In progress...");
-                    while (!cres.IsCompleted)
+                    //while (!cres.IsCompleted)
                     {
                         //Console.Write(".");
                         //Perform here any operation you need
@@ -254,10 +265,12 @@ namespace ConsoleApplication1_client_threading
         }
 		public void Dispose()
 		{
-			//PgSqlConnection.ClearPool(pgSqlConnection);
-            //pgSqlConnection.Dispose();
-            //pgSqlConnection = null;
+			PgSqlConnection.ClearPool(pgSqlConnection);
+            pgSqlConnection.Dispose();
+            pgSqlConnection = null;
+            //GC.Collect();
 		}
+        /*
         ~SqlClient()
         {
             PgSqlConnection.ClearPool(pgSqlConnection);
@@ -265,5 +278,6 @@ namespace ConsoleApplication1_client_threading
             pgSqlConnection = null;
             GC.Collect();
         }   
+         */
     }
 }
