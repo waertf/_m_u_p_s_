@@ -515,8 +515,10 @@ LIMIT 1";
             //sendtest(netStream);
 
             //alonso
-            Thread read_thread = new Thread(read_thread_method);
-            read_thread.Start(unsTcpClient);
+            //Thread read_thread = new Thread(read_thread_method);
+            //read_thread.Start(unsTcpClient);
+            read_thread_method(unsTcpClient);
+
             //ThreadPool.QueueUserWorkItem(new WaitCallback(read_thread_method), unsTcpClient);
             
             if (bool.Parse(ConfigurationManager.AppSettings["ManualSend"]))
@@ -1730,8 +1732,9 @@ Select 1-6 then press enter to send package
             Console.WriteLine("in read thread");
             Thread.CurrentThread.CurrentUICulture = new CultureInfo("en-us");
             //asyn read
-            Thread readlineThread = new Thread(ReadLine);
-            readlineThread.Start(unsTcpClient);
+            //Thread readlineThread = new Thread(ReadLine);
+            //readlineThread.Start(unsTcpClient);
+            ReadLine(unsTcpClient);
             //ReadLine(tcpClient, 2);
 			
             //syn read
