@@ -2003,16 +2003,17 @@ Select 1-6 then press enter to send package
                             {
                                 //avlsSendDone.Reset();
 
-                                //access_avls = new Thread(access_avls_server);
+                                access_avls = new Thread(access_avls_server);
                                 //access_avls.Priority = ThreadPriority.BelowNormal;
-                                //access_avls.Start(new AvlsClass(xml_root_tag, htable, sensor_name,
-                                // sensor_type, sensor_value, XmlGetAllElementsXname(xml_data),
-                                //logData, getMessage));
-
+                                access_avls.Start(new AvlsClass(xml_root_tag, htable, sensor_name,
+                                 sensor_type, sensor_value, XmlGetAllElementsXname(xml_data),
+                                logData, getMessage));
+                                /*
                                 ThreadPool.QueueUserWorkItem(new WaitCallback(access_avls_server),
                                     new AvlsClass(xml_root_tag, htable, sensor_name,
                                         sensor_type, sensor_value, XmlGetAllElementsXname(xml_data),
                                         logData, getMessage));
+                                */
                                 //access_avls_server(new AvlsClass(xml_root_tag, htable, sensor_name,
                                 //sensor_type, sensor_value, XmlGetAllElementsXname(xml_data),
                                 //logData, getMessage));
