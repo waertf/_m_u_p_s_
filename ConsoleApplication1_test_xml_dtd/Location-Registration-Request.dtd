@@ -1,2 +1,7 @@
-﻿<!ELEMENT Location-Registration-Request (application)>
-<!ELEMENT application (#PCDATA)>
+﻿<!ELEMENT Unsolicited-Location-Report (suaddr, event-info, info-data)>
+<!ELEMENT suaddr (#PCDATA)>
+<!ATTLIST suaddr
+          suaddr-type CDATA #IMPLIED>
+<!ELEMENT event-info (#PCDATA)>
+<!ELEMENT info-data (impl-spec-data?)>
+<!ELEMENT impl-spec-data (#PCDATA)>

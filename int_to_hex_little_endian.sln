@@ -23,6 +23,8 @@ Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "SetupUNS", "SetupUNS\SetupU
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PostgresqlTest", "PostgresqlTest\PostgresqlTest.csproj", "{523E096B-B4C7-4CB0-9FED-80520CE1D9E2}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsoleApplication1_test_xml_dtd", "ConsoleApplication1_test_xml_dtd\ConsoleApplication1_test_xml_dtd.csproj", "{4B5799E0-4CC0-404A-BF9D-9CD8A6B62F52}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -127,6 +129,14 @@ Global
 		{523E096B-B4C7-4CB0-9FED-80520CE1D9E2}.Release|Any CPU.Build.0 = Release|Any CPU
 		{523E096B-B4C7-4CB0-9FED-80520CE1D9E2}.Release|x64.ActiveCfg = Release|Any CPU
 		{523E096B-B4C7-4CB0-9FED-80520CE1D9E2}.Release|x86.ActiveCfg = Release|Any CPU
+		{4B5799E0-4CC0-404A-BF9D-9CD8A6B62F52}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4B5799E0-4CC0-404A-BF9D-9CD8A6B62F52}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4B5799E0-4CC0-404A-BF9D-9CD8A6B62F52}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{4B5799E0-4CC0-404A-BF9D-9CD8A6B62F52}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{4B5799E0-4CC0-404A-BF9D-9CD8A6B62F52}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4B5799E0-4CC0-404A-BF9D-9CD8A6B62F52}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4B5799E0-4CC0-404A-BF9D-9CD8A6B62F52}.Release|x64.ActiveCfg = Release|Any CPU
+		{4B5799E0-4CC0-404A-BF9D-9CD8A6B62F52}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

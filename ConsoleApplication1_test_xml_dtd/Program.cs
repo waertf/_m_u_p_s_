@@ -31,7 +31,7 @@ namespace ConsoleApplication1_test_xml_dtd
                 Console.WriteLine("Document is valid");
             else
                 Console.WriteLine("Document is invalid");
-            Console.WriteLine();
+            Console.ReadLine();
 
         }
 
