@@ -2161,11 +2161,13 @@ Select 1-6 then press enter to send package
                     }
                     if (bool.Parse(ConfigurationManager.AppSettings["SQL_ACCESS"]))
                     {
-                        Thread access_sql = new Thread(access_sql_server);
-                        access_sql.Start(new SqlClass(xml_root_tag, htable, sensor_name, sensor_type, sensor_value, XmlGetAllElementsXname(xml_data), logData, null));
-
+                        //Thread access_sql = new Thread(access_sql_server);
+                        //access_sql.Start(new SqlClass(xml_root_tag, htable, sensor_name, sensor_type, sensor_value, XmlGetAllElementsXname(xml_data), logData, null));
+                        ThreadPool.QueueUserWorkItem(new WaitCallback(access_sql_server),
+                            new SqlClass(xml_root_tag, htable, sensor_name, sensor_type, sensor_value,
+                                XmlGetAllElementsXname(xml_data), logData, null));
                         //ThreadPool.QueueUserWorkItem(new WaitCallback(access_sql_server), new SqlClass(xml_root_tag, htable, sensor_name.ToList(), sensor_type.ToList(), sensor_value.ToList(), XmlGetAllElementsXname(xml_data), logData, null));
-                            
+
                         //access_sql.Join();
                     }
                     break;
