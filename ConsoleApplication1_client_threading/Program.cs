@@ -1606,6 +1606,7 @@ Select 1-6 then press enter to send package
 
                 // Handle the message and go get the next one.
                 string returndata = Encoding.ASCII.GetString(fBuffer);
+                /*
                 Array.Resize<byte>(ref fBuffer, 0);
                 //GC.Collect();
                 //GC.WaitForPendingFinalizers();
@@ -1629,6 +1630,7 @@ Select 1-6 then press enter to send package
                 //Console.WriteLine("First node:[" + xml_root_tag + "]");
                 Console.WriteLine("E############################################################################");
                 Console.ResetColor();
+                */
                 xml_parse(returndata);
                 /*
 				Thread xmlParseThread = new Thread(xml_parse);
