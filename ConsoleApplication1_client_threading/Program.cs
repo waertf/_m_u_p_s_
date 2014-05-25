@@ -4729,7 +4729,7 @@ LIMIT 1";
             locationTableName = "public.patrol_location";
             //string getMessage = string.Empty,bundaryEventNumber = string.Empty;
                 string bundaryEventNumber = string.Empty;
-                //lock (cgaEventAccessSqlLock)
+                lock (cgaEventAccessSqlLock)
             {
 
                 /* 
@@ -4883,7 +4883,7 @@ LIMIT 1";
                 */
             #endregion access GetGidAndFullnameFromP_prohibitedAndPatrol_locationFromSql
 
-                //lock (cgaEventAccessSqlLock)
+                lock (cgaEventAccessSqlLock)
                 {
                     #region checkIfOverTime
                     //event:5->stay over specific time within 0.1 km
@@ -4939,7 +4939,7 @@ LIMIT 1";
                     }
                     #endregion checkIfOverTime
                 }
-                //lock (cgaEventAccessSqlLock)
+                lock (cgaEventAccessSqlLock)
                 {
                     #region insert into custom.cga_event_log
                     /*
