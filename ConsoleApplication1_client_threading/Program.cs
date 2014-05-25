@@ -4729,6 +4729,8 @@ LIMIT 1";
             locationTableName = "public.patrol_location";
             //string getMessage = string.Empty,bundaryEventNumber = string.Empty;
                 string bundaryEventNumber = string.Empty;
+                DateTime sn_now = DateTime.Now;
+                string sn;
                 //lock (cgaEventAccessSqlLock)
             {
 
@@ -4783,9 +4785,9 @@ LIMIT 1";
                 //Convert.ToDouble(
                     //sql_client.get_DataTable("SELECT COUNT(uid)   FROM custom.cga_event_log WHERE uid = '" + deviceID + "\'").Rows[0].ItemArray[0]);
                     //string sn = "\'" + deviceID + now + cgaEventLogIdCount.ToString("000000000000") + "\'";
-                    string sn;
+                    //string sn;
                     lock (cgaEventAccessSqlLock)
-                         sn = "\'" + deviceID + DateTime.Now.ToString("yyyyMMddHHmmssfffffff") + "\'";
+                        sn = "\'" + deviceID + sn_now.ToString("yyyyMMddHHmmssfffffff") + "\'";
                     string table_columns =
                         "serial_no ,uid ,type ,lat ,lon,altitude ,speed ,course ,radius ,info_time ,server_time ,create_user ,create_ip,start_time,create_time";
                     string table_column_value = sn + "," +
@@ -4912,9 +4914,10 @@ LIMIT 1";
                                     //Thread.SpinWait(30);
                                 }
                                 //string sn = "\'" + deviceID + now + cgaEventLogIdCount.ToString("000000000000") + "\'";
-                                string sn;
+                                //string sn;
+                                sn_now = sn_now.AddTicks(1);
                                 lock (cgaEventAccessSqlLock)
-                                    sn = "\'" + deviceID + DateTime.Now.ToString("yyyyMMddHHmmssfffffff") + "\'";
+                                    sn = "\'" + deviceID + sn_now.ToString("yyyyMMddHHmmssfffffff") + "\'";
                                 string table_columns =
                                     "serial_no ,uid ,type ,lat ,lon,altitude ,speed ,course ,radius ,info_time ,server_time ,create_user ,create_ip,start_time,create_time";
                                 string table_column_value = sn + "," +
@@ -4965,9 +4968,10 @@ LIMIT 1";
                                 {
                                     case "Emergency On":
                                         //string sn = "\'" + deviceID + now + cgaEventLogIdCount.ToString("000000000000") + "\'";
-                                        string sn;
+                                        //string sn;
+                                        sn_now = sn_now.AddTicks(1);
                                         lock (cgaEventAccessSqlLock)
-                                            sn = "\'" + deviceID + DateTime.Now.ToString("yyyyMMddHHmmssfffffff") + "\'";
+                                            sn = "\'" + deviceID + sn_now.ToString("yyyyMMddHHmmssfffffff") + "\'";
                                         string table_columns =
                                             "serial_no ,uid ,type ,lat ,lon,altitude ,speed ,course ,radius ,info_time ,server_time ,create_user ,create_ip,start_time,create_time";
                                         string table_column_value = sn + "," +
