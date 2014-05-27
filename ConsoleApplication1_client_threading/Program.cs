@@ -2041,6 +2041,14 @@ Select 1-6 then press enter to send package
                                     new SqlClass(xml_root_tag, htable, sensor_name,
                                         sensor_type, sensor_value, XmlGetAllElementsXname(xml_data),
                                         logData, getMessage));
+                                TimeSpan TS = new TimeSpan(100000);
+                                DateTime TSnow = DateTime.Now;
+                                do
+                                {
+                                    if (DateTime.Now - TSnow > TS)
+                                        break;
+                                }
+                                while (true);
                                 //access_sql_server(new SqlClass(xml_root_tag, htable, sensor_name,
                                 //sensor_type, sensor_value, XmlGetAllElementsXname(xml_data),
                                 //logData, getMessage));
