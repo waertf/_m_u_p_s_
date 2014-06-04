@@ -94,6 +94,7 @@ namespace ConsoleApplication1_client_threading
         private volatile static string unsUnsTcpWriteLineWriteParame = string.Empty;
         //private static SqlClient sql_client;
         // ManualResetEvent instances signal completion.
+        static AutoResetEvent xmlParseResetEvent = new AutoResetEvent(false);
         private static ManualResetEvent unsConnectDone =
             new ManualResetEvent(false);
         private static ManualResetEvent unsSendDone =
@@ -1640,6 +1641,7 @@ Select 1-6 then press enter to send package
                 
 				Thread xmlParseThread = new Thread(xml_parse);
                 xmlParseThread.Start(returndata);
+                xmlParseResetEvent.WaitOne();
                 //xmlParseThread.Join(int.Parse(ConfigurationManager.AppSettings["xmlParseJoinTimeout"]));
                 /*
                 switch (int.Parse(ConfigurationManager.AppSettings["xmlParseJoinType"]))
@@ -1858,8 +1860,11 @@ Select 1-6 then press enter to send package
                         {
                             string id = string.Empty;
                             id = XmlGetTagValue(xml_data, "suaddr");
-                            if(id.Equals(string.Empty))
+                            if (id.Equals(string.Empty))
+                            {
+                                xmlParseResetEvent.Set();
                                 return;
+                            }
                             else
                             {
                                 htable.Add("suaddr", id);
@@ -1871,6 +1876,7 @@ Select 1-6 then press enter to send package
                             {}
                             else
                             {
+                                xmlParseResetEvent.Set();
                                 return;
                             }
                         }
@@ -2065,7 +2071,7 @@ Select 1-6 then press enter to send package
                                 //Console.WriteLine("SQL Access Enable");
                                 //sqlAccessEvent.WaitOne();
                             }
-
+                            
                             /*
                             switch (int.Parse(ConfigurationManager.AppSettings["accessSqlJoinType"]))
                             {
@@ -2114,7 +2120,7 @@ Select 1-6 then press enter to send package
                        */
 
                     }
-                     
+                    xmlParseResetEvent.Set();
                     break;
 
                 
@@ -2151,6 +2157,7 @@ Select 1-6 then press enter to send package
                         }
 
                     }
+                    xmlParseResetEvent.Set();
                     break;
                 case "Location-Registration-Answer":
                     {
@@ -2195,6 +2202,7 @@ Select 1-6 then press enter to send package
 
                         //access_sql.Join();
                     }
+                    xmlParseResetEvent.Set();
                     break;
                 case "Immediate-Location-Answer":
                 case "Triggered-Location-Stop-Answer":
@@ -2209,7 +2217,10 @@ Select 1-6 then press enter to send package
                             string id = string.Empty;
                             id = XmlGetTagValue(xml_data, "suaddr");
                             if (id.Equals(string.Empty))
+                            {
+                                xmlParseResetEvent.Set();
                                 return;
+                            }
                             else
                             {
                                 htable.Add("suaddr", id);
@@ -2221,6 +2232,7 @@ Select 1-6 then press enter to send package
                             { }
                             else
                             {
+                                xmlParseResetEvent.Set();
                                 return;
                             }
                         }
@@ -2248,6 +2260,7 @@ Select 1-6 then press enter to send package
                              * */
                         }
                     }
+                    xmlParseResetEvent.Set();
                     break;
                 case "Triggered-Location-Device-Type-Report ":
                     {
@@ -2257,7 +2270,10 @@ Select 1-6 then press enter to send package
                             string id = string.Empty;
                             id = XmlGetTagValue(xml_data, "suaddr");
                             if (id.Equals(string.Empty))
+                            {
+                                xmlParseResetEvent.Set();
                                 return;
+                            }
                             else
                             {
                                 htable.Add("suaddr", id);
@@ -2267,6 +2283,7 @@ Select 1-6 then press enter to send package
                             { }
                             else
                             {
+                                xmlParseResetEvent.Set();
                                 return;
                             }
                         }
@@ -2279,10 +2296,12 @@ Select 1-6 then press enter to send package
                             //Console.WriteLine("err_msg:{0}", err_msg);
                         }
                     }
+                    xmlParseResetEvent.Set();
                     break;
                 default:
                     //error occur
                     Console.WriteLine("ERROR:" + logData);
+                    xmlParseResetEvent.Set();
                     break;
             }
             
