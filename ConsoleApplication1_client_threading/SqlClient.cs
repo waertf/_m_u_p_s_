@@ -155,9 +155,9 @@ namespace ConsoleApplication1_client_threading
             {
                 Console.ForegroundColor = ConsoleColor.Red;
                 Console.WriteLine("Modify exception occurs: {0}" + Environment.NewLine + "{1}", ex.Error, cmd);
-                if (ex.Error.ErrorCode=="23505") {
-                }
-                else
+                //if (ex.Error.ErrorCode=="23505") {
+                //}
+                //else
                     log.Error("Modify exception occurs: " + Environment.NewLine + ex.Error + Environment.NewLine + cmd); 
                 Console.ResetColor();
                 pgSqlConnection.Rollback();
