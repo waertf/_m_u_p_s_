@@ -1635,11 +1635,13 @@ Select 1-6 then press enter to send package
                 Console.WriteLine("E############################################################################");
                 Console.ResetColor();
                 */
-                xml_parse(returndata);
-                /*
+                
+                //xml_parse(returndata);
+                
 				Thread xmlParseThread = new Thread(xml_parse);
                 xmlParseThread.Start(returndata);
                 //xmlParseThread.Join(int.Parse(ConfigurationManager.AppSettings["xmlParseJoinTimeout"]));
+                /*
                 switch (int.Parse(ConfigurationManager.AppSettings["xmlParseJoinType"]))
                 {
                     case 0://not join
@@ -1818,12 +1820,16 @@ Select 1-6 then press enter to send package
         }
 
         //private static void xml_parse(TcpClient tcpClient, NetworkStream netStream, string returndata, TcpClient avlsTcpClient)
-        private static void xml_parse(string returndata)
+        private static void xml_parse(object o)
         {
             Stopwatch stopWatch = Stopwatch.StartNew();
             TcpClient tcpClient = unsTcpClient;
-            //string returndata = o as string;
+            string returndata = o as string;
             XDocument xml_data = XDocument.Parse(returndata);
+            Console.WriteLine("S############################################################################");
+            Console.WriteLine("Read:\r\n" + xml_data);
+            //Console.WriteLine("First node:[" + xml_root_tag + "]");
+            Console.WriteLine("E############################################################################");
             string xml_root_tag = xml_data.Root.Name.ToString();
             string logData = xml_data.ToString();
             //using (StreamWriter w = File.AppendText("log.txt"))
@@ -2008,19 +2014,19 @@ Select 1-6 then press enter to send package
                             if (bool.Parse(ConfigurationManager.AppSettings["AVLS_ACCESS"]))
                             {
                                 //avlsSendDone.Reset();
-                                /*
+                                
                                 access_avls = new Thread(access_avls_server);
                                 //access_avls.Priority = ThreadPriority.BelowNormal;
                                 access_avls.Start(new AvlsClass(xml_root_tag, htable, sensor_name,
                                  sensor_type, sensor_value, XmlGetAllElementsXname(xml_data),
                                 logData, getMessage));
-                                */
                                 
+                                /*
                                 ThreadPool.QueueUserWorkItem(new WaitCallback(access_avls_server),
                                     new AvlsClass(xml_root_tag, htable, sensor_name,
                                         sensor_type, sensor_value, XmlGetAllElementsXname(xml_data),
                                         logData, getMessage));
-                                
+                                */
                                 //access_avls_server(new AvlsClass(xml_root_tag, htable, sensor_name,
                                 //sensor_type, sensor_value, XmlGetAllElementsXname(xml_data),
                                 //logData, getMessage));
@@ -2033,10 +2039,11 @@ Select 1-6 then press enter to send package
                             {
                                 //sqlAccessEvent.Reset();
                                 
-                                 //access_sql = new Thread(access_sql_server);
-                                //access_sql.Start(new SqlClass(xml_root_tag, htable, sensor_name,
-                                    //sensor_type, sensor_value, XmlGetAllElementsXname(xml_data),
-                                    //logData, getMessage));
+                                 access_sql = new Thread(access_sql_server);
+                                access_sql.Start(new SqlClass(xml_root_tag, htable, sensor_name,
+                                    sensor_type, sensor_value, XmlGetAllElementsXname(xml_data),
+                                    logData, getMessage));
+                                /*
                                 ThreadPool.QueueUserWorkItem(new WaitCallback(access_sql_server),
                                     new SqlClass(xml_root_tag, htable, sensor_name,
                                         sensor_type, sensor_value, XmlGetAllElementsXname(xml_data),
@@ -2049,6 +2056,7 @@ Select 1-6 then press enter to send package
                                         break;
                                 }
                                 while (true);
+                                */
                                 //access_sql_server(new SqlClass(xml_root_tag, htable, sensor_name,
                                 //sensor_type, sensor_value, XmlGetAllElementsXname(xml_data),
                                 //logData, getMessage));
@@ -2176,11 +2184,13 @@ Select 1-6 then press enter to send package
                     }
                     if (bool.Parse(ConfigurationManager.AppSettings["SQL_ACCESS"]))
                     {
-                        //Thread access_sql = new Thread(access_sql_server);
-                        //access_sql.Start(new SqlClass(xml_root_tag, htable, sensor_name, sensor_type, sensor_value, XmlGetAllElementsXname(xml_data), logData, null));
+                        Thread access_sql = new Thread(access_sql_server);
+                        access_sql.Start(new SqlClass(xml_root_tag, htable, sensor_name, sensor_type, sensor_value, XmlGetAllElementsXname(xml_data), logData, null));
+                        /*
                         ThreadPool.QueueUserWorkItem(new WaitCallback(access_sql_server),
                             new SqlClass(xml_root_tag, htable, sensor_name, sensor_type, sensor_value,
                                 XmlGetAllElementsXname(xml_data), logData, null));
+                        */
                         //ThreadPool.QueueUserWorkItem(new WaitCallback(access_sql_server), new SqlClass(xml_root_tag, htable, sensor_name.ToList(), sensor_type.ToList(), sensor_value.ToList(), XmlGetAllElementsXname(xml_data), logData, null));
 
                         //access_sql.Join();
@@ -3025,8 +3035,8 @@ LIMIT 1";
             //ReadLine(avls_tcpClient, netStream, send_string.Length);
             //netStream.Close();
             //avlsTcpClient.Close();
-            htable.Clear();
-            htable = null;
+            //htable.Clear();
+            //htable = null;
             //GC.Collect();
             //GC.WaitForPendingFinalizers();
             //Console.WriteLine("-access_avls_server");
@@ -3610,7 +3620,9 @@ FROM
             AUTO_SQL_DATA gps_log = new AUTO_SQL_DATA();
             MANUAL_SQL_DATA operation_log = new MANUAL_SQL_DATA();
             gps_log._or_lat = gps_log._or_lon = gps_log._satellites = gps_log._temperature = gps_log._voltage = "0";
-            string now = string.Format("{0:yyyyMMddHHmmssfffffff}", dtime);
+                string now;
+                lock (cgaEventAccessSqlLock)
+                 now = string.Format("{0:yyyyMMddHHmmssfffffff}", dtime);
             gps_log._time = "\'" + string.Format("{0:yyyyMMdd HH:mm:ss.fff}", dtime) + "+08" + "\'";
 
             
@@ -4742,8 +4754,8 @@ LIMIT 1";
             //string getMessage = string.Empty,bundaryEventNumber = string.Empty;
                 string bundaryEventNumber = string.Empty;
                 DateTime sn_now;
-                lock (cgaEventAccessSqlLock)
-                 sn_now = DateTime.Now;
+                //lock (cgaEventAccessSqlLock)
+                 //sn_now = DateTime.Now;
                 string sn;
                 //lock (cgaEventAccessSqlLock)
             {
@@ -4801,7 +4813,7 @@ LIMIT 1";
                     //string sn = "\'" + deviceID + now + cgaEventLogIdCount.ToString("000000000000") + "\'";
                     //string sn;
                     //lock (cgaEventAccessSqlLock)
-                        sn = "\'" + deviceID + sn_now.ToString("yyyyMMddHHmmssfffffff") + "\'";
+                        sn = "\'" + deviceID + now + "0\'";
                     string table_columns =
                         "serial_no ,uid ,type ,lat ,lon,altitude ,speed ,course ,radius ,info_time ,server_time ,create_user ,create_ip,start_time,create_time";
                     string table_column_value = sn + "," +
@@ -4929,9 +4941,9 @@ LIMIT 1";
                                 }
                                 //string sn = "\'" + deviceID + now + cgaEventLogIdCount.ToString("000000000000") + "\'";
                                 //string sn;
-                                sn_now = sn_now.AddTicks(1);
+                                //sn_now = sn_now.AddTicks(1);
                                 //lock (cgaEventAccessSqlLock)
-                                    sn = "\'" + deviceID + sn_now.ToString("yyyyMMddHHmmssfffffff") + "\'";
+                                    sn = "\'" + deviceID + now + "1\'";
                                 string table_columns =
                                     "serial_no ,uid ,type ,lat ,lon,altitude ,speed ,course ,radius ,info_time ,server_time ,create_user ,create_ip,start_time,create_time";
                                 string table_column_value = sn + "," +
@@ -4983,9 +4995,9 @@ LIMIT 1";
                                     case "Emergency On":
                                         //string sn = "\'" + deviceID + now + cgaEventLogIdCount.ToString("000000000000") + "\'";
                                         //string sn;
-                                        sn_now = sn_now.AddTicks(1);
+                                        //sn_now = sn_now.AddTicks(1);
                                         //lock (cgaEventAccessSqlLock)
-                                            sn = "\'" + deviceID + sn_now.ToString("yyyyMMddHHmmssfffffff") + "\'";
+                                            sn = "\'" + deviceID + now + "2\'";
                                         string table_columns =
                                             "serial_no ,uid ,type ,lat ,lon,altitude ,speed ,course ,radius ,info_time ,server_time ,create_user ,create_ip,start_time,create_time";
                                         string table_column_value = sn + "," +
@@ -5041,8 +5053,8 @@ LIMIT 1";
                     #endregion #region insert into custom.cga_event_log
                 }
             
-            htable.Clear();
-                htable = null;
+            //htable.Clear();
+                //htable = null;
             sql_client.Dispose();
                 sql_client = null;
             //GC.Collect();
