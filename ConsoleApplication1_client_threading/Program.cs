@@ -1407,6 +1407,7 @@ Select 1-6 then press enter to send package
         }
         private static void ReadLine(object TtcpClient)
         {
+            Thread.Sleep(30);
             var tcpClient = TtcpClient as TcpClient;
             NetworkStream netStream = tcpClient.GetStream();
             try
@@ -1467,6 +1468,7 @@ Select 1-6 then press enter to send package
         }
         public static void myReadSizeCallBack(IAsyncResult ar)
         {
+            Thread.Sleep(30);
             NetworkStream myNetworkStream = (NetworkStream)ar.AsyncState;
             try
             {
@@ -1588,6 +1590,7 @@ Select 1-6 then press enter to send package
 
         private static void FinishRead(IAsyncResult result)
         {
+            Thread.Sleep(30);
             NetworkStream fStream = (NetworkStream)result.AsyncState;
             try
             {
