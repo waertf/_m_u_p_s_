@@ -556,6 +556,7 @@ LIMIT 1";
                 //GC.WaitForPendingFinalizers();
             }
              * */
+            /*
             while (true)
             {
                 if (!xmlQueue.Count.Equals(0))
@@ -566,6 +567,13 @@ LIMIT 1";
                 }
                 Thread.Sleep(30);
             }
+            */
+            var xmlParseTimer = new System.Timers.Timer(15);
+            xmlParseTimer.Elapsed += (sender, e) => { 
+                if (!xmlQueue.Count.Equals(0))
+                xml_parse(xmlQueue.Dequeue()); };
+            xmlParseTimer.Enabled = true;
+            Console.ReadLine();
             /*
             var GC =
                     new System.Timers.Timer(60 * 1000);
@@ -1801,6 +1809,7 @@ Select 1-6 then press enter to send package
         //private static void xml_parse(TcpClient tcpClient, NetworkStream netStream, string returndata, TcpClient avlsTcpClient)
         private static void xml_parse(object o)
         {
+            
             Stopwatch stopWatch = Stopwatch.StartNew();
             TcpClient tcpClient = unsTcpClient;
             string returndata = o as string;
