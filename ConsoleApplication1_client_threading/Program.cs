@@ -310,7 +310,7 @@ LIMIT 1";
         private static bool avlsFlag = false;
         private static object IsFirstExecuteLock = new object();
         private static uint deviceCount = 0;
-
+        static Queue xmlQueue = new Queue();
         static void Main(string[] args)
         {
 
@@ -556,7 +556,16 @@ LIMIT 1";
                 //GC.WaitForPendingFinalizers();
             }
              * */
-            Console.ReadLine();
+            while (true)
+            {
+                if (!xmlQueue.Count.Equals(0))
+                {
+                    Thread xmlParseThread = new Thread(xml_parse);
+                    xmlParseThread.Start(xmlQueue.Dequeue());
+                    //xmlParseThread.Join(int.Parse(ConfigurationManager.AppSettings["xmlParseJoinTimeout"]));
+                }
+                Thread.Sleep(30);
+            }
             /*
             var GC =
                     new System.Timers.Timer(60 * 1000);
@@ -942,6 +951,7 @@ LIMIT
                         else
                         {
                             //continue;
+                            Thread.Sleep(30);
                             return ;
                         }
                         /*
@@ -1088,7 +1098,7 @@ LIMIT
                 }
                 
             }
-            
+            Thread.Sleep(30);
         }
         /*
         private static void sendtest(NetworkStream netStream , SqlClient sql_client)
@@ -1621,10 +1631,10 @@ Select 1-6 then press enter to send package
                 Console.WriteLine("E############################################################################");
                 Console.ResetColor();
                 
-                
-				Thread xmlParseThread = new Thread(xml_parse);
-                xmlParseThread.Start(returndata);
-                xmlParseThread.Join(int.Parse(ConfigurationManager.AppSettings["xmlParseJoinTimeout"]));
+                xmlQueue.Enqueue(returndata);
+				//Thread xmlParseThread = new Thread(xml_parse);
+                //xmlParseThread.Start(returndata);
+                //xmlParseThread.Join(int.Parse(ConfigurationManager.AppSettings["xmlParseJoinTimeout"]));
                 //Thread.Sleep(1);
 				//xml_parse(new XmlClass(unsTcpClient, fStream, returndata, avlsTcpClient));
                 //ThreadPool.QueueUserWorkItem(new WaitCallback(xml_parse), new XmlClass(unsTcpClient, fStream, returndata, avlsTcpClient));
@@ -1807,6 +1817,7 @@ Select 1-6 then press enter to send package
             List<string> sensor_value = new List<string>();
             List<string> sensor_type = new List<string>();
             SiAuto.Main.LogText(Level.Debug, xml_root_tag+"reveive time:"+DateTime.UtcNow.ToString("g"), xml_data.ToString());
+            HashSet<XName> elements = XmlGetAllElementsXname(xml_data);
             switch (xml_root_tag)
             {
                 case "Triggered-Location-Report":
@@ -1817,7 +1828,7 @@ Select 1-6 then press enter to send package
                         //{
                             //SiAuto.Main.LogMessage(xml_data.ToString());
                         //}
-                        IEnumerable<XName> elements = XmlGetAllElementsXname(xml_data);
+                        //IEnumerable<XName> elements = XmlGetAllElementsXname(xml_data);
                         if (elements.Contains(new XElement("suaddr").Name))
                         {
                             string id = string.Empty;
@@ -1980,7 +1991,7 @@ Select 1-6 then press enter to send package
                                 //sqlAccessEvent.Reset();
                                  access_sql = new Thread(access_sql_server);
                                 access_sql.Start(new SqlClass(xml_root_tag, htable, sensor_name.ToList(),
-                                    sensor_type.ToList(), sensor_value.ToList(), XmlGetAllElementsXname(xml_data),
+                                    sensor_type.ToList(), sensor_value.ToList(), elements,
                                     logData, getMessage));
 
                                 //ThreadPool.QueueUserWorkItem(new WaitCallback(access_sql_server), new SqlClass(xml_root_tag, htable, sensor_name.ToList(), sensor_type.ToList(), sensor_value.ToList(), XmlGetAllElementsXname(xml_data), logData, getMessage));
@@ -1995,7 +2006,7 @@ Select 1-6 then press enter to send package
                                  access_avls = new Thread(access_avls_server);
                                 //access_avls.Priority = ThreadPriority.BelowNormal;
                                 access_avls.Start(new AvlsClass(xml_root_tag, htable, sensor_name.ToList(),
-                                    sensor_type.ToList(), sensor_value.ToList(), XmlGetAllElementsXname(xml_data),
+                                    sensor_type.ToList(), sensor_value.ToList(), elements,
                                     logData, getMessage));
 
                                 //ThreadPool.QueueUserWorkItem(new WaitCallback(access_avls_server), new AvlsClass(xml_root_tag, htable, sensor_name.ToList(), sensor_type.ToList(), sensor_value.ToList(), XmlGetAllElementsXname(xml_data), logData, getMessage));
@@ -2042,7 +2053,7 @@ Select 1-6 then press enter to send package
                 
                 case "Location-Protocol-Report":
                     {
-                        IEnumerable<XName> elements = XmlGetAllElementsXname(xml_data);
+                        //IEnumerable<XName> elements = XmlGetAllElementsXname(xml_data);
                         if (elements.Contains(new XElement("request-id").Name))
                         {
                             htable.Add("request_id" , XmlGetTagValue(xml_data, "request-id"));
@@ -2075,8 +2086,8 @@ Select 1-6 then press enter to send package
                     }
                     break;
                 case "Location-Registration-Answer":
-                    {
-                        IEnumerable<XName> elements = XmlGetAllElementsXname(xml_data);
+                    
+                        //IEnumerable<XName> elements = XmlGetAllElementsXname(xml_data);
                         
                         //string app_id = (string)(from e1 in xml_data.Descendants("application") select e1.Attribute("application-id").Value).First();
                         //string result_code = (string)(from e1 in xml_data.Descendants("result") select e1.Attribute("result-code").Value).First();
@@ -2103,11 +2114,11 @@ Select 1-6 then press enter to send package
                             }
                              * */
                         }
-                    }
+                    
                     if (bool.Parse(ConfigurationManager.AppSettings["SQL_ACCESS"]))
                     {
                         Thread access_sql = new Thread(access_sql_server);
-                        access_sql.Start(new SqlClass(xml_root_tag, htable, sensor_name.ToList(), sensor_type.ToList(), sensor_value.ToList(), XmlGetAllElementsXname(xml_data), logData, null));
+                        access_sql.Start(new SqlClass(xml_root_tag, htable, sensor_name.ToList(), sensor_type.ToList(), sensor_value.ToList(), elements, logData, null));
 
                         //ThreadPool.QueueUserWorkItem(new WaitCallback(access_sql_server), new SqlClass(xml_root_tag, htable, sensor_name.ToList(), sensor_type.ToList(), sensor_value.ToList(), XmlGetAllElementsXname(xml_data), logData, null));
                             
@@ -2121,7 +2132,7 @@ Select 1-6 then press enter to send package
                     {
 
                         //SiAuto.Main.LogMessage(xml_data.ToString());
-                        IEnumerable<XName> elements = XmlGetAllElementsXname(xml_data);
+                        //IEnumerable<XName> elements = XmlGetAllElementsXname(xml_data);
                         if (elements.Contains(new XElement("suaddr").Name))
                         {
                             string id = string.Empty;
@@ -2169,7 +2180,7 @@ Select 1-6 then press enter to send package
                     break;
                 case "Triggered-Location-Device-Type-Report ":
                     {
-                        IEnumerable<XName> elements = XmlGetAllElementsXname(xml_data);
+                        //IEnumerable<XName> elements = XmlGetAllElementsXname(xml_data);
                         if (elements.Contains(new XElement("suaddr").Name))
                         {
                             string id = string.Empty;
@@ -2329,7 +2340,7 @@ WHERE
             List<string> sensor_name = oo.SensorName;
             List<string> sensor_type = oo.SensorType;
             List<string> sensor_value = oo.SensorValue;
-            IEnumerable<XName> iEnumerable = oo.Elements;
+            HashSet<XName> iEnumerable = oo.Elements;
             string log = oo.Log;
             string getMessage = oo.GetMessage;
             //Console.WriteLine("+access_avls_server");
@@ -3512,7 +3523,7 @@ FROM
                 List<string> sensor_name = oo.SensorName;
                 List<string> sensor_type = oo.SensorType;
                 List<string> sensor_value = oo.SensorValue;
-                IEnumerable<XName> elements = oo.Elements;
+                HashSet<XName> elements = oo.Elements;
                 string log1 = oo.Log1;
                 string getMessage = oo.GetMessage;
                 oo = null;
@@ -5115,9 +5126,10 @@ public._gps_log._uid = '"+deviceID+@"'
                 return result;
 
         }
-        static IEnumerable<XName> XmlGetAllElementsXname(XDocument xml_data)
+        static HashSet<XName> XmlGetAllElementsXname(XDocument xml_data)
         {
-            return (from e1 in xml_data.DescendantNodes().OfType<XElement>() select e1).Select(x => x.Name).Distinct();
+            var a = (from e1 in xml_data.DescendantNodes().OfType<XElement>() select e1).Select(x => x.Name).Distinct();
+            return new HashSet<XName>(a);
         }
         static int GetLittleEndianIntegerFromByteArray(byte[] data, int startIndex)
         {
@@ -5265,12 +5277,12 @@ public._gps_log._uid = '"+deviceID+@"'
         public List<string> SensorName;
         public List<string> SensorType;
         public List<string> SensorValue;
-        public IEnumerable<XName> Elements;
+        public HashSet<XName> Elements;
         public string Log1;
         public string GetMessage;
 
         public SqlClass(string xml_root_tag, Hashtable htable, List<string> sensor_name,
-            List<string> sensor_type, List<string> sensor_value, IEnumerable<XName> elements, string log1,
+            List<string> sensor_type, List<string> sensor_value, HashSet<XName> elements, string log1,
             string getMessage)
         {
             XmlRootTag = xml_root_tag;
@@ -5309,12 +5321,12 @@ public._gps_log._uid = '"+deviceID+@"'
         public List<string> SensorName;
         public List<string> SensorType;
         public List<string> SensorValue;
-        public IEnumerable<XName> Elements;
+        public HashSet<XName> Elements;
         public string Log;
         public string GetMessage;
 
         public AvlsClass(string xml_root_tag, Hashtable htable, List<string> sensor_name,
-            List<string> sensor_type, List<string> sensor_value, IEnumerable<XName> iEnumerable, string log,
+            List<string> sensor_type, List<string> sensor_value, HashSet<XName> iEnumerable, string log,
              string getMessage)
         {
             XmlRootTag = xml_root_tag;
