@@ -429,17 +429,17 @@ LIMIT 1";
                 Thread.Sleep(30);
             }
             string totalDevice = sql_client.get_DataTable(@"SELECT reltuples FROM pg_class WHERE oid = 'sd.equipment'::regclass").Rows[0].ItemArray[0].ToString();
-            sql_client.disconnect();
+            //sql_client.disconnect();
 
             deviceCount = uint.Parse(totalDevice);
             //empty power column in table custom.uns_deivce_power_status
             string emptyPowerStatusTable = @"DELETE FROM custom.uns_deivce_power_status";
-            while (!sql_client.connect())
-            {
-                Thread.Sleep(30);
-            }
+            //while (!sql_client.connect())
+            //{
+                //Thread.Sleep(30);
+            //}
             sql_client.modify(emptyPowerStatusTable);
-            sql_client.disconnect();
+            //sql_client.disconnect();
 
             #region
             string regSqlCmd = string.Empty;
@@ -448,12 +448,12 @@ LIMIT 1";
   FROM
   sd.equipment
   ";
-            while (!sql_client.connect())
+            //while (!sql_client.connect())
             {
-                Thread.Sleep(30);
+                //Thread.Sleep(30);
             }
             DataTable dt = sql_client.get_DataTable(regSqlCmd);
-            sql_client.disconnect();
+            //sql_client.disconnect();
 
             if (dt != null && dt.Rows.Count != 0)
             {
@@ -462,12 +462,12 @@ LIMIT 1";
                 {
                     uid = row[0].ToString();
                     regSqlCmd = "INSERT INTO custom.uns_deivce_power_status (uid) VALUES ("+"\'"+uid+"\'"+")";
-                    while (!sql_client.connect())
+                    //while (!sql_client.connect())
                     {
-                        Thread.Sleep(30);
+                        //Thread.Sleep(30);
                     }
                     sql_client.modify(regSqlCmd);
-                    sql_client.disconnect();
+                    //sql_client.disconnect();
                     //Console.WriteLine("find:{0}", uid);
                 }
 
@@ -485,12 +485,12 @@ LIMIT 1";
             }
             {//access sql
                 string now = string.Format("{0:yyyyMMdd}", DateTime.Now);
-                while (!sql_client.connect())
+                //while (!sql_client.connect())
                 {
-                    Thread.Sleep(30);
+                    //Thread.Sleep(30);
                 }
                 string manual_id_serial_command = sql_client.get_DataTable("SELECT COUNT(_id)   FROM public.operation_log").Rows[0].ItemArray[0].ToString();
-                sql_client.disconnect();
+                //sql_client.disconnect();
                 MANUAL_SQL_DATA operation_log = new MANUAL_SQL_DATA();
                 operation_log._id = "\'" + "operation" + "_" + now + "_" + manual_id_serial_command + "\'";
                 operation_log.event_id = @"'null'";
@@ -500,12 +500,12 @@ LIMIT 1";
                 table_column_value = operation_log._id + "," + operation_log.event_id + "," + operation_log.application_id + "," + operation_log.create_user;
                 table_columns = "_id,event_id,application_id,create_user";
                 cmd = "INSERT INTO public.operation_log (" + table_columns + ") VALUES  (" + table_column_value + ")";
-                while (!sql_client.connect())
+                //while (!sql_client.connect())
                 {
-                    Thread.Sleep(30);
+                    //Thread.Sleep(30);
                 }
                 sql_client.modify(cmd);
-                sql_client.disconnect();
+                //sql_client.disconnect();
             }
             sql_client.Dispose();
 			sql_client=null;
@@ -636,7 +636,7 @@ LIMIT 1";
         }
 
         
-
+        /*
         private static void test()
         {
             return;
@@ -669,7 +669,7 @@ WHERE
                 Console.WriteLine("not find");
             }
         }
-
+        */
         private static void SendToAvlsEventColumnSetNegativeOneIfPowerOff(TcpClient avlsTcpClient,NetworkStream avlsNetworkStream)
         {
             //SiAuto.Main.EnterMethod(Level.Debug, "SendToAvlsEventColumnSetNegativeOneIfPowerOff");
@@ -689,7 +689,7 @@ WHERE
             }
 
             DataTable dt = sqlClient.get_DataTable(sqlCmd);
-            sqlClient.disconnect();
+            //sqlClient.disconnect();
             string uid = string.Empty;
             if (dt != null && dt.Rows.Count != 0)
             {
@@ -718,9 +718,9 @@ SET
 ""updateTime"" = '" + unsUpdateTimeStamp + @"'::timestamp
 WHERE
   custom.uns_deivce_power_status.uid = '" + device_uid + @"'";
-                    while (!sqlClient.connect())
+                    //while (!sqlClient.connect())
                     {
-                        Thread.Sleep(30);
+                        //Thread.Sleep(30);
                     }
                     //lock (access_uns_deivce_power_status_Lock)
                     sqlClient.modify(unsSqlCmd);
@@ -940,6 +940,8 @@ LIMIT
 1";
                     DataTable dt = AutosendsqlClient.get_DataTable(sqlCmd);
                     AutosendsqlClient.disconnect();
+                    AutosendsqlClient.Dispose();
+                    AutosendsqlClient = null;
                     Hashtable requeseHashtable = new  Hashtable();
                     if (dt != null && dt.Rows.Count != 0)
                     {
@@ -1564,7 +1566,7 @@ Select 1-6 then press enter to send package
                     string manual_id_serial_command =
                         sql_client.get_DataTable("SELECT COUNT(_id)   FROM public.operation_log").Rows[0].ItemArray[0]
                             .ToString();
-                    sql_client.disconnect();
+                    //sql_client.disconnect();
                     MANUAL_SQL_DATA operation_log = new MANUAL_SQL_DATA();
                     operation_log._id = "\'" + "operation" + "_" + now + "_" + manual_id_serial_command + "\'";
                     operation_log.event_id = @"'null'";
@@ -1576,9 +1578,9 @@ Select 1-6 then press enter to send package
                     table_columns = "_id,event_id,application_id,create_user";
                     cmd = "INSERT INTO public.operation_log (" + table_columns + ") VALUES  (" + table_column_value +
                           ")";
-                    while (!sql_client.connect())
+                    //while (!sql_client.connect())
                     {
-                        Thread.Sleep(30);
+                        //Thread.Sleep(30);
                     }
                     sql_client.modify(cmd);
                     sql_client.disconnect();
@@ -3059,7 +3061,7 @@ now() <= end_time::timestamp ";
                 Thread.Sleep(30);
             }
             DataTable dt = sql_client.get_DataTable(regSqlCmdForProhibitedTable);
-            sql_client.disconnect();
+            //sql_client.disconnect();
             //List<EAB2> prohibitedEab2s= new List<EAB2>();
             if (dt != null && dt.Rows.Count != 0)
             {
@@ -3099,12 +3101,12 @@ now() <= end_time::timestamp ";
                         //not over -> do nothing
                         string sqlCmd = @"select stay_time from p_config LIMIT 1";
 
-                        while (!sql_client.connect())
+                        //while (!sql_client.connect())
                         {
-                            Thread.Sleep(30);
+                            //Thread.Sleep(30);
                         }
                         DataTable dt2 = sql_client.get_DataTable(sqlCmd);
-                        sql_client.disconnect();
+                        //sql_client.disconnect();
                         if (dt2 != null && dt2.Rows.Count != 0)
                         {
                             foreach (DataRow row in dt2.Rows)
@@ -3212,12 +3214,12 @@ now() <= end_time::timestamp ";
                 
             }
 
-            while (!sql_client.connect())
+            //while (!sql_client.connect())
             {
-                Thread.Sleep(30);
+                //Thread.Sleep(30);
             }
             dt = sql_client.get_DataTable(regSqlCmdForLocationTable);
-            sql_client.disconnect();
+            //sql_client.disconnect();
             //List<EAB2> locationEab2s = new List<EAB2>();
             if (dt != null && dt.Rows.Count != 0)
             {
@@ -3255,9 +3257,9 @@ now() <= end_time::timestamp ";
 
                         string sqlCmd = @"select stay_time from p_config LIMIT 1";
 
-                        while (!sql_client.connect())
+                        //while (!sql_client.connect())
                         {
-                            Thread.Sleep(30);
+                            //Thread.Sleep(30);
                         }
                         DataTable dt2 = sql_client.get_DataTable(sqlCmd);
                         sql_client.disconnect();
@@ -3366,7 +3368,7 @@ now() <= end_time::timestamp ";
             return message;
         }
 
-
+        /*
         private static void GetRidAndGeomFromSqlTable(string table, out List<EAB> myList)
         {
             string regSqlCmd = string.Empty;
@@ -3395,7 +3397,7 @@ FROM
             dt.Dispose();
             dt = null;
         }
-
+        */
         private static void avls_WriteLine(NetworkStream netStream, byte[] writeData, string write)
         {
             if (netStream.CanWrite)
@@ -3667,7 +3669,7 @@ WHERE
                         Thread.Sleep(30);
                     }
                     DataTable dt1 = sql_client.get_DataTable(sqlCmd1);
-                    sql_client.disconnect();
+                    //sql_client.disconnect();
 
                     if (dt1 != null && dt1.Rows.Count != 0)
                     {
@@ -3679,12 +3681,12 @@ WHERE
 
                             sqlCmd1 = "INSERT INTO custom.uns_deivce_power_status (uid) VALUES (" + "\'" + deviceID + "\'" +
                                       ")";
-                            while (!sql_client.connect())
+                            //while (!sql_client.connect())
                             {
-                                Thread.Sleep(30);
+                                //Thread.Sleep(30);
                             }
                             sql_client.modify(sqlCmd1);
-                            sql_client.disconnect();
+                            //sql_client.disconnect();
 
                     }
                 dt1.Dispose();
@@ -3718,13 +3720,13 @@ WHERE
   custom.uns_deivce_power_status.uid = '" + deviceID + @"'" + @" AND 
   (custom.uns_deivce_power_status.power <> 'off' OR 
   custom.uns_deivce_power_status.power IS NULL)";
-                            while (!sql_client.connect())
+                            //while (!sql_client.connect())
                             {
-                                Thread.Sleep(30);
+                                //Thread.Sleep(30);
                             }
                             //lock (access_uns_deivce_power_status_Lock)
                             sql_client.modify(unsSqlCmd);
-                            sql_client.disconnect();
+                            //sql_client.disconnect();
                         }
                     }
 
@@ -3780,13 +3782,13 @@ WHERE
   custom.uns_deivce_power_status.uid = '" + deviceID + @"'" + @" AND 
   (custom.uns_deivce_power_status.power <> 'on' OR 
   custom.uns_deivce_power_status.power IS NULL) ";
-                            while (!sql_client.connect())
+                            //while (!sql_client.connect())
                             {
-                                Thread.Sleep(30);
+                                //Thread.Sleep(30);
                             }
                             //lock (access_uns_deivce_power_status_Lock)
                             sql_client.modify(unsSqlCmd);
-                            sql_client.disconnect();
+                            //sql_client.disconnect();
                         }
 
                         #endregion
@@ -3809,13 +3811,13 @@ WHERE
   custom.uns_deivce_power_status.uid = '" + deviceID + @"'" + @" AND 
   (custom.uns_deivce_power_status.power <> 'on' OR 
   custom.uns_deivce_power_status.power IS NULL) ";
-                            while (!sql_client.connect())
+                            //while (!sql_client.connect())
                             {
-                                Thread.Sleep(30);
+                                //Thread.Sleep(30);
                             }
                             //lock (access_uns_deivce_power_status_Lock)
                             sql_client.modify(unsSqlCmd);
-                            sql_client.disconnect();
+                            //sql_client.disconnect();
                         }
 
                         #endregion
@@ -3838,13 +3840,13 @@ WHERE
   custom.uns_deivce_power_status.uid = '" + deviceID + @"'" + @" AND 
   (custom.uns_deivce_power_status.power <> 'on' OR 
   custom.uns_deivce_power_status.power IS NULL) ";
-                            while (!sql_client.connect())
+                            //while (!sql_client.connect())
                             {
-                                Thread.Sleep(30);
+                                //Thread.Sleep(30);
                             }
                             //lock (access_uns_deivce_power_status_Lock)
                             sql_client.modify(unsSqlCmd);
-                            sql_client.disconnect();
+                            //sql_client.disconnect();
                         }
 
                         #endregion
@@ -3920,13 +3922,13 @@ WHERE
   custom.uns_deivce_power_status.uid = '" + deviceID + @"'" + @"AND 
   (custom.uns_deivce_power_status.power <> 'on' OR 
   custom.uns_deivce_power_status.power IS NULL) ";
-                                while (!sql_client.connect())
+                                //while (!sql_client.connect())
                                 {
-                                    Thread.Sleep(30);
+                                    //Thread.Sleep(30);
                                 }
                                 //lock (access_uns_deivce_power_status_Lock)
                                 sql_client.modify(unsSqlCmd);
-                                sql_client.disconnect();
+                                //sql_client.disconnect();
 
 
                                 #endregion
@@ -3940,12 +3942,12 @@ VALUES(
   '" + deviceID + @"',
   'on')";
                                 
-                                while (!sql_client.connect())
+                                //while (!sql_client.connect())
                                 {
-                                    Thread.Sleep(30);
+                                    //Thread.Sleep(30);
                                 }
                                 sql_client.modify(unsSqlCmd);
-                                sql_client.disconnect();
+                                //sql_client.disconnect();
                                 #endregion insert into unsPowerStatusHistory
                                 /*
                                 #region access custom.unsPowerStatusHistory
@@ -3992,7 +3994,9 @@ VALUES(
 
 
                         }
-
+                        sql_client.disconnect();
+                        sql_client.Dispose();
+                        sql_client = null;
                         return;
                         break;
                     case "Unit Absent":
@@ -4020,13 +4024,13 @@ WHERE
   (custom.uns_deivce_power_status.power <> 'off' OR 
   custom.uns_deivce_power_status.power IS NULL) ";
 
-                                while (!sql_client.connect())
+                                //while (!sql_client.connect())
                                 {
-                                    Thread.Sleep(30);
+                                    //Thread.Sleep(30);
                                 }
                                 //lock (access_uns_deivce_power_status_Lock)
                                 sql_client.modify(unsSqlCmd);
-                                sql_client.disconnect();
+                                //sql_client.disconnect();
 
                                 #region insert into unsPowerStatusHistory
                                 unsSqlCmd = @"INSERT INTO
@@ -4037,12 +4041,12 @@ VALUES(
   '" + deviceID + @"',
   'off')";
 
-                                while (!sql_client.connect())
+                                //while (!sql_client.connect())
                                 {
-                                    Thread.Sleep(30);
+                                    //Thread.Sleep(30);
                                 }
                                 sql_client.modify(unsSqlCmd);
-                                sql_client.disconnect();
+                                //sql_client.disconnect();
                                 #endregion insert into unsPowerStatusHistory
                                 /*
                                 #region access custom.unsPowerStatusHistory
@@ -4091,7 +4095,9 @@ VALUES(
                     }
 
                         #endregion
-
+                    sql_client.disconnect();
+                    sql_client.Dispose();
+                    sql_client = null;
                         return;
                         break;
                     case "Ignition Off":
@@ -4130,6 +4136,9 @@ VALUES(
                         Console.ForegroundColor = ConsoleColor.DarkCyan;
                         Console.WriteLine("-access_sql_server");
                         Console.ResetColor();
+                        sql_client.disconnect();
+                        sql_client.Dispose();
+                        sql_client = null;
                         return;
                     }
                     string sqlCmd = @"SELECT 
@@ -4143,12 +4152,12 @@ WHERE
 ORDER BY
   public._gps_log._time DESC
 LIMIT 1";
-                    while (!sql_client.connect())
+                    //while (!sql_client.connect())
                     {
-                        Thread.Sleep(30);
+                        //Thread.Sleep(30);
                     }
                     DataTable sqlDatetable = sql_client.get_DataTable(sqlCmd);
-                    sql_client.disconnect();
+                    //sql_client.disconnect();
                     if (sqlDatetable != null && sqlDatetable.Rows.Count != 0)
                     {
                         string avlsLat = string.Empty, avlsLon = string.Empty;
@@ -4195,6 +4204,9 @@ LIMIT 1";
                         Console.ForegroundColor = ConsoleColor.DarkCyan;
                         Console.WriteLine("-access_sql_server");
                         Console.ResetColor();
+                        sql_client.disconnect();
+                        sql_client.Dispose();
+                        sql_client = null;
                         return;
                     }
                     string lat = string.Empty, lon = string.Empty;
@@ -4351,9 +4363,9 @@ LIMIT 1";
             }
             #endregion
             */
-            while (!sql_client.connect())
+            //while (!sql_client.connect())
             {
-                Thread.Sleep(30);
+                //Thread.Sleep(30);
             }
             {
 
@@ -4660,18 +4672,18 @@ LIMIT 1";
                 }
                 finally
                 {
-                    sql_client.disconnect();
+                    //sql_client.disconnect();
                 }
             }
             
             
 
-            while (!sql_client.connect())
+            //while (!sql_client.connect())
             {
-                Thread.Sleep(30);
+                //Thread.Sleep(30);
             }
                 string cgaEventLogIdCount = string.Empty;
-            sql_client.disconnect();
+            //sql_client.disconnect();
             string yyyymmddhhmmss = DateTime.Now.ToString("yyyyMMddHHmmss");
 
             #region access GetGidAndFullnameFromP_prohibitedAndPatrol_locationFromSql
@@ -4727,9 +4739,9 @@ LIMIT 1";
                     }
 
                     //insert into custom.cga_event_log
-                    while (!sql_client.connect())
+                    //while (!sql_client.connect())
                     {
-                        Thread.Sleep(30);
+                        //Thread.Sleep(30);
                     }
                     cgaEventLogIdCount = DateTime.Now.ToString("yyyyMMddHHmmssfffffff");
                     string sn = "\'" + deviceID + now + cgaEventLogIdCount + "\'";
@@ -4753,7 +4765,7 @@ LIMIT 1";
                     string cmd = "INSERT INTO custom.cga_event_log (" + table_columns + ") VALUES  (" +
                                  table_column_value + ")";
                     sql_client.modify(cmd);
-                    sql_client.disconnect();
+                    //sql_client.disconnect();
                 }
             }
                 /*
@@ -4845,9 +4857,9 @@ LIMIT 1";
                                 bundaryEventNumber = "5";
                                 cgaEventLogIdCount = DateTime.Now.ToString("yyyyMMddHHmmssfffffff");
                                 //insert into custom.cga_event_log
-                                while (!sql_client.connect())
+                                //while (!sql_client.connect())
                                 {
-                                    Thread.Sleep(30);
+                                    //Thread.Sleep(30);
                                 }
                                 string sn = "\'" + deviceID + now + cgaEventLogIdCount + "\'";
                                 string table_columns =
@@ -4870,7 +4882,7 @@ LIMIT 1";
                                 string cmd = "INSERT INTO custom.cga_event_log (" + table_columns + ") VALUES  (" +
                                              table_column_value + ")";
                                 sql_client.modify(cmd);
-                                sql_client.disconnect();
+                                //sql_client.disconnect();
                                 break;
                             case "out":
                                 break;
@@ -4911,9 +4923,9 @@ LIMIT 1";
                                                                     @"','YYYYMMDDHH24MISS')";
                                         string cmd = "INSERT INTO custom.cga_event_log (" + table_columns + ") VALUES  (" +
                                                      table_column_value + ")";
-                                        while (!sql_client.connect())
+                                        //while (!sql_client.connect())
                                         {
-                                            Thread.Sleep(30);
+                                            //Thread.Sleep(30);
                                         }
                                         sql_client.modify(cmd);
                                         break;
