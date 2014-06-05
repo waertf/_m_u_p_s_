@@ -1632,6 +1632,7 @@ Select 1-6 then press enter to send package
                 Console.ResetColor();
                 
                 xmlQueue.Enqueue(returndata);
+                Thread.Sleep(30);
 				//Thread xmlParseThread = new Thread(xml_parse);
                 //xmlParseThread.Start(returndata);
                 //xmlParseThread.Join(int.Parse(ConfigurationManager.AppSettings["xmlParseJoinTimeout"]));
