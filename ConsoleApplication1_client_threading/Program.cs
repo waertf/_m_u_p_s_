@@ -1987,7 +1987,7 @@ Select 1-6 then press enter to send package
                     prohibitedTableName = "public.p_prohibited";
                     locationTableName = "public.patrol_location";
                     string getMessage = string.Empty;
-                        lock (getGidAndFullnameLock)
+                        //lock (getGidAndFullnameLock)
                         {
                             if (htable.ContainsKey("lat_value") && htable.ContainsKey("long_value") && htable.ContainsKey("suaddr"))
                             getMessage = GetGidAndFullnameFromP_prohibitedAndPatrol_locationFromSql(prohibitedTableName,
@@ -3079,7 +3079,7 @@ now() <= end_time::timestamp ";
                         foreach (DataRow row in dt.Rows)
                         {
                             //prohibitedEab2s.Add(new EAB2("p_prohibited", row[0].ToString(), row[1].ToString()));
-                            lock (mylock)
+                            //lock (mylock)
                             {
                                 message += ";" + "p_prohibited" + "#" + row[0].ToString() + "#" + row[1].ToString();
                             }
@@ -3135,7 +3135,7 @@ now() <= end_time::timestamp ";
                                 foreach (DataRow row in dt.Rows)
                                 {
                                     //prohibitedEab2s.Add(new EAB2("p_prohibited", row[0].ToString(), row[1].ToString()));
-                                    lock (mylock)
+                                    //lock (mylock)
                                     {
                                         message += ";" + "p_prohibited" + "#" + row[0].ToString() + "#" + row[1].ToString();
                                     }
@@ -3153,7 +3153,7 @@ now() <= end_time::timestamp ";
                             foreach (DataRow row in dt.Rows)
                             {
                                 //prohibitedEab2s.Add(new EAB2("p_prohibited", row[0].ToString(), row[1].ToString()));
-                                lock (mylock)
+                                //lock (mylock)
                                 {
                                     message += ";" + "p_prohibited" + "#" + row[0].ToString() + "#" + row[1].ToString();
                                 }
@@ -3194,7 +3194,7 @@ now() <= end_time::timestamp ";
                        // foreach (DataRow row in dt.Rows)
                         {
                             //prohibitedEab2s.Add(new EAB2("p_prohibited", row[0].ToString(), row[1].ToString()));
-                            lock (mylock)
+                            //lock (mylock)
                             {
                                 message += ";" + "p_prohibited_out";
                                 //SiAuto.Main.LogMessage(message);
@@ -3234,7 +3234,7 @@ now() <= end_time::timestamp ";
                         foreach (DataRow row in dt.Rows)
                         {
                             //locationEab2s.Add(new EAB2("patrol_location", row[0].ToString(), row[1].ToString()));
-                            lock (mylock)
+                            //lock (mylock)
                             {
                                 message += ";" + "patrol_location" + "#" + row[0].ToString() + "#" + row[1].ToString();
                             }
@@ -3289,7 +3289,7 @@ now() <= end_time::timestamp ";
                                 foreach (DataRow row in dt.Rows)
                                 {
                                     //locationEab2s.Add(new EAB2("patrol_location", row[0].ToString(), row[1].ToString()));
-                                    lock (mylock)
+                                    //lock (mylock)
                                     {
                                         message += ";" + "patrol_location" + "#" + row[0].ToString() + "#" + row[1].ToString();
                                     }
@@ -3304,7 +3304,7 @@ now() <= end_time::timestamp ";
                             foreach (DataRow row in dt.Rows)
                             {
                                 //locationEab2s.Add(new EAB2("patrol_location", row[0].ToString(), row[1].ToString()));
-                                lock (mylock)
+                                //lock (mylock)
                                 {
                                     message += ";" + "patrol_location" + "#" + row[0].ToString() + "#" + row[1].ToString();
                                 }
@@ -3338,7 +3338,7 @@ now() <= end_time::timestamp ";
                         //foreach (DataRow row in dt.Rows)
                         {
                             //locationEab2s.Add(new EAB2("patrol_location", row[0].ToString(), row[1].ToString()));
-                            lock (mylock)
+                            //lock (mylock)
                             {
                                 //message += ";" + "patrol_location" + "#" + "lout";
                             }
@@ -3570,8 +3570,9 @@ FROM
             else
                 operation_log.application_id = "\'" + "null" + "\'";
             string deviceID = string.Empty;
-                double operationLogIdCount;
-                lock (gpsLogAccessSqlLock)
+                //double operationLogIdCount;
+                /*
+                //lock (gpsLogAccessSqlLock)
                 {
                     #region sql get/set id
                     while (!sql_client.connect())
@@ -3615,7 +3616,26 @@ FROM
                     }
                     #endregion sql get/set id
                 }
-            
+            */
+                if (htable.ContainsKey("suaddr"))
+                {
+                    deviceID = htable["suaddr"] as string;
+                    gps_log._uid = operation_log.eqp_id = "\'" + deviceID + "\'";
+                    //gps_log._id = "\'" + deviceID + "_" + now + "_" + _gps_logUidCount + "\'";
+                    //operation_log._id = "\'" + "operation" + "_" + now + "_" + operationLogIdCount + "\'";
+                    gps_log._id = "\'" + deviceID + "_" + now + "\'";
+                    operation_log._id = "\'" + "op" + "_" + now + "\'";
+                }
+                else
+                {
+                    gps_log._uid = operation_log.eqp_id = "\'" + "null" + "\'";
+                    gps_log._id = "\'" + "null" + "_" + now + "\'";
+                    operation_log._id = "\'" + "op" + "_" + now + "\'";
+                    //gps_log._id = "\'" + Convert.ToBase64String(System.Guid.NewGuid().ToByteArray()) + "_" +
+                    //"\'";
+                    //operation_log._id = "\'" + Convert.ToBase64String(System.Guid.NewGuid().ToByteArray()) + "_" + manual_id_serial_command + "\'";
+                    //operation_log._id = "\'" + deviceID + "_" + now + "_"  + "\'";
+                }
             if (htable.ContainsKey("result_code"))
             {
                 gps_log._option2 = operation_log.result_code = "\'" + htable["result_code"].ToString() + "\'";
@@ -3856,7 +3876,7 @@ WHERE
                         gps_log.j_7 = "\'" + "null" + "\'";
                         gps_log.j_8 = "\'" + "null" + "\'";
                         operation_log.event_id = "\'" + operation_log.eqp_id + now +
-                                                 operationLogIdCount.ToString("000000000000") + "\'";
+                                                 "\'";
                         break;
                     case "Unit Present":
                         if (!string.IsNullOrEmpty(deviceID) && CheckIfUidExist(deviceID))
@@ -3980,7 +4000,7 @@ VALUES(
                         gps_log.j_6 = "\'" + "null" + "\'";
                         gps_log.j_8 = "\'" + "null" + "\'";
                         operation_log.event_id = "\'" + operation_log.eqp_id + now +
-                                                 operationLogIdCount.ToString("000000000000") + "\'";
+                                                 "\'";
 
                         #region access power status
 
@@ -4080,7 +4100,7 @@ VALUES(
                         gps_log.j_6 = "\'" + "null" + "\'";
                         gps_log.j_7 = "\'" + "null" + "\'";
                         operation_log.event_id = "\'" + operation_log.eqp_id + now +
-                                                 operationLogIdCount.ToString("000000000000") + "\'";
+                                                  "\'";
                         break;
                     default:
                         gps_log.j_6 = gps_log.j_7 = gps_log.j_8 = operation_log.event_id = "\'" + "null" + "\'";
@@ -4650,7 +4670,7 @@ LIMIT 1";
             {
                 Thread.Sleep(30);
             }
-                double cgaEventLogIdCount = 0;
+                string cgaEventLogIdCount = string.Empty;
             sql_client.disconnect();
             string yyyymmddhhmmss = DateTime.Now.ToString("yyyyMMddHHmmss");
 
@@ -4661,7 +4681,7 @@ LIMIT 1";
             locationTableName = "public.patrol_location";
             //string getMessage = string.Empty,bundaryEventNumber = string.Empty;
                 string bundaryEventNumber = string.Empty;
-                lock (cgaEventAccessSqlLock)
+                //lock (cgaEventAccessSqlLock)
             {
 
                 /* 
@@ -4711,10 +4731,8 @@ LIMIT 1";
                     {
                         Thread.Sleep(30);
                     }
-                    cgaEventLogIdCount =
-                Convert.ToDouble(
-                    sql_client.get_DataTable("SELECT COUNT(uid)   FROM custom.cga_event_log WHERE uid = '" + deviceID + "\'").Rows[0].ItemArray[0]);
-                    string sn = "\'" + deviceID + now + cgaEventLogIdCount.ToString("000000000000") + "\'";
+                    cgaEventLogIdCount = DateTime.Now.ToString("yyyyMMddHHmmssfffffff");
+                    string sn = "\'" + deviceID + now + cgaEventLogIdCount + "\'";
                     string table_columns =
                         "serial_no ,uid ,type ,lat ,lon,altitude ,speed ,course ,radius ,info_time ,server_time ,create_user ,create_ip,start_time,create_time";
                     string table_column_value = sn + "," +
@@ -4739,7 +4757,7 @@ LIMIT 1";
                 }
             }
                 /*
-            lock (getGidAndFullnameLock)
+            //lock (getGidAndFullnameLock)
             {
 
                  
@@ -4814,7 +4832,7 @@ LIMIT 1";
                 */
             #endregion access GetGidAndFullnameFromP_prohibitedAndPatrol_locationFromSql
 
-                lock (cgaEventAccessSqlLock)
+                //lock (cgaEventAccessSqlLock)
                 {
                     #region checkIfOverTime
                     //event:5->stay over specific time within 0.1 km
@@ -4825,20 +4843,13 @@ LIMIT 1";
                         {
                             case "in"://stay over time
                                 bundaryEventNumber = "5";
-                                while (!sql_client.connect())
-                                {
-                                    Thread.Sleep(30);
-                                }
-                                cgaEventLogIdCount =
-                                   Convert.ToDouble(
-                                       sql_client.get_DataTable("SELECT COUNT(uid)   FROM custom.cga_event_log WHERE uid = '" + deviceID + "\'").Rows[0].ItemArray[0]);
-                                sql_client.disconnect();
+                                cgaEventLogIdCount = DateTime.Now.ToString("yyyyMMddHHmmssfffffff");
                                 //insert into custom.cga_event_log
                                 while (!sql_client.connect())
                                 {
                                     Thread.Sleep(30);
                                 }
-                                string sn = "\'" + deviceID + now + cgaEventLogIdCount.ToString("000000000000") + "\'";
+                                string sn = "\'" + deviceID + now + cgaEventLogIdCount + "\'";
                                 string table_columns =
                                     "serial_no ,uid ,type ,lat ,lon,altitude ,speed ,course ,radius ,info_time ,server_time ,create_user ,create_ip,start_time,create_time";
                                 string table_column_value = sn + "," +
@@ -4867,17 +4878,10 @@ LIMIT 1";
                     }
                     #endregion checkIfOverTime
                 }
-                lock (cgaEventAccessSqlLock)
+                //lock (cgaEventAccessSqlLock)
                 {
                     #region insert into custom.cga_event_log
-                    while (!sql_client.connect())
-                    {
-                        Thread.Sleep(30);
-                    }
-                    cgaEventLogIdCount =
-                       Convert.ToDouble(
-                           sql_client.get_DataTable("SELECT COUNT(uid)   FROM custom.cga_event_log WHERE uid = '" + deviceID + "\'").Rows[0].ItemArray[0]);
-                    sql_client.disconnect();
+                    cgaEventLogIdCount = DateTime.Now.ToString("yyyyMMddHHmmssfffffff");
 
                     {
                         try
@@ -4887,7 +4891,7 @@ LIMIT 1";
                                 switch (htable["event_info"].ToString())
                                 {
                                     case "Emergency On":
-                                        string sn = "\'" + deviceID + now + cgaEventLogIdCount.ToString("000000000000") + "\'";
+                                        string sn = "\'" + deviceID + now + cgaEventLogIdCount + "\'";
                                         string table_columns =
                                             "serial_no ,uid ,type ,lat ,lon,altitude ,speed ,course ,radius ,info_time ,server_time ,create_user ,create_ip,start_time,create_time";
                                         string table_column_value = sn + "," +
