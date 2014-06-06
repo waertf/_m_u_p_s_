@@ -128,6 +128,7 @@ namespace ConsoleApplication1_client_threading
                         Console.WriteLine(
                             "E++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
                         Console.ResetColor();
+                        log.Info("sql Write:\r\n" + cmd);
                     });
                     if (command != null)
                         command.Dispose();
