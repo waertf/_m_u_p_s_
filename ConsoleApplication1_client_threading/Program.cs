@@ -604,7 +604,7 @@ LIMIT 1";
                 var avlsTimer = new System.Timers.Timer(15);
                 avlsTimer.Elapsed += (sender, e) =>
                 {
-                    if (avlsQueue.Count>=0)
+                    if (avlsQueue.Count>0)
                         access_avls_server(avlsQueue.Dequeue());
                 };
                 avlsTimer.Enabled = true;
@@ -613,7 +613,7 @@ LIMIT 1";
                 var sqlTimer = new System.Timers.Timer(30);
                 sqlTimer.Elapsed += (sender, e) =>
                 {
-                    if (sqlQueue.Count>=0)
+                    if (sqlQueue.Count>0)
                         access_sql_server(sqlQueue.Dequeue());
                 };
                 sqlTimer.Enabled = true;
