@@ -568,7 +568,7 @@ LIMIT 1";
                 Thread.Sleep(30);
             }
             */
-            var xmlParseTimer = new System.Timers.Timer(15);
+            var xmlParseTimer = new System.Timers.Timer(30);
             xmlParseTimer.Elapsed += (sender, e) => { 
                 if (!xmlQueue.Count.Equals(0))
                 xml_parse(xmlQueue.Dequeue()); };
@@ -1642,7 +1642,7 @@ Select 1-6 then press enter to send package
                 Console.ResetColor();
                 
                 xmlQueue.Enqueue(returndata);
-                Thread.Sleep(30);
+                Thread.Sleep(60);
 				//Thread xmlParseThread = new Thread(xml_parse);
                 //xmlParseThread.Start(returndata);
                 //xmlParseThread.Join(int.Parse(ConfigurationManager.AppSettings["xmlParseJoinTimeout"]));
