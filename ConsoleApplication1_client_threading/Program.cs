@@ -313,10 +313,11 @@ LIMIT 1";
         static Queue xmlQueue = new Queue();
         static Queue avlsQueue = new Queue();
         static Queue sqlQueue = new Queue();
-
+        static Mutex _mutex = new Mutex(false, "unsClient.exe");
         private static void Main(string[] args)
         {
-
+            if (!_mutex.WaitOne(1000, false))
+                return;
             //Console.WriteLine(AppDomain.CurrentDomain.BaseDirectory + "Client.exe");
             //int work, complete;
             /*
@@ -330,7 +331,7 @@ LIMIT 1";
             ThreadPool.SetMinThreads(int.Parse(ConfigurationManager.AppSettings["MinWorkerThreads"]), int.Parse(ConfigurationManager.AppSettings["MinCompletionPortThreads"]));
             ThreadPool.SetMaxThreads(int.Parse(ConfigurationManager.AppSettings["MaxWorkerThreads"]), int.Parse(ConfigurationManager.AppSettings["MaxCompletionPortThreads"]));
             */
-            Thread.Sleep(5000);
+            //Thread.Sleep(5000);
             AppDomain.CurrentDomain.ProcessExit += new EventHandler(CurrentDomain_ProcessExit);
             AppDomain.CurrentDomain.UnhandledException +=
                 new UnhandledExceptionEventHandler(CurrentDomain_UnhandledException);
@@ -654,6 +655,7 @@ LIMIT 1";
                   Process.GetCurrentProcess().WorkingSet64/1024.0/1024.0;
             SiAuto.Main.LogError(logMsg);
             log.Fatal(logMsg);
+            _mutex.ReleaseMutex();
         }
 
         static void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
