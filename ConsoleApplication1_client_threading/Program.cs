@@ -939,9 +939,9 @@ ORDER BY
 LIMIT
 1";
                     DataTable dt = AutosendsqlClient.get_DataTable(sqlCmd);
-                    AutosendsqlClient.disconnect();
-                    AutosendsqlClient.Dispose();
-                    AutosendsqlClient = null;
+                    //AutosendsqlClient.disconnect();
+                    //AutosendsqlClient.Dispose();
+                    //AutosendsqlClient = null;
                     Hashtable requeseHashtable = new  Hashtable();
                     if (dt != null && dt.Rows.Count != 0)
                     {
@@ -1092,9 +1092,9 @@ LIMIT
 
                             sqlCmd = @"UPDATE custom.equipment_request SET send_value = 1 WHERE custom.equipment_request.serial_no = '" +
                                 requeseHashtable["serial_no"] + @"'";
-                            while (!AutosendsqlClient.connect())
+                            //while (!AutosendsqlClient.connect())
                             {
-                                Thread.Sleep(30);
+                                //Thread.Sleep(30);
                             }
                             AutosendsqlClient.modify(sqlCmd);
                             AutosendsqlClient.disconnect();
