@@ -311,7 +311,10 @@ LIMIT 1";
         private static object IsFirstExecuteLock = new object();
         private static uint deviceCount = 0;
         static Queue xmlQueue = new Queue();
-        static void Main(string[] args)
+        static Queue avlsQueue = new Queue();
+        static Queue sqlQueue = new Queue();
+
+        private static void Main(string[] args)
         {
 
             //Console.WriteLine(AppDomain.CurrentDomain.BaseDirectory + "Client.exe");
@@ -329,7 +332,8 @@ LIMIT 1";
             */
             Thread.Sleep(5000);
             AppDomain.CurrentDomain.ProcessExit += new EventHandler(CurrentDomain_ProcessExit);
-            AppDomain.CurrentDomain.UnhandledException += new UnhandledExceptionEventHandler(CurrentDomain_UnhandledException);
+            AppDomain.CurrentDomain.UnhandledException +=
+                new UnhandledExceptionEventHandler(CurrentDomain_UnhandledException);
             string StartupPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
             string datalogicFilePath = Path.Combine(StartupPath, "StayCheck.sdf");
             string connString = string.Format("Data Source={0}", datalogicFilePath);
@@ -372,15 +376,17 @@ LIMIT 1";
 
             SiAuto.Si.Enabled = true;
             SiAuto.Si.Level = Level.Debug;
-            SiAuto.Si.Connections = @"file(filename=""" + Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) + "\\log.sil\",rotate=weekly,append=true,maxparts=5,maxsize=500MB)";
+            SiAuto.Si.Connections = @"file(filename=""" +
+                                    Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) +
+                                    "\\log.sil\",rotate=weekly,append=true,maxparts=5,maxsize=500MB)";
             string logMsg = string.Empty;
             logMsg = "Start time:" + DateTime.Now.ToString("G");
             SiAuto.Main.LogError(logMsg);
             log.Fatal(logMsg);
             //SiAuto.Main.LogMessage("This is my first SmartInspect message!");
             //SiAuto.Main.LogText(Level.Debug,"test","hahaha");
-            
-            
+
+
             //Console.WriteLine(GetLocalIPAddress());//current ip address
             //Console.WriteLine(System.Environment.UserName);//current username
             //Console.WriteLine(string.Format("{0:yyMMddHHmmss}", DateTime.Now));
@@ -388,9 +394,9 @@ LIMIT 1";
             //Console.WriteLine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location));
             //test();
             unsTcpClient = new TcpClient();
-            
+
             avlsTcpClient = new TcpClient();
-            
+
             /*
             while (!mups_connected)
             {
@@ -422,13 +428,21 @@ LIMIT 1";
             Keeplive.keep(avlsTcpClient.Client);
             avlsNetworkStream = avlsTcpClient.GetStream();
 
-            var sql_client = new SqlClient(ConfigurationManager.AppSettings["SQL_SERVER_IP"], ConfigurationManager.AppSettings["SQL_SERVER_PORT"], ConfigurationManager.AppSettings["SQL_SERVER_USER_ID"], ConfigurationManager.AppSettings["SQL_SERVER_PASSWORD"], ConfigurationManager.AppSettings["SQL_SERVER_DATABASE"], ConfigurationManager.AppSettings["Pooling"], ConfigurationManager.AppSettings["MinPoolSize"], ConfigurationManager.AppSettings["MaxPoolSize"], ConfigurationManager.AppSettings["ConnectionLifetime"]);
+            var sql_client = new SqlClient(ConfigurationManager.AppSettings["SQL_SERVER_IP"],
+                ConfigurationManager.AppSettings["SQL_SERVER_PORT"],
+                ConfigurationManager.AppSettings["SQL_SERVER_USER_ID"],
+                ConfigurationManager.AppSettings["SQL_SERVER_PASSWORD"],
+                ConfigurationManager.AppSettings["SQL_SERVER_DATABASE"], ConfigurationManager.AppSettings["Pooling"],
+                ConfigurationManager.AppSettings["MinPoolSize"], ConfigurationManager.AppSettings["MaxPoolSize"],
+                ConfigurationManager.AppSettings["ConnectionLifetime"]);
 
             while (!sql_client.connect())
             {
                 Thread.Sleep(30);
             }
-            string totalDevice = sql_client.get_DataTable(@"SELECT reltuples FROM pg_class WHERE oid = 'sd.equipment'::regclass").Rows[0].ItemArray[0].ToString();
+            string totalDevice =
+                sql_client.get_DataTable(@"SELECT reltuples FROM pg_class WHERE oid = 'sd.equipment'::regclass").Rows[0]
+                    .ItemArray[0].ToString();
             //sql_client.disconnect();
 
             deviceCount = uint.Parse(totalDevice);
@@ -436,12 +450,13 @@ LIMIT 1";
             string emptyPowerStatusTable = @"DELETE FROM custom.uns_deivce_power_status";
             //while (!sql_client.connect())
             //{
-                //Thread.Sleep(30);
+            //Thread.Sleep(30);
             //}
             sql_client.modify(emptyPowerStatusTable);
             //sql_client.disconnect();
 
             #region
+
             string regSqlCmd = string.Empty;
             regSqlCmd = @"SELECT
   sd.equipment.uid
@@ -461,7 +476,7 @@ LIMIT 1";
                 foreach (DataRow row in dt.Rows)
                 {
                     uid = row[0].ToString();
-                    regSqlCmd = "INSERT INTO custom.uns_deivce_power_status (uid) VALUES ("+"\'"+uid+"\'"+")";
+                    regSqlCmd = "INSERT INTO custom.uns_deivce_power_status (uid) VALUES (" + "\'" + uid + "\'" + ")";
                     //while (!sql_client.connect())
                     {
                         //Thread.Sleep(30);
@@ -474,30 +489,38 @@ LIMIT 1";
             }
             dt.Dispose();
             dt = null;
+
             #endregion
-            string registration_msg = "<Location-Registration-Request><application>" + ConfigurationManager.AppSettings["application_ID"] + "</application></Location-Registration-Request>";
+
+            string registration_msg = "<Location-Registration-Request><application>" +
+                                      ConfigurationManager.AppSettings["application_ID"] +
+                                      "</application></Location-Registration-Request>";
             UnsTcpWriteLine(netStream, data_append_dataLength(registration_msg), registration_msg);
             //using (StreamWriter w = File.AppendText("log.txt"))
             {
-                log.Info("send:\r\n"+registration_msg);
+                log.Info("send:\r\n" + registration_msg);
                 // Close the writer and underlying file.
                 //w.Close();
             }
-            {//access sql
+            {
+//access sql
                 string now = string.Format("{0:yyyyMMdd}", DateTime.Now);
                 //while (!sql_client.connect())
                 {
                     //Thread.Sleep(30);
                 }
-                string manual_id_serial_command = sql_client.get_DataTable("SELECT COUNT(_id)   FROM public.operation_log").Rows[0].ItemArray[0].ToString();
+                string manual_id_serial_command =
+                    sql_client.get_DataTable("SELECT COUNT(_id)   FROM public.operation_log").Rows[0].ItemArray[0]
+                        .ToString();
                 //sql_client.disconnect();
                 MANUAL_SQL_DATA operation_log = new MANUAL_SQL_DATA();
                 operation_log._id = "\'" + "operation" + "_" + now + "_" + manual_id_serial_command + "\'";
                 operation_log.event_id = @"'null'";
                 operation_log.application_id = "\'" + ConfigurationManager.AppSettings["application_ID"] + "\'";
                 operation_log.create_user = @"'System'";
-                string table_columns, table_column_value,cmd;
-                table_column_value = operation_log._id + "," + operation_log.event_id + "," + operation_log.application_id + "," + operation_log.create_user;
+                string table_columns, table_column_value, cmd;
+                table_column_value = operation_log._id + "," + operation_log.event_id + "," +
+                                     operation_log.application_id + "," + operation_log.create_user;
                 table_columns = "_id,event_id,application_id,create_user";
                 cmd = "INSERT INTO public.operation_log (" + table_columns + ") VALUES  (" + table_column_value + ")";
                 //while (!sql_client.connect())
@@ -508,7 +531,7 @@ LIMIT 1";
                 //sql_client.disconnect();
             }
             sql_client.Dispose();
-			sql_client=null;
+            sql_client = null;
             //sendtest(netStream);
 
             //alonso
@@ -531,14 +554,16 @@ LIMIT 1";
 
             }
 
-            var accessUnsDeivcePowerStatusSqlTable = new System.Timers.Timer(int.Parse(ConfigurationManager.AppSettings["uns_deivce_power_status_Timer_interval_sec"]) * 1000);
+            var accessUnsDeivcePowerStatusSqlTable =
+                new System.Timers.Timer(
+                    int.Parse(ConfigurationManager.AppSettings["uns_deivce_power_status_Timer_interval_sec"])*1000);
             accessUnsDeivcePowerStatusSqlTable.Elapsed +=
                 (sender, e) => { SendToAvlsEventColumnSetNegativeOneIfPowerOff(avlsTcpClient, avlsNetworkStream); };
             accessUnsDeivcePowerStatusSqlTable.Enabled = true;
 
             if (bool.Parse(ConfigurationManager.AppSettings["IsEvery30SecondSendUidEqlSixZeroToAvls"]))
             {
-                var every30SecondSendUidEqlSixZeroToAvls = new System.Timers.Timer(30 * 1000);
+                var every30SecondSendUidEqlSixZeroToAvls = new System.Timers.Timer(30*1000);
                 every30SecondSendUidEqlSixZeroToAvls.Elapsed +=
                     (sender, e) => { every30SecondSendUidEqlSixZeroToAvls_Elapsed(avlsTcpClient, avlsNetworkStream); };
                 //every30SecondSendUidEqlSixZeroToAvls.Enabled = true;
@@ -568,12 +593,33 @@ LIMIT 1";
                 Thread.Sleep(30);
             }
             */
+            /*
             var xmlParseTimer = new System.Timers.Timer(30);
             xmlParseTimer.Elapsed += (sender, e) => { 
                 if (!xmlQueue.Count.Equals(0))
                 xml_parse(xmlQueue.Dequeue()); };
             xmlParseTimer.Enabled = true;
-            Console.ReadLine();
+            */
+            {
+                var avlsTimer = new System.Timers.Timer(15);
+                avlsTimer.Elapsed += (sender, e) =>
+                {
+                    if (avlsQueue.Count>=0)
+                        access_avls_server(avlsQueue.Dequeue());
+                };
+                avlsTimer.Enabled = true;
+            }
+            {
+                var sqlTimer = new System.Timers.Timer(30);
+                sqlTimer.Elapsed += (sender, e) =>
+                {
+                    if (sqlQueue.Count>=0)
+                        access_sql_server(sqlQueue.Dequeue());
+                };
+                sqlTimer.Enabled = true;
+            }   
+
+        Console.ReadLine();
             /*
             var GC =
                     new System.Timers.Timer(60 * 1000);
@@ -1641,7 +1687,8 @@ Select 1-6 then press enter to send package
                 Console.WriteLine("E############################################################################");
                 Console.ResetColor();
                 
-                xmlQueue.Enqueue(returndata);
+                //xmlQueue.Enqueue(returndata);
+                xml_parse(returndata);
                 Thread.Sleep(60);
 				//Thread xmlParseThread = new Thread(xml_parse);
                 //xmlParseThread.Start(returndata);
@@ -2000,12 +2047,16 @@ Select 1-6 then press enter to send package
                             Thread access_sql = null, access_avls = null;
                             if (bool.Parse(ConfigurationManager.AppSettings["SQL_ACCESS"]))
                             {
+                                /*
                                 //sqlAccessEvent.Reset();
                                  access_sql = new Thread(access_sql_server);
                                 access_sql.Start(new SqlClass(xml_root_tag, htable, sensor_name.ToList(),
                                     sensor_type.ToList(), sensor_value.ToList(), elements,
                                     logData, getMessage));
-
+                                */
+                                sqlQueue.Enqueue(new SqlClass(xml_root_tag, htable, sensor_name.ToList(),
+                                    sensor_type.ToList(), sensor_value.ToList(), elements,
+                                    logData, getMessage));
                                 //ThreadPool.QueueUserWorkItem(new WaitCallback(access_sql_server), new SqlClass(xml_root_tag, htable, sensor_name.ToList(), sensor_type.ToList(), sensor_value.ToList(), XmlGetAllElementsXname(xml_data), logData, getMessage));
                                 //access_sql.Join();
                                 //Console.WriteLine("SQL Access Enable");
@@ -2014,19 +2065,23 @@ Select 1-6 then press enter to send package
 
                             if (bool.Parse(ConfigurationManager.AppSettings["AVLS_ACCESS"]))
                             {
+                                /*
                                 //avlsSendDone.Reset();
                                  access_avls = new Thread(access_avls_server);
                                 //access_avls.Priority = ThreadPriority.BelowNormal;
                                 access_avls.Start(new AvlsClass(xml_root_tag, htable, sensor_name.ToList(),
                                     sensor_type.ToList(), sensor_value.ToList(), elements,
                                     logData, getMessage));
-
+                                */
+                                avlsQueue.Enqueue(new AvlsClass(xml_root_tag, htable, sensor_name.ToList(),
+                                    sensor_type.ToList(), sensor_value.ToList(), elements,
+                                    logData, getMessage));
                                 //ThreadPool.QueueUserWorkItem(new WaitCallback(access_avls_server), new AvlsClass(xml_root_tag, htable, sensor_name.ToList(), sensor_type.ToList(), sensor_value.ToList(), XmlGetAllElementsXname(xml_data), logData, getMessage));
                                 //access_avls.Join();
                                 //Console.WriteLine("AVLS Access Enable");
                                 //avlsSendDone.WaitOne();
                             }
-                            if (access_sql != null) access_sql.Join(int.Parse(ConfigurationManager.AppSettings["accessSqlJoinTimeout"]));
+                            //if (access_sql != null) access_sql.Join(int.Parse(ConfigurationManager.AppSettings["accessSqlJoinTimeout"]));
                             //access_avls.Join();
                             //Thread.Sleep(1);
                         }
@@ -2129,9 +2184,9 @@ Select 1-6 then press enter to send package
                     
                     if (bool.Parse(ConfigurationManager.AppSettings["SQL_ACCESS"]))
                     {
-                        Thread access_sql = new Thread(access_sql_server);
-                        access_sql.Start(new SqlClass(xml_root_tag, htable, sensor_name.ToList(), sensor_type.ToList(), sensor_value.ToList(), elements, logData, null));
-
+                        //Thread access_sql = new Thread(access_sql_server);
+                        //access_sql.Start(new SqlClass(xml_root_tag, htable, sensor_name.ToList(), sensor_type.ToList(), sensor_value.ToList(), elements, logData, null));
+                        sqlQueue.Enqueue(new SqlClass(xml_root_tag, htable, sensor_name.ToList(), sensor_type.ToList(), sensor_value.ToList(), elements, logData, null)); ;
                         //ThreadPool.QueueUserWorkItem(new WaitCallback(access_sql_server), new SqlClass(xml_root_tag, htable, sensor_name.ToList(), sensor_type.ToList(), sensor_value.ToList(), XmlGetAllElementsXname(xml_data), logData, null));
                             
                         //access_sql.Join();
