@@ -4531,7 +4531,7 @@ LIMIT 1";
                             {
                                 gps_log._validity = "\'Y\'";
                                 table_columns =
-                                    "_id,_uid,_status,_validity,_or_lon,_or_lat,_satellites,_temperature,,_voltage,_option3,j_6,j_7,_lat,_lon";
+                                    "_id,_uid,_status,_validity,_or_lon,_or_lat,_satellites,_temperature,_voltage,_option3,j_6,j_7,_lat,_lon";
                                 table_column_value = gps_log._id + "," + gps_log._uid + "," + gps_log._status + "," +
                                                      gps_log._validity + "," +
                                                      gps_log._or_lon + "," + gps_log._or_lat + "," + gps_log._satellites +
