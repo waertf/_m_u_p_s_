@@ -3606,7 +3606,7 @@ FROM
             AUTO_SQL_DATA gps_log = new AUTO_SQL_DATA();
             MANUAL_SQL_DATA operation_log = new MANUAL_SQL_DATA();
             gps_log._or_lat = gps_log._or_lon = gps_log._satellites = gps_log._temperature = gps_log._voltage = "0";
-            string now = string.Format("{0:yyyyMMdd}", dtime);
+            string now = string.Format("{0:yyyyMMddHHmmssfffffff}", dtime);
             gps_log._time = "\'" + string.Format("{0:yyyyMMdd HH:mm:ss.fff}", dtime) + "+08" + "\'";
 
             
@@ -4798,7 +4798,7 @@ LIMIT 1";
                     {
                         //Thread.Sleep(30);
                     }
-                    cgaEventLogIdCount = DateTime.Now.ToString("yyyyMMddHHmmssfffffff");
+                    cgaEventLogIdCount = "-0";
                     string sn = "\'" + deviceID + now + cgaEventLogIdCount + "\'";
                     string table_columns =
                         "serial_no ,uid ,type ,lat ,lon,altitude ,speed ,course ,radius ,info_time ,server_time ,create_user ,create_ip,start_time,create_time";
@@ -4910,7 +4910,7 @@ LIMIT 1";
                         {
                             case "in"://stay over time
                                 bundaryEventNumber = "5";
-                                cgaEventLogIdCount = DateTime.Now.ToString("yyyyMMddHHmmssfffffff");
+                                cgaEventLogIdCount = "-1";
                                 //insert into custom.cga_event_log
                                 //while (!sql_client.connect())
                                 {
@@ -4948,7 +4948,7 @@ LIMIT 1";
                 //lock (cgaEventAccessSqlLock)
                 {
                     #region insert into custom.cga_event_log
-                    cgaEventLogIdCount = DateTime.Now.ToString("yyyyMMddHHmmssfffffff");
+                    cgaEventLogIdCount = "-2";
 
                     {
                         try
