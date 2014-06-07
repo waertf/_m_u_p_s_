@@ -188,7 +188,7 @@ namespace ConsoleApplication1_client_threading
                     //Console.WriteLine("Starting asynchronous retrieval of data...");
                     IAsyncResult cres = command.BeginExecuteReader();
                     //Console.Write("In progress...");
-                    while (!cres.IsCompleted)
+                    //while (!cres.IsCompleted)
                     {
                         //Console.Write(".");
                         //Perform here any operation you need
