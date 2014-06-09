@@ -621,8 +621,16 @@ LIMIT 1";
                         access_sql_server(sqlQueue.Dequeue());
                 };
                 sqlTimer.Enabled = true;
-            }   
-
+            }
+            {
+                var QueueTimer = new System.Timers.Timer(30000);
+                QueueTimer.Elapsed += (sender, e) =>
+                {
+                    avlsQueue.TrimToSize();
+                    sqlQueue.TrimToSize();
+                };
+                QueueTimer.Enabled = true;
+            }
         Console.ReadLine();
             /*
             var GC =
@@ -4328,6 +4336,10 @@ LIMIT 1";
             if (htable.ContainsKey("Odometer"))
             {
                 gps_log._distance = operation_log.eqp_distance = htable["Odometer"].ToString().Replace(",", ".");
+            }
+            else
+            {
+                gps_log._distance = "0";
             }
             if (htable.ContainsKey("info_time"))
             {
