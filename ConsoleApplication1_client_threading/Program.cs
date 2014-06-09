@@ -3498,9 +3498,11 @@ FROM
                     //Thread.Sleep(3000);
                     unsConnectDone.WaitOne();
                     //send method2
-                    IAsyncResult result = netStream.BeginWrite(writeData, 0, writeData.Length, new AsyncCallback(avls_myWriteCallBack), netStream);
-                    result.AsyncWaitHandle.WaitOne();
-                    result.AsyncWaitHandle.Close();
+                    //IAsyncResult result = netStream.BeginWrite(writeData, 0, writeData.Length, new AsyncCallback(avls_myWriteCallBack), netStream);
+                    //result.AsyncWaitHandle.WaitOne();
+                    //result.AsyncWaitHandle.Close();
+                    netStream.WriteTimeout = 10;
+                    netStream.Write(writeData, 0, writeData.Length);
                     Console.ForegroundColor = ConsoleColor.Green;
                     Console.WriteLine("S----------------------------------------------------------------------------");
                     Console.WriteLine("avls write:\r\n" + write);
