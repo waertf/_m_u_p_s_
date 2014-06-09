@@ -283,12 +283,14 @@ LIMIT 1";
 			sql_client=null;
             if (dt != null && dt.Rows.Count != 0)
             {
+                dt.Clear();
                 dt.Dispose();
                 dt = null;
                 return true;
             }
             else
             {
+                dt.Clear();
                 dt.Dispose();
                 dt = null;
                 return false;
@@ -488,6 +490,7 @@ LIMIT 1";
                 }
 
             }
+            dt.Clear();
             dt.Dispose();
             dt = null;
 
@@ -780,6 +783,7 @@ WHERE
 
                 }
             }
+            dt.Clear();
             dt.Dispose();
             dt = null;
             /*
@@ -903,6 +907,7 @@ LIMIT 1";
                     avls_package.Loc = "N" + lat_str + "E" + long_str + ",";
                     //avls_package.Loc = "N00000.0000E00000.0000,";
                 }
+                dt.Clear();
                 dt.Dispose();
                 dt = null;
             }
@@ -1009,6 +1014,9 @@ LIMIT
                         else
                         {
                             //continue;
+                            dt.Clear();
+                            dt.Dispose();
+                            dt = null;
                             Thread.Sleep(30);
                             return ;
                         }
@@ -1148,6 +1156,7 @@ LIMIT
                             AutosendsqlClient.disconnect();
                         }
                     }
+                    dt.Clear();
                     dt.Dispose();
                     dt = null;
                     AutosendsqlClient.Dispose();
@@ -2376,6 +2385,7 @@ WHERE
                 }
                 
             }
+            dt.Clear();
             dt.Dispose();
             dt = null;
         }
@@ -2598,6 +2608,7 @@ LIMIT 1";
                             avls_package.Loc = "N" + lat_str + "E" + long_str + ",";
                             //avls_package.Loc = "N00000.0000E00000.0000,";
                         }
+                        dt.Clear();
                         dt.Dispose();
                         dt = null;
                         /*
@@ -2763,6 +2774,7 @@ LIMIT 1";
                             avls_package.Loc = "N" + lat_str + "E" + long_str + ",";
                             //avls_package.Loc = "N00000.0000E00000.0000,";
                         }
+                        dt.Clear();
                         dt.Dispose();
                         dt = null;
                         /*
@@ -3171,6 +3183,7 @@ now() <= end_time::timestamp ";
                                 stayTimeInMin = double .Parse(row[0].ToString());
                             }
                         }
+                        dt2.Clear();
                         dt2.Dispose();
                         dt2 = null;
                         //SiAuto.Main.WatchDouble(Level.Debug, "stayTimeInMin", stayTimeInMin);
@@ -3275,6 +3288,9 @@ now() <= end_time::timestamp ";
             {
                 //Thread.Sleep(30);
             }
+            dt.Clear();
+            dt.Dispose();
+            dt = null;
             dt = sql_client.get_DataTable(regSqlCmdForLocationTable);
             //sql_client.disconnect();
             //List<EAB2> locationEab2s = new List<EAB2>();
@@ -3327,6 +3343,7 @@ now() <= end_time::timestamp ";
                                 stayTimeInMin = double.Parse(row[0].ToString());
                             }
                         }
+                        dt2.Clear();
                         dt2.Dispose();
                         dt2 = null;
                         //SiAuto.Main.WatchDouble(Level.Debug, "stayTimeInMin", stayTimeInMin);
@@ -3413,6 +3430,7 @@ now() <= end_time::timestamp ";
                 }
                 
             }
+            dt.Clear();
             dt.Dispose();
             dt = null;
             sql_client.Dispose();
@@ -3746,6 +3764,7 @@ WHERE
                             //sql_client.disconnect();
 
                     }
+                dt1.Clear();
                 dt1.Dispose();
                     dt1 = null;
                 }
@@ -4243,6 +4262,7 @@ LIMIT 1";
                         gps_log._lat = gps_log._or_lat = operation_log.eqp_lat = lat;
                         gps_log._lon = gps_log._or_lon = operation_log.eqp_lon = lon;
                     }
+                    sqlDatetable.Clear();
                     sqlDatetable.Dispose();
                     sqlDatetable = null;
                 }
@@ -5059,6 +5079,7 @@ LIMIT 1";
             {
                 stayTimeInMin = "0";
             }
+            dt2.Clear();
 			dt2.Dispose();
 			dt2=null;
 			sqlclient.Dispose();
@@ -5113,6 +5134,7 @@ public._gps_log._uid = '"+deviceID+@"'
                     
                     //GC.Collect();
                     //GC.WaitForPendingFinalizers();
+                    dt3.Clear();
 					dt3.Dispose();
 					dt3=null;
                     return result;
@@ -5123,6 +5145,7 @@ public._gps_log._uid = '"+deviceID+@"'
                     result = "out";
                     //GC.Collect();
                     //GC.WaitForPendingFinalizers();
+                    dt3.Clear();
 					dt3.Dispose();
 					dt3=null;
                     return result;
@@ -5133,6 +5156,7 @@ public._gps_log._uid = '"+deviceID+@"'
 
                 //GC.Collect();
                 //GC.WaitForPendingFinalizers();
+                dt3.Clear();
 				dt3.Dispose();
 				dt3=null;
                 return string.Empty;
