@@ -97,7 +97,7 @@ namespace ConsoleApplication1_client_threading
                     //cmd.CommandText = "INSERT INTO public.test (id) VALUES (1)";
                     //pgSqlConnection.BeginTransaction();
                     //async
-                    command.BeginExecuteNonQuery(new AsyncCallback(EndModify), command);
+                    IAsyncResult cres=command.BeginExecuteNonQuery(null,null);
                     //Console.Write("In progress...");
                     //while (!cres.IsCompleted)
                     {
@@ -110,7 +110,7 @@ namespace ConsoleApplication1_client_threading
                     else
                         Console.WriteLine("Have to wait for operation to complete...");
                     */
-                    //int RowsAffected = command.EndExecuteNonQuery(cres);
+                    int RowsAffected = command.EndExecuteNonQuery(cres);
                     //Console.WriteLine("Done. Rows affected: " + RowsAffected.ToString());
                     /*
                      //sync
