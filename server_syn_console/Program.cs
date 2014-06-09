@@ -694,7 +694,13 @@ WHERE
   </info-data>
 </Unsolicited-Location-Report>
 ";
-                    string[] sendStrings = new[] { Triggered_loc ,UnitPresent,UnitAbsent};
+                    string GpsError = @"<Triggered-Location-Report>
+  <suaddr suaddr-type=""APCO"">" + device + @"</suaddr>
+  <operation-error>
+    <result result-code=""200"">INSUFFICIENT GPS SATELLITES</result>
+  </operation-error>
+</Triggered-Location-Report>";
+                    string[] sendStrings = new[] { Triggered_loc ,UnitPresent,UnitAbsent,GpsError};
                     string sendString = sendStrings[rand.Next(0, sendStrings.Length)];
                     byte[] msg4 = (data_append_dataLength(sendString));
                     handler.Send(msg4);
