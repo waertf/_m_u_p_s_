@@ -178,97 +178,101 @@ namespace ConsoleApplication1_client_threading
             Stopwatch stopWatch = new Stopwatch();
             PgSqlCommand command = null;
             stopWatch.Start();
-            try
+            using (DataTable datatable = new DataTable())
             {
-                if (pgSqlConnection != null && IsConnected)
+                try
                 {
-                    DataTable datatable = new DataTable();
-                    command = pgSqlConnection.CreateCommand();
-                    command.CommandText = cmd;
-                    //Console.WriteLine("Starting asynchronous retrieval of data...");
-                    IAsyncResult cres = command.BeginExecuteReader();
-                    //Console.Write("In progress...");
-                    //while (!cres.IsCompleted)
+                    if (pgSqlConnection != null && IsConnected)
                     {
-                        //Console.Write(".");
-                        //Perform here any operation you need
-                    }
-
-                    //if (cres.IsCompleted)
-                    //Console.WriteLine("Completed.");
-                    //else
-                    //Console.WriteLine("Have to wait for operation to complete...");
-                    PgSqlDataReader myReader = command.EndExecuteReader(cres);
-                    try
-                    {
-                        // printing the column names
-                        for (int i = 0; i < myReader.FieldCount; i++)
+                        //DataTable datatable = new DataTable();
+                        command = pgSqlConnection.CreateCommand();
+                        command.CommandText = cmd;
+                        //Console.WriteLine("Starting asynchronous retrieval of data...");
+                        IAsyncResult cres = command.BeginExecuteReader();
+                        //Console.Write("In progress...");
+                        //while (!cres.IsCompleted)
                         {
-                            //Console.Write(myReader.GetName(i).ToString() + "\t");
-                            datatable.Columns.Add(myReader.GetName(i).ToString(), typeof(string));
+                            //Console.Write(".");
+                            //Perform here any operation you need
                         }
-                        //Console.Write(Environment.NewLine);
-                        while (myReader.Read())
-                        {
-                            DataRow dr = datatable.NewRow();
 
+                        //if (cres.IsCompleted)
+                        //Console.WriteLine("Completed.");
+                        //else
+                        //Console.WriteLine("Have to wait for operation to complete...");
+                        PgSqlDataReader myReader = command.EndExecuteReader(cres);
+                        try
+                        {
+                            // printing the column names
                             for (int i = 0; i < myReader.FieldCount; i++)
                             {
-                                //Console.Write(myReader.GetString(i) + "\t");
-                                dr[i] = myReader.GetString(i);
+                                //Console.Write(myReader.GetName(i).ToString() + "\t");
+                                datatable.Columns.Add(myReader.GetName(i).ToString(), typeof(string));
                             }
-                            datatable.Rows.Add(dr);
                             //Console.Write(Environment.NewLine);
-                            //Console.WriteLine(myReader.GetInt32(0) + "\t" + myReader.GetString(1) + "\t");
-                        }
-                    }
-                    finally
-                    {
-                        myReader.Close();
-                        stopWatch.Stop();
-                        // Get the elapsed time as a TimeSpan value.
-                        TimeSpan ts = stopWatch.Elapsed;
+                            while (myReader.Read())
+                            {
+                                DataRow dr = datatable.NewRow();
 
-                        // Format and display the TimeSpan value.
-                        string elapsedTime = String.Format("{0:00}:{1:00}:{2:00}.{3:00}",
-                            ts.Hours, ts.Minutes, ts.Seconds,
-                            ts.Milliseconds / 10);
-                        SiAuto.Main.AddCheckpoint(Level.Debug, "sql query take time:" + elapsedTime, cmd);
-                    }
-                    /*
-                    foreach (DataRow row in datatable.Rows) // Loop over the rows.
-                    {
-                        Console.WriteLine("--- Row ---"); // Print separator.
-                        foreach (var item in row.ItemArray) // Loop over the items.
-                        {
-                            Console.Write("Item: "); // Print label.
-                            Console.WriteLine(item); // Invokes ToString abstract method.
+                                for (int i = 0; i < myReader.FieldCount; i++)
+                                {
+                                    //Console.Write(myReader.GetString(i) + "\t");
+                                    dr[i] = myReader.GetString(i);
+                                }
+                                datatable.Rows.Add(dr);
+                                //Console.Write(Environment.NewLine);
+                                //Console.WriteLine(myReader.GetInt32(0) + "\t" + myReader.GetString(1) + "\t");
+                            }
                         }
+                        finally
+                        {
+                            myReader.Close();
+                            stopWatch.Stop();
+                            // Get the elapsed time as a TimeSpan value.
+                            TimeSpan ts = stopWatch.Elapsed;
+
+                            // Format and display the TimeSpan value.
+                            string elapsedTime = String.Format("{0:00}:{1:00}:{2:00}.{3:00}",
+                                ts.Hours, ts.Minutes, ts.Seconds,
+                                ts.Milliseconds / 10);
+                            SiAuto.Main.AddCheckpoint(Level.Debug, "sql query take time:" + elapsedTime, cmd);
+                        }
+                        /*
+                        foreach (DataRow row in datatable.Rows) // Loop over the rows.
+                        {
+                            Console.WriteLine("--- Row ---"); // Print separator.
+                            foreach (var item in row.ItemArray) // Loop over the items.
+                            {
+                                Console.Write("Item: "); // Print label.
+                                Console.WriteLine(item); // Invokes ToString abstract method.
+                            }
+                        }
+                        */
+                        if (command != null)
+                            command.Dispose();
+                        command = null;
+                        return datatable.Copy();
                     }
-                    */
+                    else
+                    {
+
+                        return null;
+                    }
+
+                }
+                catch (PgSqlException ex)
+                {
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine("GetDataTable exception occurs: {0}" + Environment.NewLine + "{1}", ex.Error, cmd);
+                    log.Error("GetDataTable exception occurs: " + Environment.NewLine + ex.Error + Environment.NewLine + cmd);
+                    Console.ResetColor();
                     if (command != null)
                         command.Dispose();
                     command = null;
-                    return datatable;
-                }
-                else
-                {
-
                     return null;
                 }
-
             }
-            catch (PgSqlException ex)
-            {
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine("GetDataTable exception occurs: {0}" + Environment.NewLine + "{1}", ex.Error, cmd);
-                log.Error("GetDataTable exception occurs: " + Environment.NewLine + ex.Error + Environment.NewLine + cmd);
-                Console.ResetColor();
-                if (command != null)
-                    command.Dispose();
-                command = null;
-                return null;
-            }
+            
         }
         public void Dispose()
         {
