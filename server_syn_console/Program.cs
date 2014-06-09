@@ -96,10 +96,10 @@ namespace server_syn_console
                     break;
                 }
             */
-            ipAddress = IPAddress.Parse(ConfigurationManager.AppSettings["MUPS_SERVER_IP"]);
-            Console.WriteLine(ipAddress);
-            log.Info("ip address =" + ipAddress.ToString());
-            IPEndPoint localEndPoint = new IPEndPoint(ipAddress, int.Parse(ConfigurationManager.AppSettings["MUPS_SERVER_PORT"]));
+            //ipAddress = IPAddress.Parse(IPAddress.Any);
+            //Console.WriteLine(ipAddress);
+            //log.Info("ip address =" + ipAddress.ToString());
+            IPEndPoint localEndPoint = new IPEndPoint(IPAddress.Any, int.Parse(ConfigurationManager.AppSettings["MUPS_SERVER_PORT"]));
 
             // Create a TCP/IP socket.
             Socket listener = new Socket(AddressFamily.InterNetwork,
@@ -676,11 +676,31 @@ WHERE
 
                     string today = DateTime.Now.ToString("yyyyMMddHHmmss");
                     string Triggered_loc = "<Triggered-Location-Report><suaddr suaddr-type=\"APCO\">" + device + "</suaddr><info-data><info-time>" + today + "</info-time><server-time>" + today + "</server-time><shape><circle-2d><lat>" + lat + "</lat><long>" + lon + "</long><radius>100</radius></circle-2d></shape><speed-hor>50</speed-hor><direction-hor>32</direction-hor></info-data><sensor-info><sensor><sensor-name>Ignition</sensor-name><sensor-value>off</sensor-value><sensor-type>Input</sensor-type></sensor><sensor><sensor-name>door</sensor-name><sensor-value>open</sensor-value><sensor-type>Input</sensor-type></sensor></sensor-info><vehicle-info><odometer>10,000</odometer></vehicle-info></Triggered-Location-Report>";
-                    byte[] msg4 = (data_append_dataLength(Triggered_loc));
+                    string UnitPresent = @"
+<Unsolicited-Location-Report>
+  <suaddr suaddr-type=""APCO"">" + device + @"</suaddr>
+  <event-info>Unit Present</event-info>
+  <info-data>
+    <impl-spec-data>4020</impl-spec-data>
+  </info-data>
+</Unsolicited-Location-Report>
+";
+                    string UnitAbsent = @"
+<Unsolicited-Location-Report>
+  <suaddr suaddr-type=""APCO"">" + device + @"</suaddr>
+  <event-info>Unit Absent</event-info>
+  <info-data>
+    <impl-spec-data>4020</impl-spec-data>
+  </info-data>
+</Unsolicited-Location-Report>
+";
+                    string[] sendStrings = new[] { Triggered_loc ,UnitPresent,UnitAbsent};
+                    string sendString = sendStrings[rand.Next(0, sendStrings.Length)];
+                    byte[] msg4 = (data_append_dataLength(sendString));
                     handler.Send(msg4);
                     //using (StreamWriter w = File.AppendText("log.txt"))
                     //{
-                        Log("send:\r\n", Triggered_loc);
+                    Log("send:\r\n", sendString);
                         // Close the writer and underlying file.
                         //w.Close();
                     //}
@@ -1186,6 +1206,7 @@ Select 0-4 then press enter to send package
             ShowWindow(handle, SW_SHOW);
             SetForegroundWindow(handle);
         }
+        static Random rand = new Random();
         static void Main(string[] args)
         {
             while (in_first_selection)
