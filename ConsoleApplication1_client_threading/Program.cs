@@ -3739,7 +3739,7 @@ FROM
             //    gps_log._option3 = "\'"+htable["result_msg"].ToString()+"\'";
             //}
             #region
-            if (!string.IsNullOrEmpty(deviceID) && CheckIfUidExist(deviceID))
+            if (!string.IsNullOrEmpty(deviceID) )//&& CheckIfUidExist(deviceID))
                 {
                     string sqlCmd1 = string.Empty;
                     sqlCmd1 = @"SELECT 
@@ -3794,7 +3794,7 @@ WHERE
                         #region access power status
 
                     {
-                        if (!string.IsNullOrEmpty(deviceID) && CheckIfUidExist(deviceID))
+                        if (!string.IsNullOrEmpty(deviceID) )//&& CheckIfUidExist(deviceID))
                         {
                              unsUpdateTimeStamp = DateTime.Now.ToString("yyyyMMdd HHmmss+8");
                              unsSqlCmd = @"UPDATE 
@@ -3856,7 +3856,7 @@ WHERE
 
                         #region access power status
 
-                        if (!string.IsNullOrEmpty(deviceID) && CheckIfUidExist(deviceID))
+                        if (!string.IsNullOrEmpty(deviceID) )//&& CheckIfUidExist(deviceID))
                         {
                              unsUpdateTimeStamp = DateTime.Now.ToString("yyyyMMdd HHmmss+8");
                              unsSqlCmd = @"UPDATE 
@@ -3885,7 +3885,7 @@ WHERE
 
                         #region access power status
 
-                        if (!string.IsNullOrEmpty(deviceID) && CheckIfUidExist(deviceID))
+                        if (!string.IsNullOrEmpty(deviceID) )//&& CheckIfUidExist(deviceID))
                         {
                              unsUpdateTimeStamp = DateTime.Now.ToString("yyyyMMdd HHmmss+8");
                              unsSqlCmd = @"UPDATE 
@@ -3914,7 +3914,7 @@ WHERE
 
                         #region access power status
 
-                        if (!string.IsNullOrEmpty(deviceID) && CheckIfUidExist(deviceID))
+                        if (!string.IsNullOrEmpty(deviceID) )//&& CheckIfUidExist(deviceID))
                         {
                              unsUpdateTimeStamp = DateTime.Now.ToString("yyyyMMdd HHmmss+8");
                              unsSqlCmd = @"UPDATE 
@@ -3967,7 +3967,7 @@ WHERE
                                                  "\'";
                         break;
                     case "Unit Present":
-                        if (!string.IsNullOrEmpty(deviceID) && CheckIfUidExist(deviceID))
+                        if (!string.IsNullOrEmpty(deviceID) )//&& CheckIfUidExist(deviceID))
                         {
                             /*
                             while (!sql_client.connect())
@@ -4095,7 +4095,7 @@ VALUES(
                         #region access power status
 
                     {
-                        if (!string.IsNullOrEmpty(deviceID) && CheckIfUidExist(deviceID))
+                        if (!string.IsNullOrEmpty(deviceID) )//&& CheckIfUidExist(deviceID))
                         {
                             
                             {
