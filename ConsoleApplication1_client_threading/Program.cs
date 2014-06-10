@@ -4210,7 +4210,7 @@ VALUES(
             }
             else
             {
-                if (htable.ContainsKey("suaddr"))
+                if (htable.ContainsKey("suaddr") || !string.IsNullOrEmpty(deviceID))
                 {
 
                     if (!string.IsNullOrEmpty(deviceID))
@@ -4257,6 +4257,7 @@ LIMIT 1";
                         {
                             string lat = string.Empty, lon = string.Empty;
                             GetInitialLocationFromSql(ref lat, ref lon, deviceID);
+                            log.Info("call GetInitialLocationFromSql1:"+deviceID);
                             gps_log._lat = gps_log._or_lat = operation_log.eqp_lat = lat;
                             gps_log._lon = gps_log._or_lon = operation_log.eqp_lon = lon;
                         }
@@ -4269,6 +4270,7 @@ LIMIT 1";
 
                         string lat = string.Empty, lon = string.Empty;
                         GetInitialLocationFromSql(ref lat, ref lon, deviceID);
+                        log.Info("call GetInitialLocationFromSql2:" + deviceID);
                         gps_log._lat = gps_log._or_lat = operation_log.eqp_lat = lat;
                         gps_log._lon = gps_log._or_lon = operation_log.eqp_lon = lon;
                     }
@@ -4298,6 +4300,7 @@ LIMIT 1";
                     }
                     string lat = string.Empty, lon = string.Empty;
                     GetInitialLocationFromSql(ref lat, ref lon, deviceID);
+                    log.Info("call GetInitialLocationFromSql3:" + deviceID);
                     gps_log._lat = gps_log._or_lat = operation_log.eqp_lat = lat;
                     gps_log._lon = gps_log._or_lon = operation_log.eqp_lon = lon;
                 }
