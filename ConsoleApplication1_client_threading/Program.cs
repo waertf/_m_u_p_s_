@@ -3715,6 +3715,7 @@ FROM
                 }
                 else
                 {
+                    log.Info("cannot find suaddr in htable");
                     sql_client.Dispose();
                     sql_client = null;
                     return;
