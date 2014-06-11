@@ -3715,6 +3715,9 @@ FROM
                 }
                 else
                 {
+                    sql_client.Dispose();
+                    sql_client = null;
+                    return;
                     gps_log._uid = operation_log.eqp_id = "\'" + "null" + "\'";
                     gps_log._id = "\'" + "null" + "_" + now + "\'";
                     operation_log._id = "\'" + "op" + "_" + now + "\'";
@@ -4203,109 +4206,115 @@ VALUES(
             else
                 gps_log.j_6 = gps_log.j_7 = gps_log.j_8 = operation_log.event_id = "\'" + "null" + "\'";
             ///TODO:implement set last lat lon value
-            if (htable.ContainsKey("lat_value") && htable.ContainsKey("long_value"))
-            {
-                gps_log._lat = gps_log._or_lat = operation_log.eqp_lat = htable["lat_value"].ToString();
-                gps_log._lon = gps_log._or_lon = operation_log.eqp_lon = htable["long_value"].ToString();
-            }
-            else
-            {
-                if (htable.ContainsKey("suaddr") || !string.IsNullOrEmpty(deviceID))
+            if (!string.IsNullOrEmpty(deviceID)) 
+                if (htable.ContainsKey("lat_value") && htable.ContainsKey("long_value"))
                 {
-
-                    if (!string.IsNullOrEmpty(deviceID))
+                    gps_log._lat = gps_log._or_lat = operation_log.eqp_lat = htable["lat_value"].ToString();
+                    gps_log._lon = gps_log._or_lon = operation_log.eqp_lon = htable["long_value"].ToString();
+                }
+                else
+                {
+                    //if (htable.ContainsKey("suaddr") || !string.IsNullOrEmpty(deviceID))
                     {
-                    }
-                    else
-                    {
-                        log.Error("access_sql_server:1:deviceID is null");
-                        Console.ForegroundColor = ConsoleColor.DarkCyan;
-                        Console.WriteLine("-access_sql_server");
-                        Console.ResetColor();
-                        sql_client.disconnect();
-                        sql_client.Dispose();
-                        sql_client = null;
-                        return;
-                    }
-                    string sqlCmd = @"SELECT 
-  public._gps_log._lat,
-  public._gps_log._lon
-FROM
-  public._gps_log
-WHERE
-  public._gps_log._time < now() AND 
-  public._gps_log._uid = '" + deviceID + @"'
-ORDER BY
-  public._gps_log._time DESC
-LIMIT 1";
-                    //while (!sql_client.connect())
-                    {
-                        //Thread.Sleep(30);
-                    }
-                    DataTable sqlDatetable = sql_client.get_DataTable(sqlCmd);
-                    //sql_client.disconnect();
-                    if (sqlDatetable != null && sqlDatetable.Rows.Count != 0)
-                    {
-                        string avlsLat = string.Empty, avlsLon = string.Empty;
-                        foreach (DataRow row in sqlDatetable.Rows)
+                        /*
+                        if (!string.IsNullOrEmpty(deviceID))
                         {
-                            gps_log._lat = gps_log._or_lat = operation_log.eqp_lat = row[0].ToString();
-                            gps_log._lon = gps_log._or_lon = operation_log.eqp_lon = row[1].ToString();
                         }
-                        string zero = "0";
-                        if (gps_log._lat.Equals(zero) || gps_log._lon.Equals(zero))
+                        else
                         {
+                            log.Error("access_sql_server:1:deviceID is null");
+                            Console.ForegroundColor = ConsoleColor.DarkCyan;
+                            Console.WriteLine("-access_sql_server");
+                            Console.ResetColor();
+                            sql_client.disconnect();
+                            sql_client.Dispose();
+                            sql_client = null;
+                            return;
+                        }
+                        */
+                        string sqlCmd = @"SELECT 
+      public._gps_log._lat,
+      public._gps_log._lon
+    FROM
+      public._gps_log
+    WHERE
+      public._gps_log._time < now() AND 
+      public._gps_log._uid = '" + deviceID + @"'
+    ORDER BY
+      public._gps_log._time DESC
+    LIMIT 1";
+                        //while (!sql_client.connect())
+                        {
+                            //Thread.Sleep(30);
+                        }
+                        DataTable sqlDatetable = sql_client.get_DataTable(sqlCmd);
+                        //sql_client.disconnect();
+                        if (sqlDatetable != null && sqlDatetable.Rows.Count != 0)
+                        {
+                            string avlsLat = string.Empty, avlsLon = string.Empty;
+                            foreach (DataRow row in sqlDatetable.Rows)
+                            {
+                                gps_log._lat = gps_log._or_lat = operation_log.eqp_lat = row[0].ToString();
+                                gps_log._lon = gps_log._or_lon = operation_log.eqp_lon = row[1].ToString();
+                            }
+                            /*
+                            string zero = "0";
+                            if (gps_log._lat.Equals(zero) || gps_log._lon.Equals(zero))
+                            {
+                                string lat = string.Empty, lon = string.Empty;
+                                GetInitialLocationFromSql(ref lat, ref lon, deviceID);
+                                log.Info("call GetInitialLocationFromSql1:"+deviceID);
+                                gps_log._lat = gps_log._or_lat = operation_log.eqp_lat = lat;
+                                gps_log._lon = gps_log._or_lon = operation_log.eqp_lon = lon;
+                            }
+                            */
+                        }
+                        else
+                        {
+                            //string zero = "0";
+                            //gps_log._lat = operation_log.eqp_lat = zero;
+                            //gps_log._lon = operation_log.eqp_lon = zero;
+
                             string lat = string.Empty, lon = string.Empty;
                             GetInitialLocationFromSql(ref lat, ref lon, deviceID);
-                            log.Info("call GetInitialLocationFromSql1:"+deviceID);
+                            log.Info("call GetInitialLocationFromSql2:" + deviceID);
                             gps_log._lat = gps_log._or_lat = operation_log.eqp_lat = lat;
                             gps_log._lon = gps_log._or_lon = operation_log.eqp_lon = lon;
                         }
+                        sqlDatetable.Clear();
+                        sqlDatetable.Dispose();
+                        sqlDatetable = null;
                     }
+                        /*
                     else
                     {
                         //string zero = "0";
                         //gps_log._lat = operation_log.eqp_lat = zero;
                         //gps_log._lon = operation_log.eqp_lon = zero;
 
+                        if (!string.IsNullOrEmpty(deviceID))
+                        {
+                        }
+                        else
+                        {
+                            log.Error("access_sql_server:2:deviceID is null");
+                            Console.ForegroundColor = ConsoleColor.DarkCyan;
+                            Console.WriteLine("-access_sql_server");
+                            Console.ResetColor();
+                            sql_client.disconnect();
+                            sql_client.Dispose();
+                            sql_client = null;
+                            return;
+                        }
                         string lat = string.Empty, lon = string.Empty;
                         GetInitialLocationFromSql(ref lat, ref lon, deviceID);
-                        log.Info("call GetInitialLocationFromSql2:" + deviceID);
+                        log.Info("call GetInitialLocationFromSql3:" + deviceID);
                         gps_log._lat = gps_log._or_lat = operation_log.eqp_lat = lat;
                         gps_log._lon = gps_log._or_lon = operation_log.eqp_lon = lon;
                     }
-                    sqlDatetable.Clear();
-                    sqlDatetable.Dispose();
-                    sqlDatetable = null;
-                }
-                else
-                {
-                    //string zero = "0";
-                    //gps_log._lat = operation_log.eqp_lat = zero;
-                    //gps_log._lon = operation_log.eqp_lon = zero;
+                        */
 
-                    if (!string.IsNullOrEmpty(deviceID))
-                    {
-                    }
-                    else
-                    {
-                        log.Error("access_sql_server:2:deviceID is null");
-                        Console.ForegroundColor = ConsoleColor.DarkCyan;
-                        Console.WriteLine("-access_sql_server");
-                        Console.ResetColor();
-                        sql_client.disconnect();
-                        sql_client.Dispose();
-                        sql_client = null;
-                        return;
-                    }
-                    string lat = string.Empty, lon = string.Empty;
-                    GetInitialLocationFromSql(ref lat, ref lon, deviceID);
-                    log.Info("call GetInitialLocationFromSql3:" + deviceID);
-                    gps_log._lat = gps_log._or_lat = operation_log.eqp_lat = lat;
-                    gps_log._lon = gps_log._or_lon = operation_log.eqp_lon = lon;
                 }
-
-            }
 
 
             if (htable.ContainsKey("radius_value"))
