@@ -270,7 +270,7 @@ FROM
   sd.equipment
 WHERE
   sd.equipment.uid = '" + uid + @"'
-LIMIT 1";
+";
             while (!sql_client.connect())
             {
                 Thread.Sleep(30);
@@ -876,7 +876,8 @@ WHERE
   public._gps_log._time < now() AND 
   public._gps_log._uid = '" + avls_package.ID + @"'
 ORDER BY
-  public._gps_log._time DESC
+  public._gps_log._time DESC,public._gps_log._lat,
+  public._gps_log._lon
 LIMIT 1";
                 log.Info("avlsSqlCmd=" + Environment.NewLine + avlsSqlCmd);
                 while (!avlsSqlClient.connect())
@@ -1005,6 +1006,12 @@ FROM
 WHERE
   custom.equipment_request.send_value = 0
 ORDER BY
+  custom.equipment_request.create_time ASC,
+    custom.equipment_request.serial_no,
+  custom.equipment_request.func_type,
+  custom.equipment_request.uid,
+  custom.equipment_request.send_value,
+  custom.equipment_request.time_interval,
   custom.equipment_request.create_time
 LIMIT
 1";
@@ -2586,7 +2593,8 @@ WHERE
   public._gps_log._time < now() AND 
   public._gps_log._uid = '" + avls_package.ID + @"'
 ORDER BY
-  public._gps_log._time DESC
+  public._gps_log._time DESC,public._gps_log._lat,
+  public._gps_log._lon
 LIMIT 1";
                         while (!avlsSqlClient.connect())
                         {
@@ -2753,7 +2761,8 @@ WHERE
   public._gps_log._time < now() AND 
   public._gps_log._uid = '" + avls_package.ID + @"'
 ORDER BY
-  public._gps_log._time DESC
+  public._gps_log._time DESC,public._gps_log._lat,
+  public._gps_log._lon
 LIMIT 1";
                         while (!avlsSqlClient.connect())
                         {
@@ -3193,7 +3202,7 @@ now() <= end_time::timestamp ";
                         //check if over time 
                         //over->send msg with prohibited data
                         //not over -> do nothing
-                        string sqlCmd = @"select stay_time from p_config LIMIT 1";
+                        string sqlCmd = @"select stay_time from p_config";
 
                         //while (!sql_client.connect())
                         {
@@ -3353,7 +3362,7 @@ now() <= end_time::timestamp ";
                         //over->send msg with prohibited data
                         //not over -> do nothing
 
-                        string sqlCmd = @"select stay_time from p_config LIMIT 1";
+                        string sqlCmd = @"select stay_time from p_config";
 
                         //while (!sql_client.connect())
                         {
@@ -4261,7 +4270,8 @@ VALUES(
       public._gps_log._time < now() AND 
       public._gps_log._uid = '" + deviceID + @"'
     ORDER BY
-      public._gps_log._time DESC
+      public._gps_log._time DESC,public._gps_log._lat,
+      public._gps_log._lon
     LIMIT 1";
                         //while (!sql_client.connect())
                         {
@@ -5106,7 +5116,7 @@ LIMIT 1";
             DB = "lmap100";
             SqlClient sqlclient = new SqlClient(ConfigurationManager.AppSettings["SQL_SERVER_IP"], ConfigurationManager.AppSettings["SQL_SERVER_PORT"], ConfigurationManager.AppSettings["SQL_SERVER_USER_ID"], ConfigurationManager.AppSettings["SQL_SERVER_PASSWORD"], DB, ConfigurationManager.AppSettings["Pooling"], ConfigurationManager.AppSettings["MinPoolSize"], ConfigurationManager.AppSettings["MaxPoolSize"], ConfigurationManager.AppSettings["ConnectionLifetime"]);
             
-            string sqlCmd = @"select stay_time from p_config LIMIT 1";
+            string sqlCmd = @"select stay_time from p_config";
 
             while (!sqlclient.connect())
             {
