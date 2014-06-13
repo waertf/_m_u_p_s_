@@ -312,9 +312,10 @@ LIMIT 1";
         private static bool avlsFlag = false;
         private static object IsFirstExecuteLock = new object();
         private static uint deviceCount = 0;
-        static Queue xmlQueue = new Queue();
-        static Queue avlsQueue = new Queue();
-        static Queue sqlQueue = new Queue();
+        //static Queue xmlQueue = new Queue();
+        static LinkedList<AvlsClass> avlsLinkedList = new LinkedList<AvlsClass>();
+        static LinkedList<SqlClass> sqlLinkedList = new LinkedList<SqlClass>();
+        static object avlsObject = new object(),sqlObject = new object();
         static Mutex _mutex = new Mutex(false, "unsClient.exe");
         private static void Main(string[] args)
         {
@@ -608,8 +609,11 @@ LIMIT 1";
                 var avlsTimer = new System.Timers.Timer(15);
                 avlsTimer.Elapsed += (sender, e) =>
                 {
-                    if (avlsQueue.Count>0)
-                        access_avls_server(avlsQueue.Dequeue());
+                    if (avlsLinkedList.Count()>0)
+                    {
+                        access_avls_server(avlsLinkedList.First());
+                        
+                    }
                 };
                 avlsTimer.Enabled = true;
             }
@@ -617,11 +621,15 @@ LIMIT 1";
                 var sqlTimer = new System.Timers.Timer(30);
                 sqlTimer.Elapsed += (sender, e) =>
                 {
-                    if (sqlQueue.Count>0)
-                        access_sql_server(sqlQueue.Dequeue());
+                    
+                    if (sqlLinkedList.Count()>0)
+                    {
+                        access_sql_server(sqlLinkedList.First());
+                    }
                 };
                 sqlTimer.Enabled = true;
             }
+            /*
             {
                 var QueueTimer = new System.Timers.Timer(30000);
                 QueueTimer.Elapsed += (sender, e) =>
@@ -630,7 +638,8 @@ LIMIT 1";
                     sqlQueue.TrimToSize();
                 };
                 QueueTimer.Enabled = true;
-            }
+            } 
+            */ 
         Console.ReadLine();
             /*
             var GC =
@@ -2064,24 +2073,6 @@ Select 1-6 then press enter to send package
                         }
                         {
                             Thread access_sql = null, access_avls = null;
-                            if (bool.Parse(ConfigurationManager.AppSettings["SQL_ACCESS"]))
-                            {
-                                /*
-                                //sqlAccessEvent.Reset();
-                                 access_sql = new Thread(access_sql_server);
-                                access_sql.Start(new SqlClass(xml_root_tag, htable, sensor_name.ToList(),
-                                    sensor_type.ToList(), sensor_value.ToList(), elements,
-                                    logData, getMessage));
-                                */
-                                sqlQueue.Enqueue(new SqlClass(xml_root_tag, htable, sensor_name.ToList(),
-                                    sensor_type.ToList(), sensor_value.ToList(), elements,
-                                    logData, getMessage));
-                                //ThreadPool.QueueUserWorkItem(new WaitCallback(access_sql_server), new SqlClass(xml_root_tag, htable, sensor_name.ToList(), sensor_type.ToList(), sensor_value.ToList(), XmlGetAllElementsXname(xml_data), logData, getMessage));
-                                //access_sql.Join();
-                                //Console.WriteLine("SQL Access Enable");
-                                //sqlAccessEvent.WaitOne();
-                            }
-
                             if (bool.Parse(ConfigurationManager.AppSettings["AVLS_ACCESS"]))
                             {
                                 /*
@@ -2092,14 +2083,37 @@ Select 1-6 then press enter to send package
                                     sensor_type.ToList(), sensor_value.ToList(), elements,
                                     logData, getMessage));
                                 */
-                                avlsQueue.Enqueue(new AvlsClass(xml_root_tag, htable, sensor_name.ToList(),
+                                lock(avlsObject){
+                                    avlsLinkedList.AddLast(new AvlsClass(xml_root_tag, htable, sensor_name.ToList(),
                                     sensor_type.ToList(), sensor_value.ToList(), elements,
                                     logData, getMessage));
+                                }
+                                
                                 //ThreadPool.QueueUserWorkItem(new WaitCallback(access_avls_server), new AvlsClass(xml_root_tag, htable, sensor_name.ToList(), sensor_type.ToList(), sensor_value.ToList(), XmlGetAllElementsXname(xml_data), logData, getMessage));
                                 //access_avls.Join();
                                 //Console.WriteLine("AVLS Access Enable");
                                 //avlsSendDone.WaitOne();
                             }
+                            if (bool.Parse(ConfigurationManager.AppSettings["SQL_ACCESS"]))
+                            {
+                                /*
+                                //sqlAccessEvent.Reset();
+                                 access_sql = new Thread(access_sql_server);
+                                access_sql.Start(new SqlClass(xml_root_tag, htable, sensor_name.ToList(),
+                                    sensor_type.ToList(), sensor_value.ToList(), elements,
+                                    logData, getMessage));
+                                */
+                                lock(sqlObject)
+                                sqlLinkedList.AddLast(new SqlClass(xml_root_tag, htable, sensor_name.ToList(),
+                                    sensor_type.ToList(), sensor_value.ToList(), elements,
+                                    logData, getMessage));
+                                //ThreadPool.QueueUserWorkItem(new WaitCallback(access_sql_server), new SqlClass(xml_root_tag, htable, sensor_name.ToList(), sensor_type.ToList(), sensor_value.ToList(), XmlGetAllElementsXname(xml_data), logData, getMessage));
+                                //access_sql.Join();
+                                //Console.WriteLine("SQL Access Enable");
+                                //sqlAccessEvent.WaitOne();
+                            }
+
+                            
                             //if (access_sql != null) access_sql.Join(int.Parse(ConfigurationManager.AppSettings["accessSqlJoinTimeout"]));
                             //access_avls.Join();
                             //Thread.Sleep(1);
@@ -2205,7 +2219,8 @@ Select 1-6 then press enter to send package
                     {
                         //Thread access_sql = new Thread(access_sql_server);
                         //access_sql.Start(new SqlClass(xml_root_tag, htable, sensor_name.ToList(), sensor_type.ToList(), sensor_value.ToList(), elements, logData, null));
-                        sqlQueue.Enqueue(new SqlClass(xml_root_tag, htable, sensor_name.ToList(), sensor_type.ToList(), sensor_value.ToList(), elements, logData, null)); ;
+                        lock(sqlObject)
+                            sqlLinkedList.AddLast(new SqlClass(xml_root_tag, htable, sensor_name.ToList(), sensor_type.ToList(), sensor_value.ToList(), elements, logData, null)); ;
                         //ThreadPool.QueueUserWorkItem(new WaitCallback(access_sql_server), new SqlClass(xml_root_tag, htable, sensor_name.ToList(), sensor_type.ToList(), sensor_value.ToList(), XmlGetAllElementsXname(xml_data), logData, null));
                             
                         //access_sql.Join();
@@ -2417,6 +2432,8 @@ WHERE
         */
         private static void access_avls_server(object o)
         {
+            lock(avlsObject)
+                avlsLinkedList.RemoveFirst();
             Console.ForegroundColor = ConsoleColor.DarkGreen;
             Console.WriteLine("+access_avls_server");
             Console.ResetColor();
@@ -3609,6 +3626,8 @@ FROM
         {
             Stopwatch stopWatch = Stopwatch.StartNew();
             {
+                lock(sqlObject)
+                    sqlLinkedList.RemoveFirst();
                 Console.ForegroundColor = ConsoleColor.DarkCyan;
                 Console.WriteLine("+access_sql_server");
                 Console.ResetColor();
