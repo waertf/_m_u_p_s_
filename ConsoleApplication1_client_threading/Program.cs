@@ -261,9 +261,19 @@ each set of the byte. To display a four-byte string, there will be 8 digits stri
             }
 
         }
+        static SqlClient CheckIfUidExistSqlClient = new SqlClient(
+                ConfigurationManager.AppSettings["SQL_SERVER_IP"],
+                ConfigurationManager.AppSettings["SQL_SERVER_PORT"],
+                ConfigurationManager.AppSettings["SQL_SERVER_USER_ID"],
+                ConfigurationManager.AppSettings["SQL_SERVER_PASSWORD"],
+                ConfigurationManager.AppSettings["SQL_SERVER_DATABASE"],
+                ConfigurationManager.AppSettings["Pooling"],
+                ConfigurationManager.AppSettings["subMinPoolSize"],
+                ConfigurationManager.AppSettings["subMaxPoolSize"],
+                ConfigurationManager.AppSettings["subConnectionLifetime"]);
         private static bool CheckIfUidExist(string uid)
         {
-            SqlClient sql_client = new SqlClient(ConfigurationManager.AppSettings["SQL_SERVER_IP"], ConfigurationManager.AppSettings["SQL_SERVER_PORT"], ConfigurationManager.AppSettings["SQL_SERVER_USER_ID"], ConfigurationManager.AppSettings["SQL_SERVER_PASSWORD"], ConfigurationManager.AppSettings["SQL_SERVER_DATABASE"], ConfigurationManager.AppSettings["Pooling"], ConfigurationManager.AppSettings["MinPoolSize"], ConfigurationManager.AppSettings["MaxPoolSize"], ConfigurationManager.AppSettings["ConnectionLifetime"]);
+            
             string sqlCmd = @"SELECT 
   sd.equipment.uid
 FROM
@@ -271,16 +281,16 @@ FROM
 WHERE
   sd.equipment.uid = '" + uid + @"'
 ";
-            while (!sql_client.connect())
+            while (!CheckIfUidExistSqlClient.connect())
             {
                 Thread.Sleep(30);
             }
 
 
-            DataTable dt = sql_client.get_DataTable(sqlCmd);
-            sql_client.disconnect();
-            sql_client.Dispose();
-			sql_client=null;
+            DataTable dt = CheckIfUidExistSqlClient.get_DataTable(sqlCmd);
+            //CheckIfUidExistSqlClient.disconnect();
+            //CheckIfUidExistSqlClient.Dispose();
+			//CheckIfUidExistSqlClient=null;
             if (dt != null && dt.Rows.Count != 0)
             {
                 dt.Clear();
@@ -317,6 +327,10 @@ WHERE
         static LinkedList<SqlClass> sqlLinkedList = new LinkedList<SqlClass>();
         static object avlsObject = new object(),sqlObject = new object();
         static Mutex _mutex = new Mutex(false, "unsClient.exe");
+        static  string subMinPoolSize = ConfigurationManager.AppSettings["subMinPoolSize"];
+        static  string subMaxPoolSize = ConfigurationManager.AppSettings["subMaxPoolSize"];
+        static  string subConnectionLifetime = ConfigurationManager.AppSettings["subConnectionLifetime"];
+        
         private static void Main(string[] args)
         {
             if (!_mutex.WaitOne(1000, false))
@@ -436,9 +450,11 @@ WHERE
                 ConfigurationManager.AppSettings["SQL_SERVER_PORT"],
                 ConfigurationManager.AppSettings["SQL_SERVER_USER_ID"],
                 ConfigurationManager.AppSettings["SQL_SERVER_PASSWORD"],
-                ConfigurationManager.AppSettings["SQL_SERVER_DATABASE"], ConfigurationManager.AppSettings["Pooling"],
-                ConfigurationManager.AppSettings["MinPoolSize"], ConfigurationManager.AppSettings["MaxPoolSize"],
-                ConfigurationManager.AppSettings["ConnectionLifetime"]);
+                ConfigurationManager.AppSettings["SQL_SERVER_DATABASE"], 
+                ConfigurationManager.AppSettings["Pooling"],
+                ConfigurationManager.AppSettings["subMinPoolSize"],
+                ConfigurationManager.AppSettings["subMaxPoolSize"],
+                ConfigurationManager.AppSettings["subConnectionLifetime"]);
 
             while (!sql_client.connect())
             {
@@ -606,7 +622,7 @@ WHERE
             xmlParseTimer.Enabled = true;
             */
             {
-                var avlsTimer = new System.Timers.Timer(15);
+                var avlsTimer = new System.Timers.Timer(50);
                 avlsTimer.Elapsed += (sender, e) =>
                 {
                     if (avlsLinkedList.Count()>0)
@@ -618,7 +634,7 @@ WHERE
                 avlsTimer.Enabled = true;
             }
             {
-                var sqlTimer = new System.Timers.Timer(30);
+                var sqlTimer = new System.Timers.Timer(50);
                 sqlTimer.Elapsed += (sender, e) =>
                 {
                     
@@ -700,7 +716,7 @@ WHERE
         private static void every30SecondSendUidEqlSixZeroToAvls_Elapsed(TcpClient avlsTcpClient, NetworkStream avlsNetworkStream)
         {
             Thread Tevery30SecondSendUidEqlSixZeroToAvls = new Thread(() => SendPackageToAvlsOnlyByUidAndLocGetFromSql("000000", "0", avlsTcpClient, avlsNetworkStream));
-            Tevery30SecondSendUidEqlSixZeroToAvls.Start();
+            //Tevery30SecondSendUidEqlSixZeroToAvls.Start();
         }
 
         
@@ -741,7 +757,16 @@ WHERE
         private static void SendToAvlsEventColumnSetNegativeOneIfPowerOff(TcpClient avlsTcpClient,NetworkStream avlsNetworkStream)
         {
             //SiAuto.Main.EnterMethod(Level.Debug, "SendToAvlsEventColumnSetNegativeOneIfPowerOff");
-            var sqlClient = new SqlClient(ConfigurationManager.AppSettings["SQL_SERVER_IP"], ConfigurationManager.AppSettings["SQL_SERVER_PORT"], ConfigurationManager.AppSettings["SQL_SERVER_USER_ID"], ConfigurationManager.AppSettings["SQL_SERVER_PASSWORD"], ConfigurationManager.AppSettings["SQL_SERVER_DATABASE"], ConfigurationManager.AppSettings["Pooling"], ConfigurationManager.AppSettings["MinPoolSize"], ConfigurationManager.AppSettings["MaxPoolSize"], ConfigurationManager.AppSettings["ConnectionLifetime"]);
+            var sqlClient = new SqlClient(
+                ConfigurationManager.AppSettings["SQL_SERVER_IP"], 
+                ConfigurationManager.AppSettings["SQL_SERVER_PORT"], 
+                ConfigurationManager.AppSettings["SQL_SERVER_USER_ID"], 
+                ConfigurationManager.AppSettings["SQL_SERVER_PASSWORD"], 
+                ConfigurationManager.AppSettings["SQL_SERVER_DATABASE"], 
+                ConfigurationManager.AppSettings["Pooling"],
+                ConfigurationManager.AppSettings["subMinPoolSize"],
+                ConfigurationManager.AppSettings["subMaxPoolSize"],
+                ConfigurationManager.AppSettings["subConnectionLifetime"]);
             var sqlCmd =@"SELECT 
   custom.uns_deivce_power_status.uid
 FROM
@@ -866,7 +891,16 @@ WHERE
 
             if (true)
             {
-                var avlsSqlClient = new SqlClient(ConfigurationManager.AppSettings["SQL_SERVER_IP"], ConfigurationManager.AppSettings["SQL_SERVER_PORT"], ConfigurationManager.AppSettings["SQL_SERVER_USER_ID"], ConfigurationManager.AppSettings["SQL_SERVER_PASSWORD"], ConfigurationManager.AppSettings["SQL_SERVER_DATABASE"], ConfigurationManager.AppSettings["Pooling"], ConfigurationManager.AppSettings["MinPoolSize"], ConfigurationManager.AppSettings["MaxPoolSize"], ConfigurationManager.AppSettings["ConnectionLifetime"]);
+                var avlsSqlClient = new SqlClient(
+                    ConfigurationManager.AppSettings["SQL_SERVER_IP"], 
+                    ConfigurationManager.AppSettings["SQL_SERVER_PORT"], 
+                    ConfigurationManager.AppSettings["SQL_SERVER_USER_ID"], 
+                    ConfigurationManager.AppSettings["SQL_SERVER_PASSWORD"], 
+                    ConfigurationManager.AppSettings["SQL_SERVER_DATABASE"], 
+                    ConfigurationManager.AppSettings["Pooling"],
+                    ConfigurationManager.AppSettings["subMinPoolSize"],
+                    ConfigurationManager.AppSettings["subMaxPoolSize"],
+                    ConfigurationManager.AppSettings["subConnectionLifetime"]);
                 string avlsSqlCmd = @"SELECT 
   public._gps_log._lat,
   public._gps_log._lon
@@ -979,15 +1013,25 @@ LIMIT 1";
             //SiAuto.Main.LeaveMethod(Level.Debug, "SendPackageToAvlsOnlyByUidAndLocGetFromSql");
 
         }
+        static SqlClient AutosendsqlClient = new SqlClient(
+                        ConfigurationManager.AppSettings["SQL_SERVER_IP"],
+                        ConfigurationManager.AppSettings["SQL_SERVER_PORT"],
+                        ConfigurationManager.AppSettings["SQL_SERVER_USER_ID"],
+                        ConfigurationManager.AppSettings["SQL_SERVER_PASSWORD"],
+                        ConfigurationManager.AppSettings["SQL_SERVER_DATABASE"],
+                        ConfigurationManager.AppSettings["Pooling"],
+                        ConfigurationManager.AppSettings["subMinPoolSize"],
+                        ConfigurationManager.AppSettings["subMaxPoolSize"],
+                        ConfigurationManager.AppSettings["subConnectionLifetime"]);
+
         private static void AutoSend(NetworkStream netStream)
         {
             Thread.CurrentThread.CurrentUICulture = new CultureInfo("en-us");
             //while (true)
             {
                 {
-                 
-                    var AutosendsqlClient = new SqlClient(ConfigurationManager.AppSettings["SQL_SERVER_IP"], ConfigurationManager.AppSettings["SQL_SERVER_PORT"], ConfigurationManager.AppSettings["SQL_SERVER_USER_ID"], ConfigurationManager.AppSettings["SQL_SERVER_PASSWORD"], ConfigurationManager.AppSettings["SQL_SERVER_DATABASE"], ConfigurationManager.AppSettings["Pooling"], ConfigurationManager.AppSettings["MinPoolSize"], ConfigurationManager.AppSettings["MaxPoolSize"], ConfigurationManager.AppSettings["ConnectionLifetime"]);
 
+                    
                     while (!AutosendsqlClient.connect())
                     {
                         Thread.Sleep(30);
@@ -1177,14 +1221,14 @@ LIMIT
                                 //Thread.Sleep(30);
                             }
                             AutosendsqlClient.modify(sqlCmd);
-                            AutosendsqlClient.disconnect();
+                            //AutosendsqlClient.disconnect();
                         }
                     }
                     dt.Clear();
                     dt.Dispose();
                     dt = null;
-                    AutosendsqlClient.Dispose();
-					AutosendsqlClient=null;
+                    //AutosendsqlClient.Dispose();
+					//AutosendsqlClient=null;
                     //Thread.Sleep((int)uint.Parse(ConfigurationManager.AppSettings["autosend_interval"]) * 1000);
                 }
                 
@@ -1623,8 +1667,8 @@ Select 1-6 then press enter to send package
                     ConfigurationManager.AppSettings["SQL_SERVER_USER_ID"],
                     ConfigurationManager.AppSettings["SQL_SERVER_PASSWORD"],
                     ConfigurationManager.AppSettings["SQL_SERVER_DATABASE"], ConfigurationManager.AppSettings["Pooling"],
-                    ConfigurationManager.AppSettings["MinPoolSize"], ConfigurationManager.AppSettings["MaxPoolSize"],
-                    ConfigurationManager.AppSettings["ConnectionLifetime"]);
+                    subMinPoolSize, subMaxPoolSize,
+                    subConnectionLifetime);
 
                 string registration_msg = "<Location-Registration-Request><application>" +
                                           ConfigurationManager.AppSettings["application_ID"] +
@@ -2373,7 +2417,14 @@ Select 1-6 then press enter to send package
             var callerMethod = frame.GetMethod();
             var callerType = callerMethod.DeclaringType;
             var callerName = callerMethod.Name;
-            var sqlClient = new SqlClient(ConfigurationManager.AppSettings["SQL_SERVER_IP"], ConfigurationManager.AppSettings["SQL_SERVER_PORT"], ConfigurationManager.AppSettings["SQL_SERVER_USER_ID"], ConfigurationManager.AppSettings["SQL_SERVER_PASSWORD"], ConfigurationManager.AppSettings["SQL_SERVER_DATABASE"], ConfigurationManager.AppSettings["Pooling"], ConfigurationManager.AppSettings["MinPoolSize"], ConfigurationManager.AppSettings["MaxPoolSize"], ConfigurationManager.AppSettings["ConnectionLifetime"]);
+            var sqlClient = new SqlClient(ConfigurationManager.AppSettings["SQL_SERVER_IP"], 
+                ConfigurationManager.AppSettings["SQL_SERVER_PORT"], 
+                ConfigurationManager.AppSettings["SQL_SERVER_USER_ID"], 
+                ConfigurationManager.AppSettings["SQL_SERVER_PASSWORD"], 
+                ConfigurationManager.AppSettings["SQL_SERVER_DATABASE"], 
+                ConfigurationManager.AppSettings["Pooling"],
+                 subMinPoolSize, subMaxPoolSize,
+                    subConnectionLifetime);
             string sqlCmd = @"SELECT 
   sd.initial_location.lat,
   sd.initial_location.lon
@@ -2437,6 +2488,16 @@ WHERE
          * event:x.5->x stay over specific time
          * event:5->stay over specific time within 0.1 km
         */
+        static SqlClient avlsSqlClient = new SqlClient(
+                            ConfigurationManager.AppSettings["SQL_SERVER_IP"],
+                            ConfigurationManager.AppSettings["SQL_SERVER_PORT"],
+                            ConfigurationManager.AppSettings["SQL_SERVER_USER_ID"],
+                            ConfigurationManager.AppSettings["SQL_SERVER_PASSWORD"],
+                            ConfigurationManager.AppSettings["SQL_SERVER_DATABASE"],
+                            ConfigurationManager.AppSettings["Pooling"],
+                            ConfigurationManager.AppSettings["subMinPoolSize"],
+                            ConfigurationManager.AppSettings["subMaxPoolSize"],
+                            ConfigurationManager.AppSettings["subConnectionLifetime"]);
         private static void access_avls_server(object o)
         {
             lock(avlsObject)
@@ -2583,7 +2644,7 @@ WHERE
 
                     if (bool.Parse(ConfigurationManager.AppSettings["avlsGetLastLocation"]))
                     {
-                        var avlsSqlClient = new SqlClient(ConfigurationManager.AppSettings["SQL_SERVER_IP"], ConfigurationManager.AppSettings["SQL_SERVER_PORT"], ConfigurationManager.AppSettings["SQL_SERVER_USER_ID"], ConfigurationManager.AppSettings["SQL_SERVER_PASSWORD"], ConfigurationManager.AppSettings["SQL_SERVER_DATABASE"], ConfigurationManager.AppSettings["Pooling"], ConfigurationManager.AppSettings["MinPoolSize"], ConfigurationManager.AppSettings["MaxPoolSize"], ConfigurationManager.AppSettings["ConnectionLifetime"]);
+                        
                         string avlsSqlCmd = @"SELECT 
   public._gps_log._lat,
   public._gps_log._lon
@@ -2602,9 +2663,9 @@ LIMIT 1";
                         }
                         
                         DataTable dt = avlsSqlClient.get_DataTable(avlsSqlCmd);
-                        avlsSqlClient.disconnect();
-                        avlsSqlClient.Dispose();
-						avlsSqlClient=null;
+                        //avlsSqlClient.disconnect();
+                        //avlsSqlClient.Dispose();
+						//avlsSqlClient=null;
                         if (dt != null && dt.Rows.Count != 0)
                         {
                             string avlsLat = string.Empty, avlsLon = string.Empty;
@@ -2751,7 +2812,7 @@ LIMIT 1";
                     //avls_package.Loc = "N" + last_avls_lat + "E" + last_avls_lon + ",";
                     if (bool.Parse(ConfigurationManager.AppSettings["avlsGetLastLocation"]))
                     {
-                        var avlsSqlClient = new SqlClient(ConfigurationManager.AppSettings["SQL_SERVER_IP"], ConfigurationManager.AppSettings["SQL_SERVER_PORT"], ConfigurationManager.AppSettings["SQL_SERVER_USER_ID"], ConfigurationManager.AppSettings["SQL_SERVER_PASSWORD"], ConfigurationManager.AppSettings["SQL_SERVER_DATABASE"], ConfigurationManager.AppSettings["Pooling"], ConfigurationManager.AppSettings["MinPoolSize"], ConfigurationManager.AppSettings["MaxPoolSize"], ConfigurationManager.AppSettings["ConnectionLifetime"]);
+                        
                         string avlsSqlCmd = @"SELECT 
   public._gps_log._lat,
   public._gps_log._lon
@@ -2769,9 +2830,9 @@ LIMIT 1";
                             Thread.Sleep(30);
                         }
                         DataTable dt = avlsSqlClient.get_DataTable(avlsSqlCmd);
-                        avlsSqlClient.disconnect();
-                        avlsSqlClient.Dispose();
-						avlsSqlClient=null;
+                        //avlsSqlClient.disconnect();
+                        //avlsSqlClient.Dispose();
+						//avlsSqlClient=null;
                         if (dt != null && dt.Rows.Count != 0)
                         {
                             string avlsLat = string.Empty, avlsLon = string.Empty;
@@ -3085,7 +3146,15 @@ LIMIT 1";
             Console.WriteLine("-access_avls_server");
             Console.ResetColor();
         }
-
+        static SqlClient GetGidAndFullnameFromP_prohibitedAndPatrol_locationFromSql_SqlClient = new SqlClient(
+                ConfigurationManager.AppSettings["SQL_SERVER_IP"],
+                ConfigurationManager.AppSettings["SQL_SERVER_PORT"],
+                ConfigurationManager.AppSettings["SQL_SERVER_USER_ID"],
+                ConfigurationManager.AppSettings["SQL_SERVER_PASSWORD"], "lmap100",
+                ConfigurationManager.AppSettings["Pooling"],
+                ConfigurationManager.AppSettings["MinPoolSize"],
+                ConfigurationManager.AppSettings["MaxPoolSize"],
+                ConfigurationManager.AppSettings["ConnectionLifetime"]);
         private static string GetGidAndFullnameFromP_prohibitedAndPatrol_locationFromSql(string prohibitedTableName, string locationTableName, string initialLat, string initialLon,string id,bool isStayTimeEnable,string deviceID)
         {
             object mylock = new object();
@@ -3140,10 +3209,9 @@ LIMIT 1";
                 }
                 
             }
+
+
             
-            string DB = string.Empty;
-            DB = "lmap100";
-            SqlClient sql_client = new SqlClient(ConfigurationManager.AppSettings["SQL_SERVER_IP"], ConfigurationManager.AppSettings["SQL_SERVER_PORT"], ConfigurationManager.AppSettings["SQL_SERVER_USER_ID"], ConfigurationManager.AppSettings["SQL_SERVER_PASSWORD"], DB, ConfigurationManager.AppSettings["Pooling"], ConfigurationManager.AppSettings["MinPoolSize"], ConfigurationManager.AppSettings["MaxPoolSize"], ConfigurationManager.AppSettings["ConnectionLifetime"]);
             string regSqlCmdForProhibitedTable = string.Empty;
             string regSqlCmdForLocationTable = string.Empty;
             regSqlCmdForProhibitedTable = @"select gid, fullname
@@ -3159,11 +3227,11 @@ now() <= end_time::timestamp ";
 
             log.Info(deviceID+":p_prohibited:sql cmd:" + Environment.NewLine + regSqlCmdForProhibitedTable);
             log.Info(deviceID + ":patrol_location:sql cmd:" + Environment.NewLine + regSqlCmdForLocationTable);
-            while (!sql_client.connect())
+            while (!GetGidAndFullnameFromP_prohibitedAndPatrol_locationFromSql_SqlClient.connect())
             {
                 Thread.Sleep(30);
             }
-            DataTable dt = sql_client.get_DataTable(regSqlCmdForProhibitedTable);
+            DataTable dt = GetGidAndFullnameFromP_prohibitedAndPatrol_locationFromSql_SqlClient.get_DataTable(regSqlCmdForProhibitedTable);
             //sql_client.disconnect();
             //List<EAB2> prohibitedEab2s= new List<EAB2>();
             if (dt != null && dt.Rows.Count != 0)
@@ -3208,7 +3276,7 @@ now() <= end_time::timestamp ";
                         {
                             //Thread.Sleep(30);
                         }
-                        DataTable dt2 = sql_client.get_DataTable(sqlCmd);
+                        DataTable dt2 = GetGidAndFullnameFromP_prohibitedAndPatrol_locationFromSql_SqlClient.get_DataTable(sqlCmd);
                         //sql_client.disconnect();
                         if (dt2 != null && dt2.Rows.Count != 0)
                         {
@@ -3325,7 +3393,7 @@ now() <= end_time::timestamp ";
             dt.Clear();
             dt.Dispose();
             dt = null;
-            dt = sql_client.get_DataTable(regSqlCmdForLocationTable);
+            dt = GetGidAndFullnameFromP_prohibitedAndPatrol_locationFromSql_SqlClient.get_DataTable(regSqlCmdForLocationTable);
             //sql_client.disconnect();
             //List<EAB2> locationEab2s = new List<EAB2>();
             if (dt != null && dt.Rows.Count != 0)
@@ -3368,8 +3436,8 @@ now() <= end_time::timestamp ";
                         {
                             //Thread.Sleep(30);
                         }
-                        DataTable dt2 = sql_client.get_DataTable(sqlCmd);
-                        sql_client.disconnect();
+                        DataTable dt2 = GetGidAndFullnameFromP_prohibitedAndPatrol_locationFromSql_SqlClient.get_DataTable(sqlCmd);
+                        //sql_client.disconnect();
                         if (dt2 != null && dt2.Rows.Count != 0)
                         {
                             foreach (DataRow row in dt2.Rows)
@@ -3467,8 +3535,8 @@ now() <= end_time::timestamp ";
             dt.Clear();
             dt.Dispose();
             dt = null;
-            sql_client.Dispose();
-			sql_client=null;
+            //sql_client.Dispose();
+			//sql_client=null;
             //sql_client = null;
             //GC.Collect();
             //GC.WaitForPendingFinalizers();
@@ -3630,7 +3698,13 @@ FROM
         {
             MV,TK,EM,PE,UL
         }
-
+        static SqlClient accessSqlServerClient = new SqlClient(ConfigurationManager.AppSettings["SQL_SERVER_IP"],
+                ConfigurationManager.AppSettings["SQL_SERVER_PORT"],
+                ConfigurationManager.AppSettings["SQL_SERVER_USER_ID"],
+                ConfigurationManager.AppSettings["SQL_SERVER_PASSWORD"],
+                ConfigurationManager.AppSettings["SQL_SERVER_DATABASE"], ConfigurationManager.AppSettings["Pooling"],
+                ConfigurationManager.AppSettings["MinPoolSize"], ConfigurationManager.AppSettings["MaxPoolSize"],
+                ConfigurationManager.AppSettings["ConnectionLifetime"]);
         private static void access_sql_server(object o)
         {
             Stopwatch stopWatch = Stopwatch.StartNew();
@@ -3653,13 +3727,7 @@ FROM
                 string getMessage = oo.GetMessage;
                 oo = null;
             Thread.CurrentThread.CurrentUICulture = new CultureInfo("en-us");
-            SqlClient sql_client = new SqlClient(ConfigurationManager.AppSettings["SQL_SERVER_IP"],
-                ConfigurationManager.AppSettings["SQL_SERVER_PORT"],
-                ConfigurationManager.AppSettings["SQL_SERVER_USER_ID"],
-                ConfigurationManager.AppSettings["SQL_SERVER_PASSWORD"],
-                ConfigurationManager.AppSettings["SQL_SERVER_DATABASE"], ConfigurationManager.AppSettings["Pooling"],
-                ConfigurationManager.AppSettings["MinPoolSize"], ConfigurationManager.AppSettings["MaxPoolSize"],
-                ConfigurationManager.AppSettings["ConnectionLifetime"]);
+            
             DateTime dtime = DateTime.Now;
             AUTO_SQL_DATA gps_log = new AUTO_SQL_DATA();
             MANUAL_SQL_DATA operation_log = new MANUAL_SQL_DATA();
@@ -3744,8 +3812,8 @@ FROM
                 else
                 {
                     log.Info("cannot find suaddr in htable");
-                    sql_client.Dispose();
-                    sql_client = null;
+                    //sql_client.Dispose();
+                    //sql_client = null;
                     return;
                     gps_log._uid = operation_log.eqp_id = "\'" + "null" + "\'";
                     gps_log._id = "\'" + "null" + "_" + now + "\'";
@@ -3781,11 +3849,11 @@ FROM
 WHERE
   custom.uns_deivce_power_status.uid = " + @"'" + deviceID+@"'";
 
-                    while (!sql_client.connect())
+                    while (!accessSqlServerClient.connect())
                     {
                         Thread.Sleep(30);
                     }
-                    DataTable dt1 = sql_client.get_DataTable(sqlCmd1);
+                    DataTable dt1 = accessSqlServerClient.get_DataTable(sqlCmd1);
                     //sql_client.disconnect();
 
                     if (dt1 != null && dt1.Rows.Count != 0)
@@ -3802,7 +3870,7 @@ WHERE
                             {
                                 //Thread.Sleep(30);
                             }
-                            sql_client.modify(sqlCmd1);
+                            accessSqlServerClient.modify(sqlCmd1);
                             //sql_client.disconnect();
 
                     }
@@ -3843,7 +3911,7 @@ WHERE
                                 //Thread.Sleep(30);
                             }
                             //lock (access_uns_deivce_power_status_Lock)
-                            sql_client.modify(unsSqlCmd);
+                            accessSqlServerClient.modify(unsSqlCmd);
                             //sql_client.disconnect();
                         }
                     }
@@ -3905,7 +3973,7 @@ WHERE
                                 //Thread.Sleep(30);
                             }
                             //lock (access_uns_deivce_power_status_Lock)
-                            sql_client.modify(unsSqlCmd);
+                            accessSqlServerClient.modify(unsSqlCmd);
                             //sql_client.disconnect();
                         }
 
@@ -3934,7 +4002,7 @@ WHERE
                                 //Thread.Sleep(30);
                             }
                             //lock (access_uns_deivce_power_status_Lock)
-                            sql_client.modify(unsSqlCmd);
+                            accessSqlServerClient.modify(unsSqlCmd);
                             //sql_client.disconnect();
                         }
 
@@ -3963,7 +4031,7 @@ WHERE
                                 //Thread.Sleep(30);
                             }
                             //lock (access_uns_deivce_power_status_Lock)
-                            sql_client.modify(unsSqlCmd);
+                            accessSqlServerClient.modify(unsSqlCmd);
                             //sql_client.disconnect();
                         }
 
@@ -4045,7 +4113,7 @@ WHERE
                                     //Thread.Sleep(30);
                                 }
                                 //lock (access_uns_deivce_power_status_Lock)
-                                sql_client.modify(unsSqlCmd);
+                                accessSqlServerClient.modify(unsSqlCmd);
                                 //sql_client.disconnect();
 
 
@@ -4064,7 +4132,7 @@ VALUES(
                                 {
                                     //Thread.Sleep(30);
                                 }
-                                sql_client.modify(unsSqlCmd);
+                                accessSqlServerClient.modify(unsSqlCmd);
                                 //sql_client.disconnect();
                                 #endregion insert into unsPowerStatusHistory
                                 /*
@@ -4112,9 +4180,9 @@ VALUES(
 
 
                         }
-                        sql_client.disconnect();
-                        sql_client.Dispose();
-                        sql_client = null;
+                        //sql_client.disconnect();
+                        //sql_client.Dispose();
+                        //sql_client = null;
                         return;
                         break;
                     case "Unit Absent":
@@ -4147,7 +4215,7 @@ WHERE
                                     //Thread.Sleep(30);
                                 }
                                 //lock (access_uns_deivce_power_status_Lock)
-                                sql_client.modify(unsSqlCmd);
+                                accessSqlServerClient.modify(unsSqlCmd);
                                 //sql_client.disconnect();
 
                                 #region insert into unsPowerStatusHistory
@@ -4163,7 +4231,7 @@ VALUES(
                                 {
                                     //Thread.Sleep(30);
                                 }
-                                sql_client.modify(unsSqlCmd);
+                                accessSqlServerClient.modify(unsSqlCmd);
                                 //sql_client.disconnect();
                                 #endregion insert into unsPowerStatusHistory
                                 /*
@@ -4213,9 +4281,9 @@ VALUES(
                     }
 
                         #endregion
-                    sql_client.disconnect();
-                    sql_client.Dispose();
-                    sql_client = null;
+                    //sql_client.disconnect();
+                    //sql_client.Dispose();
+                    //sql_client = null;
                         return;
                         break;
                     case "Ignition Off":
@@ -4277,7 +4345,7 @@ VALUES(
                         {
                             //Thread.Sleep(30);
                         }
-                        DataTable sqlDatetable = sql_client.get_DataTable(sqlCmd);
+                        DataTable sqlDatetable = accessSqlServerClient.get_DataTable(sqlCmd);
                         //sql_client.disconnect();
                         if (sqlDatetable != null && sqlDatetable.Rows.Count != 0)
                         {
@@ -4793,7 +4861,7 @@ LIMIT 1";
                         }
                             break;
                     }
-                    sql_client.modify(cmd);
+                    accessSqlServerClient.modify(cmd);
                 }
                 catch (Exception ex)
                 {
@@ -4897,7 +4965,7 @@ LIMIT 1";
                                                 @"','YYYYMMDDHH24MISS')";
                     string cmd = "INSERT INTO custom.cga_event_log (" + table_columns + ") VALUES  (" +
                                  table_column_value + ")";
-                    sql_client.modify(cmd);
+                    accessSqlServerClient.modify(cmd);
                     //sql_client.disconnect();
                 }
             }
@@ -5014,7 +5082,7 @@ LIMIT 1";
                                                             @"','YYYYMMDDHH24MISS')";
                                 string cmd = "INSERT INTO custom.cga_event_log (" + table_columns + ") VALUES  (" +
                                              table_column_value + ")";
-                                sql_client.modify(cmd);
+                                accessSqlServerClient.modify(cmd);
                                 //sql_client.disconnect();
                                 break;
                             case "out":
@@ -5060,7 +5128,7 @@ LIMIT 1";
                                         {
                                             //Thread.Sleep(30);
                                         }
-                                        sql_client.modify(cmd);
+                                        accessSqlServerClient.modify(cmd);
                                         break;
                                     case "Emergency Off":
 
@@ -5086,7 +5154,7 @@ LIMIT 1";
                         }
                         finally
                         {
-                            sql_client.disconnect();
+                            //sql_client.disconnect();
                         }
                     }
                     #endregion #region insert into custom.cga_event_log
@@ -5094,8 +5162,8 @@ LIMIT 1";
             
             htable.Clear();
                 htable = null;
-            sql_client.Dispose();
-                sql_client = null;
+            //sql_client.Dispose();
+                //sql_client = null;
             //GC.Collect();
             //GC.WaitForPendingFinalizers();
                 Console.ForegroundColor = ConsoleColor.DarkCyan;
@@ -5111,19 +5179,29 @@ LIMIT 1";
         private static string CheckIfStayOverTime(string lat, string lon, string deviceID)
         {
             double distanceLimit = 0.1;//unit:km
-            string DB = string.Empty, stayTimeInMin = string.Empty;
+            string  stayTimeInMin = string.Empty;
             List<string> resultList= new List<string>();
-            DB = "lmap100";
-            SqlClient sqlclient = new SqlClient(ConfigurationManager.AppSettings["SQL_SERVER_IP"], ConfigurationManager.AppSettings["SQL_SERVER_PORT"], ConfigurationManager.AppSettings["SQL_SERVER_USER_ID"], ConfigurationManager.AppSettings["SQL_SERVER_PASSWORD"], DB, ConfigurationManager.AppSettings["Pooling"], ConfigurationManager.AppSettings["MinPoolSize"], ConfigurationManager.AppSettings["MaxPoolSize"], ConfigurationManager.AppSettings["ConnectionLifetime"]);
+
+            SqlClient CheckIfStayOverTimeaccessDBlmap100Client = new SqlClient(
+                ConfigurationManager.AppSettings["SQL_SERVER_IP"], 
+                ConfigurationManager.AppSettings["SQL_SERVER_PORT"], 
+                ConfigurationManager.AppSettings["SQL_SERVER_USER_ID"], 
+                ConfigurationManager.AppSettings["SQL_SERVER_PASSWORD"],
+                "lmap100", ConfigurationManager.AppSettings["Pooling"],
+                ConfigurationManager.AppSettings["CheckIfStayOverTimeMinPoolSize"],
+                ConfigurationManager.AppSettings["CheckIfStayOverTimeMaxPoolSize"],
+                ConfigurationManager.AppSettings["CheckIfStayOverTimeConnectionLifetime"]);
             
             string sqlCmd = @"select stay_time from p_config";
 
-            while (!sqlclient.connect())
+            while (!CheckIfStayOverTimeaccessDBlmap100Client.connect())
             {
                 Thread.Sleep(30);
             }
-            var dt2 = sqlclient.get_DataTable(sqlCmd);
-            sqlclient.disconnect();
+            var dt2 = CheckIfStayOverTimeaccessDBlmap100Client.get_DataTable(sqlCmd);
+            CheckIfStayOverTimeaccessDBlmap100Client.disconnect();
+            CheckIfStayOverTimeaccessDBlmap100Client.Dispose();
+            CheckIfStayOverTimeaccessDBlmap100Client = null;
             if (dt2 != null && dt2.Rows.Count != 0)
             {
                 foreach (DataRow row in dt2.Rows)
@@ -5138,8 +5216,7 @@ LIMIT 1";
             dt2.Clear();
 			dt2.Dispose();
 			dt2=null;
-			sqlclient.Dispose();
-			sqlclient=null;
+            
             sqlCmd = @"SELECT
 public._gps_log._lat,
 public._gps_log._lon
@@ -5150,21 +5227,23 @@ public._gps_log._time <= now() AND
 public._gps_log._time >= now() - interval '"+stayTimeInMin+@" minute' AND
 public._gps_log._uid = '"+deviceID+@"'
 ";
-             SqlClient sql_client = new SqlClient(ConfigurationManager.AppSettings["SQL_SERVER_IP"],
+            SqlClient CheckIfStayOverTimeSql_client = new SqlClient(ConfigurationManager.AppSettings["SQL_SERVER_IP"],
                 ConfigurationManager.AppSettings["SQL_SERVER_PORT"],
                 ConfigurationManager.AppSettings["SQL_SERVER_USER_ID"],
                 ConfigurationManager.AppSettings["SQL_SERVER_PASSWORD"],
-                ConfigurationManager.AppSettings["SQL_SERVER_DATABASE"], ConfigurationManager.AppSettings["Pooling"],
-                ConfigurationManager.AppSettings["MinPoolSize"], ConfigurationManager.AppSettings["MaxPoolSize"],
-                ConfigurationManager.AppSettings["ConnectionLifetime"]);
-            while (!sql_client.connect())
+                ConfigurationManager.AppSettings["SQL_SERVER_DATABASE"], 
+                ConfigurationManager.AppSettings["Pooling"],
+                ConfigurationManager.AppSettings["CheckIfStayOverTimeMinPoolSize"],
+                ConfigurationManager.AppSettings["CheckIfStayOverTimeMaxPoolSize"],
+                ConfigurationManager.AppSettings["CheckIfStayOverTimeConnectionLifetime"]);
+            while (!CheckIfStayOverTimeSql_client.connect())
             {
                 Thread.Sleep(30);
             }
-            var dt3 = sql_client.get_DataTable(sqlCmd);
-            sql_client.disconnect();
-			sql_client.Dispose();
-                    sql_client = null;
+            var dt3 = CheckIfStayOverTimeSql_client.get_DataTable(sqlCmd);
+            CheckIfStayOverTimeSql_client.disconnect();
+			CheckIfStayOverTimeSql_client.Dispose();
+                    CheckIfStayOverTimeSql_client = null;
             if (dt3 != null && dt3.Rows.Count != 0)
             {
                 foreach (DataRow row in dt3.Rows)
