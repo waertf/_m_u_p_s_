@@ -94,12 +94,12 @@ namespace ConsoleApplication1_client_threading
                     //insert
                     command = pgSqlConnection.CreateCommand();
                     command.CommandText = cmd;
-                    command.CommandTimeout = 30;
+                    //command.CommandTimeout = 30;
 
                     //cmd.CommandText = "INSERT INTO public.test (id) VALUES (1)";
                     //pgSqlConnection.BeginTransaction();
                     //async
-                    //IAsyncResult cres=command.BeginExecuteNonQuery(null,null);
+                    IAsyncResult cres=command.BeginExecuteNonQuery(null,null);
                     //Console.Write("In progress...");
                     //while (!cres.IsCompleted)
                     {
@@ -112,12 +112,12 @@ namespace ConsoleApplication1_client_threading
                     else
                         Console.WriteLine("Have to wait for operation to complete...");
                     */
-                    //int RowsAffected = command.EndExecuteNonQuery(cres);
+                    int RowsAffected = command.EndExecuteNonQuery(cres);
                     //Console.WriteLine("Done. Rows affected: " + RowsAffected.ToString());
                     
                      //sync
-                     int aff = command.ExecuteNonQuery();
-                     Console.WriteLine(aff + " rows were affected.");
+                     //int aff = command.ExecuteNonQuery();
+                    Console.WriteLine(RowsAffected + " rows were affected.");
                       
                      
                     //pgSqlConnection.Commit();
@@ -189,9 +189,9 @@ namespace ConsoleApplication1_client_threading
                         //DataTable datatable = new DataTable();
                         command = pgSqlConnection.CreateCommand();
                         command.CommandText = cmd;
-                        command.CommandTimeout = 30;
+                        //command.CommandTimeout = 30;
                         //Console.WriteLine("Starting asynchronous retrieval of data...");
-                        //IAsyncResult cres = command.BeginExecuteReader();
+                        IAsyncResult cres = command.BeginExecuteReader();
                         //Console.Write("In progress...");
                         //while (!cres.IsCompleted)
                         {
@@ -203,8 +203,8 @@ namespace ConsoleApplication1_client_threading
                         //Console.WriteLine("Completed.");
                         //else
                         //Console.WriteLine("Have to wait for operation to complete...");
-                        //PgSqlDataReader myReader = command.EndExecuteReader(cres);
-                        PgSqlDataReader myReader = command.ExecuteReader();
+                        PgSqlDataReader myReader = command.EndExecuteReader(cres);
+                        //PgSqlDataReader myReader = command.ExecuteReader();
                         try
                         {
                             // printing the column names
