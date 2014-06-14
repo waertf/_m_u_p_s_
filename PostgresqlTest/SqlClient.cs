@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using Devart.Data.PostgreSql;
 using System.Data;
 using Gurock.SmartInspect;
@@ -53,6 +54,7 @@ namespace PostgresqlTest
                 Console.ForegroundColor = ConsoleColor.Red;
                 Console.WriteLine("Connect exception occurs: {0}", ex.Error);
                 log.Error("Connect exception occurs: "+ ex.Error);
+                SiAuto.Main.LogException(ex);
                 Console.ResetColor();
                 return false;
             }
@@ -77,6 +79,7 @@ namespace PostgresqlTest
                 Console.ForegroundColor = ConsoleColor.Red;
                 Console.WriteLine("Disconnect exception occurs: {0}", ex.Error);
                 log.Error("Disconnect exception occurs: "+ ex.Error);
+                SiAuto.Main.LogException(ex);
                 Console.ResetColor();
                 return false;
             }
@@ -126,6 +129,7 @@ namespace PostgresqlTest
                 Console.ForegroundColor = ConsoleColor.Red;
                 Console.WriteLine("Modify exception occurs: {0}" + Environment.NewLine + "{1}", ex.Error, cmd);
                 log.Error("Modify exception occurs: " + Environment.NewLine + ex.Error + Environment.NewLine + cmd);
+                SiAuto.Main.LogException(ex);
                 Console.ResetColor();
                 pgSqlConnection.Rollback();
                 return false;
@@ -147,7 +151,7 @@ namespace PostgresqlTest
                     //Console.WriteLine("Starting asynchronous retrieval of data...");
                     IAsyncResult cres = command.BeginExecuteReader();
                     //Console.Write("In progress...");
-                    while (!cres.IsCompleted)
+                    //while (!cres.IsCompleted)
                     {
                         //Console.Write(".");
                         //Perform here any operation you need
@@ -157,6 +161,7 @@ namespace PostgresqlTest
                         //Console.WriteLine("Completed.");
                     //else
                         //Console.WriteLine("Have to wait for operation to complete...");
+
                     PgSqlDataReader myReader = command.EndExecuteReader(cres);
                     try
                     {
@@ -215,6 +220,7 @@ namespace PostgresqlTest
                 Console.ForegroundColor = ConsoleColor.Red;
                 Console.WriteLine("GetDataTable exception occurs: {0}"+Environment.NewLine+"{1}", ex.Error,cmd);
                 log.Error("GetDataTable exception occurs: " + Environment.NewLine + ex.Error+Environment.NewLine+ cmd);
+                SiAuto.Main.LogException(ex);
                 Console.ResetColor();
                 return null;
             }
