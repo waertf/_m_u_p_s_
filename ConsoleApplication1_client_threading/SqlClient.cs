@@ -34,21 +34,28 @@ namespace ConsoleApplication1_client_threading
             pgCSB.ConnectionTimeout = 15;
             pgCSB.Unicode = true;
             pgSqlConnection = new PgSqlConnection(pgCSB.ConnectionString);
+            IsConnected = false;
         }
         public bool connect()
         {
             try
             {
-                if (pgSqlConnection != null)
-                {
-                    pgSqlConnection.Open();
-                    IsConnected = true;
+                if (IsConnected)
                     return true;
-                }
                 else
                 {
-                    return false;
+                    if (pgSqlConnection != null)
+                    {
+                        pgSqlConnection.Open();
+                        IsConnected = true;
+                        return true;
+                    }
+                    else
+                    {
+                        return false;
+                    }
                 }
+                
             }
             catch (PgSqlException ex)
             {
