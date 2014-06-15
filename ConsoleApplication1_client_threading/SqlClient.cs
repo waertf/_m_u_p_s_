@@ -131,13 +131,15 @@ namespace ConsoleApplication1_client_threading
                     
                      //sync
                      //int aff = command.ExecuteNonQuery();
-                    Console.WriteLine(RowsAffected + " rows were affected.");
+                    //Console.WriteLine(RowsAffected + " rows were affected.");
                       
                      
                     //pgSqlConnection.Commit();
                     ThreadPool.QueueUserWorkItem(callback =>
                     {
+                        
                         Console.ForegroundColor = ConsoleColor.Cyan;
+                        Console.WriteLine(RowsAffected + " rows were affected.");
                         Console.WriteLine(
                             "S++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
                         Console.WriteLine("sql Write:\r\n" + cmd);
@@ -206,11 +208,7 @@ namespace ConsoleApplication1_client_threading
                         //command.CommandTimeout = 30;
                         //Console.WriteLine("Starting asynchronous retrieval of data...");
                         PgSqlDataReader myReader;
-                        lock (accessLock)
-                        {
-                            IAsyncResult cres = command.BeginExecuteReader();
-                            myReader = command.EndExecuteReader(cres);
-                        }
+                        
                         //IAsyncResult cres = command.BeginExecuteReader();
                         //Console.Write("In progress...");
                         //while (!cres.IsCompleted)
@@ -227,30 +225,37 @@ namespace ConsoleApplication1_client_threading
                         //PgSqlDataReader myReader = command.ExecuteReader();
                         try
                         {
-                            // printing the column names
-                            for (int i = 0; i < myReader.FieldCount; i++)
+                            lock (accessLock)
                             {
-                                //Console.Write(myReader.GetName(i).ToString() + "\t");
-                                datatable.Columns.Add(myReader.GetName(i).ToString(), typeof(string));
-                            }
-                            //Console.Write(Environment.NewLine);
-                            while (myReader.Read())
-                            {
-                                DataRow dr = datatable.NewRow();
+                                IAsyncResult cres = command.BeginExecuteReader();
+                                myReader = command.EndExecuteReader(cres);
 
+                                // printing the column names
                                 for (int i = 0; i < myReader.FieldCount; i++)
                                 {
-                                    //Console.Write(myReader.GetString(i) + "\t");
-                                    dr[i] = myReader.GetString(i);
+                                    //Console.Write(myReader.GetName(i).ToString() + "\t");
+                                    datatable.Columns.Add(myReader.GetName(i).ToString(), typeof (string));
                                 }
-                                datatable.Rows.Add(dr);
                                 //Console.Write(Environment.NewLine);
-                                //Console.WriteLine(myReader.GetInt32(0) + "\t" + myReader.GetString(1) + "\t");
+                                while (myReader.Read())
+                                {
+                                    DataRow dr = datatable.NewRow();
+
+                                    for (int i = 0; i < myReader.FieldCount; i++)
+                                    {
+                                        //Console.Write(myReader.GetString(i) + "\t");
+                                        dr[i] = myReader.GetString(i);
+                                    }
+                                    datatable.Rows.Add(dr);
+                                    //Console.Write(Environment.NewLine);
+                                    //Console.WriteLine(myReader.GetInt32(0) + "\t" + myReader.GetString(1) + "\t");
+                                }
+                                myReader.Close();
                             }
                         }
                         finally
                         {
-                            myReader.Close();
+                            
                             stopWatch.Stop();
                             // Get the elapsed time as a TimeSpan value.
                             TimeSpan ts = stopWatch.Elapsed;
