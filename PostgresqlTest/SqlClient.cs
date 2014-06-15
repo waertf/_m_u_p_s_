@@ -18,6 +18,7 @@ namespace PostgresqlTest
         PgSqlConnection pgSqlConnection;
         public bool IsConnected{get;set;}
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+        object accesslock = new object();
         public SqlClient(string ip, string port, string user_id, string password, string database, string Pooling, string MinPoolSize, string MaxPoolSize, string ConnectionLifetime)
         {
             pgCSB.Host = ip;
@@ -149,7 +150,25 @@ namespace PostgresqlTest
                     PgSqlCommand command = pgSqlConnection.CreateCommand();
                     command.CommandText = cmd;
                     //Console.WriteLine("Starting asynchronous retrieval of data...");
-                    IAsyncResult cres = command.BeginExecuteReader();
+                    PgSqlDataReader myReader;
+                    lock (accesslock)
+                    {
+                        IAsyncResult cres = command.BeginExecuteReader();
+                        //Console.Write("In progress...");
+                        //while (!cres.IsCompleted)
+                        {
+                            //Console.Write(".");
+                            //Perform here any operation you need
+                        }
+
+                        //if (cres.IsCompleted)
+                        //Console.WriteLine("Completed.");
+                        //else
+                        //Console.WriteLine("Have to wait for operation to complete...");
+
+                         myReader = command.EndExecuteReader(cres);
+                    
+                    //IAsyncResult cres = command.BeginExecuteReader();
                     //Console.Write("In progress...");
                     //while (!cres.IsCompleted)
                     {
@@ -162,7 +181,7 @@ namespace PostgresqlTest
                     //else
                         //Console.WriteLine("Have to wait for operation to complete...");
 
-                    PgSqlDataReader myReader = command.EndExecuteReader(cres);
+                    //PgSqlDataReader myReader = command.EndExecuteReader(cres);
                     try
                     {
                         // printing the column names
@@ -198,6 +217,7 @@ namespace PostgresqlTest
                             ts.Hours, ts.Minutes, ts.Seconds,
                             ts.Milliseconds / 10);
                         SiAuto.Main.AddCheckpoint(Level.Debug,"sql query take time:"+elapsedTime,cmd);
+                    }
                     }
                     /*
                     foreach (DataRow row in datatable.Rows) // Loop over the rows.
