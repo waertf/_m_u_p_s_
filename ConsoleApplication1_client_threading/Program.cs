@@ -5175,22 +5175,31 @@ LIMIT 1";
                 SiAuto.Main.LogMessage("access_sql_server spend time(ms):"+stopWatch.ElapsedMilliseconds);
         }
     }
-
+        static SqlClient CheckIfStayOverTimeaccessDBlmap100Client = new SqlClient(
+                ConfigurationManager.AppSettings["SQL_SERVER_IP"],
+                ConfigurationManager.AppSettings["SQL_SERVER_PORT"],
+                ConfigurationManager.AppSettings["SQL_SERVER_USER_ID"],
+                ConfigurationManager.AppSettings["SQL_SERVER_PASSWORD"],
+                "lmap100", ConfigurationManager.AppSettings["Pooling"],
+                ConfigurationManager.AppSettings["CheckIfStayOverTimeMinPoolSize"],
+                ConfigurationManager.AppSettings["CheckIfStayOverTimeMaxPoolSize"],
+                ConfigurationManager.AppSettings["CheckIfStayOverTimeConnectionLifetime"]);
+        static SqlClient CheckIfStayOverTimeSql_client = new SqlClient(ConfigurationManager.AppSettings["SQL_SERVER_IP"],
+                ConfigurationManager.AppSettings["SQL_SERVER_PORT"],
+                ConfigurationManager.AppSettings["SQL_SERVER_USER_ID"],
+                ConfigurationManager.AppSettings["SQL_SERVER_PASSWORD"],
+                ConfigurationManager.AppSettings["SQL_SERVER_DATABASE"],
+                ConfigurationManager.AppSettings["Pooling"],
+                ConfigurationManager.AppSettings["CheckIfStayOverTimeMinPoolSize"],
+                ConfigurationManager.AppSettings["CheckIfStayOverTimeMaxPoolSize"],
+                ConfigurationManager.AppSettings["CheckIfStayOverTimeConnectionLifetime"]);
         private static string CheckIfStayOverTime(string lat, string lon, string deviceID)
         {
             double distanceLimit = 0.1;//unit:km
             string  stayTimeInMin = string.Empty;
             List<string> resultList= new List<string>();
 
-            SqlClient CheckIfStayOverTimeaccessDBlmap100Client = new SqlClient(
-                ConfigurationManager.AppSettings["SQL_SERVER_IP"], 
-                ConfigurationManager.AppSettings["SQL_SERVER_PORT"], 
-                ConfigurationManager.AppSettings["SQL_SERVER_USER_ID"], 
-                ConfigurationManager.AppSettings["SQL_SERVER_PASSWORD"],
-                "lmap100", ConfigurationManager.AppSettings["Pooling"],
-                ConfigurationManager.AppSettings["CheckIfStayOverTimeMinPoolSize"],
-                ConfigurationManager.AppSettings["CheckIfStayOverTimeMaxPoolSize"],
-                ConfigurationManager.AppSettings["CheckIfStayOverTimeConnectionLifetime"]);
+            
             
             string sqlCmd = @"select stay_time from p_config";
 
@@ -5199,9 +5208,9 @@ LIMIT 1";
                 Thread.Sleep(30);
             }
             var dt2 = CheckIfStayOverTimeaccessDBlmap100Client.get_DataTable(sqlCmd);
-            CheckIfStayOverTimeaccessDBlmap100Client.disconnect();
-            CheckIfStayOverTimeaccessDBlmap100Client.Dispose();
-            CheckIfStayOverTimeaccessDBlmap100Client = null;
+            //CheckIfStayOverTimeaccessDBlmap100Client.disconnect();
+            //CheckIfStayOverTimeaccessDBlmap100Client.Dispose();
+            //CheckIfStayOverTimeaccessDBlmap100Client = null;
             if (dt2 != null && dt2.Rows.Count != 0)
             {
                 foreach (DataRow row in dt2.Rows)
@@ -5227,23 +5236,15 @@ public._gps_log._time <= now() AND
 public._gps_log._time >= now() - interval '"+stayTimeInMin+@" minute' AND
 public._gps_log._uid = '"+deviceID+@"'
 ";
-            SqlClient CheckIfStayOverTimeSql_client = new SqlClient(ConfigurationManager.AppSettings["SQL_SERVER_IP"],
-                ConfigurationManager.AppSettings["SQL_SERVER_PORT"],
-                ConfigurationManager.AppSettings["SQL_SERVER_USER_ID"],
-                ConfigurationManager.AppSettings["SQL_SERVER_PASSWORD"],
-                ConfigurationManager.AppSettings["SQL_SERVER_DATABASE"], 
-                ConfigurationManager.AppSettings["Pooling"],
-                ConfigurationManager.AppSettings["CheckIfStayOverTimeMinPoolSize"],
-                ConfigurationManager.AppSettings["CheckIfStayOverTimeMaxPoolSize"],
-                ConfigurationManager.AppSettings["CheckIfStayOverTimeConnectionLifetime"]);
+            
             while (!CheckIfStayOverTimeSql_client.connect())
             {
                 Thread.Sleep(30);
             }
             var dt3 = CheckIfStayOverTimeSql_client.get_DataTable(sqlCmd);
-            CheckIfStayOverTimeSql_client.disconnect();
-			CheckIfStayOverTimeSql_client.Dispose();
-                    CheckIfStayOverTimeSql_client = null;
+            //CheckIfStayOverTimeSql_client.disconnect();
+			//CheckIfStayOverTimeSql_client.Dispose();
+                    //CheckIfStayOverTimeSql_client = null;
             if (dt3 != null && dt3.Rows.Count != 0)
             {
                 foreach (DataRow row in dt3.Rows)
