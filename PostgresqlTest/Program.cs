@@ -37,7 +37,7 @@ namespace PostgresqlTest
                 {
                     Thread sqlThread = new Thread(() => { sqlTest(); });
                     sqlThread.Start();
-                    Thread.Sleep(50);
+                    //Thread.Sleep(50);
                 }
             }
             catch (Exception ex)
@@ -57,7 +57,7 @@ namespace PostgresqlTest
 
             i++;
             Console.WriteLine("+"+i);
-            //lock (lockSql)
+            lock (lockSql)
             {
                 sqlClient.get_DataTable(@"SELECT 
   public.emp.empno,
