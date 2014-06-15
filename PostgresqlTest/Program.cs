@@ -57,7 +57,7 @@ namespace PostgresqlTest
 
             i++;
             Console.WriteLine("+"+i);
-            lock (lockSql)
+            //lock (lockSql)
             {
                 sqlClient.get_DataTable(@"SELECT 
   public.emp.empno,
