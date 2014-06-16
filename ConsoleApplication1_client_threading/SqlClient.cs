@@ -110,10 +110,12 @@ namespace ConsoleApplication1_client_threading
                     //pgSqlConnection.BeginTransaction();
                     //async
                     int RowsAffected;
-                    lock (accessLock)
+                    //lock (accessLock)
                     {
-                        IAsyncResult cres = command.BeginExecuteNonQuery();
-                        RowsAffected = command.EndExecuteNonQuery(cres);
+                        //IAsyncResult cres = command.BeginExecuteNonQuery();
+                        //RowsAffected = command.EndExecuteNonQuery(cres);
+                        lock (accessLock)
+                            RowsAffected = command.ExecuteNonQuery();
                     }
                     //IAsyncResult cres=command.BeginExecuteNonQuery(null,null);
                     //Console.Write("In progress...");
@@ -243,6 +245,7 @@ namespace ConsoleApplication1_client_threading
                                 stopWatch.Start();
                                 //IAsyncResult cres = command.BeginExecuteReader();
                                 //myReader = command.EndExecuteReader(cres);
+                                //lock (accessLock)
                                 myReader = command.ExecuteReader();
                                 //stopWatch.Stop();
                                 // Get the elapsed time as a TimeSpan value.
@@ -309,10 +312,15 @@ namespace ConsoleApplication1_client_threading
                             }
                         }
                         */
+                        Stopwatch stopWatch2= new Stopwatch();
+                        stopWatch2.Start();
                         if (command != null)
                             command.Dispose();
                         command = null;
-                        return datatable.Copy();
+                        DataTable returnTable = datatable.Copy();
+                        stopWatch2.Stop();
+                        SiAuto.Main.AddCheckpoint(Level.Debug, "sql query4 take time(ms):" + stopWatch2.ElapsedMilliseconds, cmd);
+                        return returnTable;
                     }
                     else
                     {
