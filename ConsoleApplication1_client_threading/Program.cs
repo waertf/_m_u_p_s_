@@ -416,8 +416,10 @@ WHERE
             AutosendsqlClient.connect();
             GetGidAndFullnameFromP_prohibitedAndPatrol_locationFromSql_SqlClient.connect();
             CheckIfStayOverTimeaccessDBlmap100Client.connect();
+            CheckIfStayOverTimeaccessDBlmap100Client2.connect();
             accessSqlServerClient.connect();
             CheckIfStayOverTimeSql_client.connect();
+            CheckIfStayOverTimeSql_client2.connect();
             unsTcpClient = new TcpClient();
 
             avlsTcpClient = new TcpClient();
@@ -629,7 +631,7 @@ WHERE
             xmlParseTimer.Enabled = true;
             */
             {
-                var avlsTimer = new System.Timers.Timer(30);
+                var avlsTimer = new System.Timers.Timer(10);
                 avlsTimer.Elapsed += (sender, e) =>
                 {
                     if (avlsLinkedList.Count()>0)
@@ -641,7 +643,7 @@ WHERE
                 avlsTimer.Enabled = true;
             }
             {
-                var sqlTimer = new System.Timers.Timer(30);
+                var sqlTimer = new System.Timers.Timer(10);
                 sqlTimer.Elapsed += (sender, e) =>
                 {
                     
@@ -1779,7 +1781,7 @@ Select 1-6 then press enter to send package
                 */
                 //xmlQueue.Enqueue(returndata);
                 xml_parse(returndata);
-                Thread.Sleep(60);
+                Thread.Sleep(200);
 				//Thread xmlParseThread = new Thread(xml_parse);
                 //xmlParseThread.Start(returndata);
                 //xmlParseThread.Join(int.Parse(ConfigurationManager.AppSettings["xmlParseJoinTimeout"]));
@@ -3735,6 +3737,7 @@ FROM
         private static void access_sql_server(object o)
         {
             Stopwatch stopWatch = Stopwatch.StartNew();
+
             {
                 lock(sqlObject)
                     sqlLinkedList.RemoveFirst();
@@ -3861,6 +3864,11 @@ FROM
             else
                 gps_log._option2 =
                     gps_log._option3 = operation_log.result_code = operation_log.result_msg = "\'" + "null" + "\'";
+
+            stopWatch.Stop();
+            SiAuto.Main.LogMessage("access_sql_server spend3 time(ms):" + stopWatch.ElapsedMilliseconds);
+            stopWatch.Reset();
+            stopWatch.Start();
             //if (htable.ContainsKey("result_msg"))
             //{
             //    gps_log._option3 = "\'"+htable["result_msg"].ToString()+"\'";
@@ -3881,6 +3889,10 @@ WHERE
                         //Thread.Sleep(30);
                     }
                     DataTable dt1 = accessSqlServerClient.get_DataTable(sqlCmd1);
+                    stopWatch.Stop();
+                    SiAuto.Main.LogMessage("access_sql_server spend4 time(ms):" + stopWatch.ElapsedMilliseconds);
+                    stopWatch.Reset();
+                    stopWatch.Start();
                     //sql_client.disconnect();
 
                     if (dt1 != null && dt1.Rows.Count != 0)
@@ -3904,6 +3916,10 @@ WHERE
                 dt1.Clear();
                 dt1.Dispose();
                     dt1 = null;
+                    stopWatch.Stop();
+                    SiAuto.Main.LogMessage("access_sql_server spend5 time(ms):" + stopWatch.ElapsedMilliseconds);
+                    stopWatch.Reset();
+                    stopWatch.Start();
                 }
 
                 #endregion
@@ -4078,6 +4094,10 @@ WHERE
                     */
                 }
             }
+            stopWatch.Stop();
+            SiAuto.Main.LogMessage("access_sql_server spend6 time(ms):" + stopWatch.ElapsedMilliseconds);
+            stopWatch.Reset();
+            stopWatch.Start();
             if (htable.ContainsKey("event_info"))
             {
                 gps_log._option3 = "\'" + htable["event_info"].ToString() + "\'";
@@ -4329,6 +4349,10 @@ VALUES(
             }
             else
                 gps_log.j_6 = gps_log.j_7 = gps_log.j_8 = operation_log.event_id = "\'" + "null" + "\'";
+            stopWatch.Stop();
+            SiAuto.Main.LogMessage("access_sql_server spend7 time(ms):" + stopWatch.ElapsedMilliseconds);
+            stopWatch.Reset();
+            stopWatch.Start();
             ///TODO:implement set last lat lon value
             if (!string.IsNullOrEmpty(deviceID)) 
                 if (htable.ContainsKey("lat_value") && htable.ContainsKey("long_value"))
@@ -4440,7 +4464,10 @@ VALUES(
                         */
 
                 }
-
+            stopWatch.Stop();
+            SiAuto.Main.LogMessage("access_sql_server spend8 time(ms):" + stopWatch.ElapsedMilliseconds);
+            stopWatch.Reset();
+            stopWatch.Start();
 
             if (htable.ContainsKey("radius_value"))
             {
@@ -4595,6 +4622,10 @@ LIMIT 1";
             {
                 //Thread.Sleep(30);
             }
+            stopWatch.Stop();
+            SiAuto.Main.LogMessage("access_sql_server spend9 time(ms):" + stopWatch.ElapsedMilliseconds);
+            stopWatch.Reset();
+            stopWatch.Start();
             {
 
                 try
@@ -4903,7 +4934,10 @@ LIMIT 1";
                     //sql_client.disconnect();
                 }
             }
-            
+            stopWatch.Stop();
+            SiAuto.Main.LogMessage("access_sql_server spend10 time(ms):" + stopWatch.ElapsedMilliseconds);
+            stopWatch.Reset();
+            stopWatch.Start();
             
 
             //while (!sql_client.connect())
@@ -5070,13 +5104,17 @@ LIMIT 1";
                 }
             }
                 */
+            stopWatch.Stop();
+            SiAuto.Main.LogMessage("access_sql_server spend time(ms):" + stopWatch.ElapsedMilliseconds);
+            stopWatch.Reset();
+            stopWatch.Start();
             #endregion access GetGidAndFullnameFromP_prohibitedAndPatrol_locationFromSql
 
                 //lock (cgaEventAccessSqlLock)
                 {
                     #region checkIfOverTime
                     //event:5->stay over specific time within 0.1 km
-                    getMessage = CheckIfStayOverTime(gps_log._lat, gps_log._lon, deviceID);
+                    getMessage = CheckIfStayOverTime2(gps_log._lat, gps_log._lon, deviceID);
                     if (!string.IsNullOrEmpty(getMessage))
                     {
                         switch (getMessage)
@@ -5199,9 +5237,132 @@ LIMIT 1";
             //Console.WriteLine("-access_sql_server");
             //sqlAccessEvent.Set();
                 stopWatch.Stop();
-                SiAuto.Main.LogMessage("access_sql_server spend time(ms):"+stopWatch.ElapsedMilliseconds);
+                SiAuto.Main.LogMessage("access_sql_server spend2 time(ms):"+stopWatch.ElapsedMilliseconds);
         }
     }
+        static SqlClient CheckIfStayOverTimeaccessDBlmap100Client2 = new SqlClient(
+                ConfigurationManager.AppSettings["SQL_SERVER_IP"],
+                ConfigurationManager.AppSettings["SQL_SERVER_PORT"],
+                ConfigurationManager.AppSettings["SQL_SERVER_USER_ID"],
+                ConfigurationManager.AppSettings["SQL_SERVER_PASSWORD"],
+                "lmap100", ConfigurationManager.AppSettings["Pooling"],
+                ConfigurationManager.AppSettings["CheckIfStayOverTimeMinPoolSize"],
+                ConfigurationManager.AppSettings["CheckIfStayOverTimeMaxPoolSize"],
+                ConfigurationManager.AppSettings["CheckIfStayOverTimeConnectionLifetime"]);
+        static SqlClient CheckIfStayOverTimeSql_client2 = new SqlClient(ConfigurationManager.AppSettings["SQL_SERVER_IP"],
+                ConfigurationManager.AppSettings["SQL_SERVER_PORT"],
+                ConfigurationManager.AppSettings["SQL_SERVER_USER_ID"],
+                ConfigurationManager.AppSettings["SQL_SERVER_PASSWORD"],
+                ConfigurationManager.AppSettings["SQL_SERVER_DATABASE"],
+                ConfigurationManager.AppSettings["Pooling"],
+                ConfigurationManager.AppSettings["CheckIfStayOverTimeMinPoolSize"],
+                ConfigurationManager.AppSettings["CheckIfStayOverTimeMaxPoolSize"],
+                ConfigurationManager.AppSettings["CheckIfStayOverTimeConnectionLifetime"]);
+        private static string CheckIfStayOverTime2(string lat, string lon, string deviceID)
+        {
+            double distanceLimit = 0.1;//unit:km
+            string stayTimeInMin = string.Empty;
+            List<string> resultList = new List<string>();
+
+
+
+            string sqlCmd = @"select stay_time from p_config";
+
+            //while (!CheckIfStayOverTimeaccessDBlmap100Client.connect())
+            {
+                //Thread.Sleep(30);
+            }
+            var dt2 = CheckIfStayOverTimeaccessDBlmap100Client2.get_DataTable(sqlCmd);
+            //CheckIfStayOverTimeaccessDBlmap100Client.disconnect();
+            //CheckIfStayOverTimeaccessDBlmap100Client.Dispose();
+            //CheckIfStayOverTimeaccessDBlmap100Client = null;
+            if (dt2 != null && dt2.Rows.Count != 0)
+            {
+                foreach (DataRow row in dt2.Rows)
+                {
+                    stayTimeInMin = row[0].ToString();
+                }
+            }
+            else
+            {
+                stayTimeInMin = "0";
+            }
+            dt2.Clear();
+            dt2.Dispose();
+            dt2 = null;
+
+            sqlCmd = @"SELECT
+public._gps_log._lat,
+public._gps_log._lon
+FROM
+public._gps_log
+WHERE
+public._gps_log._time <= now() AND
+public._gps_log._time >= now() - interval '" + stayTimeInMin + @" minute' AND
+public._gps_log._uid = '" + deviceID + @"'
+";
+
+            //while (!CheckIfStayOverTimeSql_client.connect())
+            {
+                //Thread.Sleep(30);
+            }
+            var dt3 = CheckIfStayOverTimeSql_client2.get_DataTable(sqlCmd);
+            //CheckIfStayOverTimeSql_client.disconnect();
+            //CheckIfStayOverTimeSql_client.Dispose();
+            //CheckIfStayOverTimeSql_client = null;
+            if (dt3 != null && dt3.Rows.Count != 0)
+            {
+                foreach (DataRow row in dt3.Rows)
+                {
+                    double d = GeoCodeCalc.CalcDistance(double.Parse(lat), double.Parse(lon), double.Parse(row[0].ToString()),
+                        double.Parse(row[1].ToString()), GeoCodeCalcMeasurement.Kilometers);
+                    if (d <= distanceLimit)
+                        resultList.Add("in");
+                    else
+                    {
+                        resultList.Add("out");
+                    }
+                    Thread.Sleep(30);
+                }
+                resultList.Sort();
+                int index = resultList.BinarySearch("out");
+                resultList.Clear();
+                resultList = null;
+                if (index < 0)
+                {
+                    string result = string.Empty;
+                    result = "in";
+
+                    //GC.Collect();
+                    //GC.WaitForPendingFinalizers();
+                    dt3.Clear();
+                    dt3.Dispose();
+                    dt3 = null;
+                    return result;
+                }
+                else
+                {
+                    string result = string.Empty;
+                    result = "out";
+                    //GC.Collect();
+                    //GC.WaitForPendingFinalizers();
+                    dt3.Clear();
+                    dt3.Dispose();
+                    dt3 = null;
+                    return result;
+                }
+            }
+            else
+            {
+
+                //GC.Collect();
+                //GC.WaitForPendingFinalizers();
+                dt3.Clear();
+                dt3.Dispose();
+                dt3 = null;
+                return string.Empty;
+            }
+        }
         static SqlClient CheckIfStayOverTimeaccessDBlmap100Client = new SqlClient(
                 ConfigurationManager.AppSettings["SQL_SERVER_IP"],
                 ConfigurationManager.AppSettings["SQL_SERVER_PORT"],
