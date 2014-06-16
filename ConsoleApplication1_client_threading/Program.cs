@@ -281,9 +281,9 @@ FROM
 WHERE
   sd.equipment.uid = '" + uid + @"'
 ";
-            while (!CheckIfUidExistSqlClient.connect())
+            //while (!CheckIfUidExistSqlClient.connect())
             {
-                Thread.Sleep(30);
+                //Thread.Sleep(30);
             }
 
 
@@ -411,6 +411,13 @@ WHERE
             //Console.WriteLine(DateTime.Now.ToString("yyyyMMdd HHmmss+8"));
             //Console.WriteLine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location));
             //test();
+            avlsSqlClient.connect();
+            CheckIfUidExistSqlClient.connect();
+            AutosendsqlClient.connect();
+            GetGidAndFullnameFromP_prohibitedAndPatrol_locationFromSql_SqlClient.connect();
+            CheckIfStayOverTimeaccessDBlmap100Client.connect();
+            accessSqlServerClient.connect();
+            CheckIfStayOverTimeSql_client.connect();
             unsTcpClient = new TcpClient();
 
             avlsTcpClient = new TcpClient();
@@ -452,9 +459,9 @@ WHERE
                 ConfigurationManager.AppSettings["SQL_SERVER_PASSWORD"],
                 ConfigurationManager.AppSettings["SQL_SERVER_DATABASE"], 
                 ConfigurationManager.AppSettings["Pooling"],
-                ConfigurationManager.AppSettings["subMinPoolSize"],
-                ConfigurationManager.AppSettings["subMaxPoolSize"],
-                ConfigurationManager.AppSettings["subConnectionLifetime"]);
+                ConfigurationManager.AppSettings["MinPoolSize"],
+                ConfigurationManager.AppSettings["MaxPoolSize"],
+                ConfigurationManager.AppSettings["ConnectionLifetime"]);
 
             while (!sql_client.connect())
             {
@@ -622,7 +629,7 @@ WHERE
             xmlParseTimer.Enabled = true;
             */
             {
-                var avlsTimer = new System.Timers.Timer(50);
+                var avlsTimer = new System.Timers.Timer(30);
                 avlsTimer.Elapsed += (sender, e) =>
                 {
                     if (avlsLinkedList.Count()>0)
@@ -634,7 +641,7 @@ WHERE
                 avlsTimer.Enabled = true;
             }
             {
-                var sqlTimer = new System.Timers.Timer(50);
+                var sqlTimer = new System.Timers.Timer(30);
                 sqlTimer.Elapsed += (sender, e) =>
                 {
                     
@@ -756,6 +763,9 @@ WHERE
         */
         private static void SendToAvlsEventColumnSetNegativeOneIfPowerOff(TcpClient avlsTcpClient,NetworkStream avlsNetworkStream)
         {
+            PgSqlConnection.ClearAllPools();
+            GC.Collect();
+            GC.WaitForPendingFinalizers();
             //SiAuto.Main.EnterMethod(Level.Debug, "SendToAvlsEventColumnSetNegativeOneIfPowerOff");
             var sqlClient = new SqlClient(
                 ConfigurationManager.AppSettings["SQL_SERVER_IP"], 
@@ -1032,9 +1042,9 @@ LIMIT 1";
                 {
 
                     
-                    while (!AutosendsqlClient.connect())
+                    //while (!AutosendsqlClient.connect())
                     {
-                        Thread.Sleep(30);
+                        //Thread.Sleep(30);
                     }
                     
                     string sqlCmd = @"
@@ -1759,13 +1769,14 @@ Select 1-6 then press enter to send package
                     Console.WriteLine("FinishReadError1:\r\n" + ex);
                     log.Error("FinishReadError1:\r\n" + ex);
                 }
+                /*
                 Console.ForegroundColor = ConsoleColor.DarkGray;
                 Console.WriteLine("S############################################################################");
                 Console.WriteLine("Read:\r\n" + ouput2);
                 //Console.WriteLine("First node:[" + xml_root_tag + "]");
                 Console.WriteLine("E############################################################################");
                 Console.ResetColor();
-                
+                */
                 //xmlQueue.Enqueue(returndata);
                 xml_parse(returndata);
                 Thread.Sleep(60);
@@ -2500,6 +2511,7 @@ WHERE
                             ConfigurationManager.AppSettings["subConnectionLifetime"]);
         private static void access_avls_server(object o)
         {
+            Stopwatch stopWatch = Stopwatch.StartNew();
             lock(avlsObject)
                 avlsLinkedList.RemoveFirst();
             Console.ForegroundColor = ConsoleColor.DarkGreen;
@@ -2657,12 +2669,15 @@ ORDER BY
   public._gps_log._time DESC,public._gps_log._lat,
   public._gps_log._lon
 LIMIT 1";
-                        while (!avlsSqlClient.connect())
+                        //Console.WriteLine("+c");
+                        //while (!avlsSqlClient.connect())
                         {
-                            Thread.Sleep(30);
+                            //Thread.Sleep(30);
                         }
-                        
+                        //Console.WriteLine("-c");
+                        //Console.WriteLine("+d");
                         DataTable dt = avlsSqlClient.get_DataTable(avlsSqlCmd);
+                        //Console.WriteLine("-d");
                         //avlsSqlClient.disconnect();
                         //avlsSqlClient.Dispose();
 						//avlsSqlClient=null;
@@ -2737,6 +2752,8 @@ LIMIT 1";
                     Console.ForegroundColor = ConsoleColor.DarkGreen;
                     Console.WriteLine("-access_avls_server");
                     Console.ResetColor();
+                    stopWatch.Stop();
+                    SiAuto.Main.LogMessage("access_avls_server spend time(ms):" + stopWatch.ElapsedMilliseconds);
                     return;
                 }
                 else
@@ -2746,6 +2763,8 @@ LIMIT 1";
                     Console.ForegroundColor = ConsoleColor.DarkGreen;
                     Console.WriteLine("-access_avls_server");
                     Console.ResetColor();
+                    stopWatch.Stop();
+                    SiAuto.Main.LogMessage("access_avls_server spend time(ms):" + stopWatch.ElapsedMilliseconds);
                     return;
                 }
 
@@ -2765,6 +2784,8 @@ LIMIT 1";
                     Console.ForegroundColor = ConsoleColor.DarkGreen;
                     Console.WriteLine("-access_avls_server");
                     Console.ResetColor();
+                    stopWatch.Stop();
+                    SiAuto.Main.LogMessage("access_avls_server spend time(ms):" + stopWatch.ElapsedMilliseconds);
                     return;
                 }
                 if (htable.ContainsKey("result_code"))
@@ -2825,11 +2846,15 @@ ORDER BY
   public._gps_log._time DESC,public._gps_log._lat,
   public._gps_log._lon
 LIMIT 1";
-                        while (!avlsSqlClient.connect())
+                        //Console.WriteLine("+c1");
+                        //while (!avlsSqlClient.connect())
                         {
-                            Thread.Sleep(30);
+                            //Thread.Sleep(30);
                         }
+                        //Console.WriteLine("-c1");
+                        //Console.WriteLine("+d2");
                         DataTable dt = avlsSqlClient.get_DataTable(avlsSqlCmd);
+                        //Console.WriteLine("-d2");
                         //avlsSqlClient.disconnect();
                         //avlsSqlClient.Dispose();
 						//avlsSqlClient=null;
@@ -3145,6 +3170,8 @@ LIMIT 1";
             Console.ForegroundColor = ConsoleColor.DarkGreen;
             Console.WriteLine("-access_avls_server");
             Console.ResetColor();
+            stopWatch.Stop();
+            SiAuto.Main.LogMessage("access_avls_server spend time(ms):" + stopWatch.ElapsedMilliseconds);
         }
         static SqlClient GetGidAndFullnameFromP_prohibitedAndPatrol_locationFromSql_SqlClient = new SqlClient(
                 ConfigurationManager.AppSettings["SQL_SERVER_IP"],
@@ -3227,9 +3254,9 @@ now() <= end_time::timestamp ";
 
             log.Info(deviceID+":p_prohibited:sql cmd:" + Environment.NewLine + regSqlCmdForProhibitedTable);
             log.Info(deviceID + ":patrol_location:sql cmd:" + Environment.NewLine + regSqlCmdForLocationTable);
-            while (!GetGidAndFullnameFromP_prohibitedAndPatrol_locationFromSql_SqlClient.connect())
+            //while (!GetGidAndFullnameFromP_prohibitedAndPatrol_locationFromSql_SqlClient.connect())
             {
-                Thread.Sleep(30);
+                //Thread.Sleep(30);
             }
             DataTable dt = GetGidAndFullnameFromP_prohibitedAndPatrol_locationFromSql_SqlClient.get_DataTable(regSqlCmdForProhibitedTable);
             //sql_client.disconnect();
@@ -3849,9 +3876,9 @@ FROM
 WHERE
   custom.uns_deivce_power_status.uid = " + @"'" + deviceID+@"'";
 
-                    while (!accessSqlServerClient.connect())
+                    //while (!accessSqlServerClient.connect())
                     {
-                        Thread.Sleep(30);
+                        //Thread.Sleep(30);
                     }
                     DataTable dt1 = accessSqlServerClient.get_DataTable(sqlCmd1);
                     //sql_client.disconnect();
@@ -5203,9 +5230,9 @@ LIMIT 1";
             
             string sqlCmd = @"select stay_time from p_config";
 
-            while (!CheckIfStayOverTimeaccessDBlmap100Client.connect())
+            //while (!CheckIfStayOverTimeaccessDBlmap100Client.connect())
             {
-                Thread.Sleep(30);
+                //Thread.Sleep(30);
             }
             var dt2 = CheckIfStayOverTimeaccessDBlmap100Client.get_DataTable(sqlCmd);
             //CheckIfStayOverTimeaccessDBlmap100Client.disconnect();
@@ -5237,9 +5264,9 @@ public._gps_log._time >= now() - interval '"+stayTimeInMin+@" minute' AND
 public._gps_log._uid = '"+deviceID+@"'
 ";
             
-            while (!CheckIfStayOverTimeSql_client.connect())
+            //while (!CheckIfStayOverTimeSql_client.connect())
             {
-                Thread.Sleep(30);
+                //Thread.Sleep(30);
             }
             var dt3 = CheckIfStayOverTimeSql_client.get_DataTable(sqlCmd);
             //CheckIfStayOverTimeSql_client.disconnect();
