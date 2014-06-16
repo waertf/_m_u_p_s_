@@ -33,10 +33,13 @@ namespace PostgresqlTest
             sqlClient.connect();
             try
             {
-                for (int i = 0; i < 10000; i++)
+                while (true)
                 {
                     Thread sqlThread = new Thread(() => { sqlTest(); });
                     sqlThread.Start();
+                }
+                {
+                    
                     //Thread.Sleep(50);
                 }
             }

@@ -1,6 +1,8 @@
 ﻿
-Microsoft Visual Studio Solution File, Format Version 10.00
-# Visual Studio 2008
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2013
+VisualStudioVersion = 12.0.21005.1
+MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "server_syn_console", "server_syn_console\server_syn_console.csproj", "{83976383-3EEC-42F5-8993-AE3F63B18074}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsoleApplication1_client_threading", "ConsoleApplication1_client_threading\ConsoleApplication1_client_threading.csproj", "{341A80CF-4233-4406-9E5C-C01F15C4770C}"

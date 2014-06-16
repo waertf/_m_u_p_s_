@@ -25,6 +25,7 @@ using keeplive;
 using System.Net;
 using Gurock.SmartInspect;
 using Configuration = System.Configuration.Configuration;
+using System.Collections.Concurrent;
 
 namespace ConsoleApplication1_client_threading
 {
@@ -45,29 +46,7 @@ namespace ConsoleApplication1_client_threading
             return linenum;
         }
     }
-    public static class GeoCodeCalc
-    {
-        public const double EarthRadiusInMiles = 3956.0;
-        public const double EarthRadiusInKilometers = 6367.0;
-        public static double ToRadian(double val) { return val * (Math.PI / 180); }
-        public static double DiffRadian(double val1, double val2) { return ToRadian(val2) - ToRadian(val1); }
-        /// <summary> 
-        /// Calculate the distance between two geocodes. Defaults to using Miles. 
-        /// </summary> 
-        public static double CalcDistance(double lat1, double lng1, double lat2, double lng2)
-        {
-            return CalcDistance(lat1, lng1, lat2, lng2, GeoCodeCalcMeasurement.Miles);
-        }
-        /// <summary> 
-        /// Calculate the distance between two geocodes. 
-        /// </summary> 
-        public static double CalcDistance(double lat1, double lng1, double lat2, double lng2, GeoCodeCalcMeasurement m)
-        {
-            double radius = GeoCodeCalc.EarthRadiusInMiles;
-            if (m == GeoCodeCalcMeasurement.Kilometers) { radius = GeoCodeCalc.EarthRadiusInKilometers; }
-            return radius * 2 * Math.Asin(Math.Min(1, Math.Sqrt((Math.Pow(Math.Sin((DiffRadian(lat1, lat2)) / 2.0), 2.0) + Math.Cos(ToRadian(lat1)) * Math.Cos(ToRadian(lat2)) * Math.Pow(Math.Sin((DiffRadian(lng1, lng2)) / 2.0), 2.0)))));
-        }
-    }
+    
     public enum GeoCodeCalcMeasurement : int
     {
         Miles = 0,
@@ -323,9 +302,9 @@ WHERE
         private static object IsFirstExecuteLock = new object();
         private static uint deviceCount = 0;
         //static Queue xmlQueue = new Queue();
-        static LinkedList<AvlsClass> avlsLinkedList = new LinkedList<AvlsClass>();
-        static LinkedList<SqlClass> sqlLinkedList = new LinkedList<SqlClass>();
-        static object avlsObject = new object(),sqlObject = new object();
+        static ConcurrentQueue<AvlsClass> avlsLinkedList = new ConcurrentQueue<AvlsClass>();
+        static ConcurrentQueue<SqlClass> sqlLinkedList = new ConcurrentQueue<SqlClass>();
+        //static object avlsObject = new object(),sqlObject = new object();
         static Mutex _mutex = new Mutex(false, "unsClient.exe");
         static  string subMinPoolSize = ConfigurationManager.AppSettings["subMinPoolSize"];
         static  string subMaxPoolSize = ConfigurationManager.AppSettings["subMaxPoolSize"];
@@ -636,11 +615,12 @@ WHERE
                 {
                     //ThreadPool.QueueUserWorkItem(delegate
                         //{
-                    if (avlsLinkedList.Count()>0)
+                    AvlsClass a;
+                    if (avlsLinkedList.TryDequeue(out a))
                     {
                         
                         
-                            access_avls_server(avlsLinkedList.First());
+                            access_avls_server(a);
                         
                     }
                         //});
@@ -653,10 +633,11 @@ WHERE
                 {
                     //ThreadPool.QueueUserWorkItem(delegate
                         //{
-                            if (sqlLinkedList.Count()>0)
+                    SqlClass s;
+                    if (sqlLinkedList.TryDequeue(out s))
                             {
                                 
-                                    access_sql_server(sqlLinkedList.First());
+                                    access_sql_server(s);
                                 
                                 
                             }
@@ -2157,11 +2138,11 @@ Select 1-6 then press enter to send package
                                     sensor_type.ToList(), sensor_value.ToList(), elements,
                                     logData, getMessage));
                                 */
-                                lock(avlsObject){
-                                    avlsLinkedList.AddLast(new AvlsClass(xml_root_tag, htable, sensor_name.ToList(),
+                                //lock(avlsObject){
+                                    avlsLinkedList.Enqueue(new AvlsClass(xml_root_tag, htable, sensor_name.ToList(),
                                     sensor_type.ToList(), sensor_value.ToList(), elements,
                                     logData, getMessage));
-                                }
+                                //}
                                 
                                 //ThreadPool.QueueUserWorkItem(new WaitCallback(access_avls_server), new AvlsClass(xml_root_tag, htable, sensor_name.ToList(), sensor_type.ToList(), sensor_value.ToList(), XmlGetAllElementsXname(xml_data), logData, getMessage));
                                 //access_avls.Join();
@@ -2177,8 +2158,8 @@ Select 1-6 then press enter to send package
                                     sensor_type.ToList(), sensor_value.ToList(), elements,
                                     logData, getMessage));
                                 */
-                                lock(sqlObject)
-                                sqlLinkedList.AddLast(new SqlClass(xml_root_tag, htable, sensor_name.ToList(),
+                                //lock(sqlObject)
+                                sqlLinkedList.Enqueue(new SqlClass(xml_root_tag, htable, sensor_name.ToList(),
                                     sensor_type.ToList(), sensor_value.ToList(), elements,
                                     logData, getMessage));
                                 //ThreadPool.QueueUserWorkItem(new WaitCallback(access_sql_server), new SqlClass(xml_root_tag, htable, sensor_name.ToList(), sensor_type.ToList(), sensor_value.ToList(), XmlGetAllElementsXname(xml_data), logData, getMessage));
@@ -2293,8 +2274,8 @@ Select 1-6 then press enter to send package
                     {
                         //Thread access_sql = new Thread(access_sql_server);
                         //access_sql.Start(new SqlClass(xml_root_tag, htable, sensor_name.ToList(), sensor_type.ToList(), sensor_value.ToList(), elements, logData, null));
-                        lock(sqlObject)
-                            sqlLinkedList.AddLast(new SqlClass(xml_root_tag, htable, sensor_name.ToList(), sensor_type.ToList(), sensor_value.ToList(), elements, logData, null)); ;
+                        //lock(sqlObject)
+                            sqlLinkedList.Enqueue(new SqlClass(xml_root_tag, htable, sensor_name.ToList(), sensor_type.ToList(), sensor_value.ToList(), elements, logData, null)); ;
                         //ThreadPool.QueueUserWorkItem(new WaitCallback(access_sql_server), new SqlClass(xml_root_tag, htable, sensor_name.ToList(), sensor_type.ToList(), sensor_value.ToList(), XmlGetAllElementsXname(xml_data), logData, null));
                             
                         //access_sql.Join();
@@ -2524,10 +2505,10 @@ WHERE
         private static void access_avls_server(object o)
         {
             Stopwatch stopWatch = Stopwatch.StartNew();
-            lock (avlsObject)
+            //lock (avlsObject)
             {
-                if(avlsLinkedList.Count>0)
-                    avlsLinkedList.RemoveFirst();
+                //if(avlsLinkedList.Count>0)
+                    //avlsLinkedList.RemoveFirst();
             }
                 
             Console.ForegroundColor = ConsoleColor.DarkGreen;
@@ -3753,10 +3734,10 @@ FROM
             Stopwatch stopWatch = Stopwatch.StartNew();
 
             {
-                lock (sqlObject)
+                //lock (sqlObject)
                 {
-                    if(sqlLinkedList.Count>0)
-                        sqlLinkedList.RemoveFirst();
+                    //if(sqlLinkedList.Count>0)
+                        //sqlLinkedList.RemoveFirst();
                 }
                     
                 Console.ForegroundColor = ConsoleColor.DarkCyan;
@@ -5843,197 +5824,17 @@ public._gps_log._uid = '"+deviceID+@"'
      * private static void access_sql_server(string xml_root_tag, Hashtable htable, List<string> sensor_name,
             List<string> sensor_type, List<string> sensor_value, IEnumerable<XName> elements, string log1, string getMessage)
      */
-    public class SqlClass
-    {
-        public string XmlRootTag;
-        public Hashtable Htable;
-        public List<string> SensorName;
-        public List<string> SensorType;
-        public List<string> SensorValue;
-        public HashSet<XName> Elements;
-        public string Log1;
-        public string GetMessage;
-
-        public SqlClass(string xml_root_tag, Hashtable htable, List<string> sensor_name,
-            List<string> sensor_type, List<string> sensor_value, HashSet<XName> elements, string log1,
-            string getMessage)
-        {
-            XmlRootTag = xml_root_tag;
-            Htable = new Hashtable(htable);
-            SensorName = new List<string>(sensor_name);
-            SensorType = new List<string>(sensor_type);
-            SensorValue = new List<string>(sensor_value);
-            Elements = elements;
-            Log1 = log1;
-            GetMessage = getMessage;
-        }
-        ~SqlClass()
-        {
-            XmlRootTag = Log1 = GetMessage = string.Empty;
-            Htable.Clear();
-            SensorName.Clear();
-            SensorType.Clear();
-            SensorValue.Clear();
-            Htable = null;
-            SensorName = null;
-            SensorType = null;
-            SensorValue = null;
-            Elements = null;
-        }
-    }
+    
     /*
      * private static void access_avls_server(string xml_root_tag, Hashtable htable, List<string> sensor_name,
             List<string> sensor_type, List<string> sensor_value, IEnumerable<XName> iEnumerable, string log, 
             TcpClient avlsTcpClient, string getMessage)
      */
 
-    public class AvlsClass
-    {
-        public string XmlRootTag;
-        public Hashtable Htable;
-        public List<string> SensorName;
-        public List<string> SensorType;
-        public List<string> SensorValue;
-        public HashSet<XName> Elements;
-        public string Log;
-        public string GetMessage;
-
-        public AvlsClass(string xml_root_tag, Hashtable htable, List<string> sensor_name,
-            List<string> sensor_type, List<string> sensor_value, HashSet<XName> iEnumerable, string log,
-             string getMessage)
-        {
-            XmlRootTag = xml_root_tag;
-            Htable = new Hashtable(htable);
-            SensorName = new List<string>(sensor_name);
-            SensorType = new List<string>(sensor_type);
-            SensorValue = new List<string>(sensor_value);
-            Elements = iEnumerable;
-            Log = log;
-            GetMessage = getMessage;
-        }
-        ~AvlsClass()
-        {
-            XmlRootTag = Log = GetMessage = string.Empty;
-            Htable.Clear();
-            SensorName.Clear();
-            SensorType.Clear();
-            SensorValue.Clear();
-            Htable = null;
-            SensorName = null;
-            SensorType = null;
-            SensorValue = null;
-            Elements = null;
-        }
-    }
     
-    public class GeoAngle
-    {
-        public bool IsNegative { get; set; }
-        public int Degrees { get; set; }
-        public int Minutes { get; set; }
-        public int Seconds { get; set; }
-        public int Milliseconds { get; set; }
+    
+    
 
-
-
-        public static GeoAngle FromDouble(decimal angleInDegrees)
-        {
-            //ensure the value will fall within the primary range [-180.0..+180.0]
-            while (angleInDegrees < -180.0m)
-                angleInDegrees += 360.0m;
-
-            while (angleInDegrees > 180.0m)
-                angleInDegrees -= 360.0m;
-
-            var result = new GeoAngle();
-
-            //switch the value to positive
-            result.IsNegative = angleInDegrees < 0;
-            angleInDegrees = Math.Abs(angleInDegrees);
-
-            //gets the degree
-            result.Degrees = (int)Math.Floor(angleInDegrees);
-            var delta = angleInDegrees - result.Degrees;
-
-            //gets minutes and seconds
-            var seconds = (int)Math.Floor(3600.0m * delta);
-            result.Seconds = seconds % 60;
-            result.Minutes = (int)Math.Floor(seconds / 60.0);
-            delta = delta * 3600.0m - seconds;
-
-            //gets fractions
-            result.Milliseconds = (int)(1000.0m * delta);
-
-            return result;
-        }
-
-
-
-        public override string ToString()
-        {
-            var degrees = this.IsNegative
-                ? -this.Degrees
-                : this.Degrees;
-
-            return string.Format(
-                "{0}° {1:00}' {2:00}\"",
-                degrees,
-                this.Minutes,
-                this.Seconds);
-        }
-
-
-
-        public string ToString(string format)
-        {
-            switch (format)
-            {
-                case "NS":
-                    return string.Format(
-                        "{0}° {1:00}' {2:00}\".{3:000} {4}",
-                        this.Degrees,
-                        this.Minutes,
-                        this.Seconds,
-                        this.Milliseconds,
-                        this.IsNegative ? 'S' : 'N');
-
-                case "WE":
-                    return string.Format(
-                        "{0}° {1:00}' {2:00}\".{3:000} {4}",
-                        this.Degrees,
-                        this.Minutes,
-                        this.Seconds,
-                        this.Milliseconds,
-                        this.IsNegative ? 'W' : 'E');
-
-                default:
-                    throw new NotImplementedException();
-            }
-        }
-    }
-
-    public class EAB //exclusion_area_boundary
-    {
-        public string rid { get; set; }
-        public string the_geom { get; set; }
-
-        public EAB(string Rid, string Geom)
-        {
-            rid = Rid;
-            the_geom = Geom;
-        }
-    }
-    public class EAB2 //exclusion_area_boundary
-    {
-        public string table { get; set; }
-        public string gid { get; set; }
-        public string fullname { get; set; }
-
-        public EAB2(string Table,string Gid, string Fullname)
-        {
-            table = Table;
-            gid = Gid;
-            fullname = Fullname;
-        }
-    }
+    
+    
 }
