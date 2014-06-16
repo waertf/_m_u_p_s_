@@ -39,11 +39,12 @@ namespace ConsoleApplication1_client_threading
         }
         public bool connect()
         {
+            pgSqlConnection.Open();
+            IsConnected = true;
+            return true;
             try
             {
-                if (IsConnected)
-                    return true;
-                else
+                
                 {
                     if (pgSqlConnection != null)
                     {
@@ -94,6 +95,7 @@ namespace ConsoleApplication1_client_threading
         //For UPDATE, INSERT, and DELETE statements
         public void modify(string cmd)
         {
+            Stopwatch stopWatch = new Stopwatch();
             PgSqlCommand command = null;
             try
             {
@@ -132,8 +134,8 @@ namespace ConsoleApplication1_client_threading
                      //sync
                      //int aff = command.ExecuteNonQuery();
                     //Console.WriteLine(RowsAffected + " rows were affected.");
-                      
-                     
+                     command.Dispose();
+                    command = null;
                     //pgSqlConnection.Commit();
                     ThreadPool.QueueUserWorkItem(callback =>
                     {
@@ -148,7 +150,15 @@ namespace ConsoleApplication1_client_threading
                         Console.ResetColor();
                         log.Info("sql Write:\r\n" + cmd);
                     });
+                    stopWatch.Stop();
+                    // Get the elapsed time as a TimeSpan value.
+                    TimeSpan ts = stopWatch.Elapsed;
 
+                    // Format and display the TimeSpan value.
+                    string elapsedTime = String.Format("{0:00}:{1:00}:{2:00}.{3:00}",
+                        ts.Hours, ts.Minutes, ts.Seconds,
+                        ts.Milliseconds / 10);
+                    SiAuto.Main.AddCheckpoint(Level.Debug, "sql modify take time:" + elapsedTime, cmd);
 
                 }
 
@@ -160,6 +170,8 @@ namespace ConsoleApplication1_client_threading
                 log.Error("Modify exception occurs: " + Environment.NewLine + ex.Error + Environment.NewLine + cmd);
                 Console.ResetColor();
                 pgSqlConnection.Rollback();
+                command.Dispose();
+                command = null;
 
 
             }
@@ -193,9 +205,8 @@ namespace ConsoleApplication1_client_threading
         //For SELECT statements
         public DataTable get_DataTable(string cmd)
         {
-            Stopwatch stopWatch = new Stopwatch();
             PgSqlCommand command = null;
-            stopWatch.Start();
+            
             using (DataTable datatable = new DataTable())
             {
                 try
@@ -227,16 +238,38 @@ namespace ConsoleApplication1_client_threading
                         {
                             lock (accessLock)
                             {
-                                IAsyncResult cres = command.BeginExecuteReader();
-                                myReader = command.EndExecuteReader(cres);
 
+                                Stopwatch stopWatch = new Stopwatch();
+                                stopWatch.Start();
+                                //IAsyncResult cres = command.BeginExecuteReader();
+                                //myReader = command.EndExecuteReader(cres);
+                                myReader = command.ExecuteReader();
+                                //stopWatch.Stop();
+                                // Get the elapsed time as a TimeSpan value.
+                                TimeSpan ts = stopWatch.Elapsed;
+
+                                // Format and display the TimeSpan value.
+                                string elapsedTime = String.Format("{0:00}:{1:00}:{2:00}.{3:00}",
+                                    ts.Hours, ts.Minutes, ts.Seconds,
+                                    ts.Milliseconds / 10);
+                                SiAuto.Main.AddCheckpoint(Level.Debug, "sql query1 take time:" + elapsedTime, cmd);
                                 // printing the column names
+                                stopWatch.Reset();
+                                stopWatch.Start();
                                 for (int i = 0; i < myReader.FieldCount; i++)
                                 {
                                     //Console.Write(myReader.GetName(i).ToString() + "\t");
                                     datatable.Columns.Add(myReader.GetName(i).ToString(), typeof (string));
                                 }
+                                //stopWatch.Stop();
+                                ts = stopWatch.Elapsed;
+                                elapsedTime = String.Format("{0:00}:{1:00}:{2:00}.{3:00}",
+                                    ts.Hours, ts.Minutes, ts.Seconds,
+                                    ts.Milliseconds / 10);
+                                SiAuto.Main.AddCheckpoint(Level.Debug, "sql query2 take time:" + elapsedTime, cmd);
                                 //Console.Write(Environment.NewLine);
+                                stopWatch.Reset();
+                                stopWatch.Start();
                                 while (myReader.Read())
                                 {
                                     DataRow dr = datatable.NewRow();
@@ -251,20 +284,19 @@ namespace ConsoleApplication1_client_threading
                                     //Console.WriteLine(myReader.GetInt32(0) + "\t" + myReader.GetString(1) + "\t");
                                 }
                                 myReader.Close();
+                                stopWatch.Stop();
+                                ts = stopWatch.Elapsed;
+                                elapsedTime = String.Format("{0:00}:{1:00}:{2:00}.{3:00}",
+                                    ts.Hours, ts.Minutes, ts.Seconds,
+                                    ts.Milliseconds / 10);
+                                SiAuto.Main.AddCheckpoint(Level.Debug, "sql query3 take time:" + elapsedTime, cmd);
+                                //myReader.Dispose();
                             }
                         }
                         finally
                         {
                             
-                            stopWatch.Stop();
-                            // Get the elapsed time as a TimeSpan value.
-                            TimeSpan ts = stopWatch.Elapsed;
-
-                            // Format and display the TimeSpan value.
-                            string elapsedTime = String.Format("{0:00}:{1:00}:{2:00}.{3:00}",
-                                ts.Hours, ts.Minutes, ts.Seconds,
-                                ts.Milliseconds / 10);
-                            SiAuto.Main.AddCheckpoint(Level.Debug, "sql query take time:" + elapsedTime, cmd);
+                            
                         }
                         /*
                         foreach (DataRow row in datatable.Rows) // Loop over the rows.
