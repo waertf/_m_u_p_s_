@@ -3045,21 +3045,27 @@ LIMIT 1";
                         SiAuto.Main.LogMessage(send_string);
                     }
 
-                    send_string = "%%" + avls_package.ID + avls_package.GPS_Valid + now + avls_package.Loc + avls_package.Speed + avls_package.Dir + avls_package.Temp + avls_package.Status + "0,";
-                    getMessage = CheckIfStayOverTime(initialLat, initialLon, deviceID);
-                    if (!string.IsNullOrEmpty(getMessage))
-                    {
-                        switch (getMessage)
-                        {
-                            case "in": //stay over time
-                                send_string += @";stay_over_specific_time" + "\r\n";
-                                avlsSendPackage = send_string;
-                                avls_WriteLine(avlsNetworkStream, System.Text.Encoding.UTF8.GetBytes(send_string), send_string);
-                                SiAuto.Main.LogMessage(send_string);
-                                break;
-                        }
+                    System.Threading.Thread t1 = new System.Threading.Thread
+      (delegate()
+      {
+          send_string = "%%" + avls_package.ID + avls_package.GPS_Valid + now + avls_package.Loc + avls_package.Speed + avls_package.Dir + avls_package.Temp + avls_package.Status + "0,";
+          getMessage = CheckIfStayOverTime(initialLat, initialLon, deviceID);
+          if (!string.IsNullOrEmpty(getMessage))
+          {
+              switch (getMessage)
+              {
+                  case "in": //stay over time
+                      send_string += @";stay_over_specific_time" + "\r\n";
+                      avlsSendPackage = send_string;
+                      avls_WriteLine(avlsNetworkStream, System.Text.Encoding.UTF8.GetBytes(send_string), send_string);
+                      SiAuto.Main.LogMessage(send_string);
+                      break;
+              }
 
-                    }
+          }
+      });
+                    t1.Start();
+                    
                 }
                 #endregion  send specific msg
             }
