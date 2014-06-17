@@ -2185,6 +2185,7 @@ Select 1-6 then press enter to send package
                                 
                                 //avlsSendDone.Reset();
                                  access_avls = new Thread(access_avls_server);
+                                access_avls.IsBackground = true;
                                 //access_avls.Priority = ThreadPriority.BelowNormal;
                                 access_avls.Start(new AvlsClass(xml_root_tag, htable, null,
                                     null, null, elements,
@@ -2212,6 +2213,7 @@ Select 1-6 then press enter to send package
                                 
                                 //sqlAccessEvent.Reset();
                                  access_sql = new Thread(access_sql_server);
+                                access_sql.IsBackground = true;
                                 access_sql.Start(new SqlClass(xml_root_tag, htable, null, null, null, elements,
                                     logData, getMessage));
                                 
