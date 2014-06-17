@@ -66,7 +66,6 @@ namespace ConsoleApplication1_client_threading
         private volatile static TcpClient unsTcpClient, avlsTcpClient;
         private volatile static NetworkStream avlsNetworkStream, unsNetworkStream;
 
-        [ThreadStatic]
         private static string avlsSendPackage;
 
         private volatile static byte[] unsSendPackage = null;
@@ -610,7 +609,7 @@ WHERE
             xmlParseTimer.Enabled = true;
             */
             {
-                var avlsTimer = new System.Timers.Timer(10);
+                var avlsTimer = new System.Timers.Timer(5);
                 avlsTimer.Elapsed += (sender, e) =>
                 {
                     //ThreadPool.QueueUserWorkItem(delegate
@@ -623,9 +622,10 @@ WHERE
                             access_avls_server(a);
                         
                     }
-                        //});
+                    a = null;
+                    //});
                 };
-                avlsTimer.Enabled = true;
+                //avlsTimer.Enabled = true;
             }
             {
                 var sqlTimer = new System.Timers.Timer(10);
@@ -641,9 +641,45 @@ WHERE
                                 
                                 
                             }
-                        //});
+                    s = null;
+                    //});
                 };
-                sqlTimer.Enabled = true;
+                //sqlTimer.Enabled = true;
+            }
+            while (false)
+            {
+
+                System.Threading.Thread t1 = new System.Threading.Thread
+                  (delegate()
+                  {
+                      AvlsClass a;
+                      if (avlsLinkedList.TryDequeue(out a))
+                      {
+
+
+                          access_avls_server(a);
+
+                      }
+                      a = null;
+                  });
+                System.Threading.Thread t2 = new System.Threading.Thread
+                  (delegate()
+                  {
+                      SqlClass s;
+                      if (sqlLinkedList.TryDequeue(out s))
+                      {
+
+                          access_sql_server(s);
+
+
+                      }
+                      s = null;
+                  });
+                t1.Start();
+                t2.Start();
+                t1.Join();
+                t2.Join();
+                //Thread.Sleep(30);
             }
             /*
             {
@@ -1772,7 +1808,7 @@ Select 1-6 then press enter to send package
                 */
                 //xmlQueue.Enqueue(returndata);
                 xml_parse(returndata);
-                Thread.Sleep(200);
+                //Thread.Sleep(200);
 				//Thread xmlParseThread = new Thread(xml_parse);
                 //xmlParseThread.Start(returndata);
                 //xmlParseThread.Join(int.Parse(ConfigurationManager.AppSettings["xmlParseJoinTimeout"]));
@@ -1945,7 +1981,9 @@ Select 1-6 then press enter to send package
             Stopwatch stopWatch = Stopwatch.StartNew();
             TcpClient tcpClient = unsTcpClient;
             string returndata = o as string;
-            XDocument xml_data = XDocument.Parse(returndata);
+            XDocument xml_data = null;
+            xml_data = XDocument.Parse(returndata);
+            returndata = null;
             string xml_root_tag = xml_data.Root.Name.ToString();
             string logData = xml_data.ToString();
             //using (StreamWriter w = File.AppendText("log.txt"))
@@ -1954,12 +1992,14 @@ Select 1-6 then press enter to send package
                 // Close the writer and underlying file.
                 //w.Close();
             }
-            Hashtable htable = new Hashtable();
+            Hashtable htable = null;
+            htable = new Hashtable();
             //List<string> sensor_name = new List<string>();
             //List<string> sensor_value = new List<string>();
             //List<string> sensor_type = new List<string>();
             SiAuto.Main.LogText(Level.Debug, xml_root_tag+"reveive time:"+DateTime.UtcNow.ToString("g"), xml_data.ToString());
-            HashSet<XName> elements = XmlGetAllElementsXname(xml_data);
+            HashSet<XName> elements = null;
+            elements = XmlGetAllElementsXname(xml_data);
             switch (xml_root_tag)
             {
                 case "Triggered-Location-Report":
@@ -1975,8 +2015,15 @@ Select 1-6 then press enter to send package
                         {
                             string id = string.Empty;
                             id = XmlGetTagValue(xml_data, "suaddr");
-                            if(id.Equals(string.Empty))
+                            if (id.Equals(string.Empty))
+                            {
+                                htable = null;
+                                xml_data = null;
+                                elements = null;
+                                xml_root_tag = null;
+                                logData = null;
                                 return;
+                            }
                             else
                             {
                                 htable.Add("suaddr", id);
@@ -1988,6 +2035,11 @@ Select 1-6 then press enter to send package
                             {}
                             else
                             {
+                                htable = null;
+                                xml_data = null;
+                                elements = null;
+                                xml_root_tag = null;
+                                logData = null;
                                 return;
                             }
                         }
@@ -2130,21 +2182,24 @@ Select 1-6 then press enter to send package
                             Thread access_sql = null, access_avls = null;
                             if (bool.Parse(ConfigurationManager.AppSettings["AVLS_ACCESS"]))
                             {
-                                /*
+                                
                                 //avlsSendDone.Reset();
                                  access_avls = new Thread(access_avls_server);
                                 //access_avls.Priority = ThreadPriority.BelowNormal;
-                                access_avls.Start(new AvlsClass(xml_root_tag, htable, sensor_name.ToList(),
-                                    sensor_type.ToList(), sensor_value.ToList(), elements,
+                                access_avls.Start(new AvlsClass(xml_root_tag, htable, null,
+                                    null, null, elements,
                                     logData, getMessage));
-                                */
+                                
                                 //lock(avlsObject){
                                     //avlsLinkedList.Enqueue(new AvlsClass(xml_root_tag, htable, sensor_name.ToList(),
                                     //sensor_type.ToList(), sensor_value.ToList(), elements,
                                     //logData, getMessage));
-                                avlsLinkedList.Enqueue(new AvlsClass(xml_root_tag, htable, null,
-                                    null, null, elements,
-                                    logData, getMessage));
+                                //avlsLinkedList.Enqueue(new AvlsClass(xml_root_tag, htable, null,
+                                    //null, null, elements,
+                                    //logData, getMessage));
+                                //access_avls_server(new AvlsClass(xml_root_tag, htable, null,
+                                    //null, null, elements,
+                                    //logData, getMessage));
                                 //}
                                 
                                 //ThreadPool.QueueUserWorkItem(new WaitCallback(access_avls_server), new AvlsClass(xml_root_tag, htable, sensor_name.ToList(), sensor_type.ToList(), sensor_value.ToList(), XmlGetAllElementsXname(xml_data), logData, getMessage));
@@ -2154,26 +2209,28 @@ Select 1-6 then press enter to send package
                             }
                             if (bool.Parse(ConfigurationManager.AppSettings["SQL_ACCESS"]))
                             {
-                                /*
+                                
                                 //sqlAccessEvent.Reset();
                                  access_sql = new Thread(access_sql_server);
-                                access_sql.Start(new SqlClass(xml_root_tag, htable, sensor_name.ToList(),
-                                    sensor_type.ToList(), sensor_value.ToList(), elements,
+                                access_sql.Start(new SqlClass(xml_root_tag, htable, null, null, null, elements,
                                     logData, getMessage));
-                                */
+                                
                                 //lock(sqlObject)
                                 //sqlLinkedList.Enqueue(new SqlClass(xml_root_tag, htable, sensor_name.ToList(),
                                     //sensor_type.ToList(), sensor_value.ToList(), elements,
                                     //logData, getMessage));
-                                sqlLinkedList.Enqueue(new SqlClass(xml_root_tag, htable, null,null,null, elements,
-                                    logData, getMessage));
+                                //sqlLinkedList.Enqueue(new SqlClass(xml_root_tag, htable, null,null,null, elements,
+                                    //logData, getMessage));
+                                //access_sql_server(new SqlClass(xml_root_tag, htable, null, null, null, elements,
+                                    //logData, getMessage));
                                 //ThreadPool.QueueUserWorkItem(new WaitCallback(access_sql_server), new SqlClass(xml_root_tag, htable, sensor_name.ToList(), sensor_type.ToList(), sensor_value.ToList(), XmlGetAllElementsXname(xml_data), logData, getMessage));
                                 //access_sql.Join();
                                 //Console.WriteLine("SQL Access Enable");
                                 //sqlAccessEvent.WaitOne();
                             }
+                            access_avls.Join();
+                            access_sql.Join();
 
-                            
                             //if (access_sql != null) access_sql.Join(int.Parse(ConfigurationManager.AppSettings["accessSqlJoinTimeout"]));
                             //access_avls.Join();
                             //Thread.Sleep(1);
@@ -2277,15 +2334,16 @@ Select 1-6 then press enter to send package
                     
                     if (bool.Parse(ConfigurationManager.AppSettings["SQL_ACCESS"]))
                     {
-                        //Thread access_sql = new Thread(access_sql_server);
-                        //access_sql.Start(new SqlClass(xml_root_tag, htable, sensor_name.ToList(), sensor_type.ToList(), sensor_value.ToList(), elements, logData, null));
+                        Thread access_sql = new Thread(access_sql_server);
+                        access_sql.Start(new SqlClass(xml_root_tag, htable, null, null, null, elements, logData, null)); ;
                         //lock(sqlObject)
                             //sqlLinkedList.Enqueue(new SqlClass(xml_root_tag, htable, sensor_name.ToList(), sensor_type.ToList(), sensor_value.ToList(), elements, logData, null)); ;
-                        sqlLinkedList.Enqueue(new SqlClass(xml_root_tag, htable, null,null,null, elements, logData, null)); ;
+                        //sqlLinkedList.Enqueue(new SqlClass(xml_root_tag, htable, null,null,null, elements, logData, null)); ;
+                        //access_sql_server(new SqlClass(xml_root_tag, htable, null, null, null, elements, logData, null)); ;
                         
                         //ThreadPool.QueueUserWorkItem(new WaitCallback(access_sql_server), new SqlClass(xml_root_tag, htable, sensor_name.ToList(), sensor_type.ToList(), sensor_value.ToList(), XmlGetAllElementsXname(xml_data), logData, null));
                             
-                        //access_sql.Join();
+                        access_sql.Join();
                     }
                     break;
                 case "Immediate-Location-Answer":
@@ -2301,7 +2359,14 @@ Select 1-6 then press enter to send package
                             string id = string.Empty;
                             id = XmlGetTagValue(xml_data, "suaddr");
                             if (id.Equals(string.Empty))
+                            {
+                                htable = null;
+                                xml_data = null;
+                                elements = null;
+                                xml_root_tag = null;
+                                logData = null;
                                 return;
+                            }
                             else
                             {
                                 htable.Add("suaddr", id);
@@ -2313,6 +2378,11 @@ Select 1-6 then press enter to send package
                             { }
                             else
                             {
+                                htable = null;
+                                xml_data = null;
+                                elements = null;
+                                xml_root_tag = null;
+                                logData = null;
                                 return;
                             }
                         }
@@ -2349,7 +2419,14 @@ Select 1-6 then press enter to send package
                             string id = string.Empty;
                             id = XmlGetTagValue(xml_data, "suaddr");
                             if (id.Equals(string.Empty))
+                            {
+                                htable = null;
+                                xml_data = null;
+                                elements = null;
+                                xml_root_tag = null;
+                                logData = null;
                                 return;
+                            }
                             else
                             {
                                 htable.Add("suaddr", id);
@@ -2359,6 +2436,11 @@ Select 1-6 then press enter to send package
                             { }
                             else
                             {
+                                htable = null;
+                                xml_data = null;
+                                elements = null;
+                                xml_root_tag = null;
+                                logData = null;
                                 return;
                             }
                         }
@@ -2393,8 +2475,11 @@ Select 1-6 then press enter to send package
                 //w.Close();
             }
             */
-            htable.Clear();
             htable = null;
+            xml_data = null;
+            elements = null;
+            xml_root_tag = null;
+            logData = null;
             //sensor_name.Clear();
             //sensor_name = null;
             //sensor_value.Clear();
@@ -3052,9 +3137,9 @@ LIMIT 1";
                         SiAuto.Main.LogMessage(send_string);
                     }
 
-                    System.Threading.Thread t1 = new System.Threading.Thread
-      (delegate()
-      {
+                    //System.Threading.Thread t1 = new System.Threading.Thread
+      //(delegate()
+      //{
           send_string = "%%" + avls_package.ID + avls_package.GPS_Valid + now + avls_package.Loc + avls_package.Speed + avls_package.Dir + avls_package.Temp + avls_package.Status + "0,";
           getMessage = CheckIfStayOverTime(initialLat, initialLon, deviceID);
           if (!string.IsNullOrEmpty(getMessage))
@@ -3070,8 +3155,9 @@ LIMIT 1";
               }
 
           }
-      });
-                    t1.Start();
+          send_string = getMessage = null;
+      //});
+                    //t1.Start();
                     
                 }
                 #endregion  send specific msg
@@ -5240,9 +5326,9 @@ LIMIT 1";
                 }
             });
                 */
-            System.Threading.Thread t1 = new System.Threading.Thread
-  (delegate()
-  {
+            //System.Threading.Thread t1 = new System.Threading.Thread
+  //(delegate()
+  //{
       //lock (cgaEventAccessSqlLock)
       {
           #region checkIfOverTime
@@ -5357,8 +5443,9 @@ LIMIT 1";
           }
           #endregion #region insert into custom.cga_event_log
       }
-  });
-            t1.Start();
+      getMessage = bundaryEventNumber = cgaEventLogIdCount = xml_root_tag=null;
+  //});
+            //t1.Start();
                 
             
             htable.Clear();
@@ -5408,10 +5495,25 @@ LIMIT 1";
             {
                 //Thread.Sleep(30);
             }
-            var dt2 = CheckIfStayOverTimeaccessDBlmap100Client2.get_DataTable(sqlCmd);
+            using (DataTable dt2 = CheckIfStayOverTimeaccessDBlmap100Client2.get_DataTable(sqlCmd))
+            {
+                if (dt2 != null && dt2.Rows.Count != 0)
+                {
+                    foreach (DataRow row in dt2.Rows)
+                    {
+                        stayTimeInMin = row[0].ToString();
+                    }
+                }
+                else
+                {
+                    stayTimeInMin = "0";
+                }
+            }
+            //DataTable dt2 = CheckIfStayOverTimeaccessDBlmap100Client2.get_DataTable(sqlCmd);
             //CheckIfStayOverTimeaccessDBlmap100Client.disconnect();
             //CheckIfStayOverTimeaccessDBlmap100Client.Dispose();
             //CheckIfStayOverTimeaccessDBlmap100Client = null;
+            /*
             if (dt2 != null && dt2.Rows.Count != 0)
             {
                 foreach (DataRow row in dt2.Rows)
@@ -5426,7 +5528,7 @@ LIMIT 1";
             dt2.Clear();
             dt2.Dispose();
             dt2 = null;
-
+            */
             sqlCmd = @"SELECT
 public._gps_log._lat,
 public._gps_log._lon
@@ -5442,10 +5544,60 @@ public._gps_log._uid = '" + deviceID + @"'
             {
                 //Thread.Sleep(30);
             }
-            var dt3 = CheckIfStayOverTimeSql_client2.get_DataTable(sqlCmd);
+            using (DataTable dt3 = CheckIfStayOverTimeSql_client2.get_DataTable(sqlCmd))
+            {
+                if (dt3 != null && dt3.Rows.Count != 0)
+                {
+                    foreach (DataRow row in dt3.Rows)
+                    {
+                        double d = GeoCodeCalc.CalcDistance(double.Parse(lat), double.Parse(lon), double.Parse(row[0].ToString()),
+                            double.Parse(row[1].ToString()), GeoCodeCalcMeasurement.Kilometers);
+                        if (d <= distanceLimit)
+                            resultList.Add("in");
+                        else
+                        {
+                            resultList.Add("out");
+                        }
+                        Thread.Sleep(30);
+                    }
+                    resultList.Sort();
+                    int index = resultList.BinarySearch("out");
+                    resultList.Clear();
+                    resultList = null;
+                    if (index < 0)
+                    {
+                        string result = string.Empty;
+                        result = "in";
+
+                        //GC.Collect();
+                        //GC.WaitForPendingFinalizers();
+                        
+                        return result;
+                    }
+                    else
+                    {
+                        string result = string.Empty;
+                        result = "out";
+                        //GC.Collect();
+                        //GC.WaitForPendingFinalizers();
+                        
+                        return result;
+                    }
+                }
+                else
+                {
+
+                    //GC.Collect();
+                    //GC.WaitForPendingFinalizers();
+                    
+                    return string.Empty;
+                }
+            }
+            //DataTable dt3 = CheckIfStayOverTimeSql_client2.get_DataTable(sqlCmd);
             //CheckIfStayOverTimeSql_client.disconnect();
             //CheckIfStayOverTimeSql_client.Dispose();
             //CheckIfStayOverTimeSql_client = null;
+            /*
             if (dt3 != null && dt3.Rows.Count != 0)
             {
                 foreach (DataRow row in dt3.Rows)
@@ -5498,6 +5650,7 @@ public._gps_log._uid = '" + deviceID + @"'
                 dt3 = null;
                 return string.Empty;
             }
+            */
         }
         static SqlClient CheckIfStayOverTimeaccessDBlmap100Client = new SqlClient(
                 ConfigurationManager.AppSettings["SQL_SERVER_IP"],
@@ -5531,10 +5684,25 @@ public._gps_log._uid = '" + deviceID + @"'
             {
                 //Thread.Sleep(30);
             }
-            var dt2 = CheckIfStayOverTimeaccessDBlmap100Client.get_DataTable(sqlCmd);
+            using (DataTable dt2 = CheckIfStayOverTimeaccessDBlmap100Client.get_DataTable(sqlCmd))
+            {
+                if (dt2 != null && dt2.Rows.Count != 0)
+                {
+                    foreach (DataRow row in dt2.Rows)
+                    {
+                        stayTimeInMin = row[0].ToString();
+                    }
+                }
+                else
+                {
+                    stayTimeInMin = "0";
+                }
+            }
+            //DataTable dt2 = CheckIfStayOverTimeaccessDBlmap100Client.get_DataTable(sqlCmd);
             //CheckIfStayOverTimeaccessDBlmap100Client.disconnect();
             //CheckIfStayOverTimeaccessDBlmap100Client.Dispose();
             //CheckIfStayOverTimeaccessDBlmap100Client = null;
+            /*
             if (dt2 != null && dt2.Rows.Count != 0)
             {
                 foreach (DataRow row in dt2.Rows)
@@ -5546,9 +5714,7 @@ public._gps_log._uid = '" + deviceID + @"'
             {
                 stayTimeInMin = "0";
             }
-            dt2.Clear();
-			dt2.Dispose();
-			dt2=null;
+            */
             
             sqlCmd = @"SELECT
 public._gps_log._lat,
@@ -5565,10 +5731,60 @@ public._gps_log._uid = '"+deviceID+@"'
             {
                 //Thread.Sleep(30);
             }
-            var dt3 = CheckIfStayOverTimeSql_client.get_DataTable(sqlCmd);
+            using (DataTable dt3 = CheckIfStayOverTimeSql_client.get_DataTable(sqlCmd))
+            {
+                if (dt3 != null && dt3.Rows.Count != 0)
+                {
+                    foreach (DataRow row in dt3.Rows)
+                    {
+                        double d = GeoCodeCalc.CalcDistance(double.Parse(lat), double.Parse(lon), double.Parse(row[0].ToString()),
+                            double.Parse(row[1].ToString()), GeoCodeCalcMeasurement.Kilometers);
+                        if (d <= distanceLimit)
+                            resultList.Add("in");
+                        else
+                        {
+                            resultList.Add("out");
+                        }
+                        Thread.Sleep(30);
+                    }
+                    resultList.Sort();
+                    int index = resultList.BinarySearch("out");
+                    resultList.Clear();
+                    resultList = null;
+                    if (index < 0)
+                    {
+                        string result = string.Empty;
+                        result = "in";
+
+                        //GC.Collect();
+                        //GC.WaitForPendingFinalizers();
+                        
+                        return result;
+                    }
+                    else
+                    {
+                        string result = string.Empty;
+                        result = "out";
+                        //GC.Collect();
+                        //GC.WaitForPendingFinalizers();
+                        
+                        return result;
+                    }
+                }
+                else
+                {
+
+                    //GC.Collect();
+                    //GC.WaitForPendingFinalizers();
+                    
+                    return string.Empty;
+                }
+            }
+            //DataTable dt3 = CheckIfStayOverTimeSql_client.get_DataTable(sqlCmd);
             //CheckIfStayOverTimeSql_client.disconnect();
 			//CheckIfStayOverTimeSql_client.Dispose();
                     //CheckIfStayOverTimeSql_client = null;
+            /*
             if (dt3 != null && dt3.Rows.Count != 0)
             {
                 foreach (DataRow row in dt3.Rows)
@@ -5621,6 +5837,7 @@ public._gps_log._uid = '"+deviceID+@"'
 				dt3=null;
                 return string.Empty;
             }
+            */
         }
         /*
              * <result result-code="A">SYNTAX ERROR</result>
