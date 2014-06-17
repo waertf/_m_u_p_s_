@@ -24,20 +24,16 @@ namespace ConsoleApplication1_client_threading
         {
             XmlRootTag = xml_root_tag;
             Htable = new Hashtable(htable);
-            SensorName = new List<string>(sensor_name);
-            SensorType = new List<string>(sensor_type);
-            SensorValue = new List<string>(sensor_value);
+            //SensorName = new List<string>(sensor_name);
+            //SensorType = new List<string>(sensor_type);
+            //SensorValue = new List<string>(sensor_value);
             Elements = elements;
             Log1 = log1;
             GetMessage = getMessage;
         }
         ~SqlClass()
         {
-            XmlRootTag = Log1 = GetMessage = string.Empty;
-            Htable.Clear();
-            SensorName.Clear();
-            SensorType.Clear();
-            SensorValue.Clear();
+            XmlRootTag = Log1 = GetMessage = null;
             Htable = null;
             SensorName = null;
             SensorType = null;
