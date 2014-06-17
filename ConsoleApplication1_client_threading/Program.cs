@@ -1955,9 +1955,9 @@ Select 1-6 then press enter to send package
                 //w.Close();
             }
             Hashtable htable = new Hashtable();
-            List<string> sensor_name = new List<string>();
-            List<string> sensor_value = new List<string>();
-            List<string> sensor_type = new List<string>();
+            //List<string> sensor_name = new List<string>();
+            //List<string> sensor_value = new List<string>();
+            //List<string> sensor_type = new List<string>();
             SiAuto.Main.LogText(Level.Debug, xml_root_tag+"reveive time:"+DateTime.UtcNow.ToString("g"), xml_data.ToString());
             HashSet<XName> elements = XmlGetAllElementsXname(xml_data);
             switch (xml_root_tag)
@@ -2078,12 +2078,12 @@ Select 1-6 then press enter to send package
                                     }
                                     break;
                             }
-                            if (elements.Contains(new XElement("sensor-info").Name))//Sensor Info
+                            if (elements.Contains(new XElement("sensor-info").Name) && false)//Sensor Info
                             {
                                 IEnumerable<XElement> de = from el in xml_data.Descendants("sensor") select el;
-                                sensor_name = (from e in de.Descendants("sensor-name") select (string)e).Cast<string>().ToList();
-                                sensor_value = (from e in de.Descendants("sensor-value") select (string)e).Cast<string>().ToList();
-                                sensor_type = (from e in de.Descendants("sensor-type") select (string)e).Cast<string>().ToList();
+                                //sensor_name = (from e in de.Descendants("sensor-name") select (string)e).Cast<string>().ToList();
+                                //sensor_value = (from e in de.Descendants("sensor-value") select (string)e).Cast<string>().ToList();
+                                //sensor_type = (from e in de.Descendants("sensor-type") select (string)e).Cast<string>().ToList();
                                 int i = 0;
                                 /*
                                 foreach (string e in sensor_name)
@@ -2139,8 +2139,11 @@ Select 1-6 then press enter to send package
                                     logData, getMessage));
                                 */
                                 //lock(avlsObject){
-                                    avlsLinkedList.Enqueue(new AvlsClass(xml_root_tag, htable, sensor_name.ToList(),
-                                    sensor_type.ToList(), sensor_value.ToList(), elements,
+                                    //avlsLinkedList.Enqueue(new AvlsClass(xml_root_tag, htable, sensor_name.ToList(),
+                                    //sensor_type.ToList(), sensor_value.ToList(), elements,
+                                    //logData, getMessage));
+                                avlsLinkedList.Enqueue(new AvlsClass(xml_root_tag, htable, null,
+                                    null, null, elements,
                                     logData, getMessage));
                                 //}
                                 
@@ -2159,8 +2162,10 @@ Select 1-6 then press enter to send package
                                     logData, getMessage));
                                 */
                                 //lock(sqlObject)
-                                sqlLinkedList.Enqueue(new SqlClass(xml_root_tag, htable, sensor_name.ToList(),
-                                    sensor_type.ToList(), sensor_value.ToList(), elements,
+                                //sqlLinkedList.Enqueue(new SqlClass(xml_root_tag, htable, sensor_name.ToList(),
+                                    //sensor_type.ToList(), sensor_value.ToList(), elements,
+                                    //logData, getMessage));
+                                sqlLinkedList.Enqueue(new SqlClass(xml_root_tag, htable, null,null,null, elements,
                                     logData, getMessage));
                                 //ThreadPool.QueueUserWorkItem(new WaitCallback(access_sql_server), new SqlClass(xml_root_tag, htable, sensor_name.ToList(), sensor_type.ToList(), sensor_value.ToList(), XmlGetAllElementsXname(xml_data), logData, getMessage));
                                 //access_sql.Join();
@@ -2275,7 +2280,9 @@ Select 1-6 then press enter to send package
                         //Thread access_sql = new Thread(access_sql_server);
                         //access_sql.Start(new SqlClass(xml_root_tag, htable, sensor_name.ToList(), sensor_type.ToList(), sensor_value.ToList(), elements, logData, null));
                         //lock(sqlObject)
-                            sqlLinkedList.Enqueue(new SqlClass(xml_root_tag, htable, sensor_name.ToList(), sensor_type.ToList(), sensor_value.ToList(), elements, logData, null)); ;
+                            //sqlLinkedList.Enqueue(new SqlClass(xml_root_tag, htable, sensor_name.ToList(), sensor_type.ToList(), sensor_value.ToList(), elements, logData, null)); ;
+                        sqlLinkedList.Enqueue(new SqlClass(xml_root_tag, htable, null,null,null, elements, logData, null)); ;
+                        
                         //ThreadPool.QueueUserWorkItem(new WaitCallback(access_sql_server), new SqlClass(xml_root_tag, htable, sensor_name.ToList(), sensor_type.ToList(), sensor_value.ToList(), XmlGetAllElementsXname(xml_data), logData, null));
                             
                         //access_sql.Join();
@@ -2388,12 +2395,12 @@ Select 1-6 then press enter to send package
             */
             htable.Clear();
             htable = null;
-            sensor_name.Clear();
-            sensor_name = null;
-            sensor_value.Clear();
-            sensor_value = null;
-            sensor_type.Clear();
-            sensor_type = null;
+            //sensor_name.Clear();
+            //sensor_name = null;
+            //sensor_value.Clear();
+            //sensor_value = null;
+            //sensor_type.Clear();
+            //sensor_type = null;
             //GC.Collect();
             //GC.WaitForPendingFinalizers();
             
