@@ -265,24 +265,24 @@ WHERE
             }
 
 
-            DataTable dt = CheckIfUidExistSqlClient.get_DataTable(sqlCmd);
+            //DataTable dt = CheckIfUidExistSqlClient.get_DataTable(sqlCmd);
             //CheckIfUidExistSqlClient.disconnect();
             //CheckIfUidExistSqlClient.Dispose();
 			//CheckIfUidExistSqlClient=null;
-            if (dt != null && dt.Rows.Count != 0)
+            using (DataTable dt = CheckIfUidExistSqlClient.get_DataTable(sqlCmd))
             {
-                dt.Clear();
-                dt.Dispose();
-                dt = null;
+               if (dt != null && dt.Rows.Count != 0)
+            {
+
                 return true;
             }
             else
             {
-                dt.Clear();
-                dt.Dispose();
-                dt = null;
+
                 return false;
+            } 
             }
+            
         }
         private static void ConvertLocToAvlsLoc(ref string lat, ref string lon)
         {
@@ -447,9 +447,15 @@ WHERE
             {
                 Thread.Sleep(30);
             }
-            string totalDevice =
-                sql_client.get_DataTable(@"SELECT reltuples FROM pg_class WHERE oid = 'sd.equipment'::regclass").Rows[0]
+            string totalDevice = null;
+            using (DataTable dt = sql_client.get_DataTable(@"SELECT reltuples FROM pg_class WHERE oid = 'sd.equipment'::regclass"))
+            {
+                totalDevice =dt.Rows[0]
                     .ItemArray[0].ToString();
+            }
+            //string totalDevice =
+                //sql_client.get_DataTable(@"SELECT reltuples FROM pg_class WHERE oid = 'sd.equipment'::regclass").Rows[0]
+                    //.ItemArray[0].ToString();
             //sql_client.disconnect();
 
             deviceCount = uint.Parse(totalDevice);
@@ -474,29 +480,30 @@ WHERE
             {
                 //Thread.Sleep(30);
             }
-            DataTable dt = sql_client.get_DataTable(regSqlCmd);
+            //DataTable dt = sql_client.get_DataTable(regSqlCmd);
             //sql_client.disconnect();
-
-            if (dt != null && dt.Rows.Count != 0)
+            using (DataTable dt = sql_client.get_DataTable(regSqlCmd))
             {
-                string uid = string.Empty;
-                foreach (DataRow row in dt.Rows)
+                if (dt != null && dt.Rows.Count != 0)
                 {
-                    uid = row[0].ToString();
-                    regSqlCmd = "INSERT INTO custom.uns_deivce_power_status (uid) VALUES (" + "\'" + uid + "\'" + ")";
-                    //while (!sql_client.connect())
+                    string uid = string.Empty;
+                    foreach (DataRow row in dt.Rows)
                     {
-                        //Thread.Sleep(30);
+                        uid = row[0].ToString();
+                        regSqlCmd = "INSERT INTO custom.uns_deivce_power_status (uid) VALUES (" + "\'" + uid + "\'" + ")";
+                        //while (!sql_client.connect())
+                        {
+                            //Thread.Sleep(30);
+                        }
+                        sql_client.modify(regSqlCmd);
+                        //sql_client.disconnect();
+                        //Console.WriteLine("find:{0}", uid);
                     }
-                    sql_client.modify(regSqlCmd);
-                    //sql_client.disconnect();
-                    //Console.WriteLine("find:{0}", uid);
+
                 }
 
             }
-            dt.Clear();
-            dt.Dispose();
-            dt = null;
+            
 
             #endregion
 
@@ -517,9 +524,15 @@ WHERE
                 {
                     //Thread.Sleep(30);
                 }
-                string manual_id_serial_command =
-                    sql_client.get_DataTable("SELECT COUNT(_id)   FROM public.operation_log").Rows[0].ItemArray[0]
+                string manual_id_serial_command = null;
+                using (DataTable dt = sql_client.get_DataTable("SELECT COUNT(_id)   FROM public.operation_log"))
+                {
+                    manual_id_serial_command = dt.Rows[0].ItemArray[0]
                         .ToString();
+                }
+                //string manual_id_serial_command =
+                    //sql_client.get_DataTable("SELECT COUNT(_id)   FROM public.operation_log").Rows[0].ItemArray[0]
+                        //.ToString();
                 //sql_client.disconnect();
                 MANUAL_SQL_DATA operation_log = new MANUAL_SQL_DATA();
                 operation_log._id = "\'" + "operation" + "_" + now + "_" + manual_id_serial_command + "\'";
@@ -820,53 +833,54 @@ WHERE
                 Thread.Sleep(30);
             }
 
-            DataTable dt = sqlClient.get_DataTable(sqlCmd);
-            //sqlClient.disconnect();
-            string uid = string.Empty;
-            if (dt != null && dt.Rows.Count != 0)
+            //DataTable dt = sqlClient.get_DataTable(sqlCmd);
+            using (DataTable dt = sqlClient.get_DataTable(sqlCmd))
             {
-                string unsUpdateTimeStamp = string.Empty;
-                string unsSqlCmd = string.Empty;
-                foreach (DataRow row in dt.Rows)
+                string uid = string.Empty;
+                if (dt != null && dt.Rows.Count != 0)
                 {
+                    string unsUpdateTimeStamp = string.Empty;
+                    string unsSqlCmd = string.Empty;
+                    foreach (DataRow row in dt.Rows)
+                    {
 
-                    uid = row[0].ToString();
-                    string device_uid = uid;
+                        uid = row[0].ToString();
+                        string device_uid = uid;
 
-                    //alonso
-                    Thread TSendPackageToAvlsOnlyByUidAndLocGetFromSql =
-                        new Thread(
-                            () =>
-                                SendPackageToAvlsOnlyByUidAndLocGetFromSql(device_uid, "-1", avlsTcpClient,
-                                    avlsNetworkStream));
-                    TSendPackageToAvlsOnlyByUidAndLocGetFromSql.Priority = ThreadPriority.BelowNormal;
-                    TSendPackageToAvlsOnlyByUidAndLocGetFromSql.Start();
+                        //alonso
+                        Thread TSendPackageToAvlsOnlyByUidAndLocGetFromSql =
+                            new Thread(
+                                () =>
+                                    SendPackageToAvlsOnlyByUidAndLocGetFromSql(device_uid, "-1", avlsTcpClient,
+                                        avlsNetworkStream));
+                        TSendPackageToAvlsOnlyByUidAndLocGetFromSql.Priority = ThreadPriority.BelowNormal;
+                        TSendPackageToAvlsOnlyByUidAndLocGetFromSql.Start();
 
-                    unsUpdateTimeStamp = DateTime.Now.ToString("yyyyMMdd HHmmss+8");
-                    unsSqlCmd = @"UPDATE 
+                        unsUpdateTimeStamp = DateTime.Now.ToString("yyyyMMdd HHmmss+8");
+                        unsSqlCmd = @"UPDATE 
   custom.uns_deivce_power_status
 SET
   power = NULL,
 ""updateTime"" = '" + unsUpdateTimeStamp + @"'::timestamp
 WHERE
   custom.uns_deivce_power_status.uid = '" + device_uid + @"'";
-                    //while (!sqlClient.connect())
-                    {
-                        //Thread.Sleep(30);
-                    }
-                    //lock (access_uns_deivce_power_status_Lock)
-                    sqlClient.modify(unsSqlCmd);
-                    sqlClient.disconnect();
-                    sqlClient.Dispose();
-					sqlClient=null;
-                    Thread.Sleep(30);
-                    
+                        //while (!sqlClient.connect())
+                        {
+                            //Thread.Sleep(30);
+                        }
+                        //lock (access_uns_deivce_power_status_Lock)
+                        sqlClient.modify(unsSqlCmd);
+                        sqlClient.disconnect();
+                        sqlClient.Dispose();
+                        sqlClient = null;
+                        Thread.Sleep(30);
 
+
+                    }
                 }
             }
-            dt.Clear();
-            dt.Dispose();
-            dt = null;
+            //sqlClient.disconnect();
+            
             /*
             else
             {
@@ -958,49 +972,51 @@ LIMIT 1";
                     Thread.Sleep(30);
                 }
                 
-                DataTable dt = avlsSqlClient.get_DataTable(avlsSqlCmd);
-                avlsSqlClient.disconnect();
-                avlsSqlClient.Dispose();
-				avlsSqlClient=null;
-                if (dt != null && dt.Rows.Count != 0)
+                //DataTable dt = avlsSqlClient.get_DataTable(avlsSqlCmd);
+                using (DataTable dt = avlsSqlClient.get_DataTable(avlsSqlCmd))
                 {
-                    string avlsLat = string.Empty, avlsLon = string.Empty;
-                    foreach (DataRow row in dt.Rows)
+                    avlsSqlClient.disconnect();
+                    avlsSqlClient.Dispose();
+                    avlsSqlClient = null;
+                    if (dt != null && dt.Rows.Count != 0)
                     {
-                        avlsLat = row[0].ToString();
-                        avlsLon = row[1].ToString();
+                        string avlsLat = string.Empty, avlsLon = string.Empty;
+                        foreach (DataRow row in dt.Rows)
+                        {
+                            avlsLat = row[0].ToString();
+                            avlsLon = row[1].ToString();
+                        }
+                        string zero = "0";
+                        if (avlsLat.Equals(zero) || avlsLon.Equals(zero))
+                        {
+                            GetInitialLocationFromSql(ref avlsLat, ref avlsLon, avls_package.ID);
+                        }
+                        //GeoAngle lat_value = GeoAngle.FromDouble(Convert.ToDecimal(avlsLat));
+                        //GeoAngle long_value = GeoAngle.FromDouble(Convert.ToDecimal(avlsLon));
+                        //string lat_str = lat_value.Degrees.ToString() + lat_value.Minutes.ToString("D2") + "." + lat_value.Seconds.ToString("D2") + lat_value.Milliseconds.ToString("D3");
+                        //string long_str = long_value.Degrees.ToString() + long_value.Minutes.ToString("D2") + "." + long_value.Seconds.ToString("D2") + long_value.Milliseconds.ToString("D3");
+                        //avls_package.Loc = "N" + (Convert.ToDouble(htable["lat_value"])*100).ToString() + "E" + (Convert.ToDouble(htable["long_value"])*100).ToString()+ ",";
+                        string lat_str = avlsLat, long_str = avlsLon;
+                        ConvertLocToAvlsLoc(ref lat_str, ref long_str);
+                        avls_package.Loc = "N" + lat_str + "E" + long_str + ",";
                     }
-                    string zero = "0";
-                    if (avlsLat.Equals(zero) || avlsLon.Equals(zero))
+                    else
                     {
+                        string avlsLat = string.Empty, avlsLon = string.Empty;
                         GetInitialLocationFromSql(ref avlsLat, ref avlsLon, avls_package.ID);
+                        //GeoAngle lat_value = GeoAngle.FromDouble(Convert.ToDecimal(avlsLat));
+                        //GeoAngle long_value = GeoAngle.FromDouble(Convert.ToDecimal(avlsLon));
+                        //string lat_str = lat_value.Degrees.ToString() + lat_value.Minutes.ToString("D2") + "." + lat_value.Seconds.ToString("D2") + lat_value.Milliseconds.ToString("D3");
+                        //string long_str = long_value.Degrees.ToString() + long_value.Minutes.ToString("D2") + "." + long_value.Seconds.ToString("D2") + long_value.Milliseconds.ToString("D3");
+                        //avls_package.Loc = "N" + (Convert.ToDouble(htable["lat_value"])*100).ToString() + "E" + (Convert.ToDouble(htable["long_value"])*100).ToString()+ ",";
+                        string lat_str = avlsLat, long_str = avlsLon;
+                        ConvertLocToAvlsLoc(ref lat_str, ref long_str);
+                        avls_package.Loc = "N" + lat_str + "E" + long_str + ",";
+                        //avls_package.Loc = "N00000.0000E00000.0000,";
                     }
-                    //GeoAngle lat_value = GeoAngle.FromDouble(Convert.ToDecimal(avlsLat));
-                    //GeoAngle long_value = GeoAngle.FromDouble(Convert.ToDecimal(avlsLon));
-                    //string lat_str = lat_value.Degrees.ToString() + lat_value.Minutes.ToString("D2") + "." + lat_value.Seconds.ToString("D2") + lat_value.Milliseconds.ToString("D3");
-                    //string long_str = long_value.Degrees.ToString() + long_value.Minutes.ToString("D2") + "." + long_value.Seconds.ToString("D2") + long_value.Milliseconds.ToString("D3");
-                    //avls_package.Loc = "N" + (Convert.ToDouble(htable["lat_value"])*100).ToString() + "E" + (Convert.ToDouble(htable["long_value"])*100).ToString()+ ",";
-                    string lat_str = avlsLat, long_str = avlsLon;
-                    ConvertLocToAvlsLoc(ref lat_str, ref long_str);
-                    avls_package.Loc = "N" + lat_str + "E" + long_str + ",";
+
                 }
-                else
-                {
-                    string avlsLat = string.Empty, avlsLon = string.Empty;
-                    GetInitialLocationFromSql(ref avlsLat, ref avlsLon, avls_package.ID);
-                    //GeoAngle lat_value = GeoAngle.FromDouble(Convert.ToDecimal(avlsLat));
-                    //GeoAngle long_value = GeoAngle.FromDouble(Convert.ToDecimal(avlsLon));
-                    //string lat_str = lat_value.Degrees.ToString() + lat_value.Minutes.ToString("D2") + "." + lat_value.Seconds.ToString("D2") + lat_value.Milliseconds.ToString("D3");
-                    //string long_str = long_value.Degrees.ToString() + long_value.Minutes.ToString("D2") + "." + long_value.Seconds.ToString("D2") + long_value.Milliseconds.ToString("D3");
-                    //avls_package.Loc = "N" + (Convert.ToDouble(htable["lat_value"])*100).ToString() + "E" + (Convert.ToDouble(htable["long_value"])*100).ToString()+ ",";
-                    string lat_str = avlsLat, long_str = avlsLon;
-                    ConvertLocToAvlsLoc(ref lat_str, ref long_str);
-                    avls_package.Loc = "N" + lat_str + "E" + long_str + ",";
-                    //avls_package.Loc = "N00000.0000E00000.0000,";
-                }
-                dt.Clear();
-                dt.Dispose();
-                dt = null;
+                
             }
             else
             {
@@ -1098,35 +1114,36 @@ ORDER BY
   custom.equipment_request.create_time
 LIMIT
 1";
-                    DataTable dt = AutosendsqlClient.get_DataTable(sqlCmd);
+                    //DataTable dt = AutosendsqlClient.get_DataTable(sqlCmd);
                     //AutosendsqlClient.disconnect();
                     //AutosendsqlClient.Dispose();
                     //AutosendsqlClient = null;
-                    Hashtable requeseHashtable = new  Hashtable();
-                    if (dt != null && dt.Rows.Count != 0)
+                    using (DataTable dt = AutosendsqlClient.get_DataTable(sqlCmd))
                     {
-                        foreach (DataRow row in dt.Rows)
+                        Hashtable requeseHashtable = new Hashtable();
+                        if (dt != null && dt.Rows.Count != 0)
                         {
-                            requeseHashtable.Add("serial_no", row[0]);
-                            requeseHashtable.Add("func_type", row[1]);
-                            requeseHashtable.Add("uid", row[2]);
-                            requeseHashtable.Add("send_value", row[3]);
-                            requeseHashtable.Add("time_interval", row[4]);
-                            requeseHashtable.Add("distance_interval", row[4]);
-                            requeseHashtable.Add("create_time", row[5]);
-                        }
-                        if (CheckIfUidExist(requeseHashtable["uid"].ToString()))
-                        {
-                        }
-                        else
-                        {
-                            //continue;
-                            dt.Clear();
-                            dt.Dispose();
-                            dt = null;
-                            Thread.Sleep(30);
-                            return ;
-                        }
+                            foreach (DataRow row in dt.Rows)
+                            {
+                                requeseHashtable.Add("serial_no", row[0]);
+                                requeseHashtable.Add("func_type", row[1]);
+                                requeseHashtable.Add("uid", row[2]);
+                                requeseHashtable.Add("send_value", row[3]);
+                                requeseHashtable.Add("time_interval", row[4]);
+                                requeseHashtable.Add("distance_interval", row[4]);
+                                requeseHashtable.Add("create_time", row[5]);
+                            }
+                            if (CheckIfUidExist(requeseHashtable["uid"].ToString()))
+                            {
+                            }
+                            else
+                            {
+                                //continue;
+                                Thread.Sleep(30);
+                                return;
+                            }
+                    }
+                    
                         /*
                         Console.WriteLine(
                         @"
@@ -1263,9 +1280,7 @@ LIMIT
                             //AutosendsqlClient.disconnect();
                         }
                     }
-                    dt.Clear();
-                    dt.Dispose();
-                    dt = null;
+
                     //AutosendsqlClient.Dispose();
 					//AutosendsqlClient=null;
                     //Thread.Sleep((int)uint.Parse(ConfigurationManager.AppSettings["autosend_interval"]) * 1000);
@@ -1726,10 +1741,15 @@ Select 1-6 then press enter to send package
                     {
                         Thread.Sleep(30);
                     }
-                    
-                    string manual_id_serial_command =
-                        sql_client.get_DataTable("SELECT COUNT(_id)   FROM public.operation_log").Rows[0].ItemArray[0]
+                    string manual_id_serial_command = null;
+                    using (DataTable dt = sql_client.get_DataTable("SELECT COUNT(_id)   FROM public.operation_log"))
+                    {
+                        manual_id_serial_command = dt.Rows[0].ItemArray[0]
                             .ToString();
+                    }
+                    //string manual_id_serial_command =
+                        //sql_client.get_DataTable("SELECT COUNT(_id)   FROM public.operation_log").Rows[0].ItemArray[0]
+                            //.ToString();
                     //sql_client.disconnect();
                     MANUAL_SQL_DATA operation_log = new MANUAL_SQL_DATA();
                     operation_log._id = "\'" + "operation" + "_" + now + "_" + manual_id_serial_command + "\'";
@@ -2550,37 +2570,39 @@ WHERE
                 Thread.Sleep(30);
             }
             
-            DataTable dt = sqlClient.get_DataTable(sqlCmd);
-            sqlClient.disconnect();
-            sqlClient.Dispose();
-			sqlClient=null;
-            if (dt != null && dt.Rows.Count != 0)
+            //DataTable dt = sqlClient.get_DataTable(sqlCmd);
+            using (DataTable dt = sqlClient.get_DataTable(sqlCmd))
             {
+                sqlClient.disconnect();
+                sqlClient.Dispose();
+                sqlClient = null;
+                if (dt != null && dt.Rows.Count != 0)
+                {
 
-                foreach (DataRow row in dt.Rows)
-                {
-                    lat = row[0].ToString();
-                    lon = row[1].ToString();
+                    foreach (DataRow row in dt.Rows)
+                    {
+                        lat = row[0].ToString();
+                        lon = row[1].ToString();
+                    }
                 }
-            }
-            else
-            {
-                lat = lon = "0";
-                switch (id)
+                else
                 {
-                    case "000000":
-                        break;
-                    default:
-                        log.Error("callerType:" + callerType);
-                        log.Error("callerName:" + callerName);
-                        log.Error("Cannot find lat lon of deviceID: " + id + " in sql table: sd.initial_location ");
-                        break;
+                    lat = lon = "0";
+                    switch (id)
+                    {
+                        case "000000":
+                            break;
+                        default:
+                            log.Error("callerType:" + callerType);
+                            log.Error("callerName:" + callerName);
+                            log.Error("Cannot find lat lon of deviceID: " + id + " in sql table: sd.initial_location ");
+                            break;
+                    }
+
                 }
-                
+
             }
-            dt.Clear();
-            dt.Dispose();
-            dt = null;
+            
         }
         /*
          * avls event list:
@@ -2781,50 +2803,51 @@ LIMIT 1";
                         }
                         //Console.WriteLine("-c");
                         //Console.WriteLine("+d");
-                        DataTable dt = avlsSqlClient.get_DataTable(avlsSqlCmd);
+                        //DataTable dt = avlsSqlClient.get_DataTable(avlsSqlCmd);
                         //Console.WriteLine("-d");
                         //avlsSqlClient.disconnect();
                         //avlsSqlClient.Dispose();
 						//avlsSqlClient=null;
-                        if (dt != null && dt.Rows.Count != 0)
+                        using (DataTable dt = avlsSqlClient.get_DataTable(avlsSqlCmd))
                         {
-                            string avlsLat = string.Empty, avlsLon = string.Empty;
-                            foreach (DataRow row in dt.Rows)
+                            if (dt != null && dt.Rows.Count != 0)
                             {
-                                initialLat=avlsLat = row[0].ToString();
-                                initialLon=avlsLon = row[1].ToString();
+                                string avlsLat = string.Empty, avlsLon = string.Empty;
+                                foreach (DataRow row in dt.Rows)
+                                {
+                                    initialLat = avlsLat = row[0].ToString();
+                                    initialLon = avlsLon = row[1].ToString();
+                                }
+                                string zero = "0";
+                                if (avlsLat.Equals(zero) || avlsLon.Equals(zero))
+                                {
+                                    GetInitialLocationFromSql(ref avlsLat, ref avlsLon, avls_package.ID);
+                                }
+                                //GeoAngle lat_value = GeoAngle.FromDouble(Convert.ToDecimal(avlsLat));
+                                //GeoAngle long_value = GeoAngle.FromDouble(Convert.ToDecimal(avlsLon));
+                                //string lat_str = lat_value.Degrees.ToString() + lat_value.Minutes.ToString("D2") + "." + lat_value.Seconds.ToString("D2") + lat_value.Milliseconds.ToString("D3");
+                                //string long_str = long_value.Degrees.ToString() + long_value.Minutes.ToString("D2") + "." + long_value.Seconds.ToString("D2") + long_value.Milliseconds.ToString("D3");
+                                //avls_package.Loc = "N" + (Convert.ToDouble(htable["lat_value"])*100).ToString() + "E" + (Convert.ToDouble(htable["long_value"])*100).ToString()+ ",";
+                                string lat_str = avlsLat, long_str = avlsLon;
+                                ConvertLocToAvlsLoc(ref lat_str, ref long_str);
+                                avls_package.Loc = "N" + lat_str + "E" + long_str + ",";
                             }
-                            string zero = "0";
-                            if (avlsLat.Equals(zero) || avlsLon.Equals(zero))
+                            else
                             {
+                                string avlsLat = string.Empty, avlsLon = string.Empty;
                                 GetInitialLocationFromSql(ref avlsLat, ref avlsLon, avls_package.ID);
+                                //GeoAngle lat_value = GeoAngle.FromDouble(Convert.ToDecimal(avlsLat));
+                                //GeoAngle long_value = GeoAngle.FromDouble(Convert.ToDecimal(avlsLon));
+                                //string lat_str = lat_value.Degrees.ToString() + lat_value.Minutes.ToString("D2") + "." + lat_value.Seconds.ToString("D2") + lat_value.Milliseconds.ToString("D3");
+                                //string long_str = long_value.Degrees.ToString() + long_value.Minutes.ToString("D2") + "." + long_value.Seconds.ToString("D2") + long_value.Milliseconds.ToString("D3");
+                                //avls_package.Loc = "N" + (Convert.ToDouble(htable["lat_value"])*100).ToString() + "E" + (Convert.ToDouble(htable["long_value"])*100).ToString()+ ",";
+                                string lat_str = initialLat = avlsLat, long_str = initialLon = avlsLon;
+                                ConvertLocToAvlsLoc(ref lat_str, ref long_str);
+                                avls_package.Loc = "N" + lat_str + "E" + long_str + ",";
+                                //avls_package.Loc = "N00000.0000E00000.0000,";
                             }
-                            //GeoAngle lat_value = GeoAngle.FromDouble(Convert.ToDecimal(avlsLat));
-                            //GeoAngle long_value = GeoAngle.FromDouble(Convert.ToDecimal(avlsLon));
-                            //string lat_str = lat_value.Degrees.ToString() + lat_value.Minutes.ToString("D2") + "." + lat_value.Seconds.ToString("D2") + lat_value.Milliseconds.ToString("D3");
-                            //string long_str = long_value.Degrees.ToString() + long_value.Minutes.ToString("D2") + "." + long_value.Seconds.ToString("D2") + long_value.Milliseconds.ToString("D3");
-                            //avls_package.Loc = "N" + (Convert.ToDouble(htable["lat_value"])*100).ToString() + "E" + (Convert.ToDouble(htable["long_value"])*100).ToString()+ ",";
-                            string lat_str = avlsLat, long_str = avlsLon;
-                            ConvertLocToAvlsLoc(ref lat_str, ref long_str); 
-                            avls_package.Loc = "N" + lat_str + "E" + long_str + ",";
                         }
-                        else
-                        {
-                            string avlsLat = string.Empty, avlsLon = string.Empty;
-                            GetInitialLocationFromSql(ref avlsLat, ref avlsLon, avls_package.ID);
-                            //GeoAngle lat_value = GeoAngle.FromDouble(Convert.ToDecimal(avlsLat));
-                            //GeoAngle long_value = GeoAngle.FromDouble(Convert.ToDecimal(avlsLon));
-                            //string lat_str = lat_value.Degrees.ToString() + lat_value.Minutes.ToString("D2") + "." + lat_value.Seconds.ToString("D2") + lat_value.Milliseconds.ToString("D3");
-                            //string long_str = long_value.Degrees.ToString() + long_value.Minutes.ToString("D2") + "." + long_value.Seconds.ToString("D2") + long_value.Milliseconds.ToString("D3");
-                            //avls_package.Loc = "N" + (Convert.ToDouble(htable["lat_value"])*100).ToString() + "E" + (Convert.ToDouble(htable["long_value"])*100).ToString()+ ",";
-                            string lat_str = initialLat=avlsLat, long_str = initialLon=avlsLon;
-                            ConvertLocToAvlsLoc(ref lat_str, ref long_str); 
-                            avls_package.Loc = "N" + lat_str + "E" + long_str + ",";
-                            //avls_package.Loc = "N00000.0000E00000.0000,";
-                        }
-                        dt.Clear();
-                        dt.Dispose();
-                        dt = null;
+                        
                         /*
                          * SELECT 
       public._gps_log._lat,
@@ -2958,50 +2981,51 @@ LIMIT 1";
                         }
                         //Console.WriteLine("-c1");
                         //Console.WriteLine("+d2");
-                        DataTable dt = avlsSqlClient.get_DataTable(avlsSqlCmd);
+                        //DataTable dt = avlsSqlClient.get_DataTable(avlsSqlCmd);
                         //Console.WriteLine("-d2");
                         //avlsSqlClient.disconnect();
                         //avlsSqlClient.Dispose();
 						//avlsSqlClient=null;
-                        if (dt != null && dt.Rows.Count != 0)
+                        using (DataTable dt = avlsSqlClient.get_DataTable(avlsSqlCmd))
                         {
-                            string avlsLat = string.Empty, avlsLon = string.Empty;
-                            foreach (DataRow row in dt.Rows)
+                            if (dt != null && dt.Rows.Count != 0)
                             {
-                                avlsLat = row[0].ToString();
-                                avlsLon = row[1].ToString();
+                                string avlsLat = string.Empty, avlsLon = string.Empty;
+                                foreach (DataRow row in dt.Rows)
+                                {
+                                    avlsLat = row[0].ToString();
+                                    avlsLon = row[1].ToString();
+                                }
+                                string zero = "0";
+                                if (avlsLat.Equals(zero) || avlsLon.Equals(zero))
+                                {
+                                    GetInitialLocationFromSql(ref avlsLat, ref avlsLon, avls_package.ID);
+                                }
+                                //GeoAngle lat_value = GeoAngle.FromDouble(Convert.ToDecimal(avlsLat));
+                                //GeoAngle long_value = GeoAngle.FromDouble(Convert.ToDecimal(avlsLon));
+                                //string lat_str = lat_value.Degrees.ToString() + lat_value.Minutes.ToString("D2") + "." + lat_value.Seconds.ToString("D2") + lat_value.Milliseconds.ToString("D3");
+                                //string long_str = long_value.Degrees.ToString() + long_value.Minutes.ToString("D2") + "." + long_value.Seconds.ToString("D2") + long_value.Milliseconds.ToString("D3");
+                                //avls_package.Loc = "N" + (Convert.ToDouble(htable["lat_value"])*100).ToString() + "E" + (Convert.ToDouble(htable["long_value"])*100).ToString()+ ",";
+                                string lat_str = initialLat = avlsLat, long_str = initialLon = avlsLon;
+                                ConvertLocToAvlsLoc(ref lat_str, ref long_str);
+                                avls_package.Loc = "N" + lat_str + "E" + long_str + ",";
                             }
-                            string zero = "0";
-                            if (avlsLat.Equals(zero) || avlsLon.Equals(zero))
+                            else
                             {
+                                string avlsLat = string.Empty, avlsLon = string.Empty;
                                 GetInitialLocationFromSql(ref avlsLat, ref avlsLon, avls_package.ID);
+                                //GeoAngle lat_value = GeoAngle.FromDouble(Convert.ToDecimal(avlsLat));
+                                //GeoAngle long_value = GeoAngle.FromDouble(Convert.ToDecimal(avlsLon));
+                                //string lat_str = lat_value.Degrees.ToString() + lat_value.Minutes.ToString("D2") + "." + lat_value.Seconds.ToString("D2") + lat_value.Milliseconds.ToString("D3");
+                                //string long_str = long_value.Degrees.ToString() + long_value.Minutes.ToString("D2") + "." + long_value.Seconds.ToString("D2") + long_value.Milliseconds.ToString("D3");
+                                //avls_package.Loc = "N" + (Convert.ToDouble(htable["lat_value"])*100).ToString() + "E" + (Convert.ToDouble(htable["long_value"])*100).ToString()+ ",";
+                                string lat_str = initialLat = avlsLat, long_str = initialLon = avlsLon;
+                                ConvertLocToAvlsLoc(ref lat_str, ref long_str);
+                                avls_package.Loc = "N" + lat_str + "E" + long_str + ",";
+                                //avls_package.Loc = "N00000.0000E00000.0000,";
                             }
-                            //GeoAngle lat_value = GeoAngle.FromDouble(Convert.ToDecimal(avlsLat));
-                            //GeoAngle long_value = GeoAngle.FromDouble(Convert.ToDecimal(avlsLon));
-                            //string lat_str = lat_value.Degrees.ToString() + lat_value.Minutes.ToString("D2") + "." + lat_value.Seconds.ToString("D2") + lat_value.Milliseconds.ToString("D3");
-                            //string long_str = long_value.Degrees.ToString() + long_value.Minutes.ToString("D2") + "." + long_value.Seconds.ToString("D2") + long_value.Milliseconds.ToString("D3");
-                            //avls_package.Loc = "N" + (Convert.ToDouble(htable["lat_value"])*100).ToString() + "E" + (Convert.ToDouble(htable["long_value"])*100).ToString()+ ",";
-                            string lat_str = initialLat = avlsLat, long_str = initialLon = avlsLon;
-                            ConvertLocToAvlsLoc(ref lat_str, ref long_str); 
-                            avls_package.Loc = "N" + lat_str + "E" + long_str + ",";
                         }
-                        else
-                        {
-                            string avlsLat = string.Empty, avlsLon = string.Empty;
-                            GetInitialLocationFromSql(ref avlsLat, ref avlsLon, avls_package.ID);
-                            //GeoAngle lat_value = GeoAngle.FromDouble(Convert.ToDecimal(avlsLat));
-                            //GeoAngle long_value = GeoAngle.FromDouble(Convert.ToDecimal(avlsLon));
-                            //string lat_str = lat_value.Degrees.ToString() + lat_value.Minutes.ToString("D2") + "." + lat_value.Seconds.ToString("D2") + lat_value.Milliseconds.ToString("D3");
-                            //string long_str = long_value.Degrees.ToString() + long_value.Minutes.ToString("D2") + "." + long_value.Seconds.ToString("D2") + long_value.Milliseconds.ToString("D3");
-                            //avls_package.Loc = "N" + (Convert.ToDouble(htable["lat_value"])*100).ToString() + "E" + (Convert.ToDouble(htable["long_value"])*100).ToString()+ ",";
-                            string lat_str =initialLat= avlsLat, long_str =initialLon= avlsLon;
-                            ConvertLocToAvlsLoc(ref lat_str, ref long_str); 
-                            avls_package.Loc = "N" + lat_str + "E" + long_str + ",";
-                            //avls_package.Loc = "N00000.0000E00000.0000,";
-                        }
-                        dt.Clear();
-                        dt.Dispose();
-                        dt = null;
+                        
                         /*
                          * SELECT 
       public._gps_log._lat,
@@ -3370,76 +3394,97 @@ now() <= end_time::timestamp ";
             {
                 //Thread.Sleep(30);
             }
-            DataTable dt = GetGidAndFullnameFromP_prohibitedAndPatrol_locationFromSql_SqlClient.get_DataTable(regSqlCmdForProhibitedTable);
+            //DataTable dt = GetGidAndFullnameFromP_prohibitedAndPatrol_locationFromSql_SqlClient.get_DataTable(regSqlCmdForProhibitedTable);
             //sql_client.disconnect();
             //List<EAB2> prohibitedEab2s= new List<EAB2>();
-            if (dt != null && dt.Rows.Count != 0)
+            using (DataTable dt = GetGidAndFullnameFromP_prohibitedAndPatrol_locationFromSql_SqlClient.get_DataTable(regSqlCmdForProhibitedTable))
             {
-                //SiAuto.Main.AddCheckpoint(Level.Debug,id+"-find data from sql", regSqlCmdForProhibitedTable);
-                try
+                if (dt != null && dt.Rows.Count != 0)
                 {
-                    CheckIfOverTime getRow = sqlCEdb.CheckIfOverTime.FirstOrDefault(p => p.CreateTime == null && p.Uid == id);
-                    if (getRow != null)
+                    //SiAuto.Main.AddCheckpoint(Level.Debug,id+"-find data from sql", regSqlCmdForProhibitedTable);
+                    try
                     {
-                        //SiAuto.Main.AddCheckpoint(Level.Debug, id+" assign time");
-                        getRow.CreateTime = DateTime.Now;
-                        sqlCEdb.SubmitChanges();
-                        #region send with prohibite data
-
-
-
-                        foreach (DataRow row in dt.Rows)
+                        CheckIfOverTime getRow = sqlCEdb.CheckIfOverTime.FirstOrDefault(p => p.CreateTime == null && p.Uid == id);
+                        if (getRow != null)
                         {
-                            //prohibitedEab2s.Add(new EAB2("p_prohibited", row[0].ToString(), row[1].ToString()));
-                            //lock (mylock)
+                            //SiAuto.Main.AddCheckpoint(Level.Debug, id+" assign time");
+                            getRow.CreateTime = DateTime.Now;
+                            sqlCEdb.SubmitChanges();
+                            #region send with prohibite data
+
+
+
+                            foreach (DataRow row in dt.Rows)
                             {
-                                message += ";" + "p_prohibited" + "#" + row[0].ToString() + "#" + row[1].ToString();
+                                //prohibitedEab2s.Add(new EAB2("p_prohibited", row[0].ToString(), row[1].ToString()));
+                                //lock (mylock)
+                                {
+                                    message += ";" + "p_prohibited" + "#" + row[0].ToString() + "#" + row[1].ToString();
+                                }
+
+                            }
+                            #endregion send with prohibite data
+                        }
+                        else
+                        {
+                            //SiAuto.Main.AddCheckpoint(Level.Debug, id+" has time");
+                            //table:p_config
+                            //column:stay_time
+                            //unit:min
+
+                            //check if over time 
+                            //over->send msg with prohibited data
+                            //not over -> do nothing
+                            string sqlCmd = @"select stay_time from p_config";
+
+                            //while (!sql_client.connect())
+                            {
+                                //Thread.Sleep(30);
+                            }
+                            //DataTable dt2 = GetGidAndFullnameFromP_prohibitedAndPatrol_locationFromSql_SqlClient.get_DataTable(sqlCmd);
+                            //sql_client.disconnect();
+                            using (DataTable dt2 = GetGidAndFullnameFromP_prohibitedAndPatrol_locationFromSql_SqlClient.get_DataTable(sqlCmd))
+                            {
+                                if (dt2 != null && dt2.Rows.Count != 0)
+                                {
+                                    foreach (DataRow row in dt2.Rows)
+                                    {
+                                        stayTimeInMin = double.Parse(row[0].ToString());
+                                    }
+                                }
                             }
 
-                        }
-                        #endregion send with prohibite data
-                    }
-                    else
-                    {
-                        //SiAuto.Main.AddCheckpoint(Level.Debug, id+" has time");
-                        //table:p_config
-                        //column:stay_time
-                        //unit:min
-
-                        //check if over time 
-                        //over->send msg with prohibited data
-                        //not over -> do nothing
-                        string sqlCmd = @"select stay_time from p_config";
-
-                        //while (!sql_client.connect())
-                        {
-                            //Thread.Sleep(30);
-                        }
-                        DataTable dt2 = GetGidAndFullnameFromP_prohibitedAndPatrol_locationFromSql_SqlClient.get_DataTable(sqlCmd);
-                        //sql_client.disconnect();
-                        if (dt2 != null && dt2.Rows.Count != 0)
-                        {
-                            foreach (DataRow row in dt2.Rows)
-                            {
-                                stayTimeInMin = double .Parse(row[0].ToString());
-                            }
-                        }
-                        dt2.Clear();
-                        dt2.Dispose();
-                        dt2 = null;
-                        //SiAuto.Main.WatchDouble(Level.Debug, "stayTimeInMin", stayTimeInMin);
-                        DateTime getTime = new DateTime();
-                        var dateTime = (from p in sqlCEdb.CheckIfOverTime where p.Uid == id select p.CreateTime).FirstOrDefault();
-                        if (dateTime != default(DateTime))
-                            getTime = dateTime.Value;
-                        //SiAuto.Main.WatchDateTime(Level.Debug, "getTime", getTime);
-                        int result;
-                        result = DateTime.Compare(DateTime.Now, getTime.AddMinutes(stayTimeInMin));
-                        //SiAuto.Main.LogText(Level.Debug, id + "-result-" + result,
+                            //SiAuto.Main.WatchDouble(Level.Debug, "stayTimeInMin", stayTimeInMin);
+                            DateTime getTime = new DateTime();
+                            var dateTime = (from p in sqlCEdb.CheckIfOverTime where p.Uid == id select p.CreateTime).FirstOrDefault();
+                            if (dateTime != default(DateTime))
+                                getTime = dateTime.Value;
+                            //SiAuto.Main.WatchDateTime(Level.Debug, "getTime", getTime);
+                            int result;
+                            result = DateTime.Compare(DateTime.Now, getTime.AddMinutes(stayTimeInMin));
+                            //SiAuto.Main.LogText(Level.Debug, id + "-result-" + result,
                             //DateTime.Now + "--" + getTime.AddMinutes(stayTimeInMin));
-                        if (isStayTimeEnable)
-                        {
-                            if (result > 0)
+                            if (isStayTimeEnable)
+                            {
+                                if (result > 0)
+                                {
+                                    #region send with prohibite data
+
+
+
+                                    foreach (DataRow row in dt.Rows)
+                                    {
+                                        //prohibitedEab2s.Add(new EAB2("p_prohibited", row[0].ToString(), row[1].ToString()));
+                                        //lock (mylock)
+                                        {
+                                            message += ";" + "p_prohibited" + "#" + row[0].ToString() + "#" + row[1].ToString();
+                                        }
+
+                                    }
+                                    #endregion send with prohibite data
+                                }
+                            }
+                            else
                             {
                                 #region send with prohibite data
 
@@ -3456,169 +3501,81 @@ now() <= end_time::timestamp ";
                                 }
                                 #endregion send with prohibite data
                             }
+
+
+
                         }
-                        else
+
+                    }
+                    catch (Exception ex)
+                    {
+
+                        SiAuto.Main.LogText(Level.Debug, id + ":sqlCEException", ex.ToString());
+                    }
+
+
+
+                }
+                else
+                {
+                    try
+                    {
+                        CheckIfOverTime getRow = sqlCEdb.CheckIfOverTime.FirstOrDefault(p => p.CreateTime != null && p.Uid == id);
+                        if (getRow != null)
                         {
+                            //SiAuto.Main.AddCheckpoint(Level.Debug,id+" remove time");
+                            getRow.CreateTime = null;
+                            sqlCEdb.SubmitChanges();
+
                             #region send with prohibite data
 
 
 
-                            foreach (DataRow row in dt.Rows)
+                            // foreach (DataRow row in dt.Rows)
                             {
                                 //prohibitedEab2s.Add(new EAB2("p_prohibited", row[0].ToString(), row[1].ToString()));
                                 //lock (mylock)
                                 {
-                                    message += ";" + "p_prohibited" + "#" + row[0].ToString() + "#" + row[1].ToString();
+                                    message += ";" + "p_prohibited_out";
+                                    //SiAuto.Main.LogMessage(message);
                                 }
 
                             }
                             #endregion send with prohibite data
                         }
-                        
-
-                        
                     }
-                   
-                }
-                catch (Exception ex)
-                {
-
-                    SiAuto.Main.LogText(Level.Debug, id+":sqlCEException", ex.ToString());
-                }
-                
-                
-              
-            }
-            else
-            {
-                try
-                {
-                    CheckIfOverTime getRow = sqlCEdb.CheckIfOverTime.FirstOrDefault(p => p.CreateTime != null && p.Uid == id);
-                    if (getRow != null)
+                    catch (Exception ex)
                     {
-                        //SiAuto.Main.AddCheckpoint(Level.Debug,id+" remove time");
-                        getRow.CreateTime = null;
-                        sqlCEdb.SubmitChanges();
 
-                        #region send with prohibite data
-
-
-
-                       // foreach (DataRow row in dt.Rows)
-                        {
-                            //prohibitedEab2s.Add(new EAB2("p_prohibited", row[0].ToString(), row[1].ToString()));
-                            //lock (mylock)
-                            {
-                                message += ";" + "p_prohibited_out";
-                                //SiAuto.Main.LogMessage(message);
-                            }
-
-                        }
-                        #endregion send with prohibite data
+                        SiAuto.Main.LogError(id + "sqlce excep 1", ex.ToString());
                     }
+
                 }
-                catch (Exception ex)
+
+                //while (!sql_client.connect())
                 {
-
-                    SiAuto.Main.LogError(id + "sqlce excep 1", ex.ToString());
+                    //Thread.Sleep(30);
                 }
-                
             }
-
-            //while (!sql_client.connect())
-            {
-                //Thread.Sleep(30);
-            }
-            dt.Clear();
-            dt.Dispose();
-            dt = null;
-            dt = GetGidAndFullnameFromP_prohibitedAndPatrol_locationFromSql_SqlClient.get_DataTable(regSqlCmdForLocationTable);
+            
+            //DataTable dt3 = GetGidAndFullnameFromP_prohibitedAndPatrol_locationFromSql_SqlClient.get_DataTable(regSqlCmdForLocationTable);
             //sql_client.disconnect();
             //List<EAB2> locationEab2s = new List<EAB2>();
-            if (dt != null && dt.Rows.Count != 0)
+            using (DataTable dt3 = GetGidAndFullnameFromP_prohibitedAndPatrol_locationFromSql_SqlClient.get_DataTable(regSqlCmdForLocationTable))
             {
-                //SiAuto.Main.AddCheckpoint(Level.Debug, id + "-find data from sql", regSqlCmdForLocationTable);
-                try
+                if (dt3 != null && dt3.Rows.Count != 0)
                 {
-                    CheckIfOverTime2 getRow = sqlCEdb.CheckIfOverTime2.FirstOrDefault(p => p.CreateTime == null && p.Uid == id);
-                    if (getRow != null)
+                    //SiAuto.Main.AddCheckpoint(Level.Debug, id + "-find data from sql", regSqlCmdForLocationTable);
+                    try
                     {
-                        //SiAuto.Main.AddCheckpoint(Level.Debug, id + " assign time");
-                        getRow.CreateTime = DateTime.Now;
-                        sqlCEdb.SubmitChanges();
-                        #region send with location data
-                        foreach (DataRow row in dt.Rows)
+                        CheckIfOverTime2 getRow = sqlCEdb.CheckIfOverTime2.FirstOrDefault(p => p.CreateTime == null && p.Uid == id);
+                        if (getRow != null)
                         {
-                            //locationEab2s.Add(new EAB2("patrol_location", row[0].ToString(), row[1].ToString()));
-                            //lock (mylock)
-                            {
-                                message += ";" + "patrol_location" + "#" + row[0].ToString() + "#" + row[1].ToString();
-                            }
-
-                        }
-                        #endregion send with location data
-                    }
-                    else
-                    {
-                        //SiAuto.Main.AddCheckpoint(Level.Debug, id + " has time");
-                        //table:p_config
-                        //column:stay_time
-                        //unit:min
-
-                        //check if over time 
-                        //over->send msg with prohibited data
-                        //not over -> do nothing
-
-                        string sqlCmd = @"select stay_time from p_config";
-
-                        //while (!sql_client.connect())
-                        {
-                            //Thread.Sleep(30);
-                        }
-                        DataTable dt2 = GetGidAndFullnameFromP_prohibitedAndPatrol_locationFromSql_SqlClient.get_DataTable(sqlCmd);
-                        //sql_client.disconnect();
-                        if (dt2 != null && dt2.Rows.Count != 0)
-                        {
-                            foreach (DataRow row in dt2.Rows)
-                            {
-                                stayTimeInMin = double.Parse(row[0].ToString());
-                            }
-                        }
-                        dt2.Clear();
-                        dt2.Dispose();
-                        dt2 = null;
-                        //SiAuto.Main.WatchDouble(Level.Debug, "stayTimeInMin", stayTimeInMin);
-                        DateTime getTime = new DateTime();
-                        var dateTime = (from p in sqlCEdb.CheckIfOverTime2 where p.Uid == id select p.CreateTime).FirstOrDefault();
-                        if (dateTime != default(DateTime))
-                            getTime = dateTime.Value;
-                        //SiAuto.Main.WatchDateTime(Level.Debug, "getTime", getTime);
-                        int result;
-                        result = DateTime.Compare(DateTime.Now, getTime.AddMinutes(stayTimeInMin));
-                        //SiAuto.Main.LogText(Level.Debug, id + "-result-" + result,
-                            //DateTime.Now + "--" + getTime.AddMinutes(stayTimeInMin));
-                        if (isStayTimeEnable)
-                        {
-                            if (result > 0)
-                            {
-
-                                #region send with location data
-                                foreach (DataRow row in dt.Rows)
-                                {
-                                    //locationEab2s.Add(new EAB2("patrol_location", row[0].ToString(), row[1].ToString()));
-                                    //lock (mylock)
-                                    {
-                                        message += ";" + "patrol_location" + "#" + row[0].ToString() + "#" + row[1].ToString();
-                                    }
-
-                                }
-                                #endregion send with location data
-                            }
-                        }
-                        else
-                        {
+                            //SiAuto.Main.AddCheckpoint(Level.Debug, id + " assign time");
+                            getRow.CreateTime = DateTime.Now;
+                            sqlCEdb.SubmitChanges();
                             #region send with location data
-                            foreach (DataRow row in dt.Rows)
+                            foreach (DataRow row in dt3.Rows)
                             {
                                 //locationEab2s.Add(new EAB2("patrol_location", row[0].ToString(), row[1].ToString()));
                                 //lock (mylock)
@@ -3629,51 +3586,122 @@ now() <= end_time::timestamp ";
                             }
                             #endregion send with location data
                         }
-                        
-
-                    }
-                }
-                catch (Exception ex)
-                {
-
-                    SiAuto.Main.LogError(id + ":sqlce excep 3", ex.ToString() );
-                }
-                
-            }
-            else
-            {
-                try
-                {
-                    CheckIfOverTime2 getRow = sqlCEdb.CheckIfOverTime2.FirstOrDefault(p => p.CreateTime != null && p.Uid == id);
-                    if (getRow != null)
-                    {
-                        //SiAuto.Main.AddCheckpoint(Level.Debug, id + " remove time");
-                        getRow.CreateTime = null;
-                        sqlCEdb.SubmitChanges();
-
-                        #region send with location data
-                        //foreach (DataRow row in dt.Rows)
+                        else
                         {
-                            //locationEab2s.Add(new EAB2("patrol_location", row[0].ToString(), row[1].ToString()));
-                            //lock (mylock)
+                            //SiAuto.Main.AddCheckpoint(Level.Debug, id + " has time");
+                            //table:p_config
+                            //column:stay_time
+                            //unit:min
+
+                            //check if over time 
+                            //over->send msg with prohibited data
+                            //not over -> do nothing
+
+                            string sqlCmd = @"select stay_time from p_config";
+
+                            //while (!sql_client.connect())
                             {
-                                //message += ";" + "patrol_location" + "#" + "lout";
+                                //Thread.Sleep(30);
+                            }
+                            //DataTable dt2 = GetGidAndFullnameFromP_prohibitedAndPatrol_locationFromSql_SqlClient.get_DataTable(sqlCmd);
+                            //sql_client.disconnect();
+                            using (DataTable dt2 = GetGidAndFullnameFromP_prohibitedAndPatrol_locationFromSql_SqlClient.get_DataTable(sqlCmd))
+                            {
+                                if (dt2 != null && dt2.Rows.Count != 0)
+                                {
+                                    foreach (DataRow row in dt2.Rows)
+                                    {
+                                        stayTimeInMin = double.Parse(row[0].ToString());
+                                    }
+                                }
                             }
 
-                        }
-                        #endregion send with location data
-                    }
-                }
-                catch (Exception ex)
-                {
+                            //SiAuto.Main.WatchDouble(Level.Debug, "stayTimeInMin", stayTimeInMin);
+                            DateTime getTime = new DateTime();
+                            var dateTime = (from p in sqlCEdb.CheckIfOverTime2 where p.Uid == id select p.CreateTime).FirstOrDefault();
+                            if (dateTime != default(DateTime))
+                                getTime = dateTime.Value;
+                            //SiAuto.Main.WatchDateTime(Level.Debug, "getTime", getTime);
+                            int result;
+                            result = DateTime.Compare(DateTime.Now, getTime.AddMinutes(stayTimeInMin));
+                            //SiAuto.Main.LogText(Level.Debug, id + "-result-" + result,
+                            //DateTime.Now + "--" + getTime.AddMinutes(stayTimeInMin));
+                            if (isStayTimeEnable)
+                            {
+                                if (result > 0)
+                                {
 
-                    SiAuto.Main.LogError(id + "sqlce excep 2", ex.ToString() );
+                                    #region send with location data
+                                    foreach (DataRow row in dt3.Rows)
+                                    {
+                                        //locationEab2s.Add(new EAB2("patrol_location", row[0].ToString(), row[1].ToString()));
+                                        //lock (mylock)
+                                        {
+                                            message += ";" + "patrol_location" + "#" + row[0].ToString() + "#" + row[1].ToString();
+                                        }
+
+                                    }
+                                    #endregion send with location data
+                                }
+                            }
+                            else
+                            {
+                                #region send with location data
+                                foreach (DataRow row in dt3.Rows)
+                                {
+                                    //locationEab2s.Add(new EAB2("patrol_location", row[0].ToString(), row[1].ToString()));
+                                    //lock (mylock)
+                                    {
+                                        message += ";" + "patrol_location" + "#" + row[0].ToString() + "#" + row[1].ToString();
+                                    }
+
+                                }
+                                #endregion send with location data
+                            }
+
+
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+
+                        SiAuto.Main.LogError(id + ":sqlce excep 3", ex.ToString());
+                    }
+
                 }
-                
+                else
+                {
+                    try
+                    {
+                        CheckIfOverTime2 getRow = sqlCEdb.CheckIfOverTime2.FirstOrDefault(p => p.CreateTime != null && p.Uid == id);
+                        if (getRow != null)
+                        {
+                            //SiAuto.Main.AddCheckpoint(Level.Debug, id + " remove time");
+                            getRow.CreateTime = null;
+                            sqlCEdb.SubmitChanges();
+
+                            #region send with location data
+                            //foreach (DataRow row in dt.Rows)
+                            {
+                                //locationEab2s.Add(new EAB2("patrol_location", row[0].ToString(), row[1].ToString()));
+                                //lock (mylock)
+                                {
+                                    //message += ";" + "patrol_location" + "#" + "lout";
+                                }
+
+                            }
+                            #endregion send with location data
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+
+                        SiAuto.Main.LogError(id + "sqlce excep 2", ex.ToString());
+                    }
+
+                }
             }
-            dt.Clear();
-            dt.Dispose();
-            dt = null;
+            
             //sql_client.Dispose();
 			//sql_client=null;
             //sql_client = null;
@@ -4002,20 +4030,22 @@ WHERE
                     {
                         //Thread.Sleep(30);
                     }
-                    DataTable dt1 = accessSqlServerClient.get_DataTable(sqlCmd1);
                     stopWatch.Stop();
                     SiAuto.Main.LogMessage("access_sql_server spend4 time(ms):" + stopWatch.ElapsedMilliseconds);
                     stopWatch.Reset();
                     stopWatch.Start();
                     //sql_client.disconnect();
+                    using (DataTable dt1 = accessSqlServerClient.get_DataTable(sqlCmd1))
+                    {
+                        
 
-                    if (dt1 != null && dt1.Rows.Count != 0)
-                    {
-                        
-                    }
-                    else
-                    {
-                        
+                        if (dt1 != null && dt1.Rows.Count != 0)
+                        {
+
+                        }
+                        else
+                        {
+
 
                             sqlCmd1 = "INSERT INTO custom.uns_deivce_power_status (uid) VALUES (" + "\'" + deviceID + "\'" +
                                       ")";
@@ -4026,10 +4056,10 @@ WHERE
                             accessSqlServerClient.modify(sqlCmd1);
                             //sql_client.disconnect();
 
+                        }
                     }
-                dt1.Clear();
-                dt1.Dispose();
-                    dt1 = null;
+                    //DataTable dt1 = accessSqlServerClient.get_DataTable(sqlCmd1);
+                    
                     stopWatch.Stop();
                     SiAuto.Main.LogMessage("access_sql_server spend5 time(ms):" + stopWatch.ElapsedMilliseconds);
                     stopWatch.Reset();
@@ -4510,43 +4540,44 @@ VALUES(
                         {
                             //Thread.Sleep(30);
                         }
-                        DataTable sqlDatetable = accessSqlServerClient.get_DataTable(sqlCmd);
-                        //sql_client.disconnect();
-                        if (sqlDatetable != null && sqlDatetable.Rows.Count != 0)
+                        using (DataTable sqlDatetable = accessSqlServerClient.get_DataTable(sqlCmd))
                         {
-                            string avlsLat = string.Empty, avlsLon = string.Empty;
-                            foreach (DataRow row in sqlDatetable.Rows)
+                            if (sqlDatetable != null && sqlDatetable.Rows.Count != 0)
                             {
-                                gps_log._lat = gps_log._or_lat = operation_log.eqp_lat = row[0].ToString();
-                                gps_log._lon = gps_log._or_lon = operation_log.eqp_lon = row[1].ToString();
+                                string avlsLat = string.Empty, avlsLon = string.Empty;
+                                foreach (DataRow row in sqlDatetable.Rows)
+                                {
+                                    gps_log._lat = gps_log._or_lat = operation_log.eqp_lat = row[0].ToString();
+                                    gps_log._lon = gps_log._or_lon = operation_log.eqp_lon = row[1].ToString();
+                                }
+                                /*
+                                string zero = "0";
+                                if (gps_log._lat.Equals(zero) || gps_log._lon.Equals(zero))
+                                {
+                                    string lat = string.Empty, lon = string.Empty;
+                                    GetInitialLocationFromSql(ref lat, ref lon, deviceID);
+                                    log.Info("call GetInitialLocationFromSql1:"+deviceID);
+                                    gps_log._lat = gps_log._or_lat = operation_log.eqp_lat = lat;
+                                    gps_log._lon = gps_log._or_lon = operation_log.eqp_lon = lon;
+                                }
+                                */
                             }
-                            /*
-                            string zero = "0";
-                            if (gps_log._lat.Equals(zero) || gps_log._lon.Equals(zero))
+                            else
                             {
+                                //string zero = "0";
+                                //gps_log._lat = operation_log.eqp_lat = zero;
+                                //gps_log._lon = operation_log.eqp_lon = zero;
+
                                 string lat = string.Empty, lon = string.Empty;
                                 GetInitialLocationFromSql(ref lat, ref lon, deviceID);
-                                log.Info("call GetInitialLocationFromSql1:"+deviceID);
+                                log.Info("call GetInitialLocationFromSql2:" + deviceID);
                                 gps_log._lat = gps_log._or_lat = operation_log.eqp_lat = lat;
                                 gps_log._lon = gps_log._or_lon = operation_log.eqp_lon = lon;
                             }
-                            */
                         }
-                        else
-                        {
-                            //string zero = "0";
-                            //gps_log._lat = operation_log.eqp_lat = zero;
-                            //gps_log._lon = operation_log.eqp_lon = zero;
-
-                            string lat = string.Empty, lon = string.Empty;
-                            GetInitialLocationFromSql(ref lat, ref lon, deviceID);
-                            log.Info("call GetInitialLocationFromSql2:" + deviceID);
-                            gps_log._lat = gps_log._or_lat = operation_log.eqp_lat = lat;
-                            gps_log._lon = gps_log._or_lon = operation_log.eqp_lon = lon;
-                        }
-                        sqlDatetable.Clear();
-                        sqlDatetable.Dispose();
-                        sqlDatetable = null;
+                        //DataTable sqlDatetable = accessSqlServerClient.get_DataTable(sqlCmd);
+                        //sql_client.disconnect();
+                        
                     }
                         /*
                     else

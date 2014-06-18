@@ -319,10 +319,14 @@ namespace ConsoleApplication1_client_threading
                         if (command != null)
                             command.Dispose();
                         command = null;
-                        DataTable returnTable = datatable.Copy();
-                        stopWatch2.Stop();
-                        SiAuto.Main.AddCheckpoint(Level.Debug, "sql query4 take time(ms):" + stopWatch2.ElapsedMilliseconds, cmd);
-                        return returnTable;
+                        using (DataTable returnTable = datatable.Copy())
+                        {
+                            stopWatch2.Stop();
+                            SiAuto.Main.AddCheckpoint(Level.Debug, "sql query4 take time(ms):" + stopWatch2.ElapsedMilliseconds, cmd);
+                            return returnTable;
+                        }
+                        //DataTable returnTable = datatable.Copy();
+                        
                     }
                     else
                     {
