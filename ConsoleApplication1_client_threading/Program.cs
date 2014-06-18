@@ -805,9 +805,9 @@ WHERE
         */
         private static void SendToAvlsEventColumnSetNegativeOneIfPowerOff(TcpClient avlsTcpClient,NetworkStream avlsNetworkStream)
         {
-            PgSqlConnection.ClearAllPools();
-            GC.Collect();
-            GC.WaitForPendingFinalizers();
+            //PgSqlConnection.ClearAllPools();
+            //GC.Collect();
+            //GC.WaitForPendingFinalizers();
             //SiAuto.Main.EnterMethod(Level.Debug, "SendToAvlsEventColumnSetNegativeOneIfPowerOff");
             var sqlClient = new SqlClient(
                 ConfigurationManager.AppSettings["SQL_SERVER_IP"], 
