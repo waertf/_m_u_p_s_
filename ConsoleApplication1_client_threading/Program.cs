@@ -5608,7 +5608,6 @@ public._gps_log._uid = '" + deviceID + @"'
                         {
                             resultList.Add("out");
                         }
-                        Thread.Sleep(30);
                     }
                     resultList.Sort();
                     int index = resultList.BinarySearch("out");
@@ -5795,7 +5794,6 @@ public._gps_log._uid = '"+deviceID+@"'
                         {
                             resultList.Add("out");
                         }
-                        Thread.Sleep(30);
                     }
                     resultList.Sort();
                     int index = resultList.BinarySearch("out");
