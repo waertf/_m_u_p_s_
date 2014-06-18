@@ -2230,8 +2230,22 @@ Select 1-6 then press enter to send package
                                 //Console.WriteLine("SQL Access Enable");
                                 //sqlAccessEvent.WaitOne();
                             }
-                            access_avls.Join();
-                            access_sql.Join();
+                            switch (ConfigurationManager.AppSettings["xmlSleepOrJoin"])
+                            {
+                                case    "sleep":
+                                    Thread.Sleep(int.Parse(ConfigurationManager.AppSettings["xmlSleepTime"]));
+                                    break;
+                                case    "join":
+                                    access_avls.Join();
+                                    access_sql.Join();
+                                    break;
+                                default:
+                                    access_avls.Join();
+                                    access_sql.Join();
+                                    break;
+                            }
+                            
+                            
 
                             //if (access_sql != null) access_sql.Join(int.Parse(ConfigurationManager.AppSettings["accessSqlJoinTimeout"]));
                             //access_avls.Join();
