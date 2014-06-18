@@ -139,6 +139,7 @@ namespace ConsoleApplication1_client_threading
                      command.Dispose();
                     command = null;
                     //pgSqlConnection.Commit();
+                    /*
                     ThreadPool.QueueUserWorkItem(callback =>
                     {
                         
@@ -152,6 +153,7 @@ namespace ConsoleApplication1_client_threading
                         Console.ResetColor();
                         log.Info("sql Write:\r\n" + cmd);
                     });
+                    */
                     stopWatch.Stop();
                     // Get the elapsed time as a TimeSpan value.
                     TimeSpan ts = stopWatch.Elapsed;
