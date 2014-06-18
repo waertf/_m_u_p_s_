@@ -1266,7 +1266,7 @@ LIMIT
                                     break;
                             }
                         }
-
+                        if (requeseHashtable.Count>0)
                         if (int.Parse((string)requeseHashtable["send_value"]).Equals(0))
                         {
 
