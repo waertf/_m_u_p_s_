@@ -3986,6 +3986,7 @@ FROM
                     log.Info("cannot find suaddr in htable");
                     //sql_client.Dispose();
                     //sql_client = null;
+                    Console.WriteLine("-access_sql_server");
                     return;
                     gps_log._uid = operation_log.eqp_id = "\'" + "null" + "\'";
                     gps_log._id = "\'" + "null" + "_" + now + "\'";
@@ -4374,6 +4375,7 @@ VALUES(
                         //sql_client.disconnect();
                         //sql_client.Dispose();
                         //sql_client = null;
+                        Console.WriteLine("-access_sql_server");
                         return;
                         break;
                     case "Unit Absent":
@@ -4475,6 +4477,7 @@ VALUES(
                     //sql_client.disconnect();
                     //sql_client.Dispose();
                     //sql_client = null;
+                    Console.WriteLine("-access_sql_server");
                         return;
                         break;
                     case "Ignition Off":
