@@ -2620,6 +2620,7 @@ WHERE
                             ConfigurationManager.AppSettings["subConnectionLifetime"]);
         private static void access_avls_server(object o)
         {
+            string myMethodName = MethodBase.GetCurrentMethod().Name;
             Stopwatch stopWatch = Stopwatch.StartNew();
             //lock (avlsObject)
             {
@@ -2628,7 +2629,7 @@ WHERE
             }
                 
             //Console.ForegroundColor = ConsoleColor.DarkGreen;
-            Console.WriteLine("+access_avls_server");
+            Console.WriteLine("+" + myMethodName);
             //Console.ResetColor();
             var oo = o as AvlsClass;
 
@@ -2864,7 +2865,7 @@ LIMIT 1";
                     //avlsTcpClient.Close();
                     //Console.WriteLine("-access_avls_server");
                     //Console.ForegroundColor = ConsoleColor.DarkGreen;
-                    Console.WriteLine("-access_avls_server");
+                    Console.WriteLine("-" + myMethodName);
                     //Console.ResetColor();
                     stopWatch.Stop();
                     SiAuto.Main.LogMessage("access_avls_server spend time(ms):" + stopWatch.ElapsedMilliseconds);
@@ -2875,7 +2876,7 @@ LIMIT 1";
                     //netStream.Close();
                     //avlsTcpClient.Close();
                     //Console.ForegroundColor = ConsoleColor.DarkGreen;
-                    Console.WriteLine("-access_avls_server");
+                    Console.WriteLine("-" + myMethodName);
                     //Console.ResetColor();
                     stopWatch.Stop();
                     SiAuto.Main.LogMessage("access_avls_server spend time(ms):" + stopWatch.ElapsedMilliseconds);
@@ -2896,7 +2897,7 @@ LIMIT 1";
                    // netStream.Close();
                     //avlsTcpClient.Close();
                     //Console.ForegroundColor = ConsoleColor.DarkGreen;
-                    Console.WriteLine("-access_avls_server");
+                    Console.WriteLine("-" + myMethodName);
                     //Console.ResetColor();
                     stopWatch.Stop();
                     SiAuto.Main.LogMessage("access_avls_server spend time(ms):" + stopWatch.ElapsedMilliseconds);
@@ -3290,7 +3291,7 @@ LIMIT 1";
             //GC.WaitForPendingFinalizers();
             //Console.WriteLine("-access_avls_server");
             //Console.ForegroundColor = ConsoleColor.DarkGreen;
-            Console.WriteLine("-access_avls_server");
+            Console.WriteLine("-" + myMethodName);
             //Console.ResetColor();
             stopWatch.Stop();
             SiAuto.Main.LogMessage("access_avls_server spend time(ms):" + stopWatch.ElapsedMilliseconds);
@@ -3864,6 +3865,7 @@ FROM
                 ConfigurationManager.AppSettings["ConnectionLifetime"]);
         private static void access_sql_server(object o)
         {
+             string myMethodName = MethodBase.GetCurrentMethod().Name;
             Stopwatch stopWatch = Stopwatch.StartNew();
 
             {
@@ -3874,7 +3876,7 @@ FROM
                 }
                     
                 //Console.ForegroundColor = ConsoleColor.DarkCyan;
-                Console.WriteLine("+access_sql_server");
+                Console.WriteLine("+" + myMethodName);
                 //Console.ResetColor();
             //Console.WriteLine("+access_sql_server");
                 var oo = o as SqlClass;
@@ -3976,7 +3978,7 @@ FROM
                     log.Info("cannot find suaddr in htable");
                     //sql_client.Dispose();
                     //sql_client = null;
-                    Console.WriteLine("-access_sql_server");
+                    Console.WriteLine("-" + myMethodName);
                     return;
                     gps_log._uid = operation_log.eqp_id = "\'" + "null" + "\'";
                     gps_log._id = "\'" + "null" + "_" + now + "\'";
@@ -4365,7 +4367,7 @@ VALUES(
                         //sql_client.disconnect();
                         //sql_client.Dispose();
                         //sql_client = null;
-                        Console.WriteLine("-access_sql_server");
+                        Console.WriteLine("-" + myMethodName);
                         return;
                         break;
                     case "Unit Absent":
@@ -4467,7 +4469,7 @@ VALUES(
                     //sql_client.disconnect();
                     //sql_client.Dispose();
                     //sql_client = null;
-                    Console.WriteLine("-access_sql_server");
+                    Console.WriteLine("-" + myMethodName);
                         return;
                         break;
                     case "Ignition Off":
@@ -5495,7 +5497,7 @@ LIMIT 1";
             //GC.Collect();
             //GC.WaitForPendingFinalizers();
                 //Console.ForegroundColor = ConsoleColor.DarkCyan;
-                Console.WriteLine("-access_sql_server");
+                Console.WriteLine("-" + myMethodName);
                 //Console.ResetColor();
             //Console.WriteLine("-access_sql_server");
             //sqlAccessEvent.Set();
