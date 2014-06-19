@@ -37,11 +37,13 @@ namespace ConsoleApplication1_client_threading
             pgSqlConnection = new PgSqlConnection(pgCSB.ConnectionString);
             IsConnected = false;
         }
-        public bool connect()
+        public void connect()
         {
             try
             {
-                
+                pgSqlConnection.Open();
+                IsConnected = true;
+                /*
                 {
                     if (pgSqlConnection != null)
                     {
@@ -54,6 +56,7 @@ namespace ConsoleApplication1_client_threading
                         return false;
                     }
                 }
+                */
                 
             }
             catch (PgSqlException ex)
@@ -62,7 +65,7 @@ namespace ConsoleApplication1_client_threading
                 Console.WriteLine("Connect exception occurs: {0}", ex.Error);
                 log.Error("Connect exception occurs: " + ex.Error);
                 Console.ResetColor();
-                return false;
+                connect();
             }
         }
         public bool disconnect()
