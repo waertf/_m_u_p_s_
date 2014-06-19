@@ -3326,8 +3326,10 @@ LIMIT 1";
             
             try
             {
-                searchID = (from p in sqlCEdb.CheckIfOverTime where p.Uid == id select p.Uid).First();
-                searchID2 = (from p in sqlCEdb.CheckIfOverTime2 where p.Uid == id select p.Uid).First();
+                //searchID = (from p in sqlCEdb.CheckIfOverTime where p.Uid == id select p.Uid).First();
+                //searchID2 = (from p in sqlCEdb.CheckIfOverTime2 where p.Uid == id select p.Uid).First();
+                searchID = SqlCeCompiledQuery.SearchID1(sqlCEdb, id).First();
+                searchID2 = SqlCeCompiledQuery.SearchID2(sqlCEdb, id).First();
             }
             catch (Exception)
             {
