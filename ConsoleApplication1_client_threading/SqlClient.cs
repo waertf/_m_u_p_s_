@@ -39,9 +39,6 @@ namespace ConsoleApplication1_client_threading
         }
         public bool connect()
         {
-            pgSqlConnection.Open();
-            IsConnected = true;
-            return true;
             try
             {
                 
