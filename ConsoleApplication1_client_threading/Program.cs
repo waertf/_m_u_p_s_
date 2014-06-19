@@ -445,7 +445,7 @@ WHERE
 
             while (!sql_client.connect())
             {
-                Thread.Sleep(30);
+                //Thread.Sleep(30);
             }
             string totalDevice = null;
             using (DataTable dt = sql_client.get_DataTable(@"SELECT reltuples FROM pg_class WHERE oid = 'sd.equipment'::regclass"))
@@ -830,7 +830,7 @@ WHERE
   custom.uns_deivce_power_status.power = 'off'";
             while (!sqlClient.connect())
             {
-                Thread.Sleep(30);
+                //Thread.Sleep(30);
             }
 
             //DataTable dt = sqlClient.get_DataTable(sqlCmd);
@@ -873,7 +873,7 @@ WHERE
                         sqlClient.disconnect();
                         sqlClient.Dispose();
                         sqlClient = null;
-                        Thread.Sleep(30);
+                        //Thread.Sleep(30);
 
 
                     }
@@ -969,7 +969,7 @@ LIMIT 1";
                 log.Info("avlsSqlCmd=" + Environment.NewLine + avlsSqlCmd);
                 while (!avlsSqlClient.connect())
                 {
-                    Thread.Sleep(30);
+                    //Thread.Sleep(30);
                 }
                 
                 //DataTable dt = avlsSqlClient.get_DataTable(avlsSqlCmd);
@@ -1139,7 +1139,7 @@ LIMIT
                             else
                             {
                                 //continue;
-                                Thread.Sleep(30);
+                                //Thread.Sleep(30);
                                 return;
                             }
                     }
@@ -1287,7 +1287,7 @@ LIMIT
                 }
                 
             }
-            Thread.Sleep(30);
+            //Thread.Sleep(30);
         }
         /*
         private static void sendtest(NetworkStream netStream , SqlClient sql_client)
@@ -1444,7 +1444,7 @@ Select 1-6 then press enter to send package
                         UnsTcpWriteLine(netStream, data_append_dataLength(Digital_Output_Change_Request), Digital_Output_Change_Request);
                         break;
                 }
-                Thread.Sleep(30);
+                //Thread.Sleep(30);
             }
             /*                                
             string error = "<error></error>";
@@ -1739,7 +1739,7 @@ Select 1-6 then press enter to send package
                     string now = string.Format("{0:yyyyMMdd}", DateTime.Now);
                     while (!sql_client.connect())
                     {
-                        Thread.Sleep(30);
+                        //Thread.Sleep(30);
                     }
                     string manual_id_serial_command = null;
                     using (DataTable dt = sql_client.get_DataTable("SELECT COUNT(_id)   FROM public.operation_log"))
@@ -2567,7 +2567,7 @@ WHERE
             log.Info("GetInitialLocationFromSqllCmd=" + Environment.NewLine + sqlCmd);
             while (!sqlClient.connect())
             {
-                Thread.Sleep(30);
+                //Thread.Sleep(30);
             }
             
             //DataTable dt = sqlClient.get_DataTable(sqlCmd);
