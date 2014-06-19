@@ -100,7 +100,7 @@
       <HintPath>bin\Release\keeplive.dll</HintPath>
     </Reference>
     <Reference Include="log4net">
-      <HintPath>C:\Users\waertf\Downloads\log4net-1.2.13-bin-newkey\log4net-1.2.13\bin\net\4.0\release\log4net.dll</HintPath>
+      <HintPath>..\..\..\..\..\Downloads\Compressed\log4net-1.2.13-bin-newkey\log4net-1.2.13\bin\net\4.0\release\log4net.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.configuration" />
