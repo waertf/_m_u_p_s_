@@ -3342,7 +3342,7 @@ LIMIT 1";
                         CheckIfOverTime newRow = new CheckIfOverTime();
                         newRow.Uid = id;
                         sqlCEdb.CheckIfOverTime.InsertOnSubmit(newRow);
-                        sqlCEdb.SubmitChanges();
+                        //sqlCEdb.SubmitChanges();
                     }
                     if (string.IsNullOrEmpty(searchID2))
                     {
@@ -3350,8 +3350,9 @@ LIMIT 1";
                         CheckIfOverTime2 newRow2 = new CheckIfOverTime2();
                         newRow2.Uid = id;
                         sqlCEdb.CheckIfOverTime2.InsertOnSubmit(newRow2);
-                        sqlCEdb.SubmitChanges();
+                        //sqlCEdb.SubmitChanges();
                     }
+                    sqlCEdb.SubmitChanges();
                 }
                 catch (Exception ex)
                 {
@@ -3697,6 +3698,7 @@ now() <= end_time::timestamp ";
             //GC.WaitForPendingFinalizers();
             //if (message.Contains("p_prohibited"))
                 //SiAuto.Main.LogMessage(message);
+
             return message;
         }
 
