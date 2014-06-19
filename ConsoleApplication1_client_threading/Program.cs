@@ -443,10 +443,7 @@ WHERE
                 ConfigurationManager.AppSettings["MaxPoolSize"],
                 ConfigurationManager.AppSettings["ConnectionLifetime"]);
 
-            while (!sql_client.connect())
-            {
-                //Thread.Sleep(30);
-            }
+            sql_client.connect();
             string totalDevice = null;
             using (DataTable dt = sql_client.get_DataTable(@"SELECT reltuples FROM pg_class WHERE oid = 'sd.equipment'::regclass"))
             {
@@ -828,10 +825,7 @@ WHERE
     ConfigurationManager.AppSettings["setNegativeOneToAvlsInterval"] + 
 @"' AND 
   custom.uns_deivce_power_status.power = 'off'";
-            while (!sqlClient.connect())
-            {
-                //Thread.Sleep(30);
-            }
+            sqlClient.connect();
 
             //DataTable dt = sqlClient.get_DataTable(sqlCmd);
             using (DataTable dt = sqlClient.get_DataTable(sqlCmd))
@@ -967,10 +961,7 @@ ORDER BY
   public._gps_log._lon
 LIMIT 1";
                 log.Info("avlsSqlCmd=" + Environment.NewLine + avlsSqlCmd);
-                while (!avlsSqlClient.connect())
-                {
-                    //Thread.Sleep(30);
-                }
+                avlsSqlClient.connect();
                 
                 //DataTable dt = avlsSqlClient.get_DataTable(avlsSqlCmd);
                 using (DataTable dt = avlsSqlClient.get_DataTable(avlsSqlCmd))
@@ -1737,10 +1728,7 @@ Select 1-6 then press enter to send package
                 {
 //access sql
                     string now = string.Format("{0:yyyyMMdd}", DateTime.Now);
-                    while (!sql_client.connect())
-                    {
-                        //Thread.Sleep(30);
-                    }
+                    sql_client.connect();
                     string manual_id_serial_command = null;
                     using (DataTable dt = sql_client.get_DataTable("SELECT COUNT(_id)   FROM public.operation_log"))
                     {
@@ -2565,10 +2553,7 @@ FROM
 WHERE
   sd.initial_location.uid = '" + id + @"'";
             log.Info("GetInitialLocationFromSqllCmd=" + Environment.NewLine + sqlCmd);
-            while (!sqlClient.connect())
-            {
-                //Thread.Sleep(30);
-            }
+            sqlClient.connect();
             
             //DataTable dt = sqlClient.get_DataTable(sqlCmd);
             using (DataTable dt = sqlClient.get_DataTable(sqlCmd))
