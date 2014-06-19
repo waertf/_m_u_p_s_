@@ -1473,11 +1473,11 @@ Select 1-6 then press enter to send package
                     IAsyncResult result = netStream.BeginWrite(writeData, 0, writeData.Length, new AsyncCallback(UnsTcpWriteCallBack), netStream);
                     result.AsyncWaitHandle.WaitOne();
                     result.AsyncWaitHandle.Close();
-                    Console.ForegroundColor = ConsoleColor.Magenta;
+                    //Console.ForegroundColor = ConsoleColor.Magenta;
                     Console.WriteLine("S****************************************************************************");
                     Console.WriteLine("uns write:\r\n" + write);
                     Console.WriteLine("E****************************************************************************");
-                    Console.ResetColor();
+                    //Console.ResetColor();
                 }
                 catch (Exception ex)
                 {
@@ -1808,12 +1808,12 @@ Select 1-6 then press enter to send package
                     log.Error("FinishReadError1:\r\n" + ex);
                 }
                 /*
-                Console.ForegroundColor = ConsoleColor.DarkGray;
+                //Console.ForegroundColor = ConsoleColor.DarkGray;
                 Console.WriteLine("S############################################################################");
                 Console.WriteLine("Read:\r\n" + ouput2);
                 //Console.WriteLine("First node:[" + xml_root_tag + "]");
                 Console.WriteLine("E############################################################################");
-                Console.ResetColor();
+                //Console.ResetColor();
                 */
                 //xmlQueue.Enqueue(returndata);
                 xml_parse(returndata);
@@ -2627,9 +2627,9 @@ WHERE
                     //avlsLinkedList.RemoveFirst();
             }
                 
-            Console.ForegroundColor = ConsoleColor.DarkGreen;
+            //Console.ForegroundColor = ConsoleColor.DarkGreen;
             Console.WriteLine("+access_avls_server");
-            Console.ResetColor();
+            //Console.ResetColor();
             var oo = o as AvlsClass;
 
             string xml_root_tag = oo.XmlRootTag;
@@ -2863,9 +2863,9 @@ LIMIT 1";
                     //netStream.Close();
                     //avlsTcpClient.Close();
                     //Console.WriteLine("-access_avls_server");
-                    Console.ForegroundColor = ConsoleColor.DarkGreen;
+                    //Console.ForegroundColor = ConsoleColor.DarkGreen;
                     Console.WriteLine("-access_avls_server");
-                    Console.ResetColor();
+                    //Console.ResetColor();
                     stopWatch.Stop();
                     SiAuto.Main.LogMessage("access_avls_server spend time(ms):" + stopWatch.ElapsedMilliseconds);
                     return;
@@ -2874,9 +2874,9 @@ LIMIT 1";
                 {
                     //netStream.Close();
                     //avlsTcpClient.Close();
-                    Console.ForegroundColor = ConsoleColor.DarkGreen;
+                    //Console.ForegroundColor = ConsoleColor.DarkGreen;
                     Console.WriteLine("-access_avls_server");
-                    Console.ResetColor();
+                    //Console.ResetColor();
                     stopWatch.Stop();
                     SiAuto.Main.LogMessage("access_avls_server spend time(ms):" + stopWatch.ElapsedMilliseconds);
                     return;
@@ -2895,9 +2895,9 @@ LIMIT 1";
                 {
                    // netStream.Close();
                     //avlsTcpClient.Close();
-                    Console.ForegroundColor = ConsoleColor.DarkGreen;
+                    //Console.ForegroundColor = ConsoleColor.DarkGreen;
                     Console.WriteLine("-access_avls_server");
-                    Console.ResetColor();
+                    //Console.ResetColor();
                     stopWatch.Stop();
                     SiAuto.Main.LogMessage("access_avls_server spend time(ms):" + stopWatch.ElapsedMilliseconds);
                     return;
@@ -3289,9 +3289,9 @@ LIMIT 1";
             //GC.Collect();
             //GC.WaitForPendingFinalizers();
             //Console.WriteLine("-access_avls_server");
-            Console.ForegroundColor = ConsoleColor.DarkGreen;
+            //Console.ForegroundColor = ConsoleColor.DarkGreen;
             Console.WriteLine("-access_avls_server");
-            Console.ResetColor();
+            //Console.ResetColor();
             stopWatch.Stop();
             SiAuto.Main.LogMessage("access_avls_server spend time(ms):" + stopWatch.ElapsedMilliseconds);
         }
@@ -3762,11 +3762,11 @@ FROM
                     //result.AsyncWaitHandle.Close();
                     netStream.WriteTimeout = 10;
                     netStream.Write(writeData, 0, writeData.Length);
-                    Console.ForegroundColor = ConsoleColor.Green;
+                    //Console.ForegroundColor = ConsoleColor.Green;
                     Console.WriteLine("S----------------------------------------------------------------------------");
                     Console.WriteLine("avls write:\r\n" + write);
                     Console.WriteLine("E----------------------------------------------------------------------------");
-                    Console.ResetColor();
+                    //Console.ResetColor();
                 }
                 catch (Exception ex)
                 {
@@ -3873,9 +3873,9 @@ FROM
                         //sqlLinkedList.RemoveFirst();
                 }
                     
-                Console.ForegroundColor = ConsoleColor.DarkCyan;
+                //Console.ForegroundColor = ConsoleColor.DarkCyan;
                 Console.WriteLine("+access_sql_server");
-                Console.ResetColor();
+                //Console.ResetColor();
             //Console.WriteLine("+access_sql_server");
                 var oo = o as SqlClass;
 
@@ -4508,9 +4508,9 @@ VALUES(
                         else
                         {
                             log.Error("access_sql_server:1:deviceID is null");
-                            Console.ForegroundColor = ConsoleColor.DarkCyan;
+                            //Console.ForegroundColor = ConsoleColor.DarkCyan;
                             Console.WriteLine("-access_sql_server");
-                            Console.ResetColor();
+                            //Console.ResetColor();
                             sql_client.disconnect();
                             sql_client.Dispose();
                             sql_client = null;
@@ -4585,9 +4585,9 @@ VALUES(
                         else
                         {
                             log.Error("access_sql_server:2:deviceID is null");
-                            Console.ForegroundColor = ConsoleColor.DarkCyan;
+                            //Console.ForegroundColor = ConsoleColor.DarkCyan;
                             Console.WriteLine("-access_sql_server");
-                            Console.ResetColor();
+                            //Console.ResetColor();
                             sql_client.disconnect();
                             sql_client.Dispose();
                             sql_client = null;
@@ -5494,9 +5494,9 @@ LIMIT 1";
                 //sql_client = null;
             //GC.Collect();
             //GC.WaitForPendingFinalizers();
-                Console.ForegroundColor = ConsoleColor.DarkCyan;
+                //Console.ForegroundColor = ConsoleColor.DarkCyan;
                 Console.WriteLine("-access_sql_server");
-                Console.ResetColor();
+                //Console.ResetColor();
             //Console.WriteLine("-access_sql_server");
             //sqlAccessEvent.Set();
                 stopWatch.Stop();
