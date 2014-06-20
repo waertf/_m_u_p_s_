@@ -12,6 +12,7 @@ using System.Net.Sockets;
 using System.Threading;
 using System.Configuration;
 using System.Collections.Specialized;
+using System.Threading.Tasks;
 using System.Timers;
 using System.Xml.Linq;
 using System.IO;
@@ -2052,93 +2053,100 @@ Select 1-6 then press enter to send package
                                 return;
                             }
                         }
-                        if (elements.Contains(new XElement("event-info").Name) && xml_root_tag == "Unsolicited-Location-Report")
-                        {
-                            htable.Add("event_info", XmlGetTagValue(xml_data, "event-info"));
-                            //Console.WriteLine("event_info:{0}", htable["event_info"]);
-                        }
-                        if (elements.Contains(new XElement("operation-error").Name))
-                        {
-                             htable.Add("result_code",XmlGetTagAttributeValue(xml_data, "result", "result-code"));
-                             //htable.Add("err_msg" , XmlGetTagValue(xml_data, "result"));
-                             htable.Add("result_msg", ConfigurationManager.AppSettings["RESULT_CODE_" + htable["result_code"]]);
-                             if (htable["result_code"].Equals("3"))//UNAUTHORIZED APPLICATION
-                             {
-                                 log.Info("UNAUTHORIZED APPLICATION call restart");
-                                 //Restart();
-                                 Environment.Exit(1);
-                             }
-                             //Console.WriteLine("result_code:{0}", htable["result_code"]);
-                             //Console.WriteLine("result_msg:{0}", htable["result_msg"]);
-                        }
+                        string getMessage = string.Empty;
+                        Task<string> GetGidAndFullnameFrom = null;
                         if (elements.Contains(new XElement("info-data").Name))
                         {
-                            if(elements.Contains(new XElement("impl-spec-data").Name))
-                            {}
+                            if (elements.Contains(new XElement("shape").Name))
+                                switch (Convert.ToString(htable["shape-type"]))//info-data scope
+                                {
+                                    case "point-2d":
+                                        {
+                                            htable.Add("lat_value", XmlGetTagValue(xml_data, "lat"));
+                                            htable.Add("long_value", XmlGetTagValue(xml_data, "long"));
+                                            //Console.WriteLine("lat_value:{0}", lat_value);
+                                            //Console.WriteLine("long_value:{0}", long_value);
+                                        }
+                                        break;
+                                    case "point-3d":
+                                        {
+                                            htable.Add("lat_value", XmlGetTagValue(xml_data, "lat"));
+                                            htable.Add("long_value", XmlGetTagValue(xml_data, "long"));
+                                            htable.Add("altitude_value", XmlGetTagValue(xml_data, "altitude"));
+                                            //Console.WriteLine("lat_value:{0}", lat_value);
+                                            //Console.WriteLine("long_value:{0}", long_value);
+                                            //Console.WriteLine("altitude_value:{0}", altitude_value);
+                                        }
+                                        break;
+                                    case "circle-2d":
+                                        {
+                                            htable.Add("lat_value", XmlGetTagValue(xml_data, "lat"));
+                                            htable.Add("long_value", XmlGetTagValue(xml_data, "long"));
+                                            htable.Add("radius_value", XmlGetTagValue(xml_data, "radius"));
+                                            //Console.WriteLine("lat:[{0}] , long:[{1}] , radius:[{2}]", lat_value, long_value, radius_value);
+                                        }
+                                        break;
+                                    case "circle-3d":
+                                        {
+                                            htable.Add("lat_value", XmlGetTagValue(xml_data, "lat"));
+                                            htable.Add("long_value", XmlGetTagValue(xml_data, "long"));
+                                            htable.Add("altitude_value", XmlGetTagValue(xml_data, "altitude"));
+                                            htable.Add("radius_value", XmlGetTagValue(xml_data, "radius"));
+                                            //Console.WriteLine("lat_value:{0}", lat_value);
+                                            //Console.WriteLine("long_value:{0}", long_value);
+                                            //Console.WriteLine("altitude_value:{0}", altitude_value);
+                                            //Console.WriteLine("radius_value:{0}", radius_value);
+                                        }
+                                        break;
+                                }
+                            //List<EAB> prohibitedList, locationList;
+                            string prohibitedTableName = string.Empty, locationTableName = string.Empty;
+                            //prohibitedTableName = "public.prohibited";
+                            //locationTableName = "public.patrol_location";
+                            //GetRidAndGeomFromSqlTable(prohibitedTableName, out prohibitedList);
+                            //GetRidAndGeomFromSqlTable(locationTableName, out locationList);
+
+                            prohibitedTableName = "public.p_prohibited";
+                            locationTableName = "public.patrol_location";
                             
+                            //lock (getGidAndFullnameLock)
+                            {
+                                if (htable.ContainsKey("lat_value") && htable.ContainsKey("long_value") &&
+                                    htable.ContainsKey("suaddr"))
+                                {
+                                    GetGidAndFullnameFrom = new Task<string>(() =>
+            GetGidAndFullnameFromP_prohibitedAndPatrol_locationFromSql(prohibitedTableName,
+                                        locationTableName,
+                                        htable["lat_value"] as string, htable["long_value"] as string, htable["suaddr"] as string, false, htable["suaddr"].ToString()));
+                                    GetGidAndFullnameFrom.Start();
+                                }
+                                    
+                            }
+                            if (elements.Contains(new XElement("impl-spec-data").Name))
+                            { }
+
                             //string shape_type = (string)(from e in xml_data.Descendants("shape") select e.Elements().First().Name.LocalName).First();
                             if (elements.Contains(new XElement("info-time").Name))
-                                htable.Add("info_time",  XmlGetTagValue(xml_data, "info-time"));//info-data scope
+                                htable.Add("info_time", XmlGetTagValue(xml_data, "info-time"));//info-data scope
                             if (elements.Contains(new XElement("server-time").Name))
-                                htable.Add("server_time" , XmlGetTagValue(xml_data, "server-time"));//info-data scope
+                                htable.Add("server_time", XmlGetTagValue(xml_data, "server-time"));//info-data scope
                             //Console.WriteLine("info_time:{0}", info_time);
                             //Console.WriteLine("server_time:{0}", server_time);
                             if (elements.Contains(new XElement("satellites-num").Name))
                             {
-                                htable.Add("satellites_num" , XmlGetTagValue(xml_data, "satellites-num"));//info-data scope
+                                htable.Add("satellites_num", XmlGetTagValue(xml_data, "satellites-num"));//info-data scope
                                 //Console.WriteLine("satellites_num:{0}", satellites_num);
                             }
                             if (elements.Contains(new XElement("speed-hor").Name))
-                                htable.Add("speed-hor" , XmlGetTagValue(xml_data, "speed-hor"));//info-data scope
+                                htable.Add("speed-hor", XmlGetTagValue(xml_data, "speed-hor"));//info-data scope
                             if (elements.Contains(new XElement("direction-hor").Name))
-                                htable.Add("direction-hor" , XmlGetTagValue(xml_data, "direction-hor"));//info-data scope
+                                htable.Add("direction-hor", XmlGetTagValue(xml_data, "direction-hor"));//info-data scope
                             if (elements.Contains(new XElement("shape").Name))
-                                htable.Add("shape-type" , XmlGetFirstChildTagName(xml_data, "shape"));//info-data scope
+                                htable.Add("shape-type", XmlGetFirstChildTagName(xml_data, "shape"));//info-data scope
                             //Console.WriteLine("shape_type :[{0}]", shape_type);
                             //Console.WriteLine("speed_hor:{0}", speed_hor);
                             //Console.WriteLine("Direction_hor:{0}", Direction_hor);
-                            if (elements.Contains(new XElement("shape").Name))
-                            switch (Convert.ToString(htable["shape-type"]))//info-data scope
-                            {
-                                case "point-2d":
-                                    {
-                                        htable.Add("lat_value" , XmlGetTagValue(xml_data, "lat"));
-                                        htable.Add("long_value" , XmlGetTagValue(xml_data, "long"));
-                                        //Console.WriteLine("lat_value:{0}", lat_value);
-                                        //Console.WriteLine("long_value:{0}", long_value);
-                                    }
-                                    break;
-                                case "point-3d":
-                                    {
-                                        htable.Add("lat_value" ,XmlGetTagValue(xml_data, "lat"));
-                                        htable.Add("long_value" , XmlGetTagValue(xml_data, "long")); 
-                                        htable.Add("altitude_value" , XmlGetTagValue(xml_data, "altitude"));
-                                        //Console.WriteLine("lat_value:{0}", lat_value);
-                                        //Console.WriteLine("long_value:{0}", long_value);
-                                        //Console.WriteLine("altitude_value:{0}", altitude_value);
-                                    }
-                                    break;
-                                case "circle-2d":
-                                    {
-                                        htable.Add("lat_value" , XmlGetTagValue(xml_data, "lat"));
-                                        htable.Add("long_value" , XmlGetTagValue(xml_data, "long")); 
-                                        htable.Add("radius_value" , XmlGetTagValue(xml_data, "radius"));
-                                        //Console.WriteLine("lat:[{0}] , long:[{1}] , radius:[{2}]", lat_value, long_value, radius_value);
-                                    }
-                                    break;
-                                case "circle-3d":
-                                    {
-                                        htable.Add("lat_value" , XmlGetTagValue(xml_data, "lat"));
-                                        htable.Add("long_value" , XmlGetTagValue(xml_data, "long")); 
-                                        htable.Add("altitude_value" , XmlGetTagValue(xml_data, "altitude"));
-                                        htable.Add("radius_value", XmlGetTagValue(xml_data, "radius"));
-                                        //Console.WriteLine("lat_value:{0}", lat_value);
-                                        //Console.WriteLine("long_value:{0}", long_value);
-                                        //Console.WriteLine("altitude_value:{0}", altitude_value);
-                                        //Console.WriteLine("radius_value:{0}", radius_value);
-                                    }
-                                    break;
-                            }
+
                             if (elements.Contains(new XElement("sensor-info").Name) && false)//Sensor Info
                             {
                                 IEnumerable<XElement> de = from el in xml_data.Descendants("sensor") select el;
@@ -2165,30 +2173,35 @@ Select 1-6 then press enter to send package
                             }
                             if (elements.Contains(new XElement("vehicle-info").Name))//Vehicle Info
                             {
-                                htable.Add("Odometer" , XmlGetTagValue(xml_data, "odometer"));
+                                htable.Add("Odometer", XmlGetTagValue(xml_data, "odometer"));
                                 //Console.WriteLine("Odometer:{0}", Odometer);
                             }
                         }
-
-                        //List<EAB> prohibitedList, locationList;
-                    string prohibitedTableName = string.Empty, locationTableName = string.Empty;
-                    //prohibitedTableName = "public.prohibited";
-                    //locationTableName = "public.patrol_location";
-                    //GetRidAndGeomFromSqlTable(prohibitedTableName, out prohibitedList);
-                    //GetRidAndGeomFromSqlTable(locationTableName, out locationList);
-
-                    prohibitedTableName = "public.p_prohibited";
-                    locationTableName = "public.patrol_location";
-                    string getMessage = string.Empty;
-                        //lock (getGidAndFullnameLock)
+                        if (elements.Contains(new XElement("event-info").Name) && xml_root_tag == "Unsolicited-Location-Report")
                         {
-                            if (htable.ContainsKey("lat_value") && htable.ContainsKey("long_value") && htable.ContainsKey("suaddr"))
-                            getMessage = GetGidAndFullnameFromP_prohibitedAndPatrol_locationFromSql(prohibitedTableName,
-                                locationTableName,
-                                htable["lat_value"] as string, htable["long_value"] as string, htable["suaddr"] as string, false, htable["suaddr"].ToString());
+                            htable.Add("event_info", XmlGetTagValue(xml_data, "event-info"));
+                            //Console.WriteLine("event_info:{0}", htable["event_info"]);
                         }
+                        if (elements.Contains(new XElement("operation-error").Name))
+                        {
+                             htable.Add("result_code",XmlGetTagAttributeValue(xml_data, "result", "result-code"));
+                             //htable.Add("err_msg" , XmlGetTagValue(xml_data, "result"));
+                             htable.Add("result_msg", ConfigurationManager.AppSettings["RESULT_CODE_" + htable["result_code"]]);
+                             if (htable["result_code"].Equals("3"))//UNAUTHORIZED APPLICATION
+                             {
+                                 log.Info("UNAUTHORIZED APPLICATION call restart");
+                                 //Restart();
+                                 Environment.Exit(1);
+                             }
+                             //Console.WriteLine("result_code:{0}", htable["result_code"]);
+                             //Console.WriteLine("result_msg:{0}", htable["result_msg"]);
+                        }
+                        
+
+                        
                         {
                             Thread access_sql = null, access_avls = null;
+                            getMessage = GetGidAndFullnameFrom.Result;
                             if (bool.Parse(ConfigurationManager.AppSettings["AVLS_ACCESS"]))
                             {
                                 
