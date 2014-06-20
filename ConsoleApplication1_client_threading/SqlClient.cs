@@ -65,6 +65,7 @@ namespace ConsoleApplication1_client_threading
                 Console.WriteLine("Connect exception occurs: {0}", ex.Error);
                 log.Error("Connect exception occurs: " + ex.Error);
                 Console.ResetColor();
+                disconnect();
                 connect();
             }
         }
