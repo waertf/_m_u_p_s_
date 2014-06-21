@@ -5602,7 +5602,7 @@ public._gps_log._uid = '" + deviceID + @"'
             {
                 if (dt3 != null && dt3.Rows.Count != 0)
                 {
-                    ConcurrentBag<string> cb = new ConcurrentBag<string>();
+                    ConcurrentDictionary<string, string> cd = new ConcurrentDictionary<string, string>();
 
                     Parallel.ForEach(dt3.AsEnumerable(), row =>
                     {
@@ -5610,32 +5610,32 @@ public._gps_log._uid = '" + deviceID + @"'
                             double.Parse(row[1].ToString()), GeoCodeCalcMeasurement.Kilometers);
                         if (d <= distanceLimit)
                         {
-                            cb.Add("in");
+                            cd.TryAdd("in", "in");
                         }
                         else
                         {
-                            cb.Add("out");
+                            cd.TryAdd("out", "out");
                         }
                     });
 
-                    if (!cb.Contains("out"))
+                    if (cd.ContainsKey("out"))
                     {
                         string result = string.Empty;
-                        result = "in";
-                        cb = null;
+                        result = "out";
+                        cd = null;
                         //GC.Collect();
                         //GC.WaitForPendingFinalizers();
-                        
+
                         return result;
                     }
                     else
                     {
                         string result = string.Empty;
-                        result = "out";
-                        cb = null;
+                        result = "in";
+                        cd = null;
                         //GC.Collect();
                         //GC.WaitForPendingFinalizers();
-                        
+
                         return result;
                     }
                 }
@@ -5790,7 +5790,7 @@ public._gps_log._uid = '"+deviceID+@"'
                 if (dt3 != null && dt3.Rows.Count != 0)
                 {
 
-                    ConcurrentBag<string> cb = new ConcurrentBag<string>();
+                    ConcurrentDictionary<string,string> cd = new ConcurrentDictionary<string, string>();
                     
                     Parallel.ForEach(dt3.AsEnumerable(), row =>
                     {
@@ -5798,19 +5798,19 @@ public._gps_log._uid = '"+deviceID+@"'
                             double.Parse(row[1].ToString()), GeoCodeCalcMeasurement.Kilometers);
                         if (d <= distanceLimit)
                         {
-                            cb.Add("in");
+                            cd.TryAdd("in", "in");
                         }
                         else
                         {
-                            cb.Add("out");
+                            cd.TryAdd("out", "out");
                         }
                     });
 
-                    if (!cb.Contains("out"))
+                    if (cd.ContainsKey("out"))
                     {
                         string result = string.Empty;
-                        result = "in";
-                        cb = null;
+                        result = "out";
+                        cd = null;
                         //GC.Collect();
                         //GC.WaitForPendingFinalizers();
                         
@@ -5819,8 +5819,8 @@ public._gps_log._uid = '"+deviceID+@"'
                     else
                     {
                         string result = string.Empty;
-                        result = "out";
-                        cb = null;
+                        result = "in";
+                        cd = null;
                         //GC.Collect();
                         //GC.WaitForPendingFinalizers();
                         
