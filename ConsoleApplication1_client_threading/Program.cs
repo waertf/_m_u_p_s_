@@ -5540,7 +5540,6 @@ LIMIT 1";
         {
             double distanceLimit = 0.1;//unit:km
             string stayTimeInMin = string.Empty;
-            List<string> resultList = new List<string>();
 
 
 
@@ -5603,26 +5602,27 @@ public._gps_log._uid = '" + deviceID + @"'
             {
                 if (dt3 != null && dt3.Rows.Count != 0)
                 {
-                    foreach (DataRow row in dt3.Rows)
+                    ConcurrentBag<string> cb = new ConcurrentBag<string>();
+
+                    Parallel.ForEach(dt3.AsEnumerable(), row =>
                     {
                         double d = GeoCodeCalc.CalcDistance(double.Parse(lat), double.Parse(lon), double.Parse(row[0].ToString()),
                             double.Parse(row[1].ToString()), GeoCodeCalcMeasurement.Kilometers);
                         if (d <= distanceLimit)
-                            resultList.Add("in");
+                        {
+                            cb.Add("in");
+                        }
                         else
                         {
-                            resultList.Add("out");
+                            cb.Add("out");
                         }
-                    }
-                    resultList.Sort();
-                    int index = resultList.BinarySearch("out");
-                    resultList.Clear();
-                    resultList = null;
-                    if (index < 0)
+                    });
+
+                    if (!cb.Contains("out"))
                     {
                         string result = string.Empty;
                         result = "in";
-
+                        cb = null;
                         //GC.Collect();
                         //GC.WaitForPendingFinalizers();
                         
@@ -5632,6 +5632,7 @@ public._gps_log._uid = '" + deviceID + @"'
                     {
                         string result = string.Empty;
                         result = "out";
+                        cb = null;
                         //GC.Collect();
                         //GC.WaitForPendingFinalizers();
                         
@@ -5728,7 +5729,6 @@ public._gps_log._uid = '" + deviceID + @"'
         {
             double distanceLimit = 0.1;//unit:km
             string  stayTimeInMin = string.Empty;
-            List<string> resultList= new List<string>();
 
             
             
@@ -5789,26 +5789,28 @@ public._gps_log._uid = '"+deviceID+@"'
             {
                 if (dt3 != null && dt3.Rows.Count != 0)
                 {
-                    foreach (DataRow row in dt3.Rows)
+
+                    ConcurrentBag<string> cb = new ConcurrentBag<string>();
+                    
+                    Parallel.ForEach(dt3.AsEnumerable(), row =>
                     {
                         double d = GeoCodeCalc.CalcDistance(double.Parse(lat), double.Parse(lon), double.Parse(row[0].ToString()),
                             double.Parse(row[1].ToString()), GeoCodeCalcMeasurement.Kilometers);
                         if (d <= distanceLimit)
-                            resultList.Add("in");
+                        {
+                            cb.Add("in");
+                        }
                         else
                         {
-                            resultList.Add("out");
+                            cb.Add("out");
                         }
-                    }
-                    resultList.Sort();
-                    int index = resultList.BinarySearch("out");
-                    resultList.Clear();
-                    resultList = null;
-                    if (index < 0)
+                    });
+
+                    if (!cb.Contains("out"))
                     {
                         string result = string.Empty;
                         result = "in";
-
+                        cb = null;
                         //GC.Collect();
                         //GC.WaitForPendingFinalizers();
                         
@@ -5818,6 +5820,7 @@ public._gps_log._uid = '"+deviceID+@"'
                     {
                         string result = string.Empty;
                         result = "out";
+                        cb = null;
                         //GC.Collect();
                         //GC.WaitForPendingFinalizers();
                         
