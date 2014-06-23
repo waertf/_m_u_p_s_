@@ -674,7 +674,7 @@ WHERE
                     //sql_client.modify("DELETE FROM public.epq_test_loc WHERE public.epq_test_loc.id = \'" + id + "\'");
                     
 
-                    string today = DateTime.Now.ToString("yyyyMMddHHmmss");
+                    string today = DateTime.Now.ToUniversalTime().ToString("yyyyMMddHHmmss");
                     string Triggered_loc = "<Triggered-Location-Report><suaddr suaddr-type=\"APCO\">" + device +
                         "</suaddr><info-data><info-time>" + today + 
                         "</info-time><server-time>" + today + 
