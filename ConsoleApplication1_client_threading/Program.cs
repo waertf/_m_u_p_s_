@@ -6060,6 +6060,7 @@ public._gps_log._uid = '"+deviceID+@"'
             while (reader.Read()) ;
 
             reader.Close();
+            settings.ValidationEventHandler-= new ValidationEventHandler(ValidationCallBack);
             // Check whether the document is valid or invalid.
             if (isValid)
             {
@@ -6076,7 +6077,7 @@ public._gps_log._uid = '"+deviceID+@"'
         private static void ValidationCallBack(object sender, ValidationEventArgs e)
         {
             isValid = false;
-            Console.WriteLine("Validation Error: {0}", e.ToString());
+            //Console.WriteLine("Validation Error: {0}", e.ToString());
         }
 
         private static IPAddress GetLocalIPAddress()
