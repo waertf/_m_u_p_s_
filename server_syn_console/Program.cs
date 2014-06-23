@@ -675,7 +675,12 @@ WHERE
                     
 
                     string today = DateTime.Now.ToString("yyyyMMddHHmmss");
-                    string Triggered_loc = "<Triggered-Location-Report><suaddr suaddr-type=\"APCO\">" + device + "</suaddr><info-data><info-time>" + today + "</info-time><server-time>" + today + "</server-time><shape><circle-2d><lat>" + lat + "</lat><long>" + lon + "</long><radius>100</radius></circle-2d></shape><speed-hor>50</speed-hor><direction-hor>32</direction-hor></info-data><sensor-info><sensor><sensor-name>Ignition</sensor-name><sensor-value>off</sensor-value><sensor-type>Input</sensor-type></sensor><sensor><sensor-name>door</sensor-name><sensor-value>open</sensor-value><sensor-type>Input</sensor-type></sensor></sensor-info><vehicle-info><odometer>10,000</odometer></vehicle-info></Triggered-Location-Report>";
+                    string Triggered_loc = "<Triggered-Location-Report><suaddr suaddr-type=\"APCO\">" + device +
+                        "</suaddr><info-data><info-time>" + today + 
+                        "</info-time><server-time>" + today + 
+                        "</server-time><shape><circle-2d><lat>" + lat + 
+                        "</lat><long>" + lon + 
+                        "</long><radius>100</radius></circle-2d></shape><speed-hor>50</speed-hor><direction-hor>32</direction-hor></info-data><sensor-info><sensor><sensor-name>Ignition</sensor-name><sensor-value>off</sensor-value><sensor-type>Input</sensor-type></sensor><sensor><sensor-name>door</sensor-name><sensor-value>open</sensor-value><sensor-type>Input</sensor-type></sensor></sensor-info><vehicle-info><odometer>10,000</odometer></vehicle-info></Triggered-Location-Report>";
                     string UnitPresent = @"
 <Unsolicited-Location-Report>
   <suaddr suaddr-type=""APCO"">" + device + @"</suaddr>
@@ -700,7 +705,30 @@ WHERE
     <result result-code=""200"">INSUFFICIENT GPS SATELLITES</result>
   </operation-error>
 </Triggered-Location-Report>";
-                    string[] sendStrings = new[] { Triggered_loc ,UnitPresent,UnitAbsent,GpsError};
+                    string EmerOn = @"<Unsolicited-Location-Report>
+  <suaddr suaddr-type=""APCO"">" + device + @"</suaddr>
+  <event-info>Emergency On</event-info>
+  <info-data>
+    <info-time>" + today + 
+                        @"</info-time>
+    <server-time>" + today + 
+                        @"</server-time>
+    <satellites-num>0</satellites-num>
+    <shape>
+      <point-3d>
+        <lat>" + lat + 
+                        @"</lat>
+        <long>" + lon + 
+                        @"</long>
+        <altitude>27</altitude>
+      </point-3d>
+    </shape>
+    <speed-hor>0</speed-hor>
+    <direction-hor>0</direction-hor>
+    <impl-spec-data>4020</impl-spec-data>
+  </info-data>
+</Unsolicited-Location-Report>";
+                    string[] sendStrings = new[] { Triggered_loc, UnitPresent, UnitAbsent, GpsError, EmerOn };
                     string sendString = sendStrings[rand.Next(0, sendStrings.Length)];
                     byte[] msg4 = (data_append_dataLength(sendString));
                     handler.Send(msg4);
