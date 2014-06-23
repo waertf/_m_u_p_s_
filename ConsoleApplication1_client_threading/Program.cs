@@ -2201,7 +2201,7 @@ Select 1-6 then press enter to send package
                         
                         {
                             Thread access_sql = null, access_avls = null;
-                            getMessage = GetGidAndFullnameFrom.Result;
+                            if (GetGidAndFullnameFrom != null) getMessage = GetGidAndFullnameFrom.Result;
                             if (bool.Parse(ConfigurationManager.AppSettings["AVLS_ACCESS"]))
                             {
                                 
