@@ -5171,7 +5171,7 @@ LIMIT 1";
                                                 gps_log._option0 + @",'YYYYMMDDHH24MISS')" +
                                                 "," + "to_timestamp(" +
                                                 gps_log._option1 + @",'YYYYMMDDHH24MISS')" +
-                                                "," + @"1" + "," + @"'" + GetLocalIPAddress().ToString() +
+                                                "," + @"1" + "," + @"'" + LocalIPAddress().ToString() +
                                                 @"'" +
                                                 "," + @"to_timestamp('" + yyyymmddhhmmss +
                                                 @"','YYYYMMDDHH24MISS')" +
@@ -5413,7 +5413,7 @@ LIMIT 1";
                                                   gps_log._option0 + @",'YYYYMMDDHH24MISS')" +
                                                   "," + "to_timestamp(" +
                                                   gps_log._option1 + @",'YYYYMMDDHH24MISS')" +
-                                                  "," + @"1" + "," + @"'" + GetLocalIPAddress().ToString() +
+                                                  "," + @"1" + "," + @"'" + LocalIPAddress().ToString() +
                                                   @"'" +
                                                   "," + @"to_timestamp('" + yyyymmddhhmmss +
                                                   @"','YYYYMMDDHH24MISS')" +
@@ -5455,7 +5455,7 @@ LIMIT 1";
                                                           gps_log._option0 + @",'YYYYMMDDHH24MISS')" +
                                                           "," + "to_timestamp(" +
                                                           gps_log._option1 + @",'YYYYMMDDHH24MISS')" +
-                                                          "," + @"1" + "," + @"'" + GetLocalIPAddress().ToString() +
+                                                          "," + @"1" + "," + @"'" + LocalIPAddress().ToString() +
                                                           @"'" +
                                                           "," + @"to_timestamp('" + yyyymmddhhmmss +
                                                           @"','YYYYMMDDHH24MISS')" +
@@ -6104,6 +6104,21 @@ public._gps_log._uid = '"+deviceID+@"'
                 }
             }
             return null;
+        }
+        static string LocalIPAddress()
+        {
+            IPHostEntry host;
+            string localIP = "";
+            host = Dns.GetHostEntry(Dns.GetHostName());
+            foreach (IPAddress ip in host.AddressList)
+            {
+                if (ip.AddressFamily == AddressFamily.InterNetwork)
+                {
+                    localIP = ip.ToString();
+                    break;
+                }
+            }
+            return localIP;
         }
     }
     /*
