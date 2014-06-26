@@ -399,6 +399,8 @@ WHERE
             accessSqlServerClient.connect();
             CheckIfStayOverTimeSql_client.connect();
             CheckIfStayOverTimeSql_client2.connect();
+            SendToAvlsEventColumnSetNegativeOneIfPowerOffSqlClient.connect();
+            SendPackageToAvlsOnlyByUidAndLocGetFromSqlSqlClient.connect();
             unsTcpClient = new TcpClient();
 
             avlsTcpClient = new TcpClient();
@@ -802,22 +804,23 @@ WHERE
             }
         }
         */
+        static SqlClient SendToAvlsEventColumnSetNegativeOneIfPowerOffSqlClient = new SqlClient(
+                ConfigurationManager.AppSettings["SQL_SERVER_IP"],
+                ConfigurationManager.AppSettings["SQL_SERVER_PORT"],
+                ConfigurationManager.AppSettings["SQL_SERVER_USER_ID"],
+                ConfigurationManager.AppSettings["SQL_SERVER_PASSWORD"],
+                ConfigurationManager.AppSettings["SQL_SERVER_DATABASE"],
+                ConfigurationManager.AppSettings["Pooling"],
+                ConfigurationManager.AppSettings["subMinPoolSize"],
+                ConfigurationManager.AppSettings["subMaxPoolSize"],
+                ConfigurationManager.AppSettings["subConnectionLifetime"]);
         private static void SendToAvlsEventColumnSetNegativeOneIfPowerOff(TcpClient avlsTcpClient,NetworkStream avlsNetworkStream)
         {
             //PgSqlConnection.ClearAllPools();
             //GC.Collect();
             //GC.WaitForPendingFinalizers();
             //SiAuto.Main.EnterMethod(Level.Debug, "SendToAvlsEventColumnSetNegativeOneIfPowerOff");
-            var sqlClient = new SqlClient(
-                ConfigurationManager.AppSettings["SQL_SERVER_IP"], 
-                ConfigurationManager.AppSettings["SQL_SERVER_PORT"], 
-                ConfigurationManager.AppSettings["SQL_SERVER_USER_ID"], 
-                ConfigurationManager.AppSettings["SQL_SERVER_PASSWORD"], 
-                ConfigurationManager.AppSettings["SQL_SERVER_DATABASE"], 
-                ConfigurationManager.AppSettings["Pooling"],
-                ConfigurationManager.AppSettings["subMinPoolSize"],
-                ConfigurationManager.AppSettings["subMaxPoolSize"],
-                ConfigurationManager.AppSettings["subConnectionLifetime"]);
+            
             var sqlCmd =@"SELECT 
   custom.uns_deivce_power_status.uid
 FROM
@@ -827,10 +830,10 @@ WHERE
     ConfigurationManager.AppSettings["setNegativeOneToAvlsInterval"] + 
 @"' AND 
   custom.uns_deivce_power_status.power = 'off'";
-            sqlClient.connect();
+            //SendToAvlsEventColumnSetNegativeOneIfPowerOffSqlClient.connect();
 
             //DataTable dt = sqlClient.get_DataTable(sqlCmd);
-            using (DataTable dt = sqlClient.get_DataTable(sqlCmd))
+            using (DataTable dt = SendToAvlsEventColumnSetNegativeOneIfPowerOffSqlClient.get_DataTable(sqlCmd))
             {
                 string uid = string.Empty;
                 if (dt != null && dt.Rows.Count != 0)
@@ -865,10 +868,10 @@ WHERE
                             //Thread.Sleep(30);
                         }
                         //lock (access_uns_deivce_power_status_Lock)
-                        sqlClient.modify(unsSqlCmd);
-                        sqlClient.disconnect();
-                        sqlClient.Dispose();
-                        sqlClient = null;
+                        SendToAvlsEventColumnSetNegativeOneIfPowerOffSqlClient.modify(unsSqlCmd);
+                        //SendToAvlsEventColumnSetNegativeOneIfPowerOffSqlClient.disconnect();
+                        //SendToAvlsEventColumnSetNegativeOneIfPowerOffSqlClient.Dispose();
+                        //SendToAvlsEventColumnSetNegativeOneIfPowerOffSqlClient = null;
                         //Thread.Sleep(30);
 
 
@@ -913,6 +916,16 @@ WHERE
             }*/
             //SiAuto.Main.LeaveMethod(Level.Debug, "SendToAvlsEventColumnSetNegativeOneIfPowerOff");
         }
+        static SqlClient SendPackageToAvlsOnlyByUidAndLocGetFromSqlSqlClient = new SqlClient(
+                    ConfigurationManager.AppSettings["SQL_SERVER_IP"],
+                    ConfigurationManager.AppSettings["SQL_SERVER_PORT"],
+                    ConfigurationManager.AppSettings["SQL_SERVER_USER_ID"],
+                    ConfigurationManager.AppSettings["SQL_SERVER_PASSWORD"],
+                    ConfigurationManager.AppSettings["SQL_SERVER_DATABASE"],
+                    ConfigurationManager.AppSettings["Pooling"],
+                    ConfigurationManager.AppSettings["subMinPoolSize"],
+                    ConfigurationManager.AppSettings["subMaxPoolSize"],
+                    ConfigurationManager.AppSettings["subConnectionLifetime"]);
         private static void SendPackageToAvlsOnlyByUidAndLocGetFromSql(string uid, string eventStatus, TcpClient avlsTcpClient, NetworkStream avlsNetworkStream)
         {
             //SiAuto.Main.EnterMethod(Level.Debug, "SendPackageToAvlsOnlyByUidAndLocGetFromSql");
@@ -940,16 +953,7 @@ WHERE
 
             if (true)
             {
-                var avlsSqlClient = new SqlClient(
-                    ConfigurationManager.AppSettings["SQL_SERVER_IP"], 
-                    ConfigurationManager.AppSettings["SQL_SERVER_PORT"], 
-                    ConfigurationManager.AppSettings["SQL_SERVER_USER_ID"], 
-                    ConfigurationManager.AppSettings["SQL_SERVER_PASSWORD"], 
-                    ConfigurationManager.AppSettings["SQL_SERVER_DATABASE"], 
-                    ConfigurationManager.AppSettings["Pooling"],
-                    ConfigurationManager.AppSettings["subMinPoolSize"],
-                    ConfigurationManager.AppSettings["subMaxPoolSize"],
-                    ConfigurationManager.AppSettings["subConnectionLifetime"]);
+                
                 string avlsSqlCmd = @"SELECT 
   public._gps_log._lat,
   public._gps_log._lon
@@ -959,18 +963,17 @@ WHERE
   public._gps_log._time < now() AND 
   public._gps_log._uid = '" + avls_package.ID + @"'
 ORDER BY
-  public._gps_log._time DESC,public._gps_log._lat,
-  public._gps_log._lon
+  public._gps_log._time DESC
 LIMIT 1";
                 log.Info("avlsSqlCmd=" + Environment.NewLine + avlsSqlCmd);
-                avlsSqlClient.connect();
+                //SendPackageToAvlsOnlyByUidAndLocGetFromSqlSqlClient.connect();
                 
                 //DataTable dt = avlsSqlClient.get_DataTable(avlsSqlCmd);
-                using (DataTable dt = avlsSqlClient.get_DataTable(avlsSqlCmd))
+                using (DataTable dt = SendPackageToAvlsOnlyByUidAndLocGetFromSqlSqlClient.get_DataTable(avlsSqlCmd))
                 {
-                    avlsSqlClient.disconnect();
-                    avlsSqlClient.Dispose();
-                    avlsSqlClient = null;
+                    //SendPackageToAvlsOnlyByUidAndLocGetFromSqlSqlClient.disconnect();
+                    //SendPackageToAvlsOnlyByUidAndLocGetFromSqlSqlClient.Dispose();
+                    //SendPackageToAvlsOnlyByUidAndLocGetFromSqlSqlClient = null;
                     if (dt != null && dt.Rows.Count != 0)
                     {
                         string avlsLat = string.Empty, avlsLon = string.Empty;
@@ -2793,8 +2796,7 @@ WHERE
   public._gps_log._time < now() AND 
   public._gps_log._uid = '" + avls_package.ID + @"'
 ORDER BY
-  public._gps_log._time DESC,public._gps_log._lat,
-  public._gps_log._lon
+  public._gps_log._time DESC
 LIMIT 1";
                         //Console.WriteLine("+c");
                         //while (!avlsSqlClient.connect())
@@ -2971,8 +2973,7 @@ WHERE
   public._gps_log._time < now() AND 
   public._gps_log._uid = '" + avls_package.ID + @"'
 ORDER BY
-  public._gps_log._time DESC,public._gps_log._lat,
-  public._gps_log._lon
+  public._gps_log._time DESC
 LIMIT 1";
                         //Console.WriteLine("+c1");
                         //while (!avlsSqlClient.connect())
@@ -4541,8 +4542,7 @@ VALUES(
       public._gps_log._time < now() AND 
       public._gps_log._uid = '" + deviceID + @"'
     ORDER BY
-      public._gps_log._time DESC,public._gps_log._lat,
-      public._gps_log._lon
+      public._gps_log._time DESC
     LIMIT 1";
                         //while (!sql_client.connect())
                         {
@@ -6283,8 +6283,7 @@ WHERE
   public._gps_log._time < now() AND 
   public._gps_log._uid = '" + avls_package.ID + @"'
 ORDER BY
-  public._gps_log._time DESC,public._gps_log._lat,
-  public._gps_log._lon
+  public._gps_log._time DESC
 LIMIT 1";
                         //Console.WriteLine("+c");
                         //while (!avlsSqlClient.connect())
@@ -6461,8 +6460,7 @@ WHERE
   public._gps_log._time < now() AND 
   public._gps_log._uid = '" + avls_package.ID + @"'
 ORDER BY
-  public._gps_log._time DESC,public._gps_log._lat,
-  public._gps_log._lon
+  public._gps_log._time DESC
 LIMIT 1";
                         //Console.WriteLine("+c1");
                         //while (!avlsSqlClient.connect())
