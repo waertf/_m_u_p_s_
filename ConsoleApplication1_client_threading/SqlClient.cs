@@ -137,7 +137,7 @@ namespace ConsoleApplication1_client_threading
                      //sync
                      //int aff = command.ExecuteNonQuery();
                     //Console.WriteLine(RowsAffected + " rows were affected.");
-                     command.Dispose();
+                     //command.Dispose();
                     command = null;
                     //pgSqlConnection.Commit();
                     /*
@@ -174,8 +174,8 @@ namespace ConsoleApplication1_client_threading
                 Console.WriteLine("Modify exception occurs: {0}" + Environment.NewLine + "{1}", ex.Error, cmd);
                 log.Error("Modify exception occurs: " + Environment.NewLine + ex.Error + Environment.NewLine + cmd);
                 Console.ResetColor();
-                pgSqlConnection.Rollback();
-                command.Dispose();
+                //pgSqlConnection.Rollback();
+                //command.Dispose();
                 command = null;
 
 
@@ -317,8 +317,8 @@ namespace ConsoleApplication1_client_threading
                         */
                         Stopwatch stopWatch2= new Stopwatch();
                         stopWatch2.Start();
-                        if (command != null)
-                            command.Dispose();
+                        //if (command != null)
+                            //command.Dispose();
                         command = null;
                         using (DataTable returnTable = datatable.Copy())
                         {
@@ -342,8 +342,8 @@ namespace ConsoleApplication1_client_threading
                     Console.WriteLine("GetDataTable exception occurs: {0}" + Environment.NewLine + "{1}", ex.Error, cmd);
                     log.Error("GetDataTable exception occurs: " + Environment.NewLine + ex.Error + Environment.NewLine + cmd);
                     Console.ResetColor();
-                    if (command != null)
-                        command.Dispose();
+                    //if (command != null)
+                        //command.Dispose();
                     command = null;
                     return null;
                 }
