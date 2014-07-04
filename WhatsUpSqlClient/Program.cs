@@ -22,12 +22,15 @@ FROM dbo_PivotDeviceToGroup INNER JOIN dbo_DeviceGroup ON dbo_PivotDeviceToGroup
             System.Threading.Thread t1 = new System.Threading.Thread
       (delegate()
       {
+          SqlConnection connection = new SqlConnection(connectionString);
+          connection.Open();
           while (true)
           {
-              using (SqlConnection connection = new SqlConnection(connectionString))
+              //using (SqlConnection connection = new SqlConnection(connectionString))
               {
-                  connection.Open();
-                  SqlCommand command = new SqlCommand(queryStringForDeviceStatus, connection);
+                  //connection.Open();
+                  //SqlCommand command = new SqlCommand(queryStringForDeviceStatus, connection);
+                  using (SqlCommand command = new SqlCommand(queryStringForDeviceStatus, connection))
                   using (SqlDataReader reader = command.ExecuteReader())
                   {
                       while (reader.Read())
@@ -36,18 +39,21 @@ FROM dbo_PivotDeviceToGroup INNER JOIN dbo_DeviceGroup ON dbo_PivotDeviceToGroup
                       }
                   }
               }
-              Thread.Sleep(3000);
+              Thread.Sleep(1000);
           }
       });
             System.Threading.Thread t2 = new System.Threading.Thread
       (delegate()
       {
+          SqlConnection connection = new SqlConnection(connectionString);
+          connection.Open();
           while (true)
           {
-              using (SqlConnection connection = new SqlConnection(connectionString))
+              //using (SqlConnection connection = new SqlConnection(connectionString))
               {
-                  connection.Open();
-                  SqlCommand command = new SqlCommand(queryStringForDeviceGroup, connection);
+                  //connection.Open();
+                  //SqlCommand command = new SqlCommand(queryStringForDeviceGroup, connection);
+                  using (SqlCommand command = new SqlCommand(queryStringForDeviceGroup, connection))
                   using (SqlDataReader reader = command.ExecuteReader())
                   {
                       while (reader.Read())
@@ -56,7 +62,7 @@ FROM dbo_PivotDeviceToGroup INNER JOIN dbo_DeviceGroup ON dbo_PivotDeviceToGroup
                       }
                   }
               }
-              Thread.Sleep(3000);
+              Thread.Sleep(1000);
           }
       });
             t1.Start();
