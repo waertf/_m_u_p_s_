@@ -2061,6 +2061,8 @@ Select 1-6 then press enter to send package
                         if (elements.Contains(new XElement("info-data").Name))
                         {
                             if (elements.Contains(new XElement("shape").Name))
+                                htable.Add("shape-type", XmlGetFirstChildTagName(xml_data, "shape"));//info-data scope
+                            if (elements.Contains(new XElement("shape").Name))
                                 switch (Convert.ToString(htable["shape-type"]))//info-data scope
                                 {
                                     case "point-2d":
@@ -2144,8 +2146,7 @@ Select 1-6 then press enter to send package
                                 htable.Add("speed-hor", XmlGetTagValue(xml_data, "speed-hor"));//info-data scope
                             if (elements.Contains(new XElement("direction-hor").Name))
                                 htable.Add("direction-hor", XmlGetTagValue(xml_data, "direction-hor"));//info-data scope
-                            if (elements.Contains(new XElement("shape").Name))
-                                htable.Add("shape-type", XmlGetFirstChildTagName(xml_data, "shape"));//info-data scope
+                            
                             //Console.WriteLine("shape_type :[{0}]", shape_type);
                             //Console.WriteLine("speed_hor:{0}", speed_hor);
                             //Console.WriteLine("Direction_hor:{0}", Direction_hor);
