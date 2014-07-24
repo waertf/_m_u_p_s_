@@ -34,6 +34,29 @@ WHERE
 		)
 	);";
             /*
+             SELECT DISTINCT
+	dbo.ActiveMonitorStateChangeLog.nPivotActiveMonitorTypeToDeviceID,
+	dbo.ActiveMonitorStateChangeLog.nMonitorStateID,
+	dbo.MonitorState.sStateName
+FROM
+	dbo.ActiveMonitorStateChangeLog
+INNER JOIN dbo.MonitorState ON dbo.ActiveMonitorStateChangeLog.nMonitorStateID = dbo.MonitorState.nMonitorStateID
+INNER JOIN dbo.Device ON dbo.ActiveMonitorStateChangeLog.nPivotActiveMonitorTypeToDeviceID = dbo.Device.nDeviceID
+WHERE
+	(
+		(
+			(
+				dbo.ActiveMonitorStateChangeLog.dEndTime IS NULL
+			)
+		)
+		AND (
+			(
+				dbo.ActiveMonitorStateChangeLog.dStartTime IS NOT NULL
+			)
+		)
+	)
+*/
+            /*
             string queryStringForDeviceGroup = @"SELECT dbo.PivotDeviceToGroup.nDeviceID, dbo.PivotDeviceToGroup.nDeviceGroupID, dbo.DeviceGroup.nParentGroupID, dbo.DeviceGroup.nMonitorStateID
 FROM dbo.PivotDeviceToGroup INNER JOIN dbo.DeviceGroup ON dbo.PivotDeviceToGroup.nDeviceGroupID = dbo.DeviceGroup.nDeviceGroupID;
 ";
