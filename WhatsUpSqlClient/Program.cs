@@ -13,11 +13,30 @@ namespace WhatsUpSqlClient
         static void Main(string[] args)
         {
             string connectionString = ConfigurationManager.AppSettings["connectString"];
-            string queryStringForDeviceStatus = @"SELECT DISTINCT dbo_ActiveMonitorStateChangeLog.nPivotActiveMonitorTypeToDeviceID, dbo_ActiveMonitorStateChangeLog.nMonitorStateID, dbo_MonitorState.sStateName
-FROM dbo_ActiveMonitorStateChangeLog INNER JOIN dbo_MonitorState ON dbo_ActiveMonitorStateChangeLog.nMonitorStateID = dbo_MonitorState.nMonitorStateID
-WHERE (((dbo_ActiveMonitorStateChangeLog.dEndTime) Is Null) AND ((dbo_ActiveMonitorStateChangeLog.dStartTime) Is Not Null));";
-            string queryStringForDeviceGroup = @"SELECT dbo_PivotDeviceToGroup.nDeviceID, dbo_PivotDeviceToGroup.nDeviceGroupID, dbo_DeviceGroup.nParentGroupID, dbo_DeviceGroup.nMonitorStateID
-FROM dbo_PivotDeviceToGroup INNER JOIN dbo_DeviceGroup ON dbo_PivotDeviceToGroup.nDeviceGroupID = dbo_DeviceGroup.nDeviceGroupID;
+            string queryStringForDeviceStatus = @"SELECT DISTINCT dbo.ActiveMonitorStateChangeLog.nPivotActiveMonitorTypeToDeviceID, dbo.ActiveMonitorStateChangeLog.nMonitorStateID, dbo.MonitorState.sStateName
+FROM dbo.ActiveMonitorStateChangeLog INNER JOIN dbo.MonitorState ON dbo.ActiveMonitorStateChangeLog.nMonitorStateID = dbo.MonitorState.nMonitorStateID
+WHERE (((dbo.ActiveMonitorStateChangeLog.dEndTime) Is Null) AND ((dbo.ActiveMonitorStateChangeLog.dStartTime) Is Not Null));";
+            /*
+            string queryStringForDeviceGroup = @"SELECT dbo.PivotDeviceToGroup.nDeviceID, dbo.PivotDeviceToGroup.nDeviceGroupID, dbo.DeviceGroup.nParentGroupID, dbo.DeviceGroup.nMonitorStateID
+FROM dbo.PivotDeviceToGroup INNER JOIN dbo.DeviceGroup ON dbo.PivotDeviceToGroup.nDeviceGroupID = dbo.DeviceGroup.nDeviceGroupID;
+";
+            */
+            string queryStringForDeviceGroup = @"SELECT
+	PivotDeviceToGroup.nDeviceID AS MyID,
+	Device.sDisplayName AS MyName,
+	PivotDeviceToGroup.nDeviceGroupID AS MyGroupID,
+	DeviceGroup_1.sGroupName AS MyGroup,
+	DeviceGroup_1.nMonitorStateID AS MyGroupStateID,
+	MonitorState.sStateName AS MyGroupState,
+	DeviceGroup_1.nParentGroupID AS MyFatherID,
+	DeviceGroup.sGroupName AS MyFather
+FROM
+	DeviceGroup
+INNER JOIN DeviceGroup AS DeviceGroup_1 ON DeviceGroup.nDeviceGroupID = DeviceGroup_1.nParentGroupID
+AND DeviceGroup.nDeviceGroupID = DeviceGroup_1.nParentGroupID
+INNER JOIN PivotDeviceToGroup ON DeviceGroup_1.nDeviceGroupID = PivotDeviceToGroup.nDeviceGroupID
+INNER JOIN Device ON PivotDeviceToGroup.nDeviceID = Device.nDeviceID
+INNER JOIN MonitorState ON DeviceGroup_1.nMonitorStateID = MonitorState.nMonitorStateID;
 ";
             System.Threading.Thread t1 = new System.Threading.Thread
       (delegate()
@@ -58,7 +77,7 @@ FROM dbo_PivotDeviceToGroup INNER JOIN dbo_DeviceGroup ON dbo_PivotDeviceToGroup
                   {
                       while (reader.Read())
                       {
-                          Console.WriteLine(String.Format("DeviceID={0}:DeviceGroupID={1}:ParentGroupID={2}:MonitorStateID={3}", reader[0], reader[1], reader[2], reader[3]));
+                          Console.WriteLine(String.Format("MyID={0}:MyName={1}:MyGroupID={2}:MyGroup={3}:MyStateID={4}:MyState={5}:MyFatherID={6}:MyFather={7}", reader[0], reader[1], reader[2], reader[3], reader[4], reader[5], reader[6], reader[7]));
                       }
                   }
               }
