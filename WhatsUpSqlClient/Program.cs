@@ -13,9 +13,26 @@ namespace WhatsUpSqlClient
         static void Main(string[] args)
         {
             string connectionString = ConfigurationManager.AppSettings["connectString"];
-            string queryStringForDeviceStatus = @"SELECT DISTINCT dbo.ActiveMonitorStateChangeLog.nPivotActiveMonitorTypeToDeviceID, dbo.ActiveMonitorStateChangeLog.nMonitorStateID, dbo.MonitorState.sStateName
-FROM dbo.ActiveMonitorStateChangeLog INNER JOIN dbo.MonitorState ON dbo.ActiveMonitorStateChangeLog.nMonitorStateID = dbo.MonitorState.nMonitorStateID
-WHERE (((dbo.ActiveMonitorStateChangeLog.dEndTime) Is Null) AND ((dbo.ActiveMonitorStateChangeLog.dStartTime) Is Not Null));";
+            string queryStringForDeviceStatus = @"SELECT DISTINCT
+	dbo.ActiveMonitorStateChangeLog.nPivotActiveMonitorTypeToDeviceID,
+	dbo.ActiveMonitorStateChangeLog.nMonitorStateID,
+	dbo.MonitorState.sStateName
+FROM
+	dbo.ActiveMonitorStateChangeLog
+INNER JOIN dbo.MonitorState ON dbo.ActiveMonitorStateChangeLog.nMonitorStateID = dbo.MonitorState.nMonitorStateID
+WHERE
+	(
+		(
+			(
+				dbo.ActiveMonitorStateChangeLog.dEndTime
+			) IS NULL
+		)
+		AND (
+			(
+				dbo.ActiveMonitorStateChangeLog.dStartTime
+			) IS NOT NULL
+		)
+	);";
             /*
             string queryStringForDeviceGroup = @"SELECT dbo.PivotDeviceToGroup.nDeviceID, dbo.PivotDeviceToGroup.nDeviceGroupID, dbo.DeviceGroup.nParentGroupID, dbo.DeviceGroup.nMonitorStateID
 FROM dbo.PivotDeviceToGroup INNER JOIN dbo.DeviceGroup ON dbo.PivotDeviceToGroup.nDeviceGroupID = dbo.DeviceGroup.nDeviceGroupID;
