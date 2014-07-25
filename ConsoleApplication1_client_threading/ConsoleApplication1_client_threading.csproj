@@ -96,6 +96,7 @@
     <Reference Include="Devart.Data.PostgreSql, Version=6.4.164.0, Culture=neutral, PublicKeyToken=09af7300eec23701, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\..\..\..\..\Program Files (x86)\Devart\dotConnect\PostgreSQL\Devart.Data.PostgreSql.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="Gurock.SmartInspect, Version=3.3.6.143, Culture=neutral, PublicKeyToken=a78b0a9303ab7a7c, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -106,7 +107,7 @@
       <HintPath>bin\Release\keeplive.dll</HintPath>
     </Reference>
     <Reference Include="log4net">
-      <HintPath>..\..\..\..\..\Downloads\Compressed\log4net-1.2.13-bin-newkey\log4net-1.2.13\bin\net\4.0\release\log4net.dll</HintPath>
+      <HintPath>D:\log4net-1.2.13-bin-newkey\log4net-1.2.13\bin\net\4.0\release\log4net.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.configuration" />
@@ -161,11 +162,6 @@
     <None Include="Unsolicited-Location-Report.dtd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="StayCheck.sdf">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
   </ItemGroup>
   <ItemGroup>
     <Service Include="{3259AA49-8AA1-44D3-9025-A0B520596A8C}" />
