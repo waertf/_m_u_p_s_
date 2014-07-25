@@ -28,7 +28,7 @@ namespace WhatsUpSqlClient
                                     Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) +
                                     "\\log.sil\",rotate=weekly,append=true,maxparts=5,maxsize=500MB)";
             string connectionString = ConfigurationManager.AppSettings["connectString"];
-            string queryStringForDeviceStatus = @"SELECT DISTINCT
+            string queryStringForDeviceStatus = @"SELECT 
 	dbo.ActiveMonitorStateChangeLog.nPivotActiveMonitorTypeToDeviceID,
 	dbo.ActiveMonitorStateChangeLog.nMonitorStateID,
 	dbo.MonitorState.sStateName
@@ -49,7 +49,7 @@ WHERE
 		)
 	);";
             /*
-             SELECT DISTINCT
+             SELECT 
 	dbo.ActiveMonitorStateChangeLog.nPivotActiveMonitorTypeToDeviceID,
 	dbo.ActiveMonitorStateChangeLog.nMonitorStateID,
 	dbo.MonitorState.sStateName
@@ -76,6 +76,7 @@ WHERE
 FROM dbo.PivotDeviceToGroup INNER JOIN dbo.DeviceGroup ON dbo.PivotDeviceToGroup.nDeviceGroupID = dbo.DeviceGroup.nDeviceGroupID;
 ";
             */
+            /*
             string queryStringForDeviceGroup = @"SELECT
 	PivotDeviceToGroup.nDeviceID AS MyID,
 	Device.sDisplayName AS MyName,
@@ -93,6 +94,7 @@ INNER JOIN PivotDeviceToGroup ON DeviceGroup_1.nDeviceGroupID = PivotDeviceToGro
 INNER JOIN Device ON PivotDeviceToGroup.nDeviceID = Device.nDeviceID
 INNER JOIN MonitorState ON DeviceGroup_1.nMonitorStateID = MonitorState.nMonitorStateID;
 ";
+            */
             System.Threading.Thread t1 = new System.Threading.Thread
       (delegate()
       {
@@ -116,6 +118,7 @@ INNER JOIN MonitorState ON DeviceGroup_1.nMonitorStateID = MonitorState.nMonitor
               Thread.Sleep(1000);
           }
       });
+            /*
             System.Threading.Thread t2 = new System.Threading.Thread
       (delegate()
       {
@@ -139,8 +142,9 @@ INNER JOIN MonitorState ON DeviceGroup_1.nMonitorStateID = MonitorState.nMonitor
               Thread.Sleep(1000);
           }
       });
+            */
             t1.Start();
-            t2.Start();
+            //t2.Start();
             
             
         }
