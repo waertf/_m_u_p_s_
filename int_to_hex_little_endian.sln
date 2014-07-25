@@ -59,8 +59,8 @@ Global
 		{341A80CF-4233-4406-9E5C-C01F15C4770C}.Debug|x86.Build.0 = Debug|x86
 		{341A80CF-4233-4406-9E5C-C01F15C4770C}.Release|Any CPU.ActiveCfg = Release|x64
 		{341A80CF-4233-4406-9E5C-C01F15C4770C}.Release|Any CPU.Build.0 = Release|x64
-		{341A80CF-4233-4406-9E5C-C01F15C4770C}.Release|Mixed Platforms.ActiveCfg = Release|x86
-		{341A80CF-4233-4406-9E5C-C01F15C4770C}.Release|Mixed Platforms.Build.0 = Release|x86
+		{341A80CF-4233-4406-9E5C-C01F15C4770C}.Release|Mixed Platforms.ActiveCfg = Release|x64
+		{341A80CF-4233-4406-9E5C-C01F15C4770C}.Release|Mixed Platforms.Build.0 = Release|x64
 		{341A80CF-4233-4406-9E5C-C01F15C4770C}.Release|x64.ActiveCfg = Release|x64
 		{341A80CF-4233-4406-9E5C-C01F15C4770C}.Release|x64.Build.0 = Release|x64
 		{341A80CF-4233-4406-9E5C-C01F15C4770C}.Release|x86.ActiveCfg = Release|x86
