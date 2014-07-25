@@ -1,17 +1,32 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Configuration;
 using System.Data.SqlClient;
 using System.Threading;
+using Gurock.SmartInspect;
+using Devart.Data.PostgreSql;
 
 namespace WhatsUpSqlClient
 {
     class Program
     {
+        static Mutex _mutex = new Mutex(false, "WhatsUpSqlClient.exe");
         static void Main(string[] args)
         {
+            if (!_mutex.WaitOne(1000, false))
+                return;
+            AppDomain.CurrentDomain.ProcessExit += CurrentDomain_ProcessExit;
+            AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
+            SiAuto.Si.Enabled = true;
+            SiAuto.Si.Level = Level.Debug;
+            SiAuto.Si.Connections = @"file(filename=""" +
+                                    Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) +
+                                    "\\log.sil\",rotate=weekly,append=true,maxparts=5,maxsize=500MB)";
             string connectionString = ConfigurationManager.AppSettings["connectString"];
             string queryStringForDeviceStatus = @"SELECT DISTINCT
 	dbo.ActiveMonitorStateChangeLog.nPivotActiveMonitorTypeToDeviceID,
@@ -128,6 +143,26 @@ INNER JOIN MonitorState ON DeviceGroup_1.nMonitorStateID = MonitorState.nMonitor
             t2.Start();
             
             
+        }
+
+        static void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
+        {
+            var exception = e.ExceptionObject as Exception;
+            if (exception != null)
+            {
+                SiAuto.Main.LogException("Restart", exception);
+            }
+            Environment.Exit(1);
+        }
+
+        static void CurrentDomain_ProcessExit(object sender, EventArgs e)
+        {
+            string logMsg = string.Empty;
+            logMsg = "Close time:" + DateTime.Now.ToString("G") + Environment.NewLine +
+                  "Memory usage:" +
+                  Process.GetCurrentProcess().WorkingSet64 / 1024.0 / 1024.0;
+            SiAuto.Main.LogWarning(logMsg);
+            _mutex.ReleaseMutex();
         }
     }
 }
