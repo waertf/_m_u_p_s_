@@ -98,22 +98,27 @@ INNER JOIN MonitorState ON DeviceGroup_1.nMonitorStateID = MonitorState.nMonitor
             System.Threading.Thread t1 = new System.Threading.Thread
       (delegate()
       {
-          SqlConnection connection = new SqlConnection(connectionString);
-          connection.Open();
+          //SqlConnection connection = new SqlConnection(connectionString);
+          //connection.Open();
           while (true)
           {
               //using (SqlConnection connection = new SqlConnection(connectionString))
               {
                   //connection.Open();
                   //SqlCommand command = new SqlCommand(queryStringForDeviceStatus, connection);
+                  using (SqlConnection connection = new SqlConnection(connectionString))
                   using (SqlCommand command = new SqlCommand(queryStringForDeviceStatus, connection))
-                  using (SqlDataReader reader = command.ExecuteReader())
                   {
-                      while (reader.Read())
+                      connection.Open();
+                      using (SqlDataReader reader = command.ExecuteReader())
                       {
-                          Console.WriteLine(String.Format("DeviceID={0}:StateID={1}:StateMsg={2}", reader[0], reader[1], reader[2]));
+                          while (reader.Read())
+                          {
+                              Console.WriteLine(String.Format("DeviceID={0}:StateID={1}:StateMsg={2}", reader[0], reader[1], reader[2]));
+                          }
                       }
                   }
+                  
               }
               Thread.Sleep(1000);
           }
