@@ -4269,6 +4269,30 @@ WHERE
                 {
                     case "Emergency On":
                     case "Emergency Off":
+                        #region access power status
+
+                        if (!string.IsNullOrEmpty(deviceID))//&& CheckIfUidExist(deviceID))
+                        {
+                            unsUpdateTimeStamp = DateTime.Now.ToString("yyyyMMdd HHmmss+8");
+                            unsSqlCmd = @"UPDATE 
+  custom.uns_deivce_power_status
+SET
+  power = 'on',
+""updateTime"" = '" + unsUpdateTimeStamp + @"'::timestamp
+WHERE
+  custom.uns_deivce_power_status.uid = '" + deviceID + @"'" + @" AND 
+  (custom.uns_deivce_power_status.power <> 'on' OR 
+  custom.uns_deivce_power_status.power IS NULL) ";
+                            //while (!sql_client.connect())
+                            {
+                                //Thread.Sleep(30);
+                            }
+                            //lock (access_uns_deivce_power_status_Lock)
+                            accessSqlServerClient.modify(unsSqlCmd);
+                            //sql_client.disconnect();
+                        }
+
+                        #endregion
                         gps_log.j_6 = "\'" + htable["event_info"].ToString() + "\'";
                         gps_log.j_7 = "\'" + "null" + "\'";
                         gps_log.j_8 = "\'" + "null" + "\'";
