@@ -98,6 +98,7 @@ namespace ConsoleApplication1_client_threading
         {
             Stopwatch stopWatch = new Stopwatch();
             PgSqlCommand command = null;
+            PgSqlTransaction myTrans = null;
             try
             {
                 if (pgSqlConnection != null && IsConnected)
@@ -111,12 +112,16 @@ namespace ConsoleApplication1_client_threading
                     //pgSqlConnection.BeginTransaction();
                     //async
                     int RowsAffected;
+                    
+                    myTrans = pgSqlConnection.BeginTransaction(IsolationLevel.ReadCommitted);
+                    command.Transaction = myTrans;
                     //lock (accessLock)
                     {
                         //IAsyncResult cres = command.BeginExecuteNonQuery();
                         //RowsAffected = command.EndExecuteNonQuery(cres);
                         lock (accessLock)
                             RowsAffected = command.ExecuteNonQuery();
+                        myTrans.Commit();
                     }
                     //IAsyncResult cres=command.BeginExecuteNonQuery(null,null);
                     //Console.Write("In progress...");
@@ -170,6 +175,7 @@ namespace ConsoleApplication1_client_threading
             }
             catch (PgSqlException ex)
             {
+                if (myTrans != null) myTrans.Rollback();
                 Console.ForegroundColor = ConsoleColor.Red;
                 Console.WriteLine("Modify exception occurs: {0}" + Environment.NewLine + "{1}", ex.Error, cmd);
                 log.Error("Modify exception occurs: " + Environment.NewLine + ex.Error + Environment.NewLine + cmd);
