@@ -852,8 +852,8 @@ WHERE
                                 () =>
                                     SendPackageToAvlsOnlyByUidAndLocGetFromSql(device_uid, "-1", avlsTcpClient,
                                         avlsNetworkStream));
-                        TSendPackageToAvlsOnlyByUidAndLocGetFromSql.Priority = ThreadPriority.BelowNormal;
-                        TSendPackageToAvlsOnlyByUidAndLocGetFromSql.Start();
+                        //TSendPackageToAvlsOnlyByUidAndLocGetFromSql.Priority = ThreadPriority.BelowNormal;
+                        //TSendPackageToAvlsOnlyByUidAndLocGetFromSql.Start();
 
                         unsUpdateTimeStamp = DateTime.Now.ToString("yyyyMMdd HHmmss+8");
                         unsSqlCmd = @"UPDATE 
@@ -868,7 +868,12 @@ WHERE
                             //Thread.Sleep(30);
                         }
                         //lock (access_uns_deivce_power_status_Lock)
-                        SendToAvlsEventColumnSetNegativeOneIfPowerOffSqlClient.modify(unsSqlCmd);
+                        Thread SendToAvlsEventColumnSetNegativeOneIfPowerOffSqlClientThread = new Thread(() => SendToAvlsEventColumnSetNegativeOneIfPowerOffSqlClient.modify(unsSqlCmd));
+                        //SendToAvlsEventColumnSetNegativeOneIfPowerOffSqlClient.modify(unsSqlCmd);
+                        SendToAvlsEventColumnSetNegativeOneIfPowerOffSqlClientThread.Start();
+                        TSendPackageToAvlsOnlyByUidAndLocGetFromSql.Start();
+                        SendToAvlsEventColumnSetNegativeOneIfPowerOffSqlClientThread.Join();
+                        TSendPackageToAvlsOnlyByUidAndLocGetFromSql.Join();
                         //SendToAvlsEventColumnSetNegativeOneIfPowerOffSqlClient.disconnect();
                         //SendToAvlsEventColumnSetNegativeOneIfPowerOffSqlClient.Dispose();
                         //SendToAvlsEventColumnSetNegativeOneIfPowerOffSqlClient = null;
@@ -3871,6 +3876,7 @@ FROM
         {
             MV,TK,EM,PE,UL
         }
+        static object timeLock = new object();
         static SqlClient accessSqlServerClient = new SqlClient(ConfigurationManager.AppSettings["SQL_SERVER_IP"],
                 ConfigurationManager.AppSettings["SQL_SERVER_PORT"],
                 ConfigurationManager.AppSettings["SQL_SERVER_USER_ID"],
@@ -3906,8 +3912,12 @@ FROM
                 string getMessage = oo.GetMessage;
                 oo = null;
             Thread.CurrentThread.CurrentUICulture = new CultureInfo("en-us");
+                DateTime dtime;
+            lock (timeLock)
+                {
+                    dtime = DateTime.Now;
+                }
             
-            DateTime dtime = DateTime.Now;
             AUTO_SQL_DATA gps_log = new AUTO_SQL_DATA();
             MANUAL_SQL_DATA operation_log = new MANUAL_SQL_DATA();
             gps_log._or_lat = gps_log._or_lon = gps_log._satellites = gps_log._temperature = gps_log._voltage = "0";
