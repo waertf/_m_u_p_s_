@@ -28,7 +28,9 @@ namespace WhatsUpSqlClient
                                     Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) +
                                     "\\log.sil\",rotate=weekly,append=true,maxparts=5,maxsize=500MB)";
             string connectionString = ConfigurationManager.AppSettings["connectString"];
-            string queryStringForDeviceStatus = @"SELECT 
+            
+            /*
+             * string queryStringForDeviceStatus = @"SELECT 
 	dbo.ActiveMonitorStateChangeLog.nPivotActiveMonitorTypeToDeviceID,
 	dbo.ActiveMonitorStateChangeLog.nMonitorStateID,
 	dbo.MonitorState.sStateName
@@ -48,8 +50,8 @@ WHERE
 			) IS NOT NULL
 		)
 	);";
-            /*
-             SELECT 
+     */
+            string queryStringForDeviceStatus = @"SELECT 
 	dbo.ActiveMonitorStateChangeLog.nPivotActiveMonitorTypeToDeviceID,
 	dbo.ActiveMonitorStateChangeLog.nMonitorStateID,
 	dbo.MonitorState.sStateName
@@ -69,8 +71,8 @@ WHERE
 				dbo.ActiveMonitorStateChangeLog.dStartTime IS NOT NULL
 			)
 		)
-	)
-*/
+	);";
+
             /*
             string queryStringForDeviceGroup = @"SELECT dbo.PivotDeviceToGroup.nDeviceID, dbo.PivotDeviceToGroup.nDeviceGroupID, dbo.DeviceGroup.nParentGroupID, dbo.DeviceGroup.nMonitorStateID
 FROM dbo.PivotDeviceToGroup INNER JOIN dbo.DeviceGroup ON dbo.PivotDeviceToGroup.nDeviceGroupID = dbo.DeviceGroup.nDeviceGroupID;
