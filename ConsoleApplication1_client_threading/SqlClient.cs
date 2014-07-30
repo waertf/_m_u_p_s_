@@ -113,14 +113,15 @@ namespace ConsoleApplication1_client_threading
                     //async
                     int RowsAffected;
                     
-                    myTrans = pgSqlConnection.BeginTransaction(IsolationLevel.ReadCommitted);
-                    command.Transaction = myTrans;
-                    //lock (accessLock)
+                    
+                    lock (accessLock)
                     {
+                        myTrans = pgSqlConnection.BeginTransaction(IsolationLevel.ReadCommitted);
+                        command.Transaction = myTrans;
                         //IAsyncResult cres = command.BeginExecuteNonQuery();
                         //RowsAffected = command.EndExecuteNonQuery(cres);
-                        lock (accessLock)
-                            RowsAffected = command.ExecuteNonQuery();
+                        //lock (accessLock)
+                        RowsAffected = command.ExecuteNonQuery();
                         myTrans.Commit();
                     }
                     //IAsyncResult cres=command.BeginExecuteNonQuery(null,null);
