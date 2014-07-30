@@ -25,6 +25,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PostgresqlTest", "Postgresq
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "unsPowerOnCount", "unsPowerOnCount\unsPowerOnCount.csproj", "{B9F564B4-E595-42C7-94B0-ACCED046AB3B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WhatsUpSqlClient", "WhatsUpSqlClient\WhatsUpSqlClient.csproj", "{3C92FA55-2C03-4A7A-B31C-010AE5C266BB}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -137,6 +139,14 @@ Global
 		{B9F564B4-E595-42C7-94B0-ACCED046AB3B}.Release|Any CPU.Build.0 = Release|Any CPU
 		{B9F564B4-E595-42C7-94B0-ACCED046AB3B}.Release|x64.ActiveCfg = Release|Any CPU
 		{B9F564B4-E595-42C7-94B0-ACCED046AB3B}.Release|x86.ActiveCfg = Release|Any CPU
+		{3C92FA55-2C03-4A7A-B31C-010AE5C266BB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3C92FA55-2C03-4A7A-B31C-010AE5C266BB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3C92FA55-2C03-4A7A-B31C-010AE5C266BB}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{3C92FA55-2C03-4A7A-B31C-010AE5C266BB}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{3C92FA55-2C03-4A7A-B31C-010AE5C266BB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3C92FA55-2C03-4A7A-B31C-010AE5C266BB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3C92FA55-2C03-4A7A-B31C-010AE5C266BB}.Release|x64.ActiveCfg = Release|Any CPU
+		{3C92FA55-2C03-4A7A-B31C-010AE5C266BB}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
