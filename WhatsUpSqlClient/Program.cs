@@ -107,15 +107,16 @@ INNER JOIN MonitorState ON DeviceGroup_1.nMonitorStateID = MonitorState.nMonitor
 ";
             */
             string pgCreateDeviceStatusTable = @"CREATE TABLE
-IF NOT EXISTS ""public"".""WhatsUpDeviceStatus"" (
+IF NOT EXISTS ""custom"".""WhatsUpDeviceStatus"" (
 	""id"" TEXT COLLATE ""default"" NOT NULL,
 	""name"" TEXT COLLATE ""default"",
 	""stateID"" TEXT COLLATE ""default"",
 	""stateName"" TEXT COLLATE ""default"",
+    ""updateTime"" timestamptz(6) DEFAULT now(),
 	CONSTRAINT ""WhatsUpDeviceStatus_pkey"" PRIMARY KEY (""id"")
 ) WITH (OIDS = FALSE);
 
-ALTER TABLE ""public"".""WhatsUpDeviceStatus"" OWNER TO ""postgres"";";
+ALTER TABLE ""custom"".""WhatsUpDeviceStatus"" OWNER TO ""postgres"";";
             pgsqSqlClient.SqlScriptCmd(pgCreateDeviceStatusTable);
             System.Threading.Thread t1 = new System.Threading.Thread
       (delegate()
