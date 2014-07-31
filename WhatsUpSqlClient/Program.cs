@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -51,8 +52,9 @@ WHERE
 		)
 	);";
      */
-            string queryStringForDeviceStatus = @"SELECT 
+            string queryStringForDeviceStatus = @"SELECT
 	dbo.ActiveMonitorStateChangeLog.nPivotActiveMonitorTypeToDeviceID,
+	dbo.Device.sDisplayName,
 	dbo.ActiveMonitorStateChangeLog.nMonitorStateID,
 	dbo.MonitorState.sStateName
 FROM
@@ -116,7 +118,7 @@ INNER JOIN MonitorState ON DeviceGroup_1.nMonitorStateID = MonitorState.nMonitor
                       {
                           while (reader.Read())
                           {
-                              Console.WriteLine(String.Format("DeviceID={0}:StateID={1}:StateMsg={2}", reader[0], reader[1], reader[2]));
+                              Console.WriteLine(String.Format("DeviceID={0}:DeviceName={1}:StateID={2}:StateMsg={3}", reader[0], reader[1], reader[2], reader[3]));
                           }
                       }
                   }
