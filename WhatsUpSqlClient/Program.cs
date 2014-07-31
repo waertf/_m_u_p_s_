@@ -17,6 +17,13 @@ namespace WhatsUpSqlClient
     class Program
     {
         static Mutex _mutex = new Mutex(false, "WhatsUpSqlClient.exe");
+        static SqlClient pgsqSqlClient = new SqlClient(
+                ConfigurationManager.AppSettings["SQL_SERVER_IP"],
+                ConfigurationManager.AppSettings["SQL_SERVER_PORT"],
+                ConfigurationManager.AppSettings["SQL_SERVER_USER_ID"],
+                ConfigurationManager.AppSettings["SQL_SERVER_PASSWORD"],
+                ConfigurationManager.AppSettings["SQL_SERVER_DATABASE"]
+                );
         static void Main(string[] args)
         {
             if (!_mutex.WaitOne(1000, false))
@@ -99,7 +106,7 @@ INNER JOIN Device ON PivotDeviceToGroup.nDeviceID = Device.nDeviceID
 INNER JOIN MonitorState ON DeviceGroup_1.nMonitorStateID = MonitorState.nMonitorStateID;
 ";
             */
-            string createDeviceStatusTable = @"CREATE TABLE
+            string pgCreateDeviceStatusTable = @"CREATE TABLE
 IF NOT EXISTS ""public"".""WhatsUpDeviceStatus"" (
 	""id"" TEXT COLLATE ""default"" NOT NULL,
 	""name"" TEXT COLLATE ""default"",
@@ -109,6 +116,7 @@ IF NOT EXISTS ""public"".""WhatsUpDeviceStatus"" (
 ) WITH (OIDS = FALSE);
 
 ALTER TABLE ""public"".""WhatsUpDeviceStatus"" OWNER TO ""postgres"";";
+            pgsqSqlClient.SqlScriptCmd(pgCreateDeviceStatusTable);
             System.Threading.Thread t1 = new System.Threading.Thread
       (delegate()
       {
@@ -126,10 +134,17 @@ ALTER TABLE ""public"".""WhatsUpDeviceStatus"" OWNER TO ""postgres"";";
                       connection.Open();
                       using (SqlDataReader reader = command.ExecuteReader())
                       {
+                          using (DataTable dt = new DataTable())
+                          {
+                              dt.Load(reader);
+                              pgsqSqlClient.LoadDatatable(dt);
+                          }
+                          /*
                           while (reader.Read())
                           {
                               Console.WriteLine(String.Format("DeviceID={0}:DeviceName={1}:StateID={2}:StateMsg={3}", reader[0], reader[1], reader[2], reader[3]));
                           }
+                          */
                       }
                   }
                   
