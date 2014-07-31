@@ -99,6 +99,16 @@ INNER JOIN Device ON PivotDeviceToGroup.nDeviceID = Device.nDeviceID
 INNER JOIN MonitorState ON DeviceGroup_1.nMonitorStateID = MonitorState.nMonitorStateID;
 ";
             */
+            string createDeviceStatusTable = @"CREATE TABLE
+IF NOT EXISTS ""public"".""WhatsUpDeviceStatus"" (
+	""id"" TEXT COLLATE ""default"" NOT NULL,
+	""name"" TEXT COLLATE ""default"",
+	""stateID"" TEXT COLLATE ""default"",
+	""stateName"" TEXT COLLATE ""default"",
+	CONSTRAINT ""WhatsUpDeviceStatus_pkey"" PRIMARY KEY (""id"")
+) WITH (OIDS = FALSE);
+
+ALTER TABLE ""public"".""WhatsUpDeviceStatus"" OWNER TO ""postgres"";";
             System.Threading.Thread t1 = new System.Threading.Thread
       (delegate()
       {
