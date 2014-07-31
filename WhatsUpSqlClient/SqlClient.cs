@@ -39,9 +39,10 @@ namespace WhatsUpSqlClient
                     try
                     {
                         loader.Connection = pgSqlConnection;
-                        loader.TableName = "WhatsUpDeviceStatus";
+                        loader.TableName = "custom.WhatsUpDeviceStatus";
                         pgSqlConnection.Open();
                         loader.Open();
+                        //loader.CreateColumns();
                         loader.LoadTable(dt);
                     }
                     catch (Exception e)
