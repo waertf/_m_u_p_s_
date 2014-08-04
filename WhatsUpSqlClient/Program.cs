@@ -113,7 +113,6 @@ IF NOT EXISTS ""custom"".""WhatsUpDeviceStatus"" (
 	""name"" TEXT COLLATE ""default"",
 	""stateID"" TEXT COLLATE ""default"",
 	""stateName"" TEXT COLLATE ""default"",
-    ""updateTime"" timestamptz(6) DEFAULT now(),
 	CONSTRAINT ""WhatsUpDeviceStatus_pkey"" PRIMARY KEY (""id"")
 ) WITH (OIDS = FALSE);
 
