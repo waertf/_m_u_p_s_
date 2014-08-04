@@ -143,14 +143,14 @@ namespace WhatsUpSqlClient
 
 
                                 // Format and display the TimeSpan value.
-                                
+
                                 for (int i = 0; i < myReader.FieldCount; i++)
                                 {
                                     //Console.Write(myReader.GetName(i).ToString() + "\t");
-                                    datatable.Columns.Add(myReader.GetName(i).ToString(), typeof(string));
+                                    datatable.Columns.Add(myReader.GetName(i).ToString(), typeof (string));
                                 }
                                 //stopWatch.Stop();
-                                
+
                                 while (myReader.Read())
                                 {
                                     DataRow dr = datatable.NewRow();
@@ -165,14 +165,14 @@ namespace WhatsUpSqlClient
                                     //Console.WriteLine(myReader.GetInt32(0) + "\t" + myReader.GetString(1) + "\t");
                                 }
                                 myReader.Close();
-                                
+
                                 //myReader.Dispose();
                             }
                         }
                         finally
                         {
 
-
+                            pgSqlConnection.Close();
                         }
                         /*
                         foreach (DataRow row in datatable.Rows) // Loop over the rows.
@@ -185,32 +185,36 @@ namespace WhatsUpSqlClient
                             }
                         }
                         */
-                        
-                        
+
+
                         //if (command != null)
                         //command.Dispose();
                         command = null;
                         using (DataTable returnTable = datatable.Copy())
                         {
-                            
+
                             return returnTable;
                         }
                         //DataTable returnTable = datatable.Copy();
 
                     }
-                    
+
 
                 }
                 catch (PgSqlException ex)
                 {
                     Console.ForegroundColor = ConsoleColor.Red;
                     Console.WriteLine("GetDataTable exception occurs: {0}" + Environment.NewLine + "{1}", ex.Error, cmd);
-                    
+
                     Console.ResetColor();
                     //if (command != null)
                     //command.Dispose();
                     command = null;
                     return null;
+                }
+                finally
+                {
+                    pgSqlConnection.Close();
                 }
             }
 
@@ -221,55 +225,55 @@ namespace WhatsUpSqlClient
             PgSqlCommand command = null;
             PgSqlTransaction myTrans = null;
             using (PgSqlConnection pgSqlConnection = new PgSqlConnection(pgCSB.ConnectionString))
-            try
-            {
-                
+                try
                 {
-                    //insert
-                    command = pgSqlConnection.CreateCommand();
-                    command.CommandText = cmd;
-                    //command.CommandTimeout = 30;
-
-                    //cmd.CommandText = "INSERT INTO public.test (id) VALUES (1)";
-                    //pgSqlConnection.BeginTransaction();
-                    //async
-                    int RowsAffected;
-
-
 
                     {
-                        pgSqlConnection.Open();
-                        myTrans = pgSqlConnection.BeginTransaction(IsolationLevel.ReadCommitted);
-                        command.Transaction = myTrans;
-                        //IAsyncResult cres = command.BeginExecuteNonQuery();
-                        //RowsAffected = command.EndExecuteNonQuery(cres);
-                        //lock (accessLock)
-                        RowsAffected = command.ExecuteNonQuery();
-                        myTrans.Commit();
-                    }
-                    //IAsyncResult cres=command.BeginExecuteNonQuery(null,null);
-                    //Console.Write("In progress...");
-                    //while (!cres.IsCompleted)
-                    {
-                        //Console.Write(".");
-                        //Perform here any operation you need
-                    }
-                    /*
+                        //insert
+                        command = pgSqlConnection.CreateCommand();
+                        command.CommandText = cmd;
+                        //command.CommandTimeout = 30;
+
+                        //cmd.CommandText = "INSERT INTO public.test (id) VALUES (1)";
+                        //pgSqlConnection.BeginTransaction();
+                        //async
+                        int RowsAffected;
+
+
+
+                        {
+                            pgSqlConnection.Open();
+                            myTrans = pgSqlConnection.BeginTransaction(IsolationLevel.ReadCommitted);
+                            command.Transaction = myTrans;
+                            //IAsyncResult cres = command.BeginExecuteNonQuery();
+                            //RowsAffected = command.EndExecuteNonQuery(cres);
+                            //lock (accessLock)
+                            RowsAffected = command.ExecuteNonQuery();
+                            myTrans.Commit();
+                        }
+                        //IAsyncResult cres=command.BeginExecuteNonQuery(null,null);
+                        //Console.Write("In progress...");
+                        //while (!cres.IsCompleted)
+                        {
+                            //Console.Write(".");
+                            //Perform here any operation you need
+                        }
+                        /*
                     if (cres.IsCompleted)
                         Console.WriteLine("Completed.");
                     else
                         Console.WriteLine("Have to wait for operation to complete...");
                     */
-                    //int RowsAffected = command.EndExecuteNonQuery(cres);
-                    //Console.WriteLine("Done. Rows affected: " + RowsAffected.ToString());
+                        //int RowsAffected = command.EndExecuteNonQuery(cres);
+                        //Console.WriteLine("Done. Rows affected: " + RowsAffected.ToString());
 
-                    //sync
-                    //int aff = command.ExecuteNonQuery();
-                    //Console.WriteLine(RowsAffected + " rows were affected.");
-                    //command.Dispose();
-                    command = null;
-                    //pgSqlConnection.Commit();
-                    /*
+                        //sync
+                        //int aff = command.ExecuteNonQuery();
+                        //Console.WriteLine(RowsAffected + " rows were affected.");
+                        //command.Dispose();
+                        command = null;
+                        //pgSqlConnection.Commit();
+                        /*
                     ThreadPool.QueueUserWorkItem(callback =>
                     {
                         
@@ -286,26 +290,29 @@ namespace WhatsUpSqlClient
                     */
 
 
-                    // Format and display the TimeSpan value.
-                    
+                        // Format and display the TimeSpan value.
+
+
+                    }
 
                 }
+                catch (PgSqlException ex)
+                {
+                    if (myTrans != null) myTrans.Rollback();
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine("Modify exception occurs: {0}" + Environment.NewLine + "{1}", ex.Error, cmd);
 
-            }
-            catch (PgSqlException ex)
-            {
-                if (myTrans != null) myTrans.Rollback();
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine("Modify exception occurs: {0}" + Environment.NewLine + "{1}", ex.Error, cmd);
-                
-                Console.ResetColor();
-                //pgSqlConnection.Rollback();
-                //command.Dispose();
-                command = null;
+                    Console.ResetColor();
+                    //pgSqlConnection.Rollback();
+                    //command.Dispose();
+                    command = null;
 
 
-            }
-
+                }
+                finally
+                {
+                    pgSqlConnection.Close();
+                }
 
         }
     }
