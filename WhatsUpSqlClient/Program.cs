@@ -107,6 +107,7 @@ INNER JOIN Device ON PivotDeviceToGroup.nDeviceID = Device.nDeviceID
 INNER JOIN MonitorState ON DeviceGroup_1.nMonitorStateID = MonitorState.nMonitorStateID;
 ";
             */
+            /*
             string pgCreateDeviceStatusTable = @"CREATE TABLE
 IF NOT EXISTS ""custom"".""WhatsUpDeviceStatus"" (
 	""id"" TEXT COLLATE ""default"" NOT NULL,
@@ -118,6 +119,7 @@ IF NOT EXISTS ""custom"".""WhatsUpDeviceStatus"" (
 
 ALTER TABLE ""custom"".""WhatsUpDeviceStatus"" OWNER TO ""postgres"";";
             pgsqSqlClient.SqlScriptCmd(pgCreateDeviceStatusTable);
+            */
             System.Threading.Thread t1 = new System.Threading.Thread
       (delegate()
       {
@@ -135,6 +137,7 @@ ALTER TABLE ""custom"".""WhatsUpDeviceStatus"" OWNER TO ""postgres"";";
                       connection.Open();
                       using (SqlDataReader reader = command.ExecuteReader())
                       {
+                          /*
                           using (DataTable dt = new DataTable())
                           {
                               dt.Load(reader);
@@ -145,12 +148,34 @@ ALTER TABLE ""custom"".""WhatsUpDeviceStatus"" OWNER TO ""postgres"";";
                               }
                               
                           }
-                          /*
+                          */
+                          
                           while (reader.Read())
                           {
                               Console.WriteLine(String.Format("DeviceID={0}:DeviceName={1}:StateID={2}:StateMsg={3}", reader[0], reader[1], reader[2], reader[3]));
+                              string DeviceID = reader[0].ToString();
+                              string DeviceName = reader[1].ToString();
+                              string StateID = reader[2].ToString();
+                              string StateMsg = reader[3].ToString();
+                              string querySpecificDeviceID = @"SELECT
+	PUBLIC .site_status_now_whatup.site_id
+FROM
+	PUBLIC .site_status_now_whatup
+WHERE
+	PUBLIC .site_status_now_whatup.site_id = " + "\'" + DeviceID+"\'";
+                              using (DataTable dt = pgsqSqlClient.get_DataTable(querySpecificDeviceID))
+                              {
+                                  if (dt != null && dt.Rows.Count != 0)
+                                  {
+                                      //update
+                                  }
+                                  else
+                                  {
+                                      //insert
+                                  }
+                              }
                           }
-                          */
+                          
                       }
                   }
                   
