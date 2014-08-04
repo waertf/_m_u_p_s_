@@ -24,6 +24,7 @@ namespace WhatsUpSqlClient
                 ConfigurationManager.AppSettings["SQL_SERVER_PASSWORD"],
                 ConfigurationManager.AppSettings["SQL_SERVER_DATABASE"]
                 );
+        static object sqlLock = new object();
         static void Main(string[] args)
         {
             if (!_mutex.WaitOne(1000, false))
@@ -138,7 +139,12 @@ ALTER TABLE ""custom"".""WhatsUpDeviceStatus"" OWNER TO ""postgres"";";
                           using (DataTable dt = new DataTable())
                           {
                               dt.Load(reader);
-                              pgsqSqlClient.LoadDatatable(dt);
+                              if (dt.Rows.Count > 0)
+                              {
+                                  pgsqSqlClient.SqlScriptCmd("DELETE FROM custom.\"WhatsUpDeviceStatus\"");
+                                  pgsqSqlClient.LoadDatatable(dt);
+                              }
+                              
                           }
                           /*
                           while (reader.Read())
