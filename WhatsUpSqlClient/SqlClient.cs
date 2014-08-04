@@ -136,6 +136,7 @@ namespace WhatsUpSqlClient
                                 //IAsyncResult cres = command.BeginExecuteReader();
                                 //myReader = command.EndExecuteReader(cres);
                                 //lock (accessLock)
+                                pgSqlConnection.Open();
                                 myReader = command.ExecuteReader();
                                 //stopWatch.Stop();
                                 // Get the elapsed time as a TimeSpan value.
@@ -237,6 +238,7 @@ namespace WhatsUpSqlClient
 
 
                     {
+                        pgSqlConnection.Open();
                         myTrans = pgSqlConnection.BeginTransaction(IsolationLevel.ReadCommitted);
                         command.Transaction = myTrans;
                         //IAsyncResult cres = command.BeginExecuteNonQuery();
