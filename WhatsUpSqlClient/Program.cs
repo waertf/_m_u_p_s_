@@ -125,6 +125,7 @@ ALTER TABLE ""custom"".""WhatsUpDeviceStatus"" OWNER TO ""postgres"";";
       {
           //SqlConnection connection = new SqlConnection(connectionString);
           //connection.Open();
+          StringBuilder sqlScriptStringBuilder = new StringBuilder();
           while (true)
           {
               //using (SqlConnection connection = new SqlConnection(connectionString))
@@ -168,10 +169,25 @@ WHERE
                                   if (dt != null && dt.Rows.Count != 0)
                                   {
                                       //update
+                                      string updateScript = @"UPDATE PUBLIC .site_status_now_whatup
+SET status_code = 2,
+ status_name = 'qq',
+ status_color = '@'
+WHERE
+	site_id = 1";
                                   }
                                   else
                                   {
                                       //insert
+                                      string insertScript = @"INSERT INTO PUBLIC .site_status_now_whatup (
+	site_id,
+	site_name,
+	status_code,
+	status_name,
+	status_color
+)
+VALUES
+	(1, 'test', 1, 'on', '#')";
                                   }
                               }
                           }
