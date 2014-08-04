@@ -61,10 +61,12 @@ WHERE
 	);";
      */
             string queryStringForDeviceStatus = @"SELECT
-	dbo.ActiveMonitorStateChangeLog.nPivotActiveMonitorTypeToDeviceID AS id,
-	dbo.Device.sDisplayName AS name,
-	dbo.ActiveMonitorStateChangeLog.nMonitorStateID AS stateID,
-	dbo.MonitorState.sStateName AS stateName
+dbo.ActiveMonitorStateChangeLog.nPivotActiveMonitorTypeToDeviceID AS id,
+dbo.Device.sDisplayName AS name,
+dbo.ActiveMonitorStateChangeLog.nMonitorStateID AS stateID,
+dbo.MonitorState.sStateName AS stateName,
+dbo.MonitorState.nStateFillColor AS stateColor
+
 FROM
 	dbo.ActiveMonitorStateChangeLog
 INNER JOIN dbo.MonitorState ON dbo.ActiveMonitorStateChangeLog.nMonitorStateID = dbo.MonitorState.nMonitorStateID
@@ -81,7 +83,8 @@ WHERE
 				dbo.ActiveMonitorStateChangeLog.dStartTime IS NOT NULL
 			)
 		)
-	);";
+	)
+;";
 
             /*
             string queryStringForDeviceGroup = @"SELECT dbo.PivotDeviceToGroup.nDeviceID, dbo.PivotDeviceToGroup.nDeviceGroupID, dbo.DeviceGroup.nParentGroupID, dbo.DeviceGroup.nMonitorStateID
@@ -153,11 +156,12 @@ ALTER TABLE ""custom"".""WhatsUpDeviceStatus"" OWNER TO ""postgres"";";
                           
                           while (reader.Read())
                           {
-                              Console.WriteLine(String.Format("DeviceID={0}:DeviceName={1}:StateID={2}:StateMsg={3}", reader[0], reader[1], reader[2], reader[3]));
+                              Console.WriteLine(String.Format("DeviceID={0}:DeviceName={1}:StateID={2}:StateMsg={3}:StateColor={4}", reader[0], reader[1], reader[2], reader[3], reader[4]));
                               string DeviceID = reader[0].ToString();
                               string DeviceName = reader[1].ToString();
                               string StateID = reader[2].ToString();
                               string StateMsg = reader[3].ToString();
+                              string StateColor = reader[4].ToString();
                               string querySpecificDeviceID = @"SELECT
 	PUBLIC .site_status_now_whatup.site_id
 FROM
