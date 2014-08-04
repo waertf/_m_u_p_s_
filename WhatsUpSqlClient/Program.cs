@@ -60,10 +60,10 @@ WHERE
 	);";
      */
             string queryStringForDeviceStatus = @"SELECT
-	dbo.ActiveMonitorStateChangeLog.nPivotActiveMonitorTypeToDeviceID,
-	dbo.Device.sDisplayName,
-	dbo.ActiveMonitorStateChangeLog.nMonitorStateID,
-	dbo.MonitorState.sStateName
+	dbo.ActiveMonitorStateChangeLog.nPivotActiveMonitorTypeToDeviceID AS id,
+	dbo.Device.sDisplayName AS name,
+	dbo.ActiveMonitorStateChangeLog.nMonitorStateID AS stateID,
+	dbo.MonitorState.sStateName AS stateName
 FROM
 	dbo.ActiveMonitorStateChangeLog
 INNER JOIN dbo.MonitorState ON dbo.ActiveMonitorStateChangeLog.nMonitorStateID = dbo.MonitorState.nMonitorStateID
