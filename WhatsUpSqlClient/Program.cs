@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.Remoting.Channels;
 using System.Text;
 using System.Configuration;
 using System.Data.SqlClient;
@@ -23,6 +24,13 @@ namespace WhatsUpSqlClient
                 ConfigurationManager.AppSettings["SQL_SERVER_USER_ID"],
                 ConfigurationManager.AppSettings["SQL_SERVER_PASSWORD"],
                 ConfigurationManager.AppSettings["SQL_SERVER_DATABASE"]
+                );
+        static SqlClient pgsqSqlHistoryClient = new SqlClient(
+                ConfigurationManager.AppSettings["SQL_SERVER_IP"],
+                ConfigurationManager.AppSettings["SQL_SERVER_PORT"],
+                ConfigurationManager.AppSettings["SQL_SERVER_USER_ID"],
+                ConfigurationManager.AppSettings["SQL_SERVER_PASSWORD"],
+                "dtltms_data"
                 );
         static object sqlLock = new object();
         static void Main(string[] args)
@@ -254,8 +262,70 @@ VALUES
           }
       });
             */
+            System.Threading.Thread t3 = new System.Threading.Thread
+      (delegate()
+      {
+          string snPointer = ConfigurationManager.AppSettings["AMSCL_pointer"];
+          decimal snPDecimal = decimal.Parse(snPointer);
+          while (true)
+          {
+              string queryResult = @"SELECT
+	dbo.ActiveMonitorStateChangeLog.nPivotActiveMonitorTypeToDeviceID,
+	dbo.Device.sDisplayName,
+	dbo.ActiveMonitorStateChangeLog.nMonitorStateID,
+	dbo.MonitorState.sStateName,
+	dbo.ActiveMonitorStateChangeLog.dStartTime,
+	dbo.ActiveMonitorStateChangeLog.dEndTime
+FROM
+	dbo.ActiveMonitorStateChangeLog
+INNER JOIN dbo.MonitorState ON dbo.ActiveMonitorStateChangeLog.nMonitorStateID = dbo.MonitorState.nMonitorStateID
+INNER JOIN dbo.Device ON dbo.ActiveMonitorStateChangeLog.nPivotActiveMonitorTypeToDeviceID = dbo.Device.nDeviceID
+WHERE
+	dbo.ActiveMonitorStateChangeLog.nActiveMonitorStateChangeLogID = " + snPDecimal + ";";
+              using (SqlConnection connection = new SqlConnection(connectionString))
+              using (SqlCommand command = new SqlCommand(queryResult, connection))
+              {
+                  connection.Open();
+                  using (SqlDataReader reader = command.ExecuteReader())
+                  {
+                      while (reader.Read())
+                      {
+                          if (reader[0].Equals(DBNull.Value))
+                          {
+                              //do nothing
+                          }
+                          else
+                          {
+                              snPDecimal++;
+                              UpdateSetting("AMSCL_pointer", snPDecimal.ToString());
+                              string DeviceID = reader[0].ToString();
+                              string DeviceName = reader[1].ToString();
+                              string StateID = reader[2].ToString();
+                              string StateMsg = reader[3].ToString();
+                              string startTime = reader[4].ToString();
+                              string endTime = reader[5].ToString();
+                              string insertScript = @"INSERT INTO PUBLIC .device_status_history (
+	device_no,
+	device_name,
+	message_code,
+	message_note,
+	start_time,
+    end_time,
+alarm_status
+)
+VALUES
+	(" + DeviceID + @", '" + DeviceName + @"', " + StateID + @", '" + StateMsg + @"', '" + startTime + @"', '" + endTime + @"',0);";
+                              pgsqSqlHistoryClient.SqlScriptCmd(insertScript);
+                          }
+                      }
+                  }
+              }
+              Thread.Sleep(30);
+          }
+      });
             t1.Start();
             //t2.Start();
+            t3.Start();
             
             
         }
@@ -278,6 +348,14 @@ VALUES
                   Process.GetCurrentProcess().WorkingSet64 / 1024.0 / 1024.0;
             SiAuto.Main.LogWarning(logMsg);
             _mutex.ReleaseMutex();
+        }
+
+        private static void UpdateSetting(string key, string value)
+        {
+            System.Configuration.Configuration config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
+            config.AppSettings.Settings[key].Value = value;
+            config.Save(ConfigurationSaveMode.Modified);
+            ConfigurationManager.RefreshSection("appSettings");
         }
     }
 }
