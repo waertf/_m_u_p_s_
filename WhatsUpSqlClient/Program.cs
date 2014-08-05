@@ -156,7 +156,7 @@ ALTER TABLE ""custom"".""WhatsUpDeviceStatus"" OWNER TO ""postgres"";";
                           
                           while (reader.Read())
                           {
-                              Console.WriteLine(String.Format("DeviceID={0}:DeviceName={1}:StateID={2}:StateMsg={3}:StateColor={4}", reader[0], reader[1], reader[2], reader[3], reader[4]));
+                              //Console.WriteLine(String.Format("DeviceID={0}:DeviceName={1}:StateID={2}:StateMsg={3}:StateColor={4}", reader[0], reader[1], reader[2], reader[3], reader[4]));
                               string DeviceID = reader[0].ToString();
                               string DeviceName = reader[1].ToString();
                               string StateID = reader[2].ToString();
@@ -167,18 +167,40 @@ ALTER TABLE ""custom"".""WhatsUpDeviceStatus"" OWNER TO ""postgres"";";
 FROM
 	PUBLIC .site_status_now_whatup
 WHERE
-	PUBLIC .site_status_now_whatup.site_id = " + "\'" + DeviceID+"\'";
+	PUBLIC .site_status_now_whatup.site_id = "  + DeviceID;
+                              string querySpecificStateID = @"SELECT
+	PUBLIC .site_status_now_whatup.status_code
+FROM
+	PUBLIC .site_status_now_whatup
+WHERE
+	PUBLIC .site_status_now_whatup.site_id = " + DeviceID;
                               using (DataTable dt = pgsqSqlClient.get_DataTable(querySpecificDeviceID))
                               {
                                   if (dt != null && dt.Rows.Count != 0)
                                   {
-                                      //update
-                                      string updateScript = @"UPDATE PUBLIC .site_status_now_whatup
-SET status_code = 2,
- status_name = 'qq',
- status_color = '@'
+                                      using (DataTable dt2 = pgsqSqlClient.get_DataTable(querySpecificStateID))
+                                      {
+                                          if (dt2 != null && dt2.Rows.Count != 0)
+                                          {
+                                              string stateResult = dt2.Rows[0].ItemArray[0]
+                                                  .ToString();
+                                              if (stateResult.Equals(StateID))
+                                              {
+                                                  //do nothing
+                                              }
+                                              else
+                                              {
+                                                  //update
+                                                  string updateScript = @"UPDATE PUBLIC .site_status_now_whatup
+SET status_code = "+StateID+@",
+ status_name = '"+StateMsg+@"',
+ status_color = '"+StateColor+@"'
 WHERE
-	site_id = 1";
+	site_id = " + DeviceID+";";
+                                                  sqlScriptStringBuilder.AppendLine(updateScript);
+                                              }
+                                          }
+                                      }    
                                   }
                                   else
                                   {
@@ -191,9 +213,13 @@ WHERE
 	status_color
 )
 VALUES
-	(1, 'test', 1, 'on', '#')";
+	("+DeviceID+@", '"+DeviceName+@"', "+StateID+@", '"+StateMsg+@"', '"+StateColor+@"');";
+                                      sqlScriptStringBuilder.AppendLine(insertScript);
                                   }
                               }
+                              //exeute insert/update script
+                              pgsqSqlClient.SqlScriptCmd(sqlScriptStringBuilder.ToString());
+                              sqlScriptStringBuilder.Clear();
                           }
                           
                       }
