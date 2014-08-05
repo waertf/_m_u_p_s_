@@ -25,13 +25,6 @@ namespace WhatsUpSqlClient
                 ConfigurationManager.AppSettings["SQL_SERVER_PASSWORD"],
                 ConfigurationManager.AppSettings["SQL_SERVER_DATABASE"]
                 );
-        static SqlClient pgsqSqlHistoryClient = new SqlClient(
-                ConfigurationManager.AppSettings["SQL_SERVER_IP"],
-                ConfigurationManager.AppSettings["SQL_SERVER_PORT"],
-                ConfigurationManager.AppSettings["SQL_SERVER_USER_ID"],
-                ConfigurationManager.AppSettings["SQL_SERVER_PASSWORD"],
-                "dtltms_data"
-                );
         static object sqlLock = new object();
         static void Main(string[] args)
         {
@@ -315,7 +308,7 @@ alarm_status
 )
 VALUES
 	(" + DeviceID + @", '" + DeviceName + @"', " + StateID + @", '" + StateMsg + @"', '" + startTime + @"', '" + endTime + @"',0);";
-                              pgsqSqlHistoryClient.SqlScriptCmd(insertScript);
+                              pgsqSqlClient.SqlScriptCmd(insertScript);
                           }
                       }
                   }
