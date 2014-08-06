@@ -297,7 +297,7 @@ WHERE
                               string StateMsg = reader[3].ToString();
                               string startTime = reader[4].ToString();
                               string endTime = reader[5].ToString();
-                              string insertScript = @"INSERT INTO PUBLIC .device_status_history (
+                              string insertScript = @"INSERT INTO PUBLIC .device_status_history_whatup (
 	device_no,
 	device_name,
 	message_code,
