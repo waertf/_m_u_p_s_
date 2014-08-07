@@ -181,10 +181,12 @@ WHERE
                                   {
                                       using (DataTable dt2 = pgsqSqlClient.get_DataTable(querySpecificStateID))
                                       {
+                                          string stateResult = string.Empty;
                                           if (dt2 != null && dt2.Rows.Count != 0)
                                           {
-                                              string stateResult = dt2.Rows[0].ItemArray[0]
+                                              stateResult = dt2.Rows[0].ItemArray[0]
                                                   .ToString();
+                                              
                                               if (stateResult.Equals(StateID))
                                               {
                                                   //do nothing
@@ -192,6 +194,8 @@ WHERE
                                               else
                                               {
                                                   //update
+                                                  Console.WriteLine("stateResult:" + stateResult + Environment.NewLine + "StateID:" + StateID);
+                                                  SiAuto.Main.LogMessage("stateResult:" + stateResult + Environment.NewLine + "StateID:" + StateID);
                                                   string updateScript = @"UPDATE PUBLIC .site_status_now_whatup
 SET status_code = "+StateID+@",
  status_name = '"+StateMsg+@"',
@@ -220,6 +224,7 @@ VALUES
                               }
                               //exeute insert/update script
                               pgsqSqlClient.SqlScriptCmd(sqlScriptStringBuilder.ToString());
+                              SiAuto.Main.LogStringBuilder("Update Modify site_status_now_whatup",sqlScriptStringBuilder);
                               sqlScriptStringBuilder.Clear();
                           }
                           
@@ -275,6 +280,7 @@ INNER JOIN dbo.MonitorState ON dbo.ActiveMonitorStateChangeLog.nMonitorStateID =
 INNER JOIN dbo.Device ON dbo.ActiveMonitorStateChangeLog.nPivotActiveMonitorTypeToDeviceID = dbo.Device.nDeviceID
 WHERE
 	dbo.ActiveMonitorStateChangeLog.nActiveMonitorStateChangeLogID = " + snPDecimal + ";";
+              
               using (SqlConnection connection = new SqlConnection(connectionString))
               using (SqlCommand command = new SqlCommand(queryResult, connection))
               {
@@ -285,7 +291,12 @@ WHERE
                       {
                           if (reader[0].Equals(DBNull.Value))
                           {
-                              //do nothing
+                              if (LessThanMaxID(snPDecimal))
+                              {
+                                  snPDecimal++;
+                                  UpdateSetting("AMSCL_pointer", snPDecimal.ToString());
+                              }
+
                           }
                           else
                           {
@@ -321,6 +332,47 @@ VALUES
             t3.Start();
             
             
+        }
+
+        private static bool LessThanMaxID(decimal snPDecimal)
+        {
+            bool result = false;
+            string connectionString = ConfigurationManager.AppSettings["connectString"];
+            string queryMaxID = @"SELECT
+	MAX (
+		dbo.ActiveMonitorStateChangeLog.nActiveMonitorStateChangeLogID
+	)
+FROM
+	dbo.ActiveMonitorStateChangeLog;";
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            using (SqlCommand command = new SqlCommand(queryMaxID, connection))
+            {
+                connection.Open();
+                using (SqlDataReader reader = command.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        string MaxID = reader[0].ToString();
+                        decimal maxIdDecimal;
+                        if (decimal.TryParse(MaxID, out maxIdDecimal))
+                        {
+                            if (maxIdDecimal > snPDecimal)
+                                result= true;
+                            else
+                            {
+                                result= false;
+                            }
+                        }
+                        else
+                        {
+                            Console.WriteLine("MaxID:" + MaxID + " Over Decimal scope" );
+                            SiAuto.Main.LogError("MaxID:"+MaxID+" Over Decimal scope");
+                            result= false;
+                        }
+                    }
+                }
+            }
+            return result;
         }
 
         static void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
