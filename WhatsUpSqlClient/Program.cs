@@ -222,15 +222,19 @@ VALUES
                                       sqlScriptStringBuilder.AppendLine(insertScript);
                                   }
                               }
-                              //exeute insert/update script
-                              pgsqSqlClient.SqlScriptCmd(sqlScriptStringBuilder.ToString());
-                              SiAuto.Main.LogStringBuilder("Update Modify site_status_now_whatup",sqlScriptStringBuilder);
-                              sqlScriptStringBuilder.Clear();
+                              
                           }
                           
                       }
                   }
                   
+              }
+              if (sqlScriptStringBuilder.Length > 0)
+              {
+                  //exeute insert/update script
+                  pgsqSqlClient.SqlScriptCmd(sqlScriptStringBuilder.ToString());
+                  SiAuto.Main.LogStringBuilder("Update Modify site_status_now_whatup", sqlScriptStringBuilder);
+                  sqlScriptStringBuilder.Clear();
               }
               Thread.Sleep(1000);
           }
