@@ -136,6 +136,62 @@ ALTER TABLE ""custom"".""WhatsUpDeviceStatus"" OWNER TO ""postgres"";";
               {
                   //connection.Open();
                   //SqlCommand command = new SqlCommand(queryStringForDeviceStatus, connection);
+                  //remove duplicate rows
+                  #region
+
+                  string getDuplicateIdAndCount = @"SELECT
+	dbo.ActiveMonitorStateChangeLog.nPivotActiveMonitorTypeToDeviceID,
+	COUNT (*)
+FROM
+	dbo.ActiveMonitorStateChangeLog
+WHERE
+	dbo.ActiveMonitorStateChangeLog.dStartTime IS NOT NULL
+AND dbo.ActiveMonitorStateChangeLog.dEndTime IS NULL
+GROUP BY
+	dbo.ActiveMonitorStateChangeLog.nPivotActiveMonitorTypeToDeviceID
+HAVING
+	COUNT (*) > 1";
+                  
+                  List<string> deviceID=new List<string>(), deviceCount=new List<string>();
+                  using (SqlConnection connection = new SqlConnection(connectionString))
+                  using (SqlCommand command = new SqlCommand(getDuplicateIdAndCount, connection))
+                  {
+                      connection.Open();
+                      using (SqlDataReader reader = command.ExecuteReader())
+                      {
+                          while (reader.Read())
+                          {
+                              deviceID.Add(reader[0].ToString());
+                              deviceCount.Add(reader[1].ToString());
+                          }
+                      }
+                  }
+                  
+
+                  for (int i = 0; i < deviceID.Count; i++)
+                  {
+                      string removeDuplicateId =
+                      @"DELETE FROM dbo.ActiveMonitorStateChangeLog WHERE ActiveMonitorStateChangeLog.nActiveMonitorStateChangeLogID
+IN
+(
+SELECT TOP "+(int.Parse(deviceCount[i])-1)+@"
+dbo.ActiveMonitorStateChangeLog.nActiveMonitorStateChangeLogID
+
+FROM
+dbo.ActiveMonitorStateChangeLog
+WHERE
+dbo.ActiveMonitorStateChangeLog.nPivotActiveMonitorTypeToDeviceID = " + deviceID[i] + @"
+
+)";
+                      using (SqlConnection connection1 = new SqlConnection(connectionString))
+                      using (SqlCommand command1 = new SqlCommand(removeDuplicateId, connection1))
+                      {
+                          connection1.Open();
+                          int row = command1.ExecuteNonQuery();
+                          Console.WriteLine("Affected rows:" + row);
+                      }
+                  }
+                  #endregion
                   using (SqlConnection connection = new SqlConnection(connectionString))
                   using (SqlCommand command = new SqlCommand(queryStringForDeviceStatus, connection))
                   {
