@@ -162,7 +162,7 @@ ALTER TABLE ""custom"".""WhatsUpDeviceStatus"" OWNER TO ""postgres"";";
                               string DeviceName = reader[1].ToString();
                               string StateID = reader[2].ToString();
                               string StateMsg = reader[3].ToString();
-                              string StateColor = "#"+int.Parse(reader[4].ToString()).ToString("X");
+                              string StateColor = "#"+int.Parse(reader[4].ToString()).ToString("X6");
                               string querySpecificDeviceID = @"SELECT
 	PUBLIC .site_status_now_whatup.site_id
 FROM
