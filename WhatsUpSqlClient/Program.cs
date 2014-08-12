@@ -181,7 +181,8 @@ FROM
 dbo.ActiveMonitorStateChangeLog
 WHERE
 dbo.ActiveMonitorStateChangeLog.nPivotActiveMonitorTypeToDeviceID = " + deviceID[i] + @"
-
+AND dbo.ActiveMonitorStateChangeLog.dStartTime IS NOT NULL
+		AND dbo.ActiveMonitorStateChangeLog.dEndTime IS NULL
 )";
                       using (SqlConnection connection1 = new SqlConnection(connectionString))
                       using (SqlCommand command1 = new SqlCommand(removeDuplicateId, connection1))
