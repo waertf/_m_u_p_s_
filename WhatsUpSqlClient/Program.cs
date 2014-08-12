@@ -347,7 +347,7 @@ WHERE
                   connection.Open();
                   using (SqlDataReader reader = command.ExecuteReader())
                   {
-                      while (reader.Read())
+                      if (reader.Read())
                       {
                           //if (reader[0].Equals(DBNull.Value))
                           {
@@ -383,14 +383,18 @@ VALUES
                               pgsqSqlClient.SqlScriptCmd(insertScript);
                           }
                       }
+                      else
+                      {
+                          if (LessThanMaxID(snPDecimal))
+                          {
+                              snPDecimal++;
+                              UpdateSetting("AMSCL_pointer", snPDecimal.ToString());
+                          }
+                      }
+                      Console.WriteLine(snPDecimal);
                   }
               }
-              if (LessThanMaxID(snPDecimal))
-              {
-                  snPDecimal++;
-                  //Console.WriteLine(snPDecimal);
-                  UpdateSetting("AMSCL_pointer", snPDecimal.ToString());
-              }
+              
               Thread.Sleep(30);
           }
       });
