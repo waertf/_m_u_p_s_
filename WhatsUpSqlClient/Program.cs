@@ -349,16 +349,17 @@ WHERE
                   {
                       while (reader.Read())
                       {
-                          if (reader[0].Equals(DBNull.Value))
+                          //if (reader[0].Equals(DBNull.Value))
                           {
+                              /*
                               if (LessThanMaxID(snPDecimal))
                               {
                                   snPDecimal++;
                                   UpdateSetting("AMSCL_pointer", snPDecimal.ToString());
                               }
-
+                              */
                           }
-                          else
+                          //else
                           {
                               snPDecimal++;
                               UpdateSetting("AMSCL_pointer", snPDecimal.ToString());
@@ -383,6 +384,12 @@ VALUES
                           }
                       }
                   }
+              }
+              if (LessThanMaxID(snPDecimal))
+              {
+                  snPDecimal++;
+                  //Console.WriteLine(snPDecimal);
+                  UpdateSetting("AMSCL_pointer", snPDecimal.ToString());
               }
               Thread.Sleep(30);
           }
