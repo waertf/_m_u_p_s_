@@ -26,10 +26,13 @@ namespace WhatsUpSqlClient
                 ConfigurationManager.AppSettings["SQL_SERVER_DATABASE"]
                 );
         static object sqlLock = new object();
+        static string snPointer = ConfigurationManager.AppSettings["AMSCL_pointer"];
+        static decimal snPDecimal = decimal.Parse(snPointer);
         static void Main(string[] args)
         {
             if (!_mutex.WaitOne(1000, false))
                 return;
+            
             AppDomain.CurrentDomain.ProcessExit += CurrentDomain_ProcessExit;
             AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
             SiAuto.Si.Enabled = true;
@@ -324,8 +327,8 @@ VALUES
             System.Threading.Thread t3 = new System.Threading.Thread
       (delegate()
       {
-          string snPointer = ConfigurationManager.AppSettings["AMSCL_pointer"];
-          decimal snPDecimal = decimal.Parse(snPointer);
+          //string snPointer = ConfigurationManager.AppSettings["AMSCL_pointer"];
+          //decimal snPDecimal = decimal.Parse(snPointer);
           while (true)
           {
               string queryResult = @"SELECT
@@ -363,7 +366,8 @@ WHERE
                           //else
                           {
                               snPDecimal++;
-                              UpdateSetting("AMSCL_pointer", snPDecimal.ToString());
+                              Console.WriteLine(snPDecimal);
+                              //UpdateSetting("AMSCL_pointer", snPDecimal.ToString());
                               string DeviceID = reader[0].ToString();
                               string DeviceName = reader[1].ToString();
                               string StateID = reader[2].ToString();
@@ -389,7 +393,8 @@ VALUES
                           if (LessThanMaxID(snPDecimal))
                           {
                               snPDecimal++;
-                              UpdateSetting("AMSCL_pointer", snPDecimal.ToString());
+                              Console.WriteLine(snPDecimal);
+                              //UpdateSetting("AMSCL_pointer", snPDecimal.ToString());
                           }
                       }
                       //Console.WriteLine(snPDecimal);
@@ -402,7 +407,7 @@ VALUES
             t1.Start();
             //t2.Start();
             t3.Start();
-            
+            GraceFullCtrlC();
             
         }
 
@@ -459,6 +464,7 @@ FROM
 
         static void CurrentDomain_ProcessExit(object sender, EventArgs e)
         {
+            UpdateSetting("AMSCL_pointer", snPDecimal.ToString());
             string logMsg = string.Empty;
             logMsg = "Close time:" + DateTime.Now.ToString("G") + Environment.NewLine +
                   "Memory usage:" +
@@ -473,6 +479,47 @@ FROM
             config.AppSettings.Settings[key].Value = value;
             config.Save(ConfigurationSaveMode.Modified);
             ConfigurationManager.RefreshSection("appSettings");
+        }
+
+        static void GraceFullCtrlC()
+        {
+            Console.CancelKeyPress += delegate(object sender,
+                                    ConsoleCancelEventArgs e)
+            {
+                if (e.SpecialKey == ConsoleSpecialKey.ControlBreak)
+                {
+                    Console.WriteLine("Ctrl-Break catched and" +
+                      " translated into an cooperative shutdown");
+                    // Environment.Exit(1) would NOT do 
+                    // a cooperative shutdown. No finalizers are called!
+                    Thread t = new Thread(delegate()
+                    {
+                        Console.WriteLine("Asynchronous shutdown started");
+                        Environment.Exit(1);
+                    });
+
+                    t.Start();
+                    t.Join();
+                }
+                if (e.SpecialKey == ConsoleSpecialKey.ControlC)
+                {
+                    e.Cancel = true; // tell the CLR to keep running
+                    Console.WriteLine("Ctrl-C catched and " +
+                      "translated into cooperative shutdown");
+                    // If we want to call exit triggered from
+                    // out event handler we have to spin
+                    // up another thread. If somebody of the
+                    // CLR team reads this. Please fix!
+                    new Thread(delegate()
+                    {
+                        Console.WriteLine("Asynchronous shutdown started");
+                        Environment.Exit(2);
+                    }).Start();
+                }
+            };
+
+            Console.WriteLine("Press now Ctrl-C or Ctrl-Break");
+            Thread.Sleep(10000);
         }
     }
 }
