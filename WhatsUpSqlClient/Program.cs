@@ -392,11 +392,11 @@ VALUES
                               UpdateSetting("AMSCL_pointer", snPDecimal.ToString());
                           }
                       }
-                      Console.WriteLine(snPDecimal);
+                      //Console.WriteLine(snPDecimal);
                   }
               }
               
-              Thread.Sleep(30);
+              Thread.Sleep(1);
           }
       });
             t1.Start();
