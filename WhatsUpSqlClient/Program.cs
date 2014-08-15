@@ -143,7 +143,7 @@ IF NOT EXISTS ""custom"".""WhatsUpDeviceStatus"" (
 ALTER TABLE ""custom"".""WhatsUpDeviceStatus"" OWNER TO ""postgres"";";
             pgsqSqlClient.SqlScriptCmd(pgCreateDeviceStatusTable);
             */
-            System.Threading.Thread t1 = new System.Threading.Thread
+            System.Threading.Thread getCurrentStatusThread = new System.Threading.Thread
       (delegate()
       {
           //SqlConnection connection = new SqlConnection(connectionString);
@@ -340,7 +340,7 @@ VALUES
           }
       });
             */
-            System.Threading.Thread t3 = new System.Threading.Thread
+            System.Threading.Thread synDeviceHistoryThread = new System.Threading.Thread
       (delegate()
       {
           //string snPointer = ConfigurationManager.AppSettings["AMSCL_pointer"];
@@ -420,9 +420,9 @@ VALUES
               Thread.Sleep(1);
           }
       });
-            t1.Start();
+            getCurrentStatusThread.Start();
             //t2.Start();
-            t3.Start();
+            synDeviceHistoryThread.Start();
             GraceFullCtrlC();
             
         }
