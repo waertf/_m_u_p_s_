@@ -279,6 +279,7 @@ SET status_code = "+StateID+@",
 WHERE
 	site_id = " + DeviceID+";";
                                                   sqlScriptStringBuilder.AppendLine(updateScript);
+                                                  //call send sms
                                               }
                                           }
                                       }    
@@ -296,6 +297,7 @@ WHERE
 VALUES
 	("+DeviceID+@", '"+DeviceName+@"', "+StateID+@", '"+StateMsg+@"', '"+StateColor+@"');";
                                       sqlScriptStringBuilder.AppendLine(insertScript);
+                                      //call send sms
                                   }
                               }
                               
