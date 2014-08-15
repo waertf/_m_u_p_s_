@@ -538,6 +538,60 @@ FROM
             Console.WriteLine("Press now Ctrl-C or Ctrl-Break");
             Thread.Sleep(10000);
         }
+
+        void SendStatusSMS(string deviceName, string deviceStateId)
+        {
+            string queryPhoneNumber = @"SELECT
+public.msg_whatup_send.phone_number
+FROM
+public.msg_whatup_send
+WHERE
+public.msg_whatup_send.message_no = " + deviceStateId;
+            string queryStateChineseDescription = @"SELECT
+public.alarm_set_whatup.cnote
+FROM
+public.alarm_set_whatup
+WHERE
+public.alarm_set_whatup.serial_no = " + deviceStateId;
+            string stateChineseDescription = null;
+            string phoneNumber = null;
+            try
+            {
+                using (DataTable dt = pgsqSqlClient.get_DataTable(queryStateChineseDescription))
+                {
+                    if (dt != null && dt.Rows.Count != 0)
+                    {
+                        stateChineseDescription = dt.Rows[0].ItemArray[0].ToString();
+                    }
+                }
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+
+            try
+            {
+                using (DataTable dt = pgsqSqlClient.get_DataTable(queryPhoneNumber))
+                {
+                    if (dt != null && dt.Rows.Count != 0)
+                    {
+                        foreach (DataRow row in dt.Rows)
+                        {
+                            phoneNumber = row[0].ToString();
+                            Console.WriteLine(phoneNumber + ":" + deviceName + ":" + stateChineseDescription);
+                            //send sms 
+                        }
+                    }
+                }
+            }
+            catch (Exception)
+            {
+                
+                throw;
+            }
+        }
         
     }
 }
