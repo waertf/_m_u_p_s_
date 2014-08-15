@@ -10,8 +10,10 @@ using System.Text;
 using System.Configuration;
 using System.Data.SqlClient;
 using System.Threading;
+using Devart.Common;
 using Gurock.SmartInspect;
 using Devart.Data.PostgreSql;
+using System.Collections.Concurrent;
 
 namespace WhatsUpSqlClient
 {
@@ -28,6 +30,7 @@ namespace WhatsUpSqlClient
         static object sqlLock = new object();
         static string snPointer = ConfigurationManager.AppSettings["AMSCL_pointer"];
         static decimal snPDecimal = decimal.Parse(snPointer);
+        static ConcurrentQueue<string> smsQueue = new ConcurrentQueue<string>(); 
         static void Main(string[] args)
         {
             if (!_mutex.WaitOne(1000, false))
@@ -280,6 +283,7 @@ WHERE
 	site_id = " + DeviceID+";";
                                                   sqlScriptStringBuilder.AppendLine(updateScript);
                                                   //call send sms
+                                                  smsQueue.Enqueue(DeviceName+"&"+StateID);
                                               }
                                           }
                                       }    
@@ -298,6 +302,7 @@ VALUES
 	("+DeviceID+@", '"+DeviceName+@"', "+StateID+@", '"+StateMsg+@"', '"+StateColor+@"');";
                                       sqlScriptStringBuilder.AppendLine(insertScript);
                                       //call send sms
+                                      smsQueue.Enqueue(DeviceName + "&" + StateID);
                                   }
                               }
                               
@@ -426,6 +431,27 @@ VALUES
             //t2.Start();
             synDeviceHistoryThread.Start();
             GraceFullCtrlC();
+            var smsSendTimer = new System.Timers.Timer(5);
+            smsSendTimer.Elapsed += (sender, e) =>
+            {
+                string result = null;
+                string deviceName = null;
+                string stateId = null;
+                //ThreadPool.QueueUserWorkItem(delegate
+                //{
+                if (smsQueue.TryDequeue(out result))
+                {
+                    string[] getStrings = result.Split(new char[] {'&'});
+                    if (getStrings.Length.Equals(2))
+                    {
+                        deviceName = getStrings[0];
+                        stateId = getStrings[1];
+                        SendStatusSMS(deviceName,stateId);
+                    }
+                }
+                //});
+            };
+            //smsSendTimer.Enabled = true;
             
         }
 
@@ -541,7 +567,7 @@ FROM
             Thread.Sleep(10000);
         }
 
-        void SendStatusSMS(string deviceName, string deviceStateId)
+        static void SendStatusSMS(string deviceName, string deviceStateId)
         {
             string queryPhoneNumber = @"SELECT
 public.msg_whatup_send.phone_number
