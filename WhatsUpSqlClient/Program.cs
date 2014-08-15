@@ -32,7 +32,6 @@ namespace WhatsUpSqlClient
         {
             if (!_mutex.WaitOne(1000, false))
                 return;
-            
             AppDomain.CurrentDomain.ProcessExit += CurrentDomain_ProcessExit;
             AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
             SiAuto.Si.Enabled = true;
@@ -41,7 +40,7 @@ namespace WhatsUpSqlClient
                                     Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) +
                                     "\\log.sil\",rotate=weekly,append=true,maxparts=5,maxsize=500MB)";
             string connectionString = ConfigurationManager.AppSettings["connectString"];
-            
+            SiAuto.Main.LogWarning("Start at " + DateTime.Now);
             /*
              * string queryStringForDeviceStatus = @"SELECT 
 	dbo.ActiveMonitorStateChangeLog.nPivotActiveMonitorTypeToDeviceID,
@@ -457,7 +456,7 @@ FROM
             var exception = e.ExceptionObject as Exception;
             if (exception != null)
             {
-                SiAuto.Main.LogException("Restart", exception);
+                SiAuto.Main.LogException(exception);
             }
             Environment.Exit(1);
         }
@@ -470,6 +469,7 @@ FROM
                   "Memory usage:" +
                   Process.GetCurrentProcess().WorkingSet64 / 1024.0 / 1024.0;
             SiAuto.Main.LogWarning(logMsg);
+            if (_mutex!=null)
             _mutex.ReleaseMutex();
         }
 
