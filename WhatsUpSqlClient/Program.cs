@@ -41,6 +41,23 @@ namespace WhatsUpSqlClient
                                     "\\log.sil\",rotate=weekly,append=true,maxparts=5,maxsize=500MB)";
             string connectionString = ConfigurationManager.AppSettings["connectString"];
             SiAuto.Main.LogWarning("Start at " + DateTime.Now);
+
+            while (true)
+            {
+                try
+                {
+                    using (SqlConnection connection = new SqlConnection(connectionString))// + ";Connection Timeout=1"))
+                    {
+                        SqlExtensions.QuickOpen(connection, 1000);
+                    }
+                    break;
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(DateTime.Now.ToString("G") + ":"+e.Message+"WhatsUp ms sql server.");
+                Thread.Sleep(10000);
+                }
+            }
             /*
              * string queryStringForDeviceStatus = @"SELECT 
 	dbo.ActiveMonitorStateChangeLog.nPivotActiveMonitorTypeToDeviceID,
@@ -521,5 +538,6 @@ FROM
             Console.WriteLine("Press now Ctrl-C or Ctrl-Break");
             Thread.Sleep(10000);
         }
+        
     }
 }
