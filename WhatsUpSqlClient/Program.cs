@@ -84,16 +84,17 @@ WHERE
 	);";
      */
             string queryStringForDeviceStatus = @"SELECT
-dbo.ActiveMonitorStateChangeLog.nPivotActiveMonitorTypeToDeviceID AS id,
-dbo.Device.sDisplayName AS name,
-dbo.ActiveMonitorStateChangeLog.nMonitorStateID AS stateID,
-dbo.MonitorState.sStateName AS stateName,
-dbo.MonitorState.nStateFillColor AS stateColor
-
+	dbo.ActiveMonitorStateChangeLog.nPivotActiveMonitorTypeToDeviceID AS id,
+	dbo.Device.sDisplayName AS name,
+	dbo.ActiveMonitorStateChangeLog.nMonitorStateID AS stateID,
+	dbo.MonitorState.sStateName AS stateName,
+	dbo.MonitorState.nStateFillColor AS stateColor
 FROM
 	dbo.ActiveMonitorStateChangeLog
 INNER JOIN dbo.MonitorState ON dbo.ActiveMonitorStateChangeLog.nMonitorStateID = dbo.MonitorState.nMonitorStateID
 INNER JOIN dbo.Device ON dbo.ActiveMonitorStateChangeLog.nPivotActiveMonitorTypeToDeviceID = dbo.Device.nDeviceID
+INNER JOIN dbo.PivotDeviceToGroup ON dbo.PivotDeviceToGroup.nDeviceID = dbo.Device.nDeviceID
+AND dbo.PivotDeviceToGroup.nDeviceGroupID = 38
 WHERE
 	(
 		(
@@ -106,8 +107,7 @@ WHERE
 				dbo.ActiveMonitorStateChangeLog.dStartTime IS NOT NULL
 			)
 		)
-	)
-;";
+	);";
 
             /*
             string queryStringForDeviceGroup = @"SELECT dbo.PivotDeviceToGroup.nDeviceID, dbo.PivotDeviceToGroup.nDeviceGroupID, dbo.DeviceGroup.nParentGroupID, dbo.DeviceGroup.nMonitorStateID
@@ -365,6 +365,8 @@ FROM
 	dbo.ActiveMonitorStateChangeLog
 INNER JOIN dbo.MonitorState ON dbo.ActiveMonitorStateChangeLog.nMonitorStateID = dbo.MonitorState.nMonitorStateID
 INNER JOIN dbo.Device ON dbo.ActiveMonitorStateChangeLog.nPivotActiveMonitorTypeToDeviceID = dbo.Device.nDeviceID
+INNER JOIN dbo.PivotDeviceToGroup ON dbo.PivotDeviceToGroup.nDeviceID = dbo.Device.nDeviceID
+AND dbo.PivotDeviceToGroup.nDeviceGroupID = 38
 WHERE
 	dbo.ActiveMonitorStateChangeLog.nActiveMonitorStateChangeLogID = " + snPDecimal + ";";
               
