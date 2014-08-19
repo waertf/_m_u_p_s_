@@ -146,6 +146,53 @@ IF NOT EXISTS ""custom"".""WhatsUpDeviceStatus"" (
 ALTER TABLE ""custom"".""WhatsUpDeviceStatus"" OWNER TO ""postgres"";";
             pgsqSqlClient.SqlScriptCmd(pgCreateDeviceStatusTable);
             */
+            //insert into current site status
+
+            string getDeviceWhichGroupIs38=@"SELECT
+	dbo.PivotDeviceToGroup.nDeviceID,
+	dbo.Device.sDisplayName
+FROM
+	dbo.PivotDeviceToGroup
+INNER JOIN dbo.Device ON dbo.PivotDeviceToGroup.nDeviceID = dbo.Device.nDeviceID
+WHERE
+	dbo.PivotDeviceToGroup.nDeviceGroupID = 38";
+
+            using (SqlConnection connection = new SqlConnection(connectionString))
+                  using (SqlCommand command = new SqlCommand(getDeviceWhichGroupIs38, connection))
+                  {
+                      StringBuilder sqlScriptStringBuilder = new StringBuilder();
+                      connection.Open();
+                      using (SqlDataReader reader = command.ExecuteReader())
+                      {
+                          while (reader.Read())
+                          {
+                              reader[0].ToString();
+                              reader[1].ToString();
+                              string insertScript = @"INSERT INTO PUBLIC .site_status_now_whatup (
+	site_id,
+	site_name,
+	status_code,
+	status_name,
+	status_color
+)
+VALUES
+	("+reader[0].ToString()+@", '"+reader[1].ToString()+@"', "+"5"+@", '"+"Up"+@"', '"+"#9DFF9D"+@"');";
+                              string updateLinkStatus=@"UPDATE link_status_now_whatup
+SET status_code = "+"5"+@"
+WHERE
+	bsite_id = "+reader[0].ToString()+";";
+                              sqlScriptStringBuilder.AppendLine(insertScript);
+                              sqlScriptStringBuilder.AppendLine(updateLinkStatus);
+                          }
+                      }
+                      if (sqlScriptStringBuilder.Length > 0)
+                      {
+                          //exeute insert/update script
+                          pgsqSqlClient.SqlScriptCmd(sqlScriptStringBuilder.ToString());
+                          SiAuto.Main.LogStringBuilder("Update Modify site_status_now_whatup", sqlScriptStringBuilder);
+                          sqlScriptStringBuilder.Clear();
+                      }
+                  }
             System.Threading.Thread getCurrentStatusThread = new System.Threading.Thread
       (delegate()
       {
@@ -281,7 +328,12 @@ SET status_code = "+StateID+@",
  status_color = '"+StateColor+@"'
 WHERE
 	site_id = " + DeviceID+";";
+                                                  string updateLinkStatus=@"UPDATE link_status_now_whatup
+SET status_code = "+StateID+@"
+WHERE
+	bsite_id = "+DeviceID+";";
                                                   sqlScriptStringBuilder.AppendLine(updateScript);
+                                                  sqlScriptStringBuilder.AppendLine(updateLinkStatus);
                                                   //call send sms
                                                   smsQueue.Enqueue(DeviceName+"&"+StateID);
                                               }
@@ -300,7 +352,12 @@ WHERE
 )
 VALUES
 	("+DeviceID+@", '"+DeviceName+@"', "+StateID+@", '"+StateMsg+@"', '"+StateColor+@"');";
+                                      string updateLinkStatus=@"UPDATE link_status_now_whatup
+SET status_code = "+StateID+@"
+WHERE
+	bsite_id = "+DeviceID+";";
                                       sqlScriptStringBuilder.AppendLine(insertScript);
+                                      sqlScriptStringBuilder.AppendLine(updateLinkStatus);
                                       //call send sms
                                       smsQueue.Enqueue(DeviceName + "&" + StateID);
                                   }
