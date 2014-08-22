@@ -636,6 +636,7 @@ FROM
             Thread.Sleep(10000);
         }
 
+        private static readonly string m_sender = "拓樸系統管理者";
         static void SendStatusSMS(string deviceName, string deviceStateId)
         {
             string queryPhoneNumber = @"SELECT
@@ -653,6 +654,7 @@ public.alarm_set_whatup.serial_no = " + deviceStateId;
             string stateChineseDescription = null;
             string phoneNumber = null;
             StringBuilder smsInsertSqlScriptBuilder = new StringBuilder();
+            StringBuilder smsHistoryBuilder = new StringBuilder();
             try
             {
                 using (DataTable dt = pgsqSqlClient.get_DataTable(queryStateChineseDescription))
@@ -690,14 +692,16 @@ public.alarm_set_whatup.serial_no = " + deviceStateId;
 )
 VALUES
 	(
-		'拓樸系統管理者',
+		'"+m_sender+@"',
 		'"+phoneNumber+@"',
 		'"+DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")+@"',
-		'"+deviceName + ":" + stateChineseDescription+@"',
+		'" + m_sender+@"(WhatsUp)"+deviceName + ":" + stateChineseDescription + @"',
 		1,
 		0
 	);";
+                            string smsHistory = @"INSERT INTO msg_whatup_send (phone_number,message_no) VALUES ('" + phoneNumber+@"','"+deviceStateId+@"');";
                             smsInsertSqlScriptBuilder.AppendLine(insertSqlScript);
+                            smsHistoryBuilder.AppendLine(smsHistory);
                         }
                     }
                 }
@@ -710,6 +714,10 @@ VALUES
             if (!smsInsertSqlScriptBuilder.Length.Equals(0))
             {
                 smsSqlClient.SqlScriptCmd(smsInsertSqlScriptBuilder.ToString());
+            }
+            if (!smsHistoryBuilder.Length.Equals(0))
+            {
+                pgsqSqlClient.SqlScriptCmd(smsHistoryBuilder.ToString());
             }
         }
         
