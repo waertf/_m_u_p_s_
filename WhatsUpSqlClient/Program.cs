@@ -95,6 +95,7 @@ INNER JOIN dbo.MonitorState ON dbo.ActiveMonitorStateChangeLog.nMonitorStateID =
 INNER JOIN dbo.Device ON dbo.ActiveMonitorStateChangeLog.nPivotActiveMonitorTypeToDeviceID = dbo.Device.nDeviceID
 INNER JOIN dbo.PivotDeviceToGroup ON dbo.PivotDeviceToGroup.nDeviceID = dbo.Device.nDeviceID
 AND dbo.PivotDeviceToGroup.nDeviceGroupID = 38
+INNER JOIN dbo.PivotActiveMonitorTypeToDevice ON dbo.PivotActiveMonitorTypeToDevice.nPivotActiveMonitorTypeToDeviceID = dbo.ActiveMonitorStateChangeLog.nPivotActiveMonitorTypeToDeviceID
 WHERE
 	(
 		(
