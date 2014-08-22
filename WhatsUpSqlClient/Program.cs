@@ -27,12 +27,20 @@ namespace WhatsUpSqlClient
                 ConfigurationManager.AppSettings["SQL_SERVER_PASSWORD"],
                 ConfigurationManager.AppSettings["SQL_SERVER_DATABASE"]
                 );
+        static SqlClient smsSqlClient = new SqlClient(
+            ConfigurationManager.AppSettings["SMS_SERVER_IP"],
+                ConfigurationManager.AppSettings["SMS_SERVER_PORT"],
+                ConfigurationManager.AppSettings["SMS_SERVER_USER_ID"],
+                ConfigurationManager.AppSettings["SMS_SERVER_PASSWORD"],
+                ConfigurationManager.AppSettings["SMS_SERVER_DATABASE"]);
         static object sqlLock = new object();
         static string snPointer = ConfigurationManager.AppSettings["AMSCL_pointer"];
         static decimal snPDecimal = decimal.Parse(snPointer);
         static ConcurrentQueue<string> smsQueue = new ConcurrentQueue<string>(); 
         static void Main(string[] args)
         {
+
+            Console.WriteLine(DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"));
             if (!_mutex.WaitOne(1000, false))
                 return;
             AppDomain.CurrentDomain.ProcessExit += CurrentDomain_ProcessExit;
@@ -644,6 +652,7 @@ WHERE
 public.alarm_set_whatup.serial_no = " + deviceStateId;
             string stateChineseDescription = null;
             string phoneNumber = null;
+            StringBuilder smsInsertSqlScriptBuilder = new StringBuilder();
             try
             {
                 using (DataTable dt = pgsqSqlClient.get_DataTable(queryStateChineseDescription))
@@ -671,6 +680,24 @@ public.alarm_set_whatup.serial_no = " + deviceStateId;
                             phoneNumber = row[0].ToString();
                             Console.WriteLine(phoneNumber + ":" + deviceName + ":" + stateChineseDescription);
                             //send sms 
+                            string insertSqlScript = @"INSERT INTO t_sendsms (
+	m_sender,
+	m_recver,
+	m_recvtime,
+	m_content,
+	m_phoneno,
+	m_status
+)
+VALUES
+	(
+		'拓樸系統管理者',
+		'"+phoneNumber+@"',
+		'"+DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")+@"',
+		'"+deviceName + ":" + stateChineseDescription+@"',
+		1,
+		0
+	);";
+                            smsInsertSqlScriptBuilder.AppendLine(insertSqlScript);
                         }
                     }
                 }
@@ -679,6 +706,10 @@ public.alarm_set_whatup.serial_no = " + deviceStateId;
             {
                 
                 throw;
+            }
+            if (!smsInsertSqlScriptBuilder.Length.Equals(0))
+            {
+                smsSqlClient.SqlScriptCmd(smsInsertSqlScriptBuilder.ToString());
             }
         }
         
