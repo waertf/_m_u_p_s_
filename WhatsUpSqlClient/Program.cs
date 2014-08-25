@@ -181,11 +181,10 @@ WHERE
 	site_id,
 	site_name,
 	status_code,
-	status_name,
-	status_color
+	status_name
 )
 VALUES
-	("+reader[0].ToString()+@", '"+reader[1].ToString()+@"', "+"5"+@", '"+"Up"+@"', '"+"#9DFF9D"+@"');";
+	("+reader[0].ToString()+@", '"+reader[1].ToString()+@"', "+"5"+@", '"+"Up"+@"');";
                               string updateLinkStatus=@"UPDATE link_status_now_whatup
 SET status_code = "+"5"+@"
 WHERE
@@ -202,6 +201,7 @@ WHERE
                           sqlScriptStringBuilder.Clear();
                       }
                   }
+            
             System.Threading.Thread getCurrentStatusThread = new System.Threading.Thread
       (delegate()
       {
@@ -215,6 +215,7 @@ WHERE
                   //connection.Open();
                   //SqlCommand command = new SqlCommand(queryStringForDeviceStatus, connection);
                   //remove duplicate rows
+                  /*
                   #region
 
                   string getDuplicateIdAndCount = @"SELECT
@@ -271,11 +272,30 @@ AND dbo.ActiveMonitorStateChangeLog.dStartTime IS NOT NULL
                       }
                   }
                   #endregion
-                  using (SqlConnection connection = new SqlConnection(connectionString))
-                  using (SqlCommand command = new SqlCommand(queryStringForDeviceStatus, connection))
+                  */
+                  DataSet dsTOP = new DataSet();
+                  DataTable dtetTOP=null;
+
+                  DataSet ds = new DataSet();
+                  DataTable dtet=null;
+                  string strQuery = "SELECT dbo.Device.nDeviceID,dbo.Device.sDisplayName " +
+                              "FROM dbo.Device INNER JOIN dbo.PivotDeviceToGroup ON dbo.Device.nDeviceID = dbo.PivotDeviceToGroup.nDeviceID " +
+                              "WHERE dbo.PivotDeviceToGroup.nDeviceGroupID = 38 order by dbo.Device.nDeviceID";
+                  using (SqlConnection conn = new SqlConnection(connectionString))
                   {
-                      connection.Open();
-                      using (SqlDataReader reader = command.ExecuteReader())
+                      conn.Open();
+                      using (SqlDataAdapter daScore = new SqlDataAdapter(strQuery, conn))
+                      {
+                          daScore.Fill(dsTOP);//, "site"
+                          dtetTOP = dsTOP.Tables[0];//["site"]
+                      }
+
+                  }
+                  using (SqlConnection conn = new SqlConnection(connectionString))
+                  //using (SqlCommand command = new SqlCommand(queryStringForDeviceStatus, conn))
+                  {
+                      //conn.Open();
+                      //using (SqlDataReader reader = command.ExecuteReader())
                       {
                           /*
                           using (DataTable dt = new DataTable())
@@ -289,15 +309,40 @@ AND dbo.ActiveMonitorStateChangeLog.dStartTime IS NOT NULL
                               
                           }
                           */
-                          
-                          while (reader.Read())
+
+                          for (int i = 0; i < dtetTOP.Rows.Count; i++)
                           {
+                              strQuery = "SELECT top 1 dbo.ActiveMonitorStateChangeLog.nActiveMonitorStateChangeLogID, " +
+                                  "dbo.MonitorState.sStateName, " +
+                                  "dbo.ActiveMonitorStateChangeLog.nPivotActiveMonitorTypeToDeviceID, " +
+                                  "dbo.ActiveMonitorStateChangeLog.dStartTime, " +
+                                  "dbo.ActiveMonitorStateChangeLog.dEndTime, " +
+                                  "dbo.PivotActiveMonitorTypeToDevice.nDeviceID, " +
+                                  "dbo.ActiveMonitorStateChangeLog.nMonitorStateID " +
+                                  "FROM " +
+                                  "(dbo.ActiveMonitorStateChangeLog INNER JOIN " +
+                                  "dbo.MonitorState ON dbo.ActiveMonitorStateChangeLog.nMonitorStateID = dbo.MonitorState.nMonitorStateID) " +
+                                  "INNER JOIN dbo.PivotActiveMonitorTypeToDevice ON " +
+                                  "dbo.ActiveMonitorStateChangeLog.nPivotActiveMonitorTypeToDeviceID = dbo.PivotActiveMonitorTypeToDevice.nPivotActiveMonitorTypeToDeviceID " +
+                                  "WHERE dbo.ActiveMonitorStateChangeLog.dEndTime Is Null and dbo.PivotActiveMonitorTypeToDevice.nDeviceID = '" + dtetTOP.Rows[i]["nDeviceID"].ToString() + "' " +
+                                  "ORDER BY dbo.ActiveMonitorStateChangeLog.dStartTime DESC";
+
+                              conn.Open();
+                              using (SqlDataAdapter daScore = new SqlDataAdapter(strQuery, conn))
+                              {
+                                  daScore.Fill(ds);//, "site"
+                                  dtet = ds.Tables[0];//["site"]
+                              }
+                              //daScore = new SqlDataAdapter(strQuery, conn);
+                              //daScore.Fill(ds);//, "site"
+                              //dtet = ds.Tables[0];//["site"]
+                              conn.Close();
                               //Console.WriteLine(String.Format("DeviceID={0}:DeviceName={1}:StateID={2}:StateMsg={3}:StateColor={4}", reader[0], reader[1], reader[2], reader[3], reader[4]));
-                              string DeviceID = reader[0].ToString();
-                              string DeviceName = reader[1].ToString();
-                              string StateID = reader[2].ToString();
-                              string StateMsg = reader[3].ToString();
-                              string StateColor = "#"+int.Parse(reader[4].ToString()).ToString("X6");
+                              string DeviceID = dtetTOP.Rows[i]["nDeviceID"].ToString();
+                              string DeviceName = dtetTOP.Rows[i]["sDisplayName"].ToString();
+                              string StateID = dtet.Rows[0]["nMonitorStateID"].ToString();
+                              string StateMsg = dtet.Rows[0]["sStateName"].ToString();
+                              //string StateColor = "#"+int.Parse(reader[4].ToString()).ToString("X6");
                               string querySpecificDeviceID = @"SELECT
 	PUBLIC .site_status_now_whatup.site_id
 FROM
@@ -333,8 +378,7 @@ WHERE
                                                   SiAuto.Main.LogMessage("stateResult:" + stateResult + Environment.NewLine + "StateID:" + StateID);
                                                   string updateScript = @"UPDATE PUBLIC .site_status_now_whatup
 SET status_code = "+StateID+@",
- status_name = '"+StateMsg+@"',
- status_color = '"+StateColor+@"'
+ status_name = '"+StateMsg+@"'"+@"
 WHERE
 	site_id = " + DeviceID+";";
                                                   string updateLinkStatus=@"UPDATE link_status_now_whatup
@@ -356,11 +400,10 @@ WHERE
 	site_id,
 	site_name,
 	status_code,
-	status_name,
-	status_color
+	status_name
 )
 VALUES
-	("+DeviceID+@", '"+DeviceName+@"', "+StateID+@", '"+StateMsg+@"', '"+StateColor+@"');";
+	("+DeviceID+@", '"+DeviceName+@"', "+StateID+@", '"+StateMsg+@"');";
                                       string updateLinkStatus=@"UPDATE link_status_now_whatup
 SET status_code = "+StateID+@"
 WHERE
