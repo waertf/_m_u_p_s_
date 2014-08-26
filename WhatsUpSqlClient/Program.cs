@@ -276,7 +276,7 @@ AND dbo.ActiveMonitorStateChangeLog.dStartTime IS NOT NULL
                   DataSet dsTOP = new DataSet();
                   DataTable dtetTOP=null;
 
-                  DataSet ds = new DataSet();
+                  //DataSet ds = new DataSet();
                   DataTable dtet=null;
                   string strQuery = "SELECT dbo.Device.nDeviceID,dbo.Device.sDisplayName " +
                               "FROM dbo.Device INNER JOIN dbo.PivotDeviceToGroup ON dbo.Device.nDeviceID = dbo.PivotDeviceToGroup.nDeviceID " +
@@ -328,6 +328,7 @@ AND dbo.ActiveMonitorStateChangeLog.dStartTime IS NOT NULL
                                   "ORDER BY dbo.ActiveMonitorStateChangeLog.dStartTime DESC";
 
                               conn.Open();
+                              using (DataSet ds = new DataSet())
                               using (SqlDataAdapter daScore = new SqlDataAdapter(strQuery, conn))
                               {
                                   daScore.Fill(ds);//, "site"
