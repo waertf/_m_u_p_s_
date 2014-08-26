@@ -564,7 +564,7 @@ VALUES
                 }
                 //});
             };
-            //smsSendTimer.Enabled = true;
+            smsSendTimer.Enabled = true;
             
         }
 
@@ -726,6 +726,7 @@ public.alarm_set_whatup.serial_no = " + deviceStateId;
                             phoneNumber = row[0].ToString();
                             Console.WriteLine(phoneNumber + ":" + deviceName + ":" + stateChineseDescription);
                             //send sms 
+                            SiAuto.Main.LogText("send sms", phoneNumber + ":" + deviceName + ":" + stateChineseDescription);
                             string insertSqlScript = @"INSERT INTO t_sendsms (
 	m_sender,
 	m_recver,
@@ -743,7 +744,7 @@ VALUES
 		1,
 		0
 	);";
-                            string smsHistory = @"INSERT INTO msg_whatup_send (phone_number,message_no) VALUES ('" + phoneNumber+@"','"+deviceStateId+@"');";
+                            string smsHistory = @"INSERT INTO ams_history (phone_number,message_no) VALUES ('" + phoneNumber+@"','"+deviceStateId+@"');";
                             smsInsertSqlScriptBuilder.AppendLine(insertSqlScript);
                             smsHistoryBuilder.AppendLine(smsHistory);
                         }
