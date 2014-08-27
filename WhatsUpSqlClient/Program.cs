@@ -744,7 +744,7 @@ VALUES
 		1,
 		0
 	);";
-                            string smsHistory = @"INSERT INTO ams_history (phone_number,message_no) VALUES ('" + phoneNumber+@"','"+deviceStateId+@"');";
+                            string smsHistory = @"INSERT INTO ams_history (phone_number,message_note) VALUES ('" + phoneNumber + @"','" + deviceStateId + @"');";
                             smsInsertSqlScriptBuilder.AppendLine(insertSqlScript);
                             smsHistoryBuilder.AppendLine(smsHistory);
                         }
