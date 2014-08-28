@@ -742,7 +742,7 @@ VALUES
 		'"+DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")+@"',
 		'" + m_sender+@"(WhatsUp)"+deviceName + ":" + stateChineseDescription + @"',
 		1,
-		0
+		1
 	);";
                             string smsHistory = @"INSERT INTO ams_history (phone_number,message_note) VALUES ('" + phoneNumber + @"','" + deviceStateId + @"');";
                             smsInsertSqlScriptBuilder.AppendLine(insertSqlScript);
