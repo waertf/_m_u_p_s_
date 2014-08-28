@@ -190,7 +190,7 @@ SET status_code = "+"5"+@"
 WHERE
 	bsite_id = "+reader[0].ToString()+";";
                               sqlScriptStringBuilder.AppendLine(insertScript);
-                              sqlScriptStringBuilder.AppendLine(updateLinkStatus);
+                              //sqlScriptStringBuilder.AppendLine(updateLinkStatus);
                           }
                       }
                       if (sqlScriptStringBuilder.Length > 0)
