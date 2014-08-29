@@ -173,20 +173,21 @@ WHERE
                       connection.Open();
                       using (SqlDataReader reader = command.ExecuteReader())
                       {
+                          string insertScript = null;
                           while (reader.Read())
                           {
                               reader[0].ToString();
                               reader[1].ToString();
-                              string insertScript = @"INSERT INTO PUBLIC .site_status_now_whatup (
+                              insertScript = @"INSERT INTO PUBLIC .site_status_now_whatup (
 	site_id,
 	site_name,
 	status_code,
 	status_name
 )
 VALUES
-	("+reader[0].ToString()+@", '"+reader[1].ToString()+@"', "+"5"+@", '"+"Up"+@"');";
+	(" + reader[0].ToString() + @", '" + reader[1].ToString() + @"', " + "6" + @", '" + "Up at least 5 min" + @"');";
                               string updateLinkStatus=@"UPDATE link_status_now_whatup
-SET status_code = "+"5"+@"
+SET status_code = "+"6"+@"
 WHERE
 	bsite_id = "+reader[0].ToString()+";";
                               sqlScriptStringBuilder.AppendLine(insertScript);
