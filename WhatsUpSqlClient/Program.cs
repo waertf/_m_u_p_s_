@@ -36,7 +36,8 @@ namespace WhatsUpSqlClient
         static object sqlLock = new object();
         static string snPointer = ConfigurationManager.AppSettings["AMSCL_pointer"];
         static decimal snPDecimal = decimal.Parse(snPointer);
-        static ConcurrentQueue<string> smsQueue = new ConcurrentQueue<string>(); 
+        static ConcurrentQueue<string> smsQueue = new ConcurrentQueue<string>();
+        private static string sendSMS = ConfigurationManager.AppSettings["sendSMS"];
         static void Main(string[] args)
         {
 
@@ -743,7 +744,7 @@ VALUES
 		'"+DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")+@"',
 		'" + m_sender+@"(WhatsUp)"+deviceName + ":" + stateChineseDescription + @"',
 		1,
-		1
+		" + sendSMS + @"
 	);";
                             string smsHistory = @"INSERT INTO ams_history (phone_number,message_note) VALUES ('" + phoneNumber + @"','" + deviceStateId + @"');";
                             smsInsertSqlScriptBuilder.AppendLine(insertSqlScript);
