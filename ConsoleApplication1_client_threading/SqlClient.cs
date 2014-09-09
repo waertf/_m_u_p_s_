@@ -7,6 +7,7 @@ using System.Threading;
 using Devart.Data.PostgreSql;
 using System.Data;
 using Gurock.SmartInspect;
+using System.Configuration;
 using log4net;
 using log4net.Config;
 
@@ -15,7 +16,8 @@ namespace ConsoleApplication1_client_threading
     class SqlClient
     {
 
-        PgSqlConnection pgSqlConnection;
+        PgSqlConnection pgSqlConnection, pgSqlConnection2;
+        PgSqlConnectionStringBuilder pgCSB2 = new PgSqlConnectionStringBuilder();
         public bool IsConnected { get; set; }
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
         object accessLock = new object();
@@ -23,10 +25,10 @@ namespace ConsoleApplication1_client_threading
         {
             PgSqlConnectionStringBuilder pgCSB = new PgSqlConnectionStringBuilder();
             pgCSB.Host = ip;
-            pgCSB.Port = int.Parse(port);
-            pgCSB.UserId = user_id;
-            pgCSB.Password = password;
-            pgCSB.Database = database;
+            pgCSB.Port =pgCSB2.Port= int.Parse(port);
+            pgCSB.UserId = pgCSB2.UserId=user_id;
+            pgCSB.Password = pgCSB2.Password=password;
+            pgCSB.Database = pgCSB2.Database=database;
 
             pgCSB.Pooling = bool.Parse(Pooling);
             pgCSB.MinPoolSize = int.Parse(MinPoolSize);
@@ -36,6 +38,10 @@ namespace ConsoleApplication1_client_threading
             pgCSB.Unicode = true;
             pgSqlConnection = new PgSqlConnection(pgCSB.ConnectionString);
             IsConnected = false;
+
+            
+            pgCSB2.Host = ConfigurationManager.AppSettings["DB2_ADDRESS"];
+            pgCSB2.Unicode = true;
         }
         public void connect()
         {
@@ -96,6 +102,12 @@ namespace ConsoleApplication1_client_threading
         //For UPDATE, INSERT, and DELETE statements
         public void modify(string cmd)
         {
+            System.Threading.Thread accessDb2Thread = new System.Threading.Thread
+      (delegate()
+      {
+          modifyDB2(cmd);
+      });
+            accessDb2Thread.Start();
             Stopwatch stopWatch = new Stopwatch();
             PgSqlCommand command = null;
             PgSqlTransaction myTrans = null;
@@ -170,7 +182,7 @@ namespace ConsoleApplication1_client_threading
                         ts.Hours, ts.Minutes, ts.Seconds,
                         ts.Milliseconds / 10);
                     SiAuto.Main.AddCheckpoint(Level.Debug, "sql modify take time:" + elapsedTime, cmd);
-
+                    accessDb2Thread.Join();
                 }
 
             }
@@ -369,6 +381,105 @@ namespace ConsoleApplication1_client_threading
         //PgSqlConnection.ClearPool(pgSqlConnection);
         //pgSqlConnection.Dispose();
         //pgSqlConnection = null;
-        //}   
+        //} 
+        void modifyDB2(string cmd)
+        {
+            //Stopwatch stopWatch = new Stopwatch();
+            PgSqlCommand command = null;
+            PgSqlTransaction myTrans = null;
+            using (pgSqlConnection2 = new PgSqlConnection(pgCSB2.ConnectionString))
+            try
+            {
+                
+                {
+                    pgSqlConnection2.Open();
+                    //insert
+                    command = pgSqlConnection2.CreateCommand();
+                    command.CommandText = cmd;
+                    //command.CommandTimeout = 30;
+
+                    //cmd.CommandText = "INSERT INTO public.test (id) VALUES (1)";
+                    //pgSqlConnection.BeginTransaction();
+                    //async
+                    int RowsAffected;
+
+
+                    //lock (accessLock)
+                    {
+                        myTrans = pgSqlConnection2.BeginTransaction(IsolationLevel.ReadCommitted);
+                        command.Transaction = myTrans;
+                        //IAsyncResult cres = command.BeginExecuteNonQuery();
+                        //RowsAffected = command.EndExecuteNonQuery(cres);
+                        //lock (accessLock)
+                        RowsAffected = command.ExecuteNonQuery();
+                        myTrans.Commit();
+                    }
+                    pgSqlConnection2.Close();
+                    //IAsyncResult cres=command.BeginExecuteNonQuery(null,null);
+                    //Console.Write("In progress...");
+                    //while (!cres.IsCompleted)
+                    {
+                        //Console.Write(".");
+                        //Perform here any operation you need
+                    }
+                    /*
+                    if (cres.IsCompleted)
+                        Console.WriteLine("Completed.");
+                    else
+                        Console.WriteLine("Have to wait for operation to complete...");
+                    */
+                    //int RowsAffected = command.EndExecuteNonQuery(cres);
+                    //Console.WriteLine("Done. Rows affected: " + RowsAffected.ToString());
+
+                    //sync
+                    //int aff = command.ExecuteNonQuery();
+                    //Console.WriteLine(RowsAffected + " rows were affected.");
+                    //command.Dispose();
+                    command = null;
+                    //pgSqlConnection.Commit();
+                    /*
+                    ThreadPool.QueueUserWorkItem(callback =>
+                    {
+                        
+                        Console.ForegroundColor = ConsoleColor.Cyan;
+                        Console.WriteLine(RowsAffected + " rows were affected.");
+                        Console.WriteLine(
+                            "S++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
+                        Console.WriteLine("sql Write:\r\n" + cmd);
+                        Console.WriteLine(
+                            "E++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
+                        Console.ResetColor();
+                        log.Info("sql Write:\r\n" + cmd);
+                    });
+                    */
+                    //stopWatch.Stop();
+                    // Get the elapsed time as a TimeSpan value.
+                    //TimeSpan ts = stopWatch.Elapsed;
+
+                    // Format and display the TimeSpan value.
+                    //string elapsedTime = String.Format("{0:00}:{1:00}:{2:00}.{3:00}",
+                        //ts.Hours, ts.Minutes, ts.Seconds,
+                        //ts.Milliseconds / 10);
+                    //SiAuto.Main.AddCheckpoint(Level.Debug, "sql modify take time:" + elapsedTime, cmd);
+
+                }
+
+            }
+            catch (PgSqlException ex)
+            {
+                if (myTrans != null) myTrans.Rollback();
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine("Modify exception occurs: {0}" + Environment.NewLine + "{1}", ex.Error, cmd);
+                log.Error("Modify exception occurs: " + Environment.NewLine + ex.Error + Environment.NewLine + cmd);
+                Console.ResetColor();
+                //pgSqlConnection.Rollback();
+                //command.Dispose();
+                command = null;
+
+
+            }
+
+
+        }
     }
 }
