@@ -474,7 +474,7 @@ namespace ConsoleApplication1_client_threading
                 //pgSqlConnection.Rollback();
                 //command.Dispose();
                 command = null;
-
+                pgSqlConnection2.Close();
 
             }
 
