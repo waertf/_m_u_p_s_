@@ -182,7 +182,7 @@ namespace ConsoleApplication1_client_threading
                         ts.Hours, ts.Minutes, ts.Seconds,
                         ts.Milliseconds / 10);
                     SiAuto.Main.AddCheckpoint(Level.Debug, "sql modify take time:" + elapsedTime, cmd);
-                    accessDb2Thread.Join();
+                    
                 }
 
             }
@@ -197,10 +197,9 @@ namespace ConsoleApplication1_client_threading
                 //command.Dispose();
                 command = null;
 
-
             }
 
-
+            accessDb2Thread.Join();
         }
         void EndModify(IAsyncResult ar)
         {
