@@ -16,8 +16,9 @@ namespace unsAtiaTrigger
             {
                 changeIpAddress(Properties.Settings.Default.ReceiveMsgIp);
                 Task serverTask = Task.Factory.StartNew(()=>Server(context));
-                Task clientTask = Task.Factory.StartNew(() => Client(context));
-                Task.WaitAll(serverTask, clientTask);
+                //Task clientTask = Task.Factory.StartNew(() => Client(context));
+                //Task.WaitAll(serverTask, clientTask);
+                Task.WaitAll(serverTask);
             }
         }
         static private string[] ip, subset, gateway, dns;
@@ -33,16 +34,16 @@ namespace unsAtiaTrigger
             SetIP(nic, ipAddress, subsetS, gatewayS, dnsS);
         }
 
-        private static void Client(NetMQContext context)
+        private static void Client(string message)
         {
+            using (NetMQContext context = NetMQContext.Create())
             using (NetMQSocket clientSocket = context.CreateRequestSocket())
             {
-                clientSocket.Connect("tcp://127.0.0.1:5555");
+                clientSocket.Connect("tcp://"+Properties.Settings.Default.RemoteIpAddress+":"+Properties.Settings.Default.RemotePort);
 
                 while (true)
                 {
                     Console.WriteLine("Please enter your message:");
-                    string message = Console.ReadLine();
                     clientSocket.Send(message);
 
                     string answer = clientSocket.ReceiveString();
@@ -73,6 +74,9 @@ namespace unsAtiaTrigger
                     {
                         case "CloseLocalAtiaThenStartRemoteAtia":
                             serverSocket.Send("exit");
+                            //close atia
+                            //change ip address
+                            //start remote atia
                             break;
                     }
                     /*

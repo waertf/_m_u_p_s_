@@ -58,5 +58,29 @@ namespace unsAtiaTrigger.Properties {
                 this["NIC_NAME"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("127.0.0.1")]
+        public string RemoteIpAddress {
+            get {
+                return ((string)(this["RemoteIpAddress"]));
+            }
+            set {
+                this["RemoteIpAddress"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("5555")]
+        public string RemotePort {
+            get {
+                return ((string)(this["RemotePort"]));
+            }
+            set {
+                this["RemotePort"] = value;
+            }
+        }
     }
 }
