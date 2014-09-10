@@ -1,0 +1,15 @@
+﻿<?xml version='1.0' encoding='utf-8'?>
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="unsAtiaTrigger.Properties" GeneratedClassName="Settings">
+  <Profiles />
+  <Settings>
+    <Setting Name="ReceiveMsgIp" Type="System.String" Scope="User">
+      <Value Profile="(Default)">10.6.3.14</Value>
+    </Setting>
+    <Setting Name="BlockMsgIp" Type="System.String" Scope="User">
+      <Value Profile="(Default)">10.6.3.11</Value>
+    </Setting>
+    <Setting Name="NIC_NAME" Type="System.String" Scope="User">
+      <Value Profile="(Default)">[00000007] Realtek PCIe GBE Family Controller</Value>
+    </Setting>
+  </Settings>
+</SettingsFile>
