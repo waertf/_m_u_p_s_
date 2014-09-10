@@ -9,10 +9,14 @@ namespace unsAtiaTrigger
 {
     class Program
     {
+        static private string[] ip, subset, gateway, dns;
         static void Main(string[] args)
         {
             using (NetMQContext context=NetMQContext.Create())
             {
+                // get index and nic name console command:wmic nic get index,name
+                GetIP("[00000007] Realtek PCIe GBE Family Controller", out ip, out subset, out gateway, out dns);
+                SetIP("[00000007] Realtek PCIe GBE Family Controller", "192.168.1.27", "255.255.255.0", "192.168.1.1", "192.168.1.1,168.95.1.1");
                 Task serverTask = Task.Factory.StartNew(()=>Server(context));
                 Task clientTask = Task.Factory.StartNew(() => Client(context));
                 Task.WaitAll(serverTask, clientTask);
@@ -87,7 +91,9 @@ namespace unsAtiaTrigger
                 // Not something like memory card or VM Ware
                 if (mo["IPEnabled"] is bool ? (bool) mo["IPEnabled"] : false)
                 {
-                    if (mo["Caption"].Equals(nicName))
+                    string caption = null;
+                    caption = mo["Caption"].ToString();
+                    if (caption.Contains(nicName))
                     {
 
                         ManagementBaseObject newIP =
@@ -111,6 +117,47 @@ namespace unsAtiaTrigger
                           "SetGateways", newGate, null);
                         ManagementBaseObject setDNS = mo.InvokeMethod(
                           "SetDNSServerSearchOrder", newDNS, null);
+
+                        break;
+                    }
+                }
+            }
+        }
+        /// <summary>
+        /// Returns the network card configuration of the specified NIC
+        /// </summary>
+        /// <PARAM name="nicName">Name of the NIC</PARAM>
+        /// <PARAM name="ipAdresses">Array of IP</PARAM>
+        /// <PARAM name="subnets">Array of subnet masks</PARAM>
+        /// <PARAM name="gateways">Array of gateways</PARAM>
+        /// <PARAM name="dnses">Array of DNS IP</PARAM>
+        public static void GetIP(string nicName, out string[] ipAdresses,
+          out string[] subnets, out string[] gateways, out string[] dnses)
+        {
+            ipAdresses = null;
+            subnets = null;
+            gateways = null;
+            dnses = null;
+
+            ManagementClass mc = new ManagementClass(
+              "Win32_NetworkAdapterConfiguration");
+            ManagementObjectCollection moc = mc.GetInstances();
+
+            foreach (ManagementObject mo in moc)
+            {
+                // Make sure this is a IP enabled device. 
+                // Not something like memory card or VM Ware
+                if (mo["ipEnabled"] is bool ? (bool) mo["ipEnabled"] : false)
+                {
+                    string caption = null;
+                    caption = mo["Caption"].ToString();
+                    Console.WriteLine(caption);
+                    if (caption.Contains(nicName))
+                    {
+                        ipAdresses = (string[])mo["IPAddress"];
+                        subnets = (string[])mo["IPSubnet"];
+                        gateways = (string[])mo["DefaultIPGateway"];
+                        dnses = (string[])mo["DNSServerSearchOrder"];
 
                         break;
                     }
