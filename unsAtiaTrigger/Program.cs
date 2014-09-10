@@ -14,8 +14,8 @@ namespace unsAtiaTrigger
             using (NetMQContext context=NetMQContext.Create())
             {
                 Task serverTask = Task.Factory.StartNew(()=>Server(context));
-                Task clienTask = Task.Factory.StartNew(() => Client(context));
-                Task.WaitAll(serverTask, clienTask);
+                Task clientTask = Task.Factory.StartNew(() => Client(context));
+                Task.WaitAll(serverTask, clientTask);
             }
         }
 
