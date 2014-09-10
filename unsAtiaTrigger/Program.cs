@@ -69,12 +69,20 @@ namespace unsAtiaTrigger
 
                     Console.WriteLine("Receive message {0}", message);
 
+                    switch (message)
+                    {
+                        case "CloseLocalAtiaThenStartRemoteAtia":
+                            serverSocket.Send("exit");
+                            break;
+                    }
+                    /*
                     serverSocket.Send("World");
 
                     if (message == "exit")
                     {
                         break;
                     }
+                    */
                 }
             }      
         }
