@@ -9,18 +9,27 @@ namespace unsAtiaTrigger
 {
     class Program
     {
-        static private string[] ip, subset, gateway, dns;
+        
         static void Main(string[] args)
         {
             using (NetMQContext context=NetMQContext.Create())
             {
-                // get index and nic name console command:wmic nic get index,name
-                GetIP("[00000007] Realtek PCIe GBE Family Controller", out ip, out subset, out gateway, out dns);
-                SetIP("[00000007] Realtek PCIe GBE Family Controller", "192.168.1.27", "255.255.255.0", "192.168.1.1", "192.168.1.1,168.95.1.1");
+                changeIpAddress("192.168.1.27");
                 Task serverTask = Task.Factory.StartNew(()=>Server(context));
                 Task clientTask = Task.Factory.StartNew(() => Client(context));
                 Task.WaitAll(serverTask, clientTask);
             }
+        }
+        static private string[] ip, subset, gateway, dns;
+        private static void changeIpAddress(string ipAddress)
+        {
+            // get index and nic name console command:wmic nic get index,name
+            GetIP("[00000007] Realtek PCIe GBE Family Controller", out ip, out subset, out gateway, out dns);
+            string ipS = string.Join(",", ip);
+            string subsetS = subset[0];
+            string gatewayS = string.Join(",", gateway);
+            string dnsS = string.Join(",", dns);
+            SetIP("[00000007] Realtek PCIe GBE Family Controller", ipAddress, subsetS, gatewayS, dnsS);
         }
 
         private static void Client(NetMQContext context)
@@ -158,7 +167,6 @@ namespace unsAtiaTrigger
                         subnets = (string[])mo["IPSubnet"];
                         gateways = (string[])mo["DefaultIPGateway"];
                         dnses = (string[])mo["DNSServerSearchOrder"];
-
                         break;
                     }
                 }
