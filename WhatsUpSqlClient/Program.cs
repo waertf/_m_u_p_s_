@@ -746,7 +746,7 @@ VALUES
 		1,
 		" + sendSMS + @"
 	);";
-                            string smsHistory = @"INSERT INTO ams_history (phone_number,message_note) VALUES ('" + phoneNumber + @"','" + deviceStateId + @"');";
+                            string smsHistory = @"INSERT INTO ams_history (phone_number,message_note) VALUES ('" + phoneNumber + @"','" + m_sender + @"(WhatsUp)" + deviceName + ":" + stateChineseDescription + @"');";
                             smsInsertSqlScriptBuilder.AppendLine(insertSqlScript);
                             smsHistoryBuilder.AppendLine(smsHistory);
                         }
