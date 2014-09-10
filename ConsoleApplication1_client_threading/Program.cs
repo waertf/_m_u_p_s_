@@ -197,6 +197,7 @@ each set of the byte. To display a four-byte string, there will be 8 digits stri
                     unsTcpClient.Close();
                         
                 }
+                //close myself and start remote uns
                 unsTcpClient = new TcpClient();
                 
                 unsConnectDone.Reset();
@@ -1674,10 +1675,14 @@ Select 1-6 then press enter to send package
             }
             catch (Exception ex)
             {
+                
                 Console.WriteLine("myReadSizeCallBackError:"+Environment.NewLine+ex);
                 //Console.WriteLine(System.Reflection.MethodBase.GetCurrentMethod().Name + "_errorline:" + ex.LineNumber());
                 //log.Error(System.Reflection.MethodBase.GetCurrentMethod().Name + "_errorline:" + ex.LineNumber());
                 log.Error("myReadSizeCallBackError:" + Environment.NewLine + ex);
+
+                //close myself and start remote uns
+
                 try
                 {
                     Monitor.Enter(readRecoveryLock);
