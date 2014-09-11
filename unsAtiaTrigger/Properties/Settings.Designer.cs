@@ -26,36 +26,36 @@ namespace unsAtiaTrigger.Properties {
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("10.6.3.14")]
-        public string ReceiveMsgIp {
+        public string ReceiveAtiaMsgIp {
             get {
-                return ((string)(this["ReceiveMsgIp"]));
+                return ((string)(this["ReceiveAtiaMsgIp"]));
             }
             set {
-                this["ReceiveMsgIp"] = value;
+                this["ReceiveAtiaMsgIp"] = value;
             }
         }
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("10.6.3.11")]
-        public string BlockMsgIp {
+        public string BlockAtiaMsgIp {
             get {
-                return ((string)(this["BlockMsgIp"]));
+                return ((string)(this["BlockAtiaMsgIp"]));
             }
             set {
-                this["BlockMsgIp"] = value;
+                this["BlockAtiaMsgIp"] = value;
             }
         }
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("[00000007] Realtek PCIe GBE Family Controller")]
-        public string NIC_NAME {
+        public string ATIA_NIC_NAME {
             get {
-                return ((string)(this["NIC_NAME"]));
+                return ((string)(this["ATIA_NIC_NAME"]));
             }
             set {
-                this["NIC_NAME"] = value;
+                this["ATIA_NIC_NAME"] = value;
             }
         }
         
@@ -164,6 +164,42 @@ namespace unsAtiaTrigger.Properties {
             }
             set {
                 this["UnsProcessName"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("[00000007] Realtek PCIe GBE Family Controller")]
+        public string UNS_NIC_NAME {
+            get {
+                return ((string)(this["UNS_NIC_NAME"]));
+            }
+            set {
+                this["UNS_NIC_NAME"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("10.6.3.16")]
+        public string ReceiveUnsMsgIp {
+            get {
+                return ((string)(this["ReceiveUnsMsgIp"]));
+            }
+            set {
+                this["ReceiveUnsMsgIp"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("10.6.3.12")]
+        public string BlockUnsMsgIp {
+            get {
+                return ((string)(this["BlockUnsMsgIp"]));
+            }
+            set {
+                this["BlockUnsMsgIp"] = value;
             }
         }
     }

@@ -32,16 +32,27 @@ namespace unsAtiaTrigger
             }
         }
         static private string[] ip, subset, gateway, dns;
-        private static string nic = Properties.Settings.Default.NIC_NAME;
-        private static void changeIpAddress(string ipAddress)
+        private static string aitaNic = Properties.Settings.Default.ATIA_NIC_NAME;
+        private static void changeIpAddressForATIA(string ipAddress)
         {
             // get index and nic name console command:wmic nic get index,name
-            GetIP(nic, out ip, out subset, out gateway, out dns);
+            GetIP(aitaNic, out ip, out subset, out gateway, out dns);
             string ipS = string.Join(",", ip);
             string subsetS = subset[0];
             string gatewayS = string.Join(",", gateway);
             string dnsS = string.Join(",", dns);
-            SetIP(nic, ipAddress, subsetS, gatewayS, dnsS);
+            SetIP(aitaNic, ipAddress, subsetS, gatewayS, dnsS);
+        }
+        private static string unsNic = Properties.Settings.Default.UNS_NIC_NAME;
+        private static void changeIpAddressForUNS(string ipAddress)
+        {
+            // get index and nic name console command:wmic nic get index,name
+            GetIP(unsNic, out ip, out subset, out gateway, out dns);
+            string ipS = string.Join(",", ip);
+            string subsetS = subset[0];
+            string gatewayS = string.Join(",", gateway);
+            string dnsS = string.Join(",", dns);
+            SetIP(unsNic, ipAddress, subsetS, gatewayS, dnsS);
         }
 
         private static void Client(string message)
@@ -96,11 +107,13 @@ namespace unsAtiaTrigger
                             }
                             
                             //change ip address
-                            changeIpAddress(Properties.Settings.Default.BlockMsgIp);
+                            changeIpAddressForATIA(Properties.Settings.Default.BlockAtiaMsgIp);
                             //start remote atia
                             Client("StartRemoteAtia");
                             break;
                         case "StartRemoteAtia":
+                            //change ip address
+                            changeIpAddressForATIA(Properties.Settings.Default.ReceiveAtiaMsgIp);
                             switch (Properties.Settings.Default.AtiaUnsServiceOrProcess)
                             {
                                 case "Service":
@@ -126,11 +139,12 @@ namespace unsAtiaTrigger
                             }
                             
                             //change ip address
-                            changeIpAddress(Properties.Settings.Default.BlockMsgIp);
+                            changeIpAddressForUNS(Properties.Settings.Default.BlockUnsMsgIp);
                             //start remote atia
                             Client("StartRemoteUns");
                             break;
                         case "StartRemoteUns":
+                            changeIpAddressForUNS(Properties.Settings.Default.ReceiveUnsMsgIp);
                             switch (Properties.Settings.Default.AtiaUnsServiceOrProcess)
                             {
                                 case "Service":
