@@ -25,7 +25,7 @@ namespace unsAtiaTrigger.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("10.6.3.14")]
+        [global::System.Configuration.DefaultSettingValueAttribute("10.53.1.114")]
         public string ReceiveAtiaMsgIp {
             get {
                 return ((string)(this["ReceiveAtiaMsgIp"]));
@@ -37,7 +37,7 @@ namespace unsAtiaTrigger.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("10.6.3.11")]
+        [global::System.Configuration.DefaultSettingValueAttribute("10.53.1.xxx")]
         public string BlockAtiaMsgIp {
             get {
                 return ((string)(this["BlockAtiaMsgIp"]));
@@ -200,6 +200,31 @@ namespace unsAtiaTrigger.Properties {
             }
             set {
                 this["BlockUnsMsgIp"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("netsh interface ip add address \\\"Local Area Connection\\\" 10.53.1.114  255.255.255" +
+            ".0")]
+        public string AddAtiaIpAdressAndSubnet {
+            get {
+                return ((string)(this["AddAtiaIpAdressAndSubnet"]));
+            }
+            set {
+                this["AddAtiaIpAdressAndSubnet"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("netsh interface ip delete address \\\"Local Area Connection\\\" 10.53.1.114")]
+        public string RemoveAtiaIpAddress {
+            get {
+                return ((string)(this["RemoveAtiaIpAddress"]));
+            }
+            set {
+                this["RemoveAtiaIpAddress"] = value;
             }
         }
     }

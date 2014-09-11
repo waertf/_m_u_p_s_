@@ -3,10 +3,10 @@
   <Profiles />
   <Settings>
     <Setting Name="ReceiveAtiaMsgIp" Type="System.String" Scope="User">
-      <Value Profile="(Default)">10.6.3.14</Value>
+      <Value Profile="(Default)">10.53.1.114</Value>
     </Setting>
     <Setting Name="BlockAtiaMsgIp" Type="System.String" Scope="User">
-      <Value Profile="(Default)">10.6.3.11</Value>
+      <Value Profile="(Default)">10.53.1.xxx</Value>
     </Setting>
     <Setting Name="ATIA_NIC_NAME" Type="System.String" Scope="User">
       <Value Profile="(Default)">[00000007] Realtek PCIe GBE Family Controller</Value>
@@ -46,6 +46,12 @@
     </Setting>
     <Setting Name="BlockUnsMsgIp" Type="System.String" Scope="User">
       <Value Profile="(Default)">10.6.3.12</Value>
+    </Setting>
+    <Setting Name="AddAtiaIpAdressAndSubnet" Type="System.String" Scope="User">
+      <Value Profile="(Default)">netsh interface ip add address \"Local Area Connection\" 10.53.1.114  255.255.255.0</Value>
+    </Setting>
+    <Setting Name="RemoveAtiaIpAddress" Type="System.String" Scope="User">
+      <Value Profile="(Default)">netsh interface ip delete address \"Local Area Connection\" 10.53.1.114</Value>
     </Setting>
   </Settings>
 </SettingsFile>

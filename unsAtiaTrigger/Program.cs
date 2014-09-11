@@ -22,9 +22,11 @@ namespace unsAtiaTrigger
             SiAuto.Si.Connections = @"file(filename=""" +
                                     Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) +
                                     "\\log.sil\",rotate=weekly,append=true,maxparts=5,maxsize=500MB)";
+            //Console.WriteLine(RunCmd(Properties.Settings.Default.AddAtiaIpAdressAndSubnet));
+            //Console.WriteLine(RunCmd(Properties.Settings.Default.RemoveAtiaIpAddress));
             using (NetMQContext context=NetMQContext.Create())
             {
-                //changeIpAddress(Properties.Settings.Default.ReceiveMsgIp);
+                //changeIpAddressForUNS("192.168.1.28,192.168.1.27");
                 Task serverTask = Task.Factory.StartNew(()=>Server(context));
                 //Task clientTask = Task.Factory.StartNew(() => Client(context));
                 //Task.WaitAll(serverTask, clientTask);
@@ -107,13 +109,19 @@ namespace unsAtiaTrigger
                             }
                             
                             //change ip address
-                            changeIpAddressForATIA(Properties.Settings.Default.BlockAtiaMsgIp);
+                            //changeIpAddressForATIA(Properties.Settings.Default.BlockAtiaMsgIp);
+                            //remove ip address
+                            //System.Diagnostics.Process.Start("cmd.exe", "/C " + Properties.Settings.Default.RemoveAtiaIpAddress);
+                            Console.WriteLine(RunCmd(Properties.Settings.Default.RemoveAtiaIpAddress));
                             //start remote atia
                             Client("StartRemoteAtia");
                             break;
                         case "StartRemoteAtia":
                             //change ip address
-                            changeIpAddressForATIA(Properties.Settings.Default.ReceiveAtiaMsgIp);
+                            //changeIpAddressForATIA(Properties.Settings.Default.ReceiveAtiaMsgIp);
+                            //add ip address
+                            //System.Diagnostics.Process.Start("cmd.exe", "/C " + Properties.Settings.Default.AddAtiaIpAdressAndSubnet);
+                            Console.WriteLine(RunCmd(Properties.Settings.Default.AddAtiaIpAdressAndSubnet));
                             switch (Properties.Settings.Default.AtiaUnsServiceOrProcess)
                             {
                                 case "Service":
@@ -127,7 +135,7 @@ namespace unsAtiaTrigger
                             break;
                         case "CloseLocalUnsThenStartRemoteUns":
                             serverSocket.Send("exit");
-                            //close atia
+                            //close uns
                             switch (Properties.Settings.Default.AtiaUnsServiceOrProcess)
                             {
                                 case   "Service":
@@ -139,12 +147,12 @@ namespace unsAtiaTrigger
                             }
                             
                             //change ip address
-                            changeIpAddressForUNS(Properties.Settings.Default.BlockUnsMsgIp);
-                            //start remote atia
+                            //changeIpAddressForUNS(Properties.Settings.Default.BlockUnsMsgIp);
+                            //start remote uns
                             Client("StartRemoteUns");
                             break;
                         case "StartRemoteUns":
-                            changeIpAddressForUNS(Properties.Settings.Default.ReceiveUnsMsgIp);
+                            //changeIpAddressForUNS(Properties.Settings.Default.ReceiveUnsMsgIp);
                             switch (Properties.Settings.Default.AtiaUnsServiceOrProcess)
                             {
                                 case "Service":
@@ -335,5 +343,28 @@ namespace unsAtiaTrigger
                 }
             }
         }
+        private static string RunCmd(string command)
+         {
+             //實例一個Process類，啟動一個獨立進程
+             Process p = new Process();
+ 
+             //Process類有一個StartInfo屬性，這個是ProcessStartInfo類，包括了一些屬性和方法，下面我們用到了他的幾個屬性：
+ 
+             p.StartInfo.FileName = "cmd.exe";           //設定程序名
+             p.StartInfo.Arguments = "/c " + command;    //設定程式執行參數
+             p.StartInfo.UseShellExecute = false;        //關閉Shell的使用
+             p.StartInfo.RedirectStandardInput = true;   //重定向標準輸入
+             p.StartInfo.RedirectStandardOutput = true;  //重定向標準輸出
+             p.StartInfo.RedirectStandardError = true;   //重定向錯誤輸出
+             p.StartInfo.CreateNoWindow = true;          //設置不顯示窗口
+ 
+             p.Start();   //啟動
+             
+             //p.StandardInput.WriteLine(command);       //也可以用這種方式輸入要執行的命令
+             //p.StandardInput.WriteLine("exit");        //不過要記得加上Exit要不然下一行程式執行的時候會當機
+            
+             return p.StandardOutput.ReadToEnd();        //從輸出流取得命令執行結果
+ 
+         }
     }
 }
