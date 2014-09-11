@@ -14,7 +14,7 @@ namespace unsAtiaTrigger
         {
             using (NetMQContext context=NetMQContext.Create())
             {
-                changeIpAddress(Properties.Settings.Default.ReceiveMsgIp);
+                //changeIpAddress(Properties.Settings.Default.ReceiveMsgIp);
                 Task serverTask = Task.Factory.StartNew(()=>Server(context));
                 //Task clientTask = Task.Factory.StartNew(() => Client(context));
                 //Task.WaitAll(serverTask, clientTask);
@@ -50,7 +50,7 @@ namespace unsAtiaTrigger
 
                     Console.WriteLine("Answer from server: {0}", answer);
 
-                    if (message == "exit")
+                    if (answer == "exit")
                     {
                         break;
                     }
@@ -76,7 +76,12 @@ namespace unsAtiaTrigger
                             serverSocket.Send("exit");
                             //close atia
                             //change ip address
+                            changeIpAddress(Properties.Settings.Default.BlockMsgIp);
                             //start remote atia
+                            Client("StartRemoteAtia");
+                            break;
+                        case "StartRemoteAtia":
+                            serverSocket.Send("exit");
                             break;
                     }
                     /*
