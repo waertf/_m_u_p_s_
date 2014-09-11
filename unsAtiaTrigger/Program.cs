@@ -1,10 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using NetMQ;
 using System.Management;
+using System.ServiceProcess;
+using System.Diagnostics;
+using Gurock.SmartInspect;
 namespace unsAtiaTrigger
 {
     class Program
@@ -12,6 +17,11 @@ namespace unsAtiaTrigger
         
         static void Main(string[] args)
         {
+            SiAuto.Si.Enabled = true;
+            SiAuto.Si.Level = Level.Debug;
+            SiAuto.Si.Connections = @"file(filename=""" +
+                                    Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) +
+                                    "\\log.sil\",rotate=weekly,append=true,maxparts=5,maxsize=500MB)";
             using (NetMQContext context=NetMQContext.Create())
             {
                 //changeIpAddress(Properties.Settings.Default.ReceiveMsgIp);
@@ -75,12 +85,31 @@ namespace unsAtiaTrigger
                         case "CloseLocalAtiaThenStartRemoteAtia":
                             serverSocket.Send("exit");
                             //close atia
+                            switch (Properties.Settings.Default.AtiaUnsServiceOrProcess)
+                            {
+                                case   "Service":
+                                    StopService(Properties.Settings.Default.AtiaServiceName);
+                                    break;
+                                case "Process":
+                                    KillProcess(Properties.Settings.Default.AtiaProcessName);
+                                    break;
+                            }
+                            
                             //change ip address
                             changeIpAddress(Properties.Settings.Default.BlockMsgIp);
                             //start remote atia
                             Client("StartRemoteAtia");
                             break;
                         case "StartRemoteAtia":
+                            switch (Properties.Settings.Default.AtiaUnsServiceOrProcess)
+                            {
+                                case "Service":
+                                    StartService(Properties.Settings.Default.AtiaServiceName);
+                                    break;
+                                case "Process":
+                                    StartProcess(Properties.Settings.Default.AtiaProcessPath,Properties.Settings.Default.AtiaProcessName);
+                                    break;
+                            }
                             serverSocket.Send("exit");
                             break;
                     }
@@ -94,6 +123,78 @@ namespace unsAtiaTrigger
                     */
                 }
             }      
+        }
+
+        private static void StartProcess(string ProcessPath, string ProcessName)
+        {
+            try
+            {
+                ProcessStartInfo psi = new ProcessStartInfo();
+                psi.WorkingDirectory = @ProcessPath;
+                psi.FileName = ProcessName;
+                Process.Start(psi);
+            }
+            catch (Exception e)
+            {
+
+                Console.WriteLine(e.ToString());
+                SiAuto.Main.LogException(e);
+            }
+        }
+
+        private static void StartService(string ServiceName)
+        {
+            try
+            {
+                ServiceController controller = new ServiceController(ServiceName);
+                controller.Start();
+
+                controller.WaitForStatus(ServiceControllerStatus.Running);
+                Console.WriteLine("Service status: " + controller.Status);
+            }
+            catch (Exception e)
+            {
+
+                Console.WriteLine(e.ToString());
+                SiAuto.Main.LogException(e);
+            }
+        }
+
+        private static void KillProcess(string ProcessName)
+        {
+            try
+            {
+                Process[] processes = Process.GetProcessesByName(ProcessName);
+                foreach (Process process in processes)
+                {
+                    process.Kill();
+                    process.WaitForExit();
+                }
+            }
+            catch (Exception e)
+            {
+                
+                Console.WriteLine(e.ToString());
+                SiAuto.Main.LogException(e);
+            }
+        }
+
+        private static void StopService(string ServiceName)
+        {
+            try
+            {
+                ServiceController controller = new ServiceController(ServiceName);
+                controller.Stop();
+
+                controller.WaitForStatus(ServiceControllerStatus.Stopped);
+                Console.WriteLine("Service status: " + controller.Status);
+            }
+            catch (Exception e)
+            {
+
+                Console.WriteLine(e.ToString());
+                SiAuto.Main.LogException(e);
+            }
         }
 
         /// <summary>
