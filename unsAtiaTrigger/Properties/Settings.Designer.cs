@@ -82,5 +82,89 @@ namespace unsAtiaTrigger.Properties {
                 this["RemotePort"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("Atia")]
+        public string AtiaServiceName {
+            get {
+                return ((string)(this["AtiaServiceName"]));
+            }
+            set {
+                this["AtiaServiceName"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("d:\\cgaWork\\Atia")]
+        public string AtiaProcessPath {
+            get {
+                return ((string)(this["AtiaProcessPath"]));
+            }
+            set {
+                this["AtiaProcessPath"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("Uns")]
+        public string UnsServiceName {
+            get {
+                return ((string)(this["UnsServiceName"]));
+            }
+            set {
+                this["UnsServiceName"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("d:\\cgaWork\\Uns")]
+        public string UnsProcessPath {
+            get {
+                return ((string)(this["UnsProcessPath"]));
+            }
+            set {
+                this["UnsProcessPath"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("Process")]
+        public string AtiaUnsServiceOrProcess {
+            get {
+                return ((string)(this["AtiaUnsServiceOrProcess"]));
+            }
+            set {
+                this["AtiaUnsServiceOrProcess"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("Atia.exe")]
+        public string AtiaProcessName {
+            get {
+                return ((string)(this["AtiaProcessName"]));
+            }
+            set {
+                this["AtiaProcessName"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("Uns.exe")]
+        public string UnsProcessName {
+            get {
+                return ((string)(this["UnsProcessName"]));
+            }
+            set {
+                this["UnsProcessName"] = value;
+            }
+        }
     }
 }

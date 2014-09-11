@@ -17,5 +17,26 @@
     <Setting Name="RemotePort" Type="System.String" Scope="User">
       <Value Profile="(Default)">5555</Value>
     </Setting>
+    <Setting Name="AtiaServiceName" Type="System.String" Scope="User">
+      <Value Profile="(Default)">Atia</Value>
+    </Setting>
+    <Setting Name="AtiaProcessPath" Type="System.String" Scope="User">
+      <Value Profile="(Default)">d:\cgaWork\Atia</Value>
+    </Setting>
+    <Setting Name="UnsServiceName" Type="System.String" Scope="User">
+      <Value Profile="(Default)">Uns</Value>
+    </Setting>
+    <Setting Name="UnsProcessPath" Type="System.String" Scope="User">
+      <Value Profile="(Default)">d:\cgaWork\Uns</Value>
+    </Setting>
+    <Setting Name="AtiaUnsServiceOrProcess" Type="System.String" Scope="User">
+      <Value Profile="(Default)">Process</Value>
+    </Setting>
+    <Setting Name="AtiaProcessName" Type="System.String" Scope="User">
+      <Value Profile="(Default)">Atia.exe</Value>
+    </Setting>
+    <Setting Name="UnsProcessName" Type="System.String" Scope="User">
+      <Value Profile="(Default)">Uns.exe</Value>
+    </Setting>
   </Settings>
 </SettingsFile>
