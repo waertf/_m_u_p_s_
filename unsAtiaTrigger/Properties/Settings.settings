@@ -12,7 +12,7 @@
       <Value Profile="(Default)">[00000007] Realtek PCIe GBE Family Controller</Value>
     </Setting>
     <Setting Name="RemoteIpAddress" Type="System.String" Scope="User">
-      <Value Profile="(Default)">127.0.0.1</Value>
+      <Value Profile="(Default)">10.6.3.103</Value>
     </Setting>
     <Setting Name="RemotePort" Type="System.String" Scope="User">
       <Value Profile="(Default)">5555</Value>

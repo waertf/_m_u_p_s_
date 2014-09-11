@@ -61,7 +61,7 @@ namespace unsAtiaTrigger.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("127.0.0.1")]
+        [global::System.Configuration.DefaultSettingValueAttribute("10.6.3.103")]
         public string RemoteIpAddress {
             get {
                 return ((string)(this["RemoteIpAddress"]));
