@@ -112,6 +112,36 @@ namespace unsAtiaTrigger
                             }
                             serverSocket.Send("exit");
                             break;
+                        case "CloseLocalUnsThenStartRemoteUns":
+                            serverSocket.Send("exit");
+                            //close atia
+                            switch (Properties.Settings.Default.AtiaUnsServiceOrProcess)
+                            {
+                                case   "Service":
+                                    StopService(Properties.Settings.Default.UnsServiceName);
+                                    break;
+                                case "Process":
+                                    KillProcess(Properties.Settings.Default.UnsProcessName);
+                                    break;
+                            }
+                            
+                            //change ip address
+                            changeIpAddress(Properties.Settings.Default.BlockMsgIp);
+                            //start remote atia
+                            Client("StartRemoteUns");
+                            break;
+                        case "StartRemoteUns":
+                            switch (Properties.Settings.Default.AtiaUnsServiceOrProcess)
+                            {
+                                case "Service":
+                                    StartService(Properties.Settings.Default.UnsServiceName);
+                                    break;
+                                case "Process":
+                                    StartProcess(Properties.Settings.Default.UnsProcessPath, Properties.Settings.Default.UnsProcessName);
+                                    break;
+                            }
+                            serverSocket.Send("exit");
+                            break;
                     }
                     /*
                     serverSocket.Send("World");

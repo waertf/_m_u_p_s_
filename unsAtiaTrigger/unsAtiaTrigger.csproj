@@ -35,12 +35,14 @@
     <ApplicationManifest>app.manifest</ApplicationManifest>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Gurock.SmartInspect, Version=3.3.6.143, Culture=neutral, PublicKeyToken=a78b0a9303ab7a7c, processorArchitecture=MSIL" />
     <Reference Include="NetMQ">
       <HintPath>..\packages\NetMQ.3.3.0.10\lib\net40\NetMQ.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Management" />
+    <Reference Include="System.ServiceProcess" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
