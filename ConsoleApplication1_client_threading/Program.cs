@@ -27,6 +27,7 @@ using System.Net;
 using Gurock.SmartInspect;
 using Configuration = System.Configuration.Configuration;
 using System.Collections.Concurrent;
+using NetMQ;
 
 namespace ConsoleApplication1_client_threading
 {
@@ -198,6 +199,7 @@ each set of the byte. To display a four-byte string, there will be 8 digits stri
                         
                 }
                 //close myself and start remote uns
+                CloseLocalUnsThenStartRemoteUns();
                 unsTcpClient = new TcpClient();
                 
                 unsConnectDone.Reset();
@@ -207,6 +209,39 @@ each set of the byte. To display a four-byte string, there will be 8 digits stri
             }
             
         }
+
+        private static void CloseLocalUnsThenStartRemoteUns()
+        {
+            string port = null;
+            port = ConfigurationManager.AppSettings["TriggerPort"];
+            using (NetMQContext context = NetMQContext.Create())
+            {
+                using (NetMQSocket clientSocket = context.CreateRequestSocket())
+                {
+                    clientSocket.Connect("tcp://127.0.0.1:" + port);
+
+                    while (true)
+                    {
+                        //Console.WriteLine("Please enter your message:");
+                        string message = null;
+                        message = System.Reflection.MethodBase.GetCurrentMethod().Name;
+                        Console.WriteLine("send message to trigger:" + message);
+                        log.Info("send message to trigger:" + message);
+                        clientSocket.Send(message);
+
+                        string answer = clientSocket.ReceiveString();
+
+                        Console.WriteLine("Answer from server: {0}", answer);
+
+                        if (answer == "exit")
+                        {
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+
         static void AvlsConnectCallback(IAsyncResult ar)
         {
             try
@@ -1682,7 +1717,7 @@ Select 1-6 then press enter to send package
                 log.Error("myReadSizeCallBackError:" + Environment.NewLine + ex);
 
                 //close myself and start remote uns
-
+                CloseLocalUnsThenStartRemoteUns();
                 try
                 {
                     Monitor.Enter(readRecoveryLock);
