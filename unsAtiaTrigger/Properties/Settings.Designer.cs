@@ -61,13 +61,13 @@ namespace unsAtiaTrigger.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("10.6.3.103")]
-        public string RemoteIpAddress {
+        [global::System.Configuration.DefaultSettingValueAttribute("10.6.3.17")]
+        public string NorthIpAddress {
             get {
-                return ((string)(this["RemoteIpAddress"]));
+                return ((string)(this["NorthIpAddress"]));
             }
             set {
-                this["RemoteIpAddress"] = value;
+                this["NorthIpAddress"] = value;
             }
         }
         
@@ -206,24 +206,72 @@ namespace unsAtiaTrigger.Properties {
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("netsh interface ip add address \\\"SLOT 2 連接埠 1\\\" 10.53.1.114  255.255.255.0")]
-        public string AddAtiaIpAdressAndSubnet {
+        public string AddAtiaIpAdressAndSubnetInSouthServer {
             get {
-                return ((string)(this["AddAtiaIpAdressAndSubnet"]));
+                return ((string)(this["AddAtiaIpAdressAndSubnetInSouthServer"]));
             }
             set {
-                this["AddAtiaIpAdressAndSubnet"] = value;
+                this["AddAtiaIpAdressAndSubnetInSouthServer"] = value;
             }
         }
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("netsh interface ip delete address \\\"SLOT 2 連接埠 1\\\" 10.53.1.114")]
-        public string RemoveAtiaIpAddress {
+        public string RemoveAtiaIpAddressFromSouthServer {
             get {
-                return ((string)(this["RemoveAtiaIpAddress"]));
+                return ((string)(this["RemoveAtiaIpAddressFromSouthServer"]));
             }
             set {
-                this["RemoveAtiaIpAddress"] = value;
+                this["RemoveAtiaIpAddressFromSouthServer"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("netsh interface ip add address \\\"NIC2\\\" 10.53.1.114  255.255.255.0")]
+        public string AddAtiaIpAdressAndSubnetInNorthServer {
+            get {
+                return ((string)(this["AddAtiaIpAdressAndSubnetInNorthServer"]));
+            }
+            set {
+                this["AddAtiaIpAdressAndSubnetInNorthServer"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("netsh interface ip delete address \\\"NIC2\\\" 10.53.1.114")]
+        public string RemoveAtiaIpAddressFromNorthServer {
+            get {
+                return ((string)(this["RemoveAtiaIpAddressFromNorthServer"]));
+            }
+            set {
+                this["RemoveAtiaIpAddressFromNorthServer"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("North")]
+        public string Location {
+            get {
+                return ((string)(this["Location"]));
+            }
+            set {
+                this["Location"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("10.6.3.103")]
+        public string SoundIpAddress {
+            get {
+                return ((string)(this["SoundIpAddress"]));
+            }
+            set {
+                this["SoundIpAddress"] = value;
             }
         }
     }

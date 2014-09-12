@@ -62,7 +62,15 @@ namespace unsAtiaTrigger
             using (NetMQContext context = NetMQContext.Create())
             using (NetMQSocket clientSocket = context.CreateRequestSocket())
             {
-                clientSocket.Connect("tcp://"+Properties.Settings.Default.RemoteIpAddress+":"+Properties.Settings.Default.RemotePort);
+                switch (Properties.Settings.Default.Location)
+                {
+                    case "North":
+                        clientSocket.Connect("tcp://"+Properties.Settings.Default.SoundIpAddress+":"+Properties.Settings.Default.RemotePort);
+                        break;
+                    case "South":
+                        clientSocket.Connect("tcp://" + Properties.Settings.Default.NorthIpAddress + ":" + Properties.Settings.Default.RemotePort);
+                        break;
+                }
 
                 while (true)
                 {
@@ -112,7 +120,15 @@ namespace unsAtiaTrigger
                             //changeIpAddressForATIA(Properties.Settings.Default.BlockAtiaMsgIp);
                             //remove ip address
                             //System.Diagnostics.Process.Start("cmd.exe", "/C " + Properties.Settings.Default.RemoveAtiaIpAddress);
-                            Console.WriteLine(RunCmd(Properties.Settings.Default.RemoveAtiaIpAddress));
+                            switch (Properties.Settings.Default.Location)
+                            {
+                                case "North":
+                                    Console.WriteLine(RunCmd(Properties.Settings.Default.RemoveAtiaIpAddressFromNorthServer));
+                                    break;
+                                case "South":
+                                    Console.WriteLine(RunCmd(Properties.Settings.Default.RemoveAtiaIpAddressFromSouthServer));
+                                    break;
+                            }
                             //start remote atia
                             Client("StartRemoteAtia");
                             break;
@@ -121,7 +137,16 @@ namespace unsAtiaTrigger
                             //changeIpAddressForATIA(Properties.Settings.Default.ReceiveAtiaMsgIp);
                             //add ip address
                             //System.Diagnostics.Process.Start("cmd.exe", "/C " + Properties.Settings.Default.AddAtiaIpAdressAndSubnet);
-                            Console.WriteLine(RunCmd(Properties.Settings.Default.AddAtiaIpAdressAndSubnet));
+                            switch (Properties.Settings.Default.Location)
+                            {
+                                case "North":
+                                    Console.WriteLine(RunCmd(Properties.Settings.Default.AddAtiaIpAdressAndSubnetInNorthServer));
+                                    break;
+                                case "South":
+                                    Console.WriteLine(RunCmd(Properties.Settings.Default.AddAtiaIpAdressAndSubnetInSouthServer));
+                                    break;
+                            }
+                            
                             switch (Properties.Settings.Default.AtiaUnsServiceOrProcess)
                             {
                                 case "Service":

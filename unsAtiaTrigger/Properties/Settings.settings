@@ -11,8 +11,8 @@
     <Setting Name="ATIA_NIC_NAME" Type="System.String" Scope="User">
       <Value Profile="(Default)">[00000007] Realtek PCIe GBE Family Controller</Value>
     </Setting>
-    <Setting Name="RemoteIpAddress" Type="System.String" Scope="User">
-      <Value Profile="(Default)">10.6.3.103</Value>
+    <Setting Name="NorthIpAddress" Type="System.String" Scope="User">
+      <Value Profile="(Default)">10.6.3.17</Value>
     </Setting>
     <Setting Name="RemotePort" Type="System.String" Scope="User">
       <Value Profile="(Default)">5555</Value>
@@ -47,11 +47,23 @@
     <Setting Name="BlockUnsMsgIp" Type="System.String" Scope="User">
       <Value Profile="(Default)">10.6.3.12</Value>
     </Setting>
-    <Setting Name="AddAtiaIpAdressAndSubnet" Type="System.String" Scope="User">
+    <Setting Name="AddAtiaIpAdressAndSubnetInSouthServer" Type="System.String" Scope="User">
       <Value Profile="(Default)">netsh interface ip add address \"SLOT 2 連接埠 1\" 10.53.1.114  255.255.255.0</Value>
     </Setting>
-    <Setting Name="RemoveAtiaIpAddress" Type="System.String" Scope="User">
+    <Setting Name="RemoveAtiaIpAddressFromSouthServer" Type="System.String" Scope="User">
       <Value Profile="(Default)">netsh interface ip delete address \"SLOT 2 連接埠 1\" 10.53.1.114</Value>
+    </Setting>
+    <Setting Name="AddAtiaIpAdressAndSubnetInNorthServer" Type="System.String" Scope="User">
+      <Value Profile="(Default)">netsh interface ip add address \"NIC2\" 10.53.1.114  255.255.255.0</Value>
+    </Setting>
+    <Setting Name="RemoveAtiaIpAddressFromNorthServer" Type="System.String" Scope="User">
+      <Value Profile="(Default)">netsh interface ip delete address \"NIC2\" 10.53.1.114</Value>
+    </Setting>
+    <Setting Name="Location" Type="System.String" Scope="User">
+      <Value Profile="(Default)">North</Value>
+    </Setting>
+    <Setting Name="SoundIpAddress" Type="System.String" Scope="User">
+      <Value Profile="(Default)">10.6.3.103</Value>
     </Setting>
   </Settings>
 </SettingsFile>
