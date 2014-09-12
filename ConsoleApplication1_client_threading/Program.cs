@@ -426,6 +426,7 @@ WHERE
             //Console.WriteLine(DateTime.Now.ToString("yyyyMMdd HHmmss+8"));
             //Console.WriteLine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location));
             //test();
+            Console.WriteLine("+sql clients connect");
             avlsSqlClient.connect();
             CheckIfUidExistSqlClient.connect();
             AutosendsqlClient.connect();
@@ -437,6 +438,7 @@ WHERE
             CheckIfStayOverTimeSql_client2.connect();
             SendToAvlsEventColumnSetNegativeOneIfPowerOffSqlClient.connect();
             SendPackageToAvlsOnlyByUidAndLocGetFromSqlSqlClient.connect();
+            Console.WriteLine("-sql clients connect");
             unsTcpClient = new TcpClient();
 
             avlsTcpClient = new TcpClient();
@@ -457,18 +459,22 @@ WHERE
             }
             */
             //unsTcpClient.NoDelay = false;
-
+            Console.WriteLine("+unsConnectDone connect");
             unsConnectDone.Reset();
             unsTcpClient.BeginConnect(ipAddress, port, new AsyncCallback(ConnectCallback), unsTcpClient);
             unsConnectDone.WaitOne();
+            Console.WriteLine("-unsConnectDone connect");
             Keeplive.keep(unsTcpClient.Client);
             NetworkStream netStream = unsTcpClient.GetStream();
             unsNetworkStream = netStream;
 
+
             //avls_tcpClient.Connect(ipAddress, port);
+            Console.WriteLine("+avlsConnectDone connect");
             avlsConnectDone.Reset();
             avlsTcpClient.BeginConnect(avls_ipaddress, avls_port, new AsyncCallback(AvlsConnectCallback), avlsTcpClient);
             avlsConnectDone.WaitOne();
+            Console.WriteLine("-avlsConnectDone connect");
             Keeplive.keep(avlsTcpClient.Client);
             avlsNetworkStream = avlsTcpClient.GetStream();
 
@@ -501,6 +507,7 @@ WHERE
             //{
             //Thread.Sleep(30);
             //}
+            Console.WriteLine("emptyPowerStatusTable");
             sql_client.modify(emptyPowerStatusTable);
             //sql_client.disconnect();
 
@@ -532,6 +539,7 @@ WHERE
                             //Thread.Sleep(30);
                         }
                         sql_client.modify(regSqlCmd);
+                        Console.WriteLine(regSqlCmd);
                         //sql_client.disconnect();
                         //Console.WriteLine("find:{0}", uid);
                     }
