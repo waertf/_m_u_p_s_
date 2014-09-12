@@ -48,10 +48,10 @@
       <Value Profile="(Default)">10.6.3.12</Value>
     </Setting>
     <Setting Name="AddAtiaIpAdressAndSubnet" Type="System.String" Scope="User">
-      <Value Profile="(Default)">netsh interface ip add address \"Local Area Connection\" 10.53.1.114  255.255.255.0</Value>
+      <Value Profile="(Default)">netsh interface ip add address \"SLOT 2 連接埠 1\" 10.53.1.114  255.255.255.0</Value>
     </Setting>
     <Setting Name="RemoveAtiaIpAddress" Type="System.String" Scope="User">
-      <Value Profile="(Default)">netsh interface ip delete address \"Local Area Connection\" 10.53.1.114</Value>
+      <Value Profile="(Default)">netsh interface ip delete address \"SLOT 2 連接埠 1\" 10.53.1.114</Value>
     </Setting>
   </Settings>
 </SettingsFile>
