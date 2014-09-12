@@ -21,22 +21,22 @@
       <Value Profile="(Default)">Atia</Value>
     </Setting>
     <Setting Name="AtiaProcessPath" Type="System.String" Scope="User">
-      <Value Profile="(Default)">d:\cgaWork\Atia</Value>
+      <Value Profile="(Default)">D:\CGAWork\Atia</Value>
     </Setting>
     <Setting Name="UnsServiceName" Type="System.String" Scope="User">
       <Value Profile="(Default)">Uns</Value>
     </Setting>
     <Setting Name="UnsProcessPath" Type="System.String" Scope="User">
-      <Value Profile="(Default)">d:\cgaWork\Uns</Value>
+      <Value Profile="(Default)">D:\CGAWork\Uns</Value>
     </Setting>
     <Setting Name="AtiaUnsServiceOrProcess" Type="System.String" Scope="User">
       <Value Profile="(Default)">Process</Value>
     </Setting>
     <Setting Name="AtiaProcessName" Type="System.String" Scope="User">
-      <Value Profile="(Default)">Atia.exe</Value>
+      <Value Profile="(Default)">ATIA_2.exe</Value>
     </Setting>
     <Setting Name="UnsProcessName" Type="System.String" Scope="User">
-      <Value Profile="(Default)">Uns.exe</Value>
+      <Value Profile="(Default)">Client.exe</Value>
     </Setting>
     <Setting Name="UNS_NIC_NAME" Type="System.String" Scope="User">
       <Value Profile="(Default)">[00000007] Realtek PCIe GBE Family Controller</Value>

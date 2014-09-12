@@ -97,7 +97,7 @@ namespace unsAtiaTrigger.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("d:\\cgaWork\\Atia")]
+        [global::System.Configuration.DefaultSettingValueAttribute("D:\\CGAWork\\Atia")]
         public string AtiaProcessPath {
             get {
                 return ((string)(this["AtiaProcessPath"]));
@@ -121,7 +121,7 @@ namespace unsAtiaTrigger.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("d:\\cgaWork\\Uns")]
+        [global::System.Configuration.DefaultSettingValueAttribute("D:\\CGAWork\\Uns")]
         public string UnsProcessPath {
             get {
                 return ((string)(this["UnsProcessPath"]));
@@ -145,7 +145,7 @@ namespace unsAtiaTrigger.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("Atia.exe")]
+        [global::System.Configuration.DefaultSettingValueAttribute("ATIA_2.exe")]
         public string AtiaProcessName {
             get {
                 return ((string)(this["AtiaProcessName"]));
@@ -157,7 +157,7 @@ namespace unsAtiaTrigger.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("Uns.exe")]
+        [global::System.Configuration.DefaultSettingValueAttribute("Client.exe")]
         public string UnsProcessName {
             get {
                 return ((string)(this["UnsProcessName"]));
