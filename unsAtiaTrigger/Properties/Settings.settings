@@ -60,7 +60,7 @@
       <Value Profile="(Default)">netsh interface ip delete address \"NIC2\" 10.53.1.114</Value>
     </Setting>
     <Setting Name="Location" Type="System.String" Scope="User">
-      <Value Profile="(Default)">North</Value>
+      <Value Profile="(Default)">South</Value>
     </Setting>
     <Setting Name="SoundIpAddress" Type="System.String" Scope="User">
       <Value Profile="(Default)">10.6.3.103</Value>

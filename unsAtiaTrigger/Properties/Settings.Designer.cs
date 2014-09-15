@@ -253,7 +253,7 @@ namespace unsAtiaTrigger.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("North")]
+        [global::System.Configuration.DefaultSettingValueAttribute("South")]
         public string Location {
             get {
                 return ((string)(this["Location"]));
