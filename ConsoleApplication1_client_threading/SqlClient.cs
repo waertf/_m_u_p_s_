@@ -117,6 +117,7 @@ namespace ConsoleApplication1_client_threading
                 {
                     //insert
                     command = pgSqlConnection.CreateCommand();
+                    command.UnpreparedExecute = true;
                     command.CommandText = cmd;
                     //command.CommandTimeout = 30;
 
@@ -394,6 +395,7 @@ namespace ConsoleApplication1_client_threading
                     pgSqlConnection2.Open();
                     //insert
                     command = pgSqlConnection2.CreateCommand();
+                    command.UnpreparedExecute = true;
                     command.CommandText = cmd;
                     //command.CommandTimeout = 30;
 
