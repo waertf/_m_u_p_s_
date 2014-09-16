@@ -1679,6 +1679,7 @@ Select 1-6 then press enter to send package
                 //Console.WriteLine(System.Reflection.MethodBase.GetCurrentMethod().Name + "_errorline:" + ex.LineNumber());
                 //log.Error(System.Reflection.MethodBase.GetCurrentMethod().Name + "_errorline:" + ex.LineNumber());
                 log.Error("ReadLineError:\r\n" + ex);
+                CloseLocalUnsThenStartRemoteUns();
                 try
                 {
                     Monitor.Enter(readRecoveryLock);
