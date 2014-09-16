@@ -530,20 +530,24 @@ WHERE
                 if (dt != null && dt.Rows.Count != 0)
                 {
                     string uid = string.Empty;
+                    StringBuilder sbBuilder = new StringBuilder();
                     foreach (DataRow row in dt.Rows)
                     {
                         uid = row[0].ToString();
-                        regSqlCmd = "INSERT INTO custom.uns_deivce_power_status (uid) VALUES (" + "\'" + uid + "\'" + ")";
+                        regSqlCmd = "INSERT INTO custom.uns_deivce_power_status (uid) VALUES (" + "\'" + uid + "\'" + ");";
                         //while (!sql_client.connect())
                         {
                             //Thread.Sleep(30);
                         }
-                        sql_client.modify(regSqlCmd);
-                        Console.WriteLine(regSqlCmd);
+                        sbBuilder.Append(regSqlCmd);
+                        //sql_client.modify(regSqlCmd);
+                        //Console.WriteLine(regSqlCmd);
                         //sql_client.disconnect();
                         //Console.WriteLine("find:{0}", uid);
                     }
-
+                    sql_client.modify(sbBuilder.ToString());
+                    Console.WriteLine(sbBuilder.ToString());
+                    sbBuilder.Clear();
                 }
 
             }
