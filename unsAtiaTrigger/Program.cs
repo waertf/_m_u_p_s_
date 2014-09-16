@@ -112,7 +112,7 @@ namespace unsAtiaTrigger
                                     StopService(Properties.Settings.Default.AtiaServiceName);
                                     break;
                                 case "Process":
-                                    KillProcess(Properties.Settings.Default.AtiaProcessName);
+                                    KillProcess(Properties.Settings.Default.AtiaProcessName.Replace(".exe",""));
                                     break;
                             }
                             
@@ -167,7 +167,7 @@ namespace unsAtiaTrigger
                                     StopService(Properties.Settings.Default.UnsServiceName);
                                     break;
                                 case "Process":
-                                    KillProcess(Properties.Settings.Default.UnsProcessName);
+                                    KillProcess(Properties.Settings.Default.UnsProcessName.Replace(".exe",""));
                                     break;
                             }
                             
