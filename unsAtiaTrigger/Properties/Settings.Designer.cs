@@ -266,12 +266,12 @@ namespace unsAtiaTrigger.Properties {
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("10.6.3.103")]
-        public string SoundIpAddress {
+        public string SouthIpAddress {
             get {
-                return ((string)(this["SoundIpAddress"]));
+                return ((string)(this["SouthIpAddress"]));
             }
             set {
-                this["SoundIpAddress"] = value;
+                this["SouthIpAddress"] = value;
             }
         }
     }

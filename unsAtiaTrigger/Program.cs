@@ -65,7 +65,7 @@ namespace unsAtiaTrigger
                 switch (Properties.Settings.Default.Location)
                 {
                     case "North":
-                        clientSocket.Connect("tcp://"+Properties.Settings.Default.SoundIpAddress+":"+Properties.Settings.Default.RemotePort);
+                        clientSocket.Connect("tcp://"+Properties.Settings.Default.SouthIpAddress+":"+Properties.Settings.Default.RemotePort);
                         break;
                     case "South":
                         clientSocket.Connect("tcp://" + Properties.Settings.Default.NorthIpAddress + ":" + Properties.Settings.Default.RemotePort);
