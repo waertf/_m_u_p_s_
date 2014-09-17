@@ -268,8 +268,8 @@ namespace ConsoleApplication1_client_threading
                         //Console.WriteLine("Have to wait for operation to complete...");
                         //PgSqlDataReader myReader = command.EndExecuteReader(cres);
                         //PgSqlDataReader myReader = command.ExecuteReader();
-                        try
-                        {
+                        //try
+                        //{
                             lock (accessLock)
                             {
 
@@ -328,12 +328,12 @@ namespace ConsoleApplication1_client_threading
                                 SiAuto.Main.AddCheckpoint(Level.Debug, "sql query3 take time:" + elapsedTime, cmd);
                                 //myReader.Dispose();
                             }
-                        }
-                        finally
-                        {
+                        //}
+                        //finally
+                        //{
                             
                             
-                        }
+                        //}
                         /*
                         foreach (DataRow row in datatable.Rows) // Loop over the rows.
                         {
