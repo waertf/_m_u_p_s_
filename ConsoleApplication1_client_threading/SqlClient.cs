@@ -391,7 +391,7 @@ namespace ConsoleApplication1_client_threading
             try
             {
                 
-                {
+                //{
                     pgSqlConnection2.Open();
                     //insert
                     command = pgSqlConnection2.CreateCommand();
@@ -406,7 +406,7 @@ namespace ConsoleApplication1_client_threading
 
 
                     //lock (accessLock)
-                    {
+                    //{
                         myTrans = pgSqlConnection2.BeginTransaction(IsolationLevel.ReadCommitted);
                         command.Transaction = myTrans;
                         //IAsyncResult cres = command.BeginExecuteNonQuery();
@@ -414,15 +414,15 @@ namespace ConsoleApplication1_client_threading
                         //lock (accessLock)
                         RowsAffected = command.ExecuteNonQuery();
                         myTrans.Commit();
-                    }
+                    //}
                     pgSqlConnection2.Close();
                     //IAsyncResult cres=command.BeginExecuteNonQuery(null,null);
                     //Console.Write("In progress...");
                     //while (!cres.IsCompleted)
-                    {
+                    //{
                         //Console.Write(".");
                         //Perform here any operation you need
-                    }
+                    //}
                     /*
                     if (cres.IsCompleted)
                         Console.WriteLine("Completed.");
@@ -463,7 +463,7 @@ namespace ConsoleApplication1_client_threading
                         //ts.Milliseconds / 10);
                     //SiAuto.Main.AddCheckpoint(Level.Debug, "sql modify take time:" + elapsedTime, cmd);
 
-                }
+                //}
 
             }
             catch (PgSqlException ex)
