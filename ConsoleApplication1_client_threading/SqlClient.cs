@@ -16,28 +16,30 @@ namespace ConsoleApplication1_client_threading
     class SqlClient
     {
 
-        PgSqlConnection pgSqlConnection, pgSqlConnection2;
+        //PgSqlConnection pgSqlConnection; 
+        PgSqlConnection pgSqlConnection2;
         PgSqlConnectionStringBuilder pgCSB2 = new PgSqlConnectionStringBuilder();
+        PgSqlConnectionStringBuilder pgCSB = new PgSqlConnectionStringBuilder();
         public bool IsConnected { get; set; }
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
         object accessLock = new object();
         public SqlClient(string ip, string port, string user_id, string password, string database, string Pooling, string MinPoolSize, string MaxPoolSize, string ConnectionLifetime)
         {
-            PgSqlConnectionStringBuilder pgCSB = new PgSqlConnectionStringBuilder();
+            //PgSqlConnectionStringBuilder pgCSB = new PgSqlConnectionStringBuilder();
             pgCSB.Host = ip;
             pgCSB.Port =pgCSB2.Port= int.Parse(port);
             pgCSB.UserId = pgCSB2.UserId=user_id;
             pgCSB.Password = pgCSB2.Password=password;
             pgCSB.Database = pgCSB2.Database=database;
 
-            pgCSB.Pooling = bool.Parse(Pooling);
-            pgCSB.MinPoolSize = int.Parse(MinPoolSize);
-            pgCSB.MaxPoolSize = int.Parse(MaxPoolSize);
-            pgCSB.ConnectionLifetime = int.Parse(ConnectionLifetime); ;
-            pgCSB.ConnectionTimeout = 15;
+            //pgCSB.Pooling = bool.Parse(Pooling);
+            //pgCSB.MinPoolSize = int.Parse(MinPoolSize);
+            //pgCSB.MaxPoolSize = int.Parse(MaxPoolSize);
+            //pgCSB.ConnectionLifetime = int.Parse(ConnectionLifetime); ;
+            //pgCSB.ConnectionTimeout = 15;
             pgCSB.Unicode = true;
-            pgSqlConnection = new PgSqlConnection(pgCSB.ConnectionString);
-            IsConnected = false;
+            //pgSqlConnection = new PgSqlConnection(pgCSB.ConnectionString);
+            //IsConnected = false;
 
             
             pgCSB2.Host = ConfigurationManager.AppSettings["DB2_ADDRESS"];
@@ -45,9 +47,10 @@ namespace ConsoleApplication1_client_threading
         }
         public void connect()
         {
+            return;
             try
             {
-                pgSqlConnection.Open();
+                //pgSqlConnection.Open();
                 IsConnected = true;
                 /*
                 {
@@ -77,15 +80,16 @@ namespace ConsoleApplication1_client_threading
         }
         public bool disconnect()
         {
+            return true;
             try
             {
-                if (pgSqlConnection != null)
+                //if (pgSqlConnection != null)
                 {
-                    pgSqlConnection.Close();
+                    //pgSqlConnection.Close();
                     IsConnected = false;
                     return true;
                 }
-                else
+                //else
                 {
                     return false;
                 }
@@ -111,11 +115,14 @@ namespace ConsoleApplication1_client_threading
             Stopwatch stopWatch = new Stopwatch();
             PgSqlCommand command = null;
             PgSqlTransaction myTrans = null;
+            using (var pgSqlConnection = new PgSqlConnection(pgCSB.ConnectionString))
             try
             {
-                if (pgSqlConnection != null && IsConnected)
-                {
+                //if (pgSqlConnection != null && IsConnected)
+                
+                //{
                     //insert
+                    pgSqlConnection.Open();
                     command = pgSqlConnection.CreateCommand();
                     command.UnpreparedExecute = true;
                     command.CommandText = cmd;
@@ -137,6 +144,7 @@ namespace ConsoleApplication1_client_threading
                         RowsAffected = command.ExecuteNonQuery();
                         myTrans.Commit();
                     }
+                pgSqlConnection.Close();
                     //IAsyncResult cres=command.BeginExecuteNonQuery(null,null);
                     //Console.Write("In progress...");
                     //while (!cres.IsCompleted)
@@ -184,7 +192,7 @@ namespace ConsoleApplication1_client_threading
                         ts.Milliseconds / 10);
                     SiAuto.Main.AddCheckpoint(Level.Debug, "sql modify take time:" + elapsedTime, cmd);
                     
-                }
+                //}
 
             }
             catch (PgSqlException ex)
@@ -217,7 +225,7 @@ namespace ConsoleApplication1_client_threading
                 Console.WriteLine("Modify exception occurs: {0}" + Environment.NewLine + "{1}", ex.Error, command.CommandText);
                 log.Error("Modify exception occurs: " + Environment.NewLine + ex.Error + Environment.NewLine + command.CommandText);
                 Console.ResetColor();
-                pgSqlConnection.Rollback();
+                //pgSqlConnection.Rollback();
             }
             finally
             {
@@ -232,11 +240,13 @@ namespace ConsoleApplication1_client_threading
             PgSqlCommand command = null;
             
             using (DataTable datatable = new DataTable())
+            using (var pgSqlConnection = new PgSqlConnection(pgCSB.ConnectionString))
             {
                 try
                 {
-                    if (pgSqlConnection != null && IsConnected)
-                    {
+                    //if (pgSqlConnection != null && IsConnected)
+                    //{
+                        pgSqlConnection.Open();
                         //DataTable datatable = new DataTable();
                         command = pgSqlConnection.CreateCommand();
                         command.CommandText = cmd;
@@ -309,6 +319,7 @@ namespace ConsoleApplication1_client_threading
                                     //Console.WriteLine(myReader.GetInt32(0) + "\t" + myReader.GetString(1) + "\t");
                                 }
                                 myReader.Close();
+                                pgSqlConnection.Close();
                                 stopWatch.Stop();
                                 ts = stopWatch.Elapsed;
                                 elapsedTime = String.Format("{0:00}:{1:00}:{2:00}.{3:00}",
@@ -347,12 +358,12 @@ namespace ConsoleApplication1_client_threading
                         }
                         //DataTable returnTable = datatable.Copy();
                         
-                    }
-                    else
-                    {
+                    //}
+                    //else
+                    //{
 
-                        return null;
-                    }
+                        //return null;
+                    //}
 
                 }
                 catch (PgSqlException ex)
@@ -371,10 +382,11 @@ namespace ConsoleApplication1_client_threading
         }
         public void Dispose()
         {
+            return;
             //PgSqlConnection.ClearAllPools(true);
-            PgSqlConnection.ClearPool(pgSqlConnection);
+            //PgSqlConnection.ClearPool(pgSqlConnection);
             //pgSqlConnection.Dispose();
-            pgSqlConnection = null;
+            //pgSqlConnection = null;
         }
         //~SqlClient()
         //{
