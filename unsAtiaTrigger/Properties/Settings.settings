@@ -65,5 +65,11 @@
     <Setting Name="SouthIpAddress" Type="System.String" Scope="User">
       <Value Profile="(Default)">10.6.3.103</Value>
     </Setting>
+    <Setting Name="unsMonitorName" Type="System.String" Scope="User">
+      <Value Profile="(Default)">ProcessMonitor.exe</Value>
+    </Setting>
+    <Setting Name="atiaMonitorName" Type="System.String" Scope="User">
+      <Value Profile="(Default)">ProcessMonitor.exe</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

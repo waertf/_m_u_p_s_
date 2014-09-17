@@ -274,5 +274,29 @@ namespace unsAtiaTrigger.Properties {
                 this["SouthIpAddress"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("ProcessMonitor.exe")]
+        public string unsMonitorName {
+            get {
+                return ((string)(this["unsMonitorName"]));
+            }
+            set {
+                this["unsMonitorName"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("ProcessMonitor.exe")]
+        public string atiaMonitorName {
+            get {
+                return ((string)(this["atiaMonitorName"]));
+            }
+            set {
+                this["atiaMonitorName"] = value;
+            }
+        }
     }
 }

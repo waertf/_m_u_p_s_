@@ -112,7 +112,8 @@ namespace unsAtiaTrigger
                                     StopService(Properties.Settings.Default.AtiaServiceName);
                                     break;
                                 case "Process":
-                                    KillProcess(Properties.Settings.Default.AtiaProcessName.Replace(".exe",""));
+                                    KillProcessWithSpecificPath(Properties.Settings.Default.atiaMonitorName.Replace(".exe", ""),"Atia");
+                                    KillProcess(Properties.Settings.Default.AtiaProcessName.Replace(".exe", ""));
                                     break;
                             }
                             
@@ -153,7 +154,7 @@ namespace unsAtiaTrigger
                                     StartService(Properties.Settings.Default.AtiaServiceName);
                                     break;
                                 case "Process":
-                                    StartProcess(Properties.Settings.Default.AtiaProcessPath,Properties.Settings.Default.AtiaProcessName);
+                                    StartProcess(Properties.Settings.Default.AtiaProcessPath, Properties.Settings.Default.atiaMonitorName);
                                     break;
                             }
                             serverSocket.Send("exit");
@@ -167,7 +168,8 @@ namespace unsAtiaTrigger
                                     StopService(Properties.Settings.Default.UnsServiceName);
                                     break;
                                 case "Process":
-                                    KillProcess(Properties.Settings.Default.UnsProcessName.Replace(".exe",""));
+                                    KillProcessWithSpecificPath(Properties.Settings.Default.unsMonitorName.Replace(".exe", ""),"Uns");
+                                    KillProcess(Properties.Settings.Default.UnsProcessName.Replace(".exe", ""));
                                     break;
                             }
                             
@@ -184,7 +186,7 @@ namespace unsAtiaTrigger
                                     StartService(Properties.Settings.Default.UnsServiceName);
                                     break;
                                 case "Process":
-                                    StartProcess(Properties.Settings.Default.UnsProcessPath, Properties.Settings.Default.UnsProcessName);
+                                    StartProcess(Properties.Settings.Default.UnsProcessPath, Properties.Settings.Default.unsMonitorName);
                                     break;
                             }
                             serverSocket.Send("exit");
@@ -256,6 +258,28 @@ namespace unsAtiaTrigger
             }
         }
 
+        private static void KillProcessWithSpecificPath(string ProcessName , string path)
+        {
+            try
+            {
+                Process[] processes = Process.GetProcessesByName(ProcessName);
+                foreach (Process process in processes)
+                {
+                    if (process.MainModule.FileName.Contains(path))
+                    {
+                        process.Kill();
+                        process.WaitForExit();
+                    }
+                    
+                }
+            }
+            catch (Exception e)
+            {
+
+                Console.WriteLine(e.ToString());
+                SiAuto.Main.LogException(e);
+            }
+        }
         private static void StopService(string ServiceName)
         {
             try
