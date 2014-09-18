@@ -122,7 +122,7 @@ namespace ConsoleApplication1_client_threading
                 
                 //{
                     //insert
-                    pgSqlConnection.Open();
+                    //pgSqlConnection.Open();
                     command = pgSqlConnection.CreateCommand();
                     command.UnpreparedExecute = true;
                     command.CommandText = cmd;
@@ -136,6 +136,7 @@ namespace ConsoleApplication1_client_threading
                     
                     lock (accessLock)
                     {
+                        pgSqlConnection.Open();
                         myTrans = pgSqlConnection.BeginTransaction(IsolationLevel.ReadCommitted);
                         command.Transaction = myTrans;
                         //IAsyncResult cres = command.BeginExecuteNonQuery();
@@ -143,8 +144,9 @@ namespace ConsoleApplication1_client_threading
                         //lock (accessLock)
                         RowsAffected = command.ExecuteNonQuery();
                         myTrans.Commit();
+                        pgSqlConnection.Close();
                     }
-                pgSqlConnection.Close();
+                
                     //IAsyncResult cres=command.BeginExecuteNonQuery(null,null);
                     //Console.Write("In progress...");
                     //while (!cres.IsCompleted)
@@ -246,7 +248,7 @@ namespace ConsoleApplication1_client_threading
                 {
                     //if (pgSqlConnection != null && IsConnected)
                     //{
-                        pgSqlConnection.Open();
+                        //pgSqlConnection.Open();
                         //DataTable datatable = new DataTable();
                         command = pgSqlConnection.CreateCommand();
                         command.CommandText = cmd;
@@ -278,6 +280,7 @@ namespace ConsoleApplication1_client_threading
                                 //IAsyncResult cres = command.BeginExecuteReader();
                                 //myReader = command.EndExecuteReader(cres);
                                 //lock (accessLock)
+                                pgSqlConnection.Open();
                                 myReader = command.ExecuteReader();
                                 //stopWatch.Stop();
                                 // Get the elapsed time as a TimeSpan value.
@@ -404,7 +407,7 @@ namespace ConsoleApplication1_client_threading
             {
                 
                 //{
-                    pgSqlConnection2.Open();
+                    //pgSqlConnection2.Open();
                     //insert
                     command = pgSqlConnection2.CreateCommand();
                     command.UnpreparedExecute = true;
@@ -419,6 +422,7 @@ namespace ConsoleApplication1_client_threading
 
                     //lock (accessLock)
                     //{
+                    pgSqlConnection2.Open();
                         myTrans = pgSqlConnection2.BeginTransaction(IsolationLevel.ReadCommitted);
                         command.Transaction = myTrans;
                         //IAsyncResult cres = command.BeginExecuteNonQuery();
