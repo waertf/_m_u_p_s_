@@ -198,7 +198,7 @@ WHERE
                       if (sqlScriptStringBuilder.Length > 0)
                       {
                           //exeute insert/update script
-                          pgsqSqlClient.SqlScriptCmd(sqlScriptStringBuilder.ToString());
+                          pgsqSqlClient.modify(sqlScriptStringBuilder.ToString());
                           SiAuto.Main.LogStringBuilder("Update Modify site_status_now_whatup", sqlScriptStringBuilder);
                           sqlScriptStringBuilder.Clear();
                       }
@@ -427,7 +427,7 @@ WHERE
               if (sqlScriptStringBuilder.Length > 0)
               {
                   //exeute insert/update script
-                  pgsqSqlClient.SqlScriptCmd(sqlScriptStringBuilder.ToString());
+                  pgsqSqlClient.modify(sqlScriptStringBuilder.ToString());
                   SiAuto.Main.LogStringBuilder("Update Modify site_status_now_whatup", sqlScriptStringBuilder);
                   sqlScriptStringBuilder.Clear();
               }
@@ -523,7 +523,7 @@ alarm_status
 )
 VALUES
 	(" + DeviceID + @", '" + DeviceName + @"', " + StateID + @", '" + StateMsg + @"', '" + startTime + @"', '" + endTime + @"',0);";
-                              pgsqSqlClient.SqlScriptCmd(insertScript);
+                              pgsqSqlClient.modify(insertScript);
                           }
                       }
                       else
@@ -760,11 +760,11 @@ VALUES
             }
             if (!smsInsertSqlScriptBuilder.Length.Equals(0))
             {
-                smsSqlClient.SqlScriptCmd(smsInsertSqlScriptBuilder.ToString());
+                smsSqlClient.modify(smsInsertSqlScriptBuilder.ToString());
             }
             if (!smsHistoryBuilder.Length.Equals(0))
             {
-                pgsqSqlClient.SqlScriptCmd(smsHistoryBuilder.ToString());
+                pgsqSqlClient.modify(smsHistoryBuilder.ToString());
             }
         }
         

@@ -31,6 +31,7 @@ namespace WhatsUpSqlClient
                                     "\\sqllog.sil\",rotate=weekly,append=true,maxparts=5,maxsize=500MB)";
         }
 
+        /*
         public void LoadDatatable(DataTable dt)
         {
             using (PgSqlConnection pgSqlConnection = new PgSqlConnection(pgCSB.ConnectionString))
@@ -60,6 +61,8 @@ namespace WhatsUpSqlClient
                 }
             }
         }
+        */
+        /*
         public void SqlScriptCmd(string script)
         {
             using (PgSqlConnection pgSqlConnection = new PgSqlConnection(pgCSB.ConnectionString))
@@ -83,7 +86,8 @@ namespace WhatsUpSqlClient
                 }
             }
         }
-
+        */
+        /*
         void pgscScript_Error(object sender, Devart.Common.ScriptErrorEventArgs e)
         {
             e.Ignore = true;
@@ -97,6 +101,7 @@ namespace WhatsUpSqlClient
             Console.WriteLine(e.Text);
             Console.WriteLine("  Successfully executed."); 
         }
+        */
         public DataTable get_DataTable(string cmd)
         {
             PgSqlCommand command = null;
@@ -106,7 +111,7 @@ namespace WhatsUpSqlClient
                 try
                 {
 
-                    {
+                    //{
                         //DataTable datatable = new DataTable();
                         command = pgSqlConnection.CreateCommand();
                         command.CommandText = cmd;
@@ -117,10 +122,10 @@ namespace WhatsUpSqlClient
                         //IAsyncResult cres = command.BeginExecuteReader();
                         //Console.Write("In progress...");
                         //while (!cres.IsCompleted)
-                        {
+                        //{
                             //Console.Write(".");
                             //Perform here any operation you need
-                        }
+                        //}
 
                         //if (cres.IsCompleted)
                         //Console.WriteLine("Completed.");
@@ -128,9 +133,9 @@ namespace WhatsUpSqlClient
                         //Console.WriteLine("Have to wait for operation to complete...");
                         //PgSqlDataReader myReader = command.EndExecuteReader(cres);
                         //PgSqlDataReader myReader = command.ExecuteReader();
-                        try
-                        {
-                            {
+                        //try
+                        //{
+                            //{
 
 
                                 //IAsyncResult cres = command.BeginExecuteReader();
@@ -165,15 +170,15 @@ namespace WhatsUpSqlClient
                                     //Console.WriteLine(myReader.GetInt32(0) + "\t" + myReader.GetString(1) + "\t");
                                 }
                                 myReader.Close();
-
+                                pgSqlConnection.Close();
                                 //myReader.Dispose();
-                            }
-                        }
-                        finally
-                        {
+                            //}
+                        //}
+                        //finally
+                        //{
 
-                            pgSqlConnection.Close();
-                        }
+                            //pgSqlConnection.Close();
+                        //}
                         /*
                         foreach (DataRow row in datatable.Rows) // Loop over the rows.
                         {
@@ -197,7 +202,7 @@ namespace WhatsUpSqlClient
                         }
                         //DataTable returnTable = datatable.Copy();
 
-                    }
+                    //}
 
 
                 }
@@ -228,9 +233,10 @@ namespace WhatsUpSqlClient
                 try
                 {
 
-                    {
+                    //{
                         //insert
                         command = pgSqlConnection.CreateCommand();
+                        command.UnpreparedExecute = true;
                         command.CommandText = cmd;
                         //command.CommandTimeout = 30;
 
@@ -241,7 +247,7 @@ namespace WhatsUpSqlClient
 
 
 
-                        {
+                        //{
                             pgSqlConnection.Open();
                             myTrans = pgSqlConnection.BeginTransaction(IsolationLevel.ReadCommitted);
                             command.Transaction = myTrans;
@@ -250,14 +256,14 @@ namespace WhatsUpSqlClient
                             //lock (accessLock)
                             RowsAffected = command.ExecuteNonQuery();
                             myTrans.Commit();
-                        }
+                        //}
                         //IAsyncResult cres=command.BeginExecuteNonQuery(null,null);
                         //Console.Write("In progress...");
                         //while (!cres.IsCompleted)
-                        {
+                        //{
                             //Console.Write(".");
                             //Perform here any operation you need
-                        }
+                        //}
                         /*
                     if (cres.IsCompleted)
                         Console.WriteLine("Completed.");
@@ -293,7 +299,7 @@ namespace WhatsUpSqlClient
                         // Format and display the TimeSpan value.
 
 
-                    }
+                    //}
 
                 }
                 catch (PgSqlException ex)
