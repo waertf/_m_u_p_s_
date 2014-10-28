@@ -807,7 +807,7 @@ ORDER BY
 public._gps_log._time DESC
 LIMIT 1
              */
-            using (DataTable dt = SendToAvlsPowerOffIfPowerOnTimeOutSqlClient.get_DataTable(sqlCmd))
+            using (DataTable dt = SendToAvlsPowerOffIfPowerOnTimeOutSqlClient.get_DataTable(sqlcmd))
             { 
                 if (dt != null && dt.Rows.Count != 0)
                     foreach (DataRow row in dt.Rows)
