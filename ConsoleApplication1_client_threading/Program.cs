@@ -631,6 +631,13 @@ WHERE
                 (sender, e) => { SendToAvlsEventColumnSetNegativeOneIfPowerOff(avlsTcpClient, avlsNetworkStream); };
             accessUnsDeivcePowerStatusSqlTable.Enabled = true;
 
+            var sendPowerOffIfPowerOnTimeOut =
+                new System.Timers.Timer(
+                    int.Parse(ConfigurationManager.AppSettings["SendPowerOffIfPowerOnTimeOut"]));
+            accessUnsDeivcePowerStatusSqlTable.Elapsed +=
+                (sender, e) => { SendToAvlsPowerOffIfPowerOnTimeOut(avlsTcpClient, avlsNetworkStream); };
+            sendPowerOffIfPowerOnTimeOut.Enabled = true;
+
             if (bool.Parse(ConfigurationManager.AppSettings["IsEvery30SecondSendUidEqlSixZeroToAvls"]))
             {
                 var every30SecondSendUidEqlSixZeroToAvls = new System.Timers.Timer(30*1000);
@@ -769,6 +776,46 @@ WHERE
 
 
             //unsTcpClient.Close();
+        }
+        static SqlClient SendToAvlsPowerOffIfPowerOnTimeOutSqlClient = new SqlClient(
+                ConfigurationManager.AppSettings["SQL_SERVER_IP"],
+                ConfigurationManager.AppSettings["SQL_SERVER_PORT"],
+                ConfigurationManager.AppSettings["SQL_SERVER_USER_ID"],
+                ConfigurationManager.AppSettings["SQL_SERVER_PASSWORD"],
+                ConfigurationManager.AppSettings["SQL_SERVER_DATABASE"],
+                ConfigurationManager.AppSettings["Pooling"],
+                ConfigurationManager.AppSettings["subMinPoolSize"],
+                ConfigurationManager.AppSettings["subMaxPoolSize"],
+                ConfigurationManager.AppSettings["subConnectionLifetime"]);
+        private static void SendToAvlsPowerOffIfPowerOnTimeOut(TcpClient avlsTcpClient, NetworkStream avlsNetworkStream)
+        {
+            var sqlcmd = @"SELECT
+sd.equipment.uid,
+sd.equipment.type
+FROM
+  sd.equipment";
+            /*
+             SELECT
+public._gps_log._uid,
+public._gps_log._time
+FROM
+public._gps_log
+WHERE
+public._gps_log._uid = '911200' AND
+public._gps_log._time <= current_timestamp- interval '5 minutes'
+ORDER BY
+public._gps_log._time DESC
+LIMIT 1
+             */
+            using (DataTable dt = SendToAvlsPowerOffIfPowerOnTimeOutSqlClient.get_DataTable(sqlCmd))
+            { 
+                if (dt != null && dt.Rows.Count != 0)
+                    foreach (DataRow row in dt.Rows)
+                    { 
+
+                    }
+
+            }
         }
 
         static void memoryUsageTimer_Elapsed(object sender, ElapsedEventArgs e)
