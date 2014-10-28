@@ -19,8 +19,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "timer_test", "timer_test\ti
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WindowsServiceUNSClientThreading", "WindowsServiceUNSClientThreading\WindowsServiceUNSClientThreading.csproj", "{706DD18D-EB7F-4C46-BFF0-54E539E0FAE6}"
 EndProject
-Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "SetupUNS", "SetupUNS\SetupUNS.vdproj", "{A760776E-2AF4-478D-9ED3-F5B46C485E97}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PostgresqlTest", "PostgresqlTest\PostgresqlTest.csproj", "{523E096B-B4C7-4CB0-9FED-80520CE1D9E2}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "unsPowerOnCount", "unsPowerOnCount\unsPowerOnCount.csproj", "{B9F564B4-E595-42C7-94B0-ACCED046AB3B}"
@@ -28,6 +26,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WhatsUpSqlClient", "WhatsUpSqlClient\WhatsUpSqlClient.csproj", "{3C92FA55-2C03-4A7A-B31C-010AE5C266BB}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "unsAtiaTrigger", "unsAtiaTrigger\unsAtiaTrigger.csproj", "{64550021-3C34-4513-9123-943430EE6F0F}"
+EndProject
+Project("{840C416C-B8F3-42BC-B0DD-F6BB14C9F8CB}") = "SetupUNS_advinst", "SetupUNS_advinst\SetupUNS_advinst.aiproj", "{B09A553B-337A-4C80-BE7E-A5E420B88208}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -115,16 +115,6 @@ Global
 		{706DD18D-EB7F-4C46-BFF0-54E539E0FAE6}.Release|Any CPU.Build.0 = Release|Any CPU
 		{706DD18D-EB7F-4C46-BFF0-54E539E0FAE6}.Release|x64.ActiveCfg = Release|Any CPU
 		{706DD18D-EB7F-4C46-BFF0-54E539E0FAE6}.Release|x86.ActiveCfg = Release|Any CPU
-		{A760776E-2AF4-478D-9ED3-F5B46C485E97}.Debug|Any CPU.ActiveCfg = Debug
-		{A760776E-2AF4-478D-9ED3-F5B46C485E97}.Debug|x64.ActiveCfg = Debug
-		{A760776E-2AF4-478D-9ED3-F5B46C485E97}.Debug|x64.Build.0 = Debug
-		{A760776E-2AF4-478D-9ED3-F5B46C485E97}.Debug|x86.ActiveCfg = Debug
-		{A760776E-2AF4-478D-9ED3-F5B46C485E97}.Debug|x86.Build.0 = Debug
-		{A760776E-2AF4-478D-9ED3-F5B46C485E97}.Release|Any CPU.ActiveCfg = Release
-		{A760776E-2AF4-478D-9ED3-F5B46C485E97}.Release|x64.ActiveCfg = Release
-		{A760776E-2AF4-478D-9ED3-F5B46C485E97}.Release|x64.Build.0 = Release
-		{A760776E-2AF4-478D-9ED3-F5B46C485E97}.Release|x86.ActiveCfg = Release
-		{A760776E-2AF4-478D-9ED3-F5B46C485E97}.Release|x86.Build.0 = Release
 		{523E096B-B4C7-4CB0-9FED-80520CE1D9E2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{523E096B-B4C7-4CB0-9FED-80520CE1D9E2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{523E096B-B4C7-4CB0-9FED-80520CE1D9E2}.Debug|x64.ActiveCfg = Debug|Any CPU
@@ -157,6 +147,18 @@ Global
 		{64550021-3C34-4513-9123-943430EE6F0F}.Release|Any CPU.Build.0 = Release|Any CPU
 		{64550021-3C34-4513-9123-943430EE6F0F}.Release|x64.ActiveCfg = Release|Any CPU
 		{64550021-3C34-4513-9123-943430EE6F0F}.Release|x86.ActiveCfg = Release|Any CPU
+		{B09A553B-337A-4C80-BE7E-A5E420B88208}.Debug|Any CPU.ActiveCfg = All
+		{B09A553B-337A-4C80-BE7E-A5E420B88208}.Debug|Any CPU.Build.0 = All
+		{B09A553B-337A-4C80-BE7E-A5E420B88208}.Debug|x64.ActiveCfg = All
+		{B09A553B-337A-4C80-BE7E-A5E420B88208}.Debug|x64.Build.0 = All
+		{B09A553B-337A-4C80-BE7E-A5E420B88208}.Debug|x86.ActiveCfg = All
+		{B09A553B-337A-4C80-BE7E-A5E420B88208}.Debug|x86.Build.0 = All
+		{B09A553B-337A-4C80-BE7E-A5E420B88208}.Release|Any CPU.ActiveCfg = All
+		{B09A553B-337A-4C80-BE7E-A5E420B88208}.Release|Any CPU.Build.0 = All
+		{B09A553B-337A-4C80-BE7E-A5E420B88208}.Release|x64.ActiveCfg = All
+		{B09A553B-337A-4C80-BE7E-A5E420B88208}.Release|x64.Build.0 = All
+		{B09A553B-337A-4C80-BE7E-A5E420B88208}.Release|x86.ActiveCfg = All
+		{B09A553B-337A-4C80-BE7E-A5E420B88208}.Release|x86.Build.0 = All
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
