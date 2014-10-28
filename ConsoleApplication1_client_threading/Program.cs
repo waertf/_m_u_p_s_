@@ -787,6 +787,16 @@ WHERE
                 ConfigurationManager.AppSettings["subMinPoolSize"],
                 ConfigurationManager.AppSettings["subMaxPoolSize"],
                 ConfigurationManager.AppSettings["subConnectionLifetime"]);
+        static SqlClient SendToAvlsPowerOffIfPowerOnTimeOutSqlClient2 = new SqlClient(
+                ConfigurationManager.AppSettings["SQL_SERVER_IP"],
+                ConfigurationManager.AppSettings["SQL_SERVER_PORT"],
+                ConfigurationManager.AppSettings["SQL_SERVER_USER_ID"],
+                ConfigurationManager.AppSettings["SQL_SERVER_PASSWORD"],
+                ConfigurationManager.AppSettings["SQL_SERVER_DATABASE"],
+                ConfigurationManager.AppSettings["Pooling"],
+                ConfigurationManager.AppSettings["subMinPoolSize"],
+                ConfigurationManager.AppSettings["subMaxPoolSize"],
+                ConfigurationManager.AppSettings["subConnectionLifetime"]);
         private static void SendToAvlsPowerOffIfPowerOnTimeOut(TcpClient avlsTcpClient, NetworkStream avlsNetworkStream)
         {
             var sqlcmd = @"SELECT
@@ -807,14 +817,68 @@ ORDER BY
 public._gps_log._time DESC
 LIMIT 1
              */
+            List<string> sendPowerOffToAvlsList= new List<string>();
             using (DataTable dt = SendToAvlsPowerOffIfPowerOnTimeOutSqlClient.get_DataTable(sqlcmd))
-            { 
+            {
+                string uid = string.Empty;
+                string type = string.Empty;
+                string fixStationTimeOut = ConfigurationManager.AppSettings["FixStationTimeOut"];
+                string otherDeviceTimeOut = ConfigurationManager.AppSettings["OtherDeviceTimeOut"];
                 if (dt != null && dt.Rows.Count != 0)
                     foreach (DataRow row in dt.Rows)
-                    { 
-
+                    {
+                        uid = row[0].ToString();
+                        type = row[1].ToString();
+                        switch (type)
+                        {
+                            case "0300":
+                                sqlcmd = @"SELECT
+public._gps_log._uid,
+public._gps_log._time
+FROM
+public._gps_log
+WHERE
+public._gps_log._uid = '"+uid+@"' AND
+public._gps_log._time <= current_timestamp- interval '"+fixStationTimeOut+@"'
+ORDER BY
+public._gps_log._time DESC
+LIMIT 1";
+                                using (DataTable dt2 = SendToAvlsPowerOffIfPowerOnTimeOutSqlClient2.get_DataTable(sqlcmd))
+                                {
+                                    if (dt2 != null && dt2.Rows.Count != 0)
+                                        sendPowerOffToAvlsList.Add(uid);
+                                }
+                                break;
+                            default:
+                                sqlcmd = @"SELECT
+public._gps_log._uid,
+public._gps_log._time
+FROM
+public._gps_log
+WHERE
+public._gps_log._uid = '" + uid + @"' AND
+public._gps_log._time <= current_timestamp- interval '" +otherDeviceTimeOut+@"'
+ORDER BY
+public._gps_log._time DESC
+LIMIT 1";
+                                using (DataTable dt2 = SendToAvlsPowerOffIfPowerOnTimeOutSqlClient2.get_DataTable(sqlcmd))
+                                {
+                                    if (dt2 != null && dt2.Rows.Count != 0)
+                                        sendPowerOffToAvlsList.Add(uid);
+                                }
+                                break;
+                        }
                     }
 
+            }
+            foreach (var id in sendPowerOffToAvlsList)
+            {
+                Thread TSendPackageToAvlsOnlyByUidAndLocGetFromSql =
+                            new Thread(
+                                () =>
+                                    SendPackageToAvlsOnlyByUidAndLocGetFromSql(id, "182", avlsTcpClient,
+                                        avlsNetworkStream));
+                TSendPackageToAvlsOnlyByUidAndLocGetFromSql.Start();
             }
         }
 
