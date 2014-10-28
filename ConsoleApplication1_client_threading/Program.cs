@@ -829,6 +829,7 @@ LIMIT 1
                     {
                         uid = row[0].ToString();
                         type = row[1].ToString();
+                        //query custom.uns_deivce_power_status by uid, if power on , goto switch
                         switch (type)
                         {
                             case "0300":
