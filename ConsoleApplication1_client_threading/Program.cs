@@ -865,16 +865,15 @@ LIMIT 1";
                     }
 
             }
-            foreach (var id in sendPowerOffToAvlsList)
+            for (int i = 0; i < sendPowerOffToAvlsList.Count; i++)
             {
-                string id1 = id;
                 var sendPackageToAvlsOnlyByUidAndLocGetFromSql =
                             new Thread(
                                 () =>
-                                    SendPackageToAvlsOnlyByUidAndLocGetFromSql(id1, "182", avlsTcpClient,
+                                    SendPackageToAvlsOnlyByUidAndLocGetFromSql(sendPowerOffToAvlsList[i], "182", avlsTcpClient,
                                         avlsNetworkStream));
                 sendPackageToAvlsOnlyByUidAndLocGetFromSql.Start();
-            }
+            } 
         }
 
         static void memoryUsageTimer_Elapsed(object sender, ElapsedEventArgs e)
