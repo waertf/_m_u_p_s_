@@ -794,7 +794,10 @@ WHERE
 sd.equipment.uid,
 sd.equipment.type
 FROM
-  sd.equipment";
+sd.equipment
+INNER JOIN custom.uns_deivce_power_status ON sd.equipment.uid = custom.uns_deivce_power_status.uid
+WHERE
+custom.uns_deivce_power_status.power = 'on'";
             /*
              SELECT
 public._gps_log._uid,
@@ -820,7 +823,6 @@ LIMIT 1
                     {
                         uid = row[0].ToString();
                         type = row[1].ToString();
-                        //query custom.uns_deivce_power_status by uid, if power on , goto switch
                         switch (type)
                         {
                             case "0300":
@@ -865,12 +867,13 @@ LIMIT 1";
             }
             foreach (var id in sendPowerOffToAvlsList)
             {
-                Thread TSendPackageToAvlsOnlyByUidAndLocGetFromSql =
+                string id1 = id;
+                var sendPackageToAvlsOnlyByUidAndLocGetFromSql =
                             new Thread(
                                 () =>
-                                    SendPackageToAvlsOnlyByUidAndLocGetFromSql(id, "182", avlsTcpClient,
+                                    SendPackageToAvlsOnlyByUidAndLocGetFromSql(id1, "182", avlsTcpClient,
                                         avlsNetworkStream));
-                TSendPackageToAvlsOnlyByUidAndLocGetFromSql.Start();
+                sendPackageToAvlsOnlyByUidAndLocGetFromSql.Start();
             }
         }
 
