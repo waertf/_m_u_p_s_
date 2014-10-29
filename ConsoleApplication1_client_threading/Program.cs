@@ -787,16 +787,7 @@ WHERE
                 ConfigurationManager.AppSettings["subMinPoolSize"],
                 ConfigurationManager.AppSettings["subMaxPoolSize"],
                 ConfigurationManager.AppSettings["subConnectionLifetime"]);
-        static SqlClient SendToAvlsPowerOffIfPowerOnTimeOutSqlClient2 = new SqlClient(
-                ConfigurationManager.AppSettings["SQL_SERVER_IP"],
-                ConfigurationManager.AppSettings["SQL_SERVER_PORT"],
-                ConfigurationManager.AppSettings["SQL_SERVER_USER_ID"],
-                ConfigurationManager.AppSettings["SQL_SERVER_PASSWORD"],
-                ConfigurationManager.AppSettings["SQL_SERVER_DATABASE"],
-                ConfigurationManager.AppSettings["Pooling"],
-                ConfigurationManager.AppSettings["subMinPoolSize"],
-                ConfigurationManager.AppSettings["subMaxPoolSize"],
-                ConfigurationManager.AppSettings["subConnectionLifetime"]);
+        
         private static void SendToAvlsPowerOffIfPowerOnTimeOut(TcpClient avlsTcpClient, NetworkStream avlsNetworkStream)
         {
             var sqlcmd = @"SELECT
@@ -844,7 +835,7 @@ public._gps_log._time <= current_timestamp- interval '"+fixStationTimeOut+@"'
 ORDER BY
 public._gps_log._time DESC
 LIMIT 1";
-                                using (DataTable dt2 = SendToAvlsPowerOffIfPowerOnTimeOutSqlClient2.get_DataTable(sqlcmd))
+                                using (DataTable dt2 = SendToAvlsPowerOffIfPowerOnTimeOutSqlClient.get_DataTable(sqlcmd))
                                 {
                                     if (dt2 != null && dt2.Rows.Count != 0)
                                         sendPowerOffToAvlsList.Add(uid);
@@ -862,7 +853,7 @@ public._gps_log._time <= current_timestamp- interval '" +otherDeviceTimeOut+@"'
 ORDER BY
 public._gps_log._time DESC
 LIMIT 1";
-                                using (DataTable dt2 = SendToAvlsPowerOffIfPowerOnTimeOutSqlClient2.get_DataTable(sqlcmd))
+                                using (DataTable dt2 = SendToAvlsPowerOffIfPowerOnTimeOutSqlClient.get_DataTable(sqlcmd))
                                 {
                                     if (dt2 != null && dt2.Rows.Count != 0)
                                         sendPowerOffToAvlsList.Add(uid);
