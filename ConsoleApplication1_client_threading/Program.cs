@@ -1219,6 +1219,7 @@ LIMIT 1";
             send_string = "%%" + avls_package.ID + avls_package.GPS_Valid + avls_package.Date_Time + avls_package.Loc + avls_package.Speed + avls_package.Dir + avls_package.Temp + avls_package.Status + avls_package.Event + avls_package.Message + "\r\n";
             //SiAuto.Main.LogText(Level.Debug, "send_string", send_string);
             avlsSendPackage = send_string;
+            SiAuto.Main.LogMessage(avlsSendPackage);
             //avlsSendDone.Reset();
             avls_WriteLine(avlsNetworkStream, System.Text.Encoding.UTF8.GetBytes(send_string), send_string);
             //avlsSendDone.WaitOne();
