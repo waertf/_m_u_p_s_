@@ -348,6 +348,7 @@ WHERE
         
         private static void Main(string[] args)
         {
+            Console.WriteLine(System.Reflection.MethodBase.GetCurrentMethod().Name);
             if (!_mutex.WaitOne(1000, false))
                 return;
             //Console.WriteLine(AppDomain.CurrentDomain.BaseDirectory + "Client.exe");
@@ -790,6 +791,8 @@ WHERE
         
         private static void SendToAvlsPowerOffIfPowerOnTimeOut(TcpClient avlsTcpClient, NetworkStream avlsNetworkStream)
         {
+            Console.WriteLine("+" + System.Reflection.MethodBase.GetCurrentMethod().Name);
+            SiAuto.Main.AddCheckpoint("+" + System.Reflection.MethodBase.GetCurrentMethod().Name);
             var sqlcmd = @"SELECT
 sd.equipment.uid,
 sd.equipment.type
@@ -873,7 +876,9 @@ LIMIT 1";
                                     SendPackageToAvlsOnlyByUidAndLocGetFromSql(sendPowerOffToAvlsList[i], "182", avlsTcpClient,
                                         avlsNetworkStream));
                 sendPackageToAvlsOnlyByUidAndLocGetFromSql.Start();
-            } 
+            }
+            SiAuto.Main.AddCheckpoint("-" + System.Reflection.MethodBase.GetCurrentMethod().Name);
+            Console.WriteLine("-" + System.Reflection.MethodBase.GetCurrentMethod().Name);
         }
 
         static void memoryUsageTimer_Elapsed(object sender, ElapsedEventArgs e)
