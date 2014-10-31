@@ -836,14 +836,18 @@ FROM
 public._gps_log
 WHERE
 public._gps_log._uid = '"+uid+@"' AND
-public._gps_log._time <= current_timestamp- interval '"+fixStationTimeOut+@"'
+public._gps_log._time >= current_timestamp- interval '" + fixStationTimeOut + @"' AND
+public._gps_log._time <= current_timestamp
 ORDER BY
 public._gps_log._time DESC
 LIMIT 1";
                                 using (DataTable dt2 = SendToAvlsPowerOffIfPowerOnTimeOutSqlClient.get_DataTable(sqlcmd))
                                 {
                                     if (dt2 != null && dt2.Rows.Count != 0)
-                                        sendPowerOffToAvlsList.Add(uid);
+                                    {
+                                    }
+                                    else
+                                    sendPowerOffToAvlsList.Add(uid);
                                 }
                                 break;
                             default:
@@ -854,14 +858,18 @@ FROM
 public._gps_log
 WHERE
 public._gps_log._uid = '" + uid + @"' AND
-public._gps_log._time <= current_timestamp- interval '" +otherDeviceTimeOut+@"'
+public._gps_log._time >= current_timestamp- interval '" + otherDeviceTimeOut + @"' AND
+public._gps_log._time <= current_timestamp
 ORDER BY
 public._gps_log._time DESC
 LIMIT 1";
                                 using (DataTable dt2 = SendToAvlsPowerOffIfPowerOnTimeOutSqlClient.get_DataTable(sqlcmd))
                                 {
                                     if (dt2 != null && dt2.Rows.Count != 0)
-                                        sendPowerOffToAvlsList.Add(uid);
+                                    {
+                                    }
+                                    else
+                                    sendPowerOffToAvlsList.Add(uid);
                                 }
                                 break;
                         }
