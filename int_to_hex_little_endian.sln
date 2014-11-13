@@ -29,6 +29,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "unsAtiaTrigger", "unsAtiaTr
 EndProject
 Project("{840C416C-B8F3-42BC-B0DD-F6BB14C9F8CB}") = "SetupUNS_advinst", "SetupUNS_advinst\SetupUNS_advinst.aiproj", "{B09A553B-337A-4C80-BE7E-A5E420B88208}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "test", "test\test.csproj", "{5F40C65E-6936-40B6-BF98-1004523F05C4}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -159,6 +161,14 @@ Global
 		{B09A553B-337A-4C80-BE7E-A5E420B88208}.Release|x64.Build.0 = All
 		{B09A553B-337A-4C80-BE7E-A5E420B88208}.Release|x86.ActiveCfg = All
 		{B09A553B-337A-4C80-BE7E-A5E420B88208}.Release|x86.Build.0 = All
+		{5F40C65E-6936-40B6-BF98-1004523F05C4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5F40C65E-6936-40B6-BF98-1004523F05C4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5F40C65E-6936-40B6-BF98-1004523F05C4}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{5F40C65E-6936-40B6-BF98-1004523F05C4}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{5F40C65E-6936-40B6-BF98-1004523F05C4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5F40C65E-6936-40B6-BF98-1004523F05C4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5F40C65E-6936-40B6-BF98-1004523F05C4}.Release|x64.ActiveCfg = Release|Any CPU
+		{5F40C65E-6936-40B6-BF98-1004523F05C4}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
