@@ -642,21 +642,21 @@ WHERE
 
             var SendPowerOffIfPowerOnTimeOutFixStation =
                 new System.Timers.Timer(
-                    int.Parse(ConfigurationManager.AppSettings["SendPowerOffIfPowerOnTimeOutFixStation"]));
+                    double.Parse(ConfigurationManager.AppSettings["SendPowerOffIfPowerOnTimeOutFixStation"]));
             accessUnsDeivcePowerStatusSqlTable.Elapsed +=
                 (sender, e) => { SendPowerOffIfPowerOnTimeOutForFixStation(avlsTcpClient, avlsNetworkStream); };
             SendPowerOffIfPowerOnTimeOutFixStation.Enabled = true;
 
             var SendPowerOffIfPowerOnTimeOutMobile =
                 new System.Timers.Timer(
-                    int.Parse(ConfigurationManager.AppSettings["SendPowerOffIfPowerOnTimeOutMobile"]));
+                    double.Parse(ConfigurationManager.AppSettings["SendPowerOffIfPowerOnTimeOutMobile"]));
             accessUnsDeivcePowerStatusSqlTable.Elapsed +=
                 (sender, e) => { SendPowerOffIfPowerOnTimeOutForMobile(avlsTcpClient, avlsNetworkStream); };
             SendPowerOffIfPowerOnTimeOutMobile.Enabled = true;
 
             var SendPowerOffIfPowerOnTimeOutOthres =
                 new System.Timers.Timer(
-                    int.Parse(ConfigurationManager.AppSettings["SendPowerOffIfPowerOnTimeOutOthres"]));
+                    double.Parse(ConfigurationManager.AppSettings["SendPowerOffIfPowerOnTimeOutOthres"]));
             accessUnsDeivcePowerStatusSqlTable.Elapsed +=
                 (sender, e) => { SendPowerOffIfPowerOnTimeOutForOthres(avlsTcpClient, avlsNetworkStream); };
             SendPowerOffIfPowerOnTimeOutOthres.Enabled = true;
@@ -800,7 +800,36 @@ WHERE
 
             //unsTcpClient.Close();
         }
-
+        static SqlClient SendToAvlsPowerOffIfPowerOnTimeOutSqlClientFixStation = new SqlClient(
+                ConfigurationManager.AppSettings["SQL_SERVER_IP"],
+                ConfigurationManager.AppSettings["SQL_SERVER_PORT"],
+                ConfigurationManager.AppSettings["SQL_SERVER_USER_ID"],
+                ConfigurationManager.AppSettings["SQL_SERVER_PASSWORD"],
+                ConfigurationManager.AppSettings["SQL_SERVER_DATABASE"],
+                ConfigurationManager.AppSettings["Pooling"],
+                ConfigurationManager.AppSettings["subMinPoolSize"],
+                ConfigurationManager.AppSettings["subMaxPoolSize"],
+                ConfigurationManager.AppSettings["subConnectionLifetime"]);
+        static SqlClient SendToAvlsPowerOffIfPowerOnTimeOutSqlClientMobile = new SqlClient(
+                ConfigurationManager.AppSettings["SQL_SERVER_IP"],
+                ConfigurationManager.AppSettings["SQL_SERVER_PORT"],
+                ConfigurationManager.AppSettings["SQL_SERVER_USER_ID"],
+                ConfigurationManager.AppSettings["SQL_SERVER_PASSWORD"],
+                ConfigurationManager.AppSettings["SQL_SERVER_DATABASE"],
+                ConfigurationManager.AppSettings["Pooling"],
+                ConfigurationManager.AppSettings["subMinPoolSize"],
+                ConfigurationManager.AppSettings["subMaxPoolSize"],
+                ConfigurationManager.AppSettings["subConnectionLifetime"]);
+        static SqlClient SendToAvlsPowerOffIfPowerOnTimeOutSqlClientOthers = new SqlClient(
+                ConfigurationManager.AppSettings["SQL_SERVER_IP"],
+                ConfigurationManager.AppSettings["SQL_SERVER_PORT"],
+                ConfigurationManager.AppSettings["SQL_SERVER_USER_ID"],
+                ConfigurationManager.AppSettings["SQL_SERVER_PASSWORD"],
+                ConfigurationManager.AppSettings["SQL_SERVER_DATABASE"],
+                ConfigurationManager.AppSettings["Pooling"],
+                ConfigurationManager.AppSettings["subMinPoolSize"],
+                ConfigurationManager.AppSettings["subMaxPoolSize"],
+                ConfigurationManager.AppSettings["subConnectionLifetime"]);
         private static void SendPowerOffIfPowerOnTimeOutForOthres(TcpClient avlsTcpClient, NetworkStream avlsNetworkStream)
         {
             Console.WriteLine("+" + System.Reflection.MethodBase.GetCurrentMethod().Name);
@@ -829,7 +858,7 @@ public._gps_log._time DESC
 LIMIT 1
              */
             List<string> sendPowerOffToAvlsList = new List<string>();
-            using (DataTable dt = SendToAvlsPowerOffIfPowerOnTimeOutSqlClient.get_DataTable(sqlcmd))
+            using (DataTable dt = SendToAvlsPowerOffIfPowerOnTimeOutSqlClientOthers.get_DataTable(sqlcmd))
             {
                 string uid = string.Empty;
                 string type = string.Empty;
@@ -849,7 +878,7 @@ public._gps_log._uid = '" + uid + @"' AND
 public._gps_log._time >= current_timestamp- interval '" + timeOut + @"' AND
 public._gps_log._time <= current_timestamp
 ";
-                        using (DataTable dt2 = SendToAvlsPowerOffIfPowerOnTimeOutSqlClient.get_DataTable(sqlcmd))
+                        using (DataTable dt2 = SendToAvlsPowerOffIfPowerOnTimeOutSqlClientOthers.get_DataTable(sqlcmd))
                         {
                             if (dt2 != null && dt2.Rows.Count != 0)
                             {
@@ -902,7 +931,7 @@ public._gps_log._time DESC
 LIMIT 1
              */
             List<string> sendPowerOffToAvlsList = new List<string>();
-            using (DataTable dt = SendToAvlsPowerOffIfPowerOnTimeOutSqlClient.get_DataTable(sqlcmd))
+            using (DataTable dt = SendToAvlsPowerOffIfPowerOnTimeOutSqlClientMobile.get_DataTable(sqlcmd))
             {
                 string uid = string.Empty;
                 string type = string.Empty;
@@ -922,7 +951,7 @@ public._gps_log._uid = '" + uid + @"' AND
 public._gps_log._time >= current_timestamp- interval '" + timeOut + @"' AND
 public._gps_log._time <= current_timestamp
 ";
-                        using (DataTable dt2 = SendToAvlsPowerOffIfPowerOnTimeOutSqlClient.get_DataTable(sqlcmd))
+                        using (DataTable dt2 = SendToAvlsPowerOffIfPowerOnTimeOutSqlClientMobile.get_DataTable(sqlcmd))
                         {
                             if (dt2 != null && dt2.Rows.Count != 0)
                             {
@@ -975,7 +1004,7 @@ public._gps_log._time DESC
 LIMIT 1
              */
             List<string> sendPowerOffToAvlsList = new List<string>();
-            using (DataTable dt = SendToAvlsPowerOffIfPowerOnTimeOutSqlClient.get_DataTable(sqlcmd))
+            using (DataTable dt = SendToAvlsPowerOffIfPowerOnTimeOutSqlClientFixStation.get_DataTable(sqlcmd))
             {
                 string uid = string.Empty;
                 string type = string.Empty;
@@ -995,7 +1024,7 @@ public._gps_log._uid = '" + uid + @"' AND
 public._gps_log._time >= current_timestamp- interval '" + timeOut + @"' AND
 public._gps_log._time <= current_timestamp
 ";
-                        using (DataTable dt2 = SendToAvlsPowerOffIfPowerOnTimeOutSqlClient.get_DataTable(sqlcmd))
+                        using (DataTable dt2 = SendToAvlsPowerOffIfPowerOnTimeOutSqlClientFixStation.get_DataTable(sqlcmd))
                         {
                             if (dt2 != null && dt2.Rows.Count != 0)
                             {
@@ -1020,17 +1049,8 @@ public._gps_log._time <= current_timestamp
             SiAuto.Main.AddCheckpoint("-" + System.Reflection.MethodBase.GetCurrentMethod().Name);
             Console.WriteLine("-" + System.Reflection.MethodBase.GetCurrentMethod().Name);
         }
-        static SqlClient SendToAvlsPowerOffIfPowerOnTimeOutSqlClient = new SqlClient(
-                ConfigurationManager.AppSettings["SQL_SERVER_IP"],
-                ConfigurationManager.AppSettings["SQL_SERVER_PORT"],
-                ConfigurationManager.AppSettings["SQL_SERVER_USER_ID"],
-                ConfigurationManager.AppSettings["SQL_SERVER_PASSWORD"],
-                ConfigurationManager.AppSettings["SQL_SERVER_DATABASE"],
-                ConfigurationManager.AppSettings["Pooling"],
-                ConfigurationManager.AppSettings["subMinPoolSize"],
-                ConfigurationManager.AppSettings["subMaxPoolSize"],
-                ConfigurationManager.AppSettings["subConnectionLifetime"]);
         
+        /*
         private static void SendToAvlsPowerOffIfPowerOnTimeOut(TcpClient avlsTcpClient, NetworkStream avlsNetworkStream)
         {
             Console.WriteLine("+" + System.Reflection.MethodBase.GetCurrentMethod().Name);
@@ -1055,7 +1075,7 @@ public._gps_log._time <= current_timestamp- interval '5 minutes'
 ORDER BY
 public._gps_log._time DESC
 LIMIT 1
-             */
+             
             List<string> sendPowerOffToAvlsList= new List<string>();
             using (DataTable dt = SendToAvlsPowerOffIfPowerOnTimeOutSqlClient.get_DataTable(sqlcmd))
             {
@@ -1128,7 +1148,7 @@ public._gps_log._time <= current_timestamp
             SiAuto.Main.AddCheckpoint("-" + System.Reflection.MethodBase.GetCurrentMethod().Name);
             Console.WriteLine("-" + System.Reflection.MethodBase.GetCurrentMethod().Name);
         }
-
+        */
         static void memoryUsageTimer_Elapsed(object sender, ElapsedEventArgs e)
         {
             string logMsg = string.Empty;
