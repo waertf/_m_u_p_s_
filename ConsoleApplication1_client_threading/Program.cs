@@ -631,13 +631,14 @@ WHERE
             accessUnsDeivcePowerStatusSqlTable.Elapsed +=
                 (sender, e) => { SendToAvlsEventColumnSetNegativeOneIfPowerOff(avlsTcpClient, avlsNetworkStream); };
             accessUnsDeivcePowerStatusSqlTable.Enabled = true;
-
+            /*
             var sendPowerOffIfPowerOnTimeOut =
                 new System.Timers.Timer(
                     int.Parse(ConfigurationManager.AppSettings["SendPowerOffIfPowerOnTimeOut"]));
             accessUnsDeivcePowerStatusSqlTable.Elapsed +=
                 (sender, e) => { SendToAvlsPowerOffIfPowerOnTimeOut(avlsTcpClient, avlsNetworkStream); };
             sendPowerOffIfPowerOnTimeOut.Enabled = false;
+            */
 
             var SendPowerOffIfPowerOnTimeOutFixStation =
                 new System.Timers.Timer(
