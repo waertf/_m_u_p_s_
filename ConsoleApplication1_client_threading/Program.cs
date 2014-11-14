@@ -637,7 +637,28 @@ WHERE
                     int.Parse(ConfigurationManager.AppSettings["SendPowerOffIfPowerOnTimeOut"]));
             accessUnsDeivcePowerStatusSqlTable.Elapsed +=
                 (sender, e) => { SendToAvlsPowerOffIfPowerOnTimeOut(avlsTcpClient, avlsNetworkStream); };
-            sendPowerOffIfPowerOnTimeOut.Enabled = true;
+            sendPowerOffIfPowerOnTimeOut.Enabled = false;
+
+            var SendPowerOffIfPowerOnTimeOutFixStation =
+                new System.Timers.Timer(
+                    int.Parse(ConfigurationManager.AppSettings["SendPowerOffIfPowerOnTimeOutFixStation"]));
+            accessUnsDeivcePowerStatusSqlTable.Elapsed +=
+                (sender, e) => { SendPowerOffIfPowerOnTimeOutForFixStation(avlsTcpClient, avlsNetworkStream); };
+            SendPowerOffIfPowerOnTimeOutFixStation.Enabled = true;
+
+            var SendPowerOffIfPowerOnTimeOutMobile =
+                new System.Timers.Timer(
+                    int.Parse(ConfigurationManager.AppSettings["SendPowerOffIfPowerOnTimeOutMobile"]));
+            accessUnsDeivcePowerStatusSqlTable.Elapsed +=
+                (sender, e) => { SendPowerOffIfPowerOnTimeOutForMobile(avlsTcpClient, avlsNetworkStream); };
+            SendPowerOffIfPowerOnTimeOutMobile.Enabled = true;
+
+            var SendPowerOffIfPowerOnTimeOutOthres =
+                new System.Timers.Timer(
+                    int.Parse(ConfigurationManager.AppSettings["SendPowerOffIfPowerOnTimeOutOthres"]));
+            accessUnsDeivcePowerStatusSqlTable.Elapsed +=
+                (sender, e) => { SendPowerOffIfPowerOnTimeOutForOthres(avlsTcpClient, avlsNetworkStream); };
+            SendPowerOffIfPowerOnTimeOutOthres.Enabled = true;
 
             if (bool.Parse(ConfigurationManager.AppSettings["IsEvery30SecondSendUidEqlSixZeroToAvls"]))
             {
@@ -777,6 +798,226 @@ WHERE
 
 
             //unsTcpClient.Close();
+        }
+
+        private static void SendPowerOffIfPowerOnTimeOutForOthres(TcpClient avlsTcpClient, NetworkStream avlsNetworkStream)
+        {
+            Console.WriteLine("+" + System.Reflection.MethodBase.GetCurrentMethod().Name);
+            SiAuto.Main.AddCheckpoint("+" + System.Reflection.MethodBase.GetCurrentMethod().Name);
+            var sqlcmd = @"SELECT
+sd.equipment.uid,
+sd.equipment.type
+FROM
+sd.equipment
+INNER JOIN custom.uns_deivce_power_status ON sd.equipment.uid = custom.uns_deivce_power_status.uid
+WHERE
+custom.uns_deivce_power_status.power = 'on' AND
+sd.equipment.type != '0300' AND
+sd.equipment.type != '0303'";
+            /*
+             SELECT
+public._gps_log._uid,
+public._gps_log._time
+FROM
+public._gps_log
+WHERE
+public._gps_log._uid = '911200' AND
+public._gps_log._time <= current_timestamp- interval '5 minutes'
+ORDER BY
+public._gps_log._time DESC
+LIMIT 1
+             */
+            List<string> sendPowerOffToAvlsList = new List<string>();
+            using (DataTable dt = SendToAvlsPowerOffIfPowerOnTimeOutSqlClient.get_DataTable(sqlcmd))
+            {
+                string uid = string.Empty;
+                string type = string.Empty;
+                string timeOut = ConfigurationManager.AppSettings["OtherDeviceTimeOut"];
+                if (dt != null && dt.Rows.Count != 0)
+                    foreach (DataRow row in dt.Rows)
+                    {
+                        uid = row[0].ToString();
+                        type = row[1].ToString();
+                        sqlcmd = @"SELECT
+public._gps_log._uid,
+public._gps_log._time
+FROM
+public._gps_log
+WHERE
+public._gps_log._uid = '" + uid + @"' AND
+public._gps_log._time >= current_timestamp- interval '" + timeOut + @"' AND
+public._gps_log._time <= current_timestamp
+";
+                        using (DataTable dt2 = SendToAvlsPowerOffIfPowerOnTimeOutSqlClient.get_DataTable(sqlcmd))
+                        {
+                            if (dt2 != null && dt2.Rows.Count != 0)
+                            {
+                            }
+                            else
+                                sendPowerOffToAvlsList.Add(uid);
+                        }
+                    }
+
+            }
+
+            foreach (var id in sendPowerOffToAvlsList)
+            {
+                string id1 = id;
+                var sendPackageToAvlsOnlyByUidAndLocGetFromSql =
+                            new Thread(
+                                () =>
+                                    SendPackageToAvlsOnlyByUidAndLocGetFromSql(id1, "182", avlsTcpClient,
+                                        avlsNetworkStream));
+                sendPackageToAvlsOnlyByUidAndLocGetFromSql.Start();
+            }
+            SiAuto.Main.AddCheckpoint("-" + System.Reflection.MethodBase.GetCurrentMethod().Name);
+            Console.WriteLine("-" + System.Reflection.MethodBase.GetCurrentMethod().Name);
+        }
+
+        private static void SendPowerOffIfPowerOnTimeOutForMobile(TcpClient avlsTcpClient, NetworkStream avlsNetworkStream)
+        {
+            Console.WriteLine("+" + System.Reflection.MethodBase.GetCurrentMethod().Name);
+            SiAuto.Main.AddCheckpoint("+" + System.Reflection.MethodBase.GetCurrentMethod().Name);
+            var sqlcmd = @"SELECT
+sd.equipment.uid,
+sd.equipment.type
+FROM
+sd.equipment
+INNER JOIN custom.uns_deivce_power_status ON sd.equipment.uid = custom.uns_deivce_power_status.uid
+WHERE
+custom.uns_deivce_power_status.power = 'on' AND
+sd.equipment.type = '0303'";
+            /*
+             SELECT
+public._gps_log._uid,
+public._gps_log._time
+FROM
+public._gps_log
+WHERE
+public._gps_log._uid = '911200' AND
+public._gps_log._time <= current_timestamp- interval '5 minutes'
+ORDER BY
+public._gps_log._time DESC
+LIMIT 1
+             */
+            List<string> sendPowerOffToAvlsList = new List<string>();
+            using (DataTable dt = SendToAvlsPowerOffIfPowerOnTimeOutSqlClient.get_DataTable(sqlcmd))
+            {
+                string uid = string.Empty;
+                string type = string.Empty;
+                string timeOut = ConfigurationManager.AppSettings["MobileTimeOut"];
+                if (dt != null && dt.Rows.Count != 0)
+                    foreach (DataRow row in dt.Rows)
+                    {
+                        uid = row[0].ToString();
+                        type = row[1].ToString();
+                        sqlcmd = @"SELECT
+public._gps_log._uid,
+public._gps_log._time
+FROM
+public._gps_log
+WHERE
+public._gps_log._uid = '" + uid + @"' AND
+public._gps_log._time >= current_timestamp- interval '" + timeOut + @"' AND
+public._gps_log._time <= current_timestamp
+";
+                        using (DataTable dt2 = SendToAvlsPowerOffIfPowerOnTimeOutSqlClient.get_DataTable(sqlcmd))
+                        {
+                            if (dt2 != null && dt2.Rows.Count != 0)
+                            {
+                            }
+                            else
+                                sendPowerOffToAvlsList.Add(uid);
+                        }
+                    }
+
+            }
+
+            foreach (var id in sendPowerOffToAvlsList)
+            {
+                string id1 = id;
+                var sendPackageToAvlsOnlyByUidAndLocGetFromSql =
+                            new Thread(
+                                () =>
+                                    SendPackageToAvlsOnlyByUidAndLocGetFromSql(id1, "182", avlsTcpClient,
+                                        avlsNetworkStream));
+                sendPackageToAvlsOnlyByUidAndLocGetFromSql.Start();
+            }
+            SiAuto.Main.AddCheckpoint("-" + System.Reflection.MethodBase.GetCurrentMethod().Name);
+            Console.WriteLine("-" + System.Reflection.MethodBase.GetCurrentMethod().Name);
+        }
+
+        private static void SendPowerOffIfPowerOnTimeOutForFixStation(TcpClient avlsTcpClient, NetworkStream avlsNetworkStream)
+        {
+            Console.WriteLine("+" + System.Reflection.MethodBase.GetCurrentMethod().Name);
+            SiAuto.Main.AddCheckpoint("+" + System.Reflection.MethodBase.GetCurrentMethod().Name);
+            var sqlcmd = @"SELECT
+sd.equipment.uid,
+sd.equipment.type
+FROM
+sd.equipment
+INNER JOIN custom.uns_deivce_power_status ON sd.equipment.uid = custom.uns_deivce_power_status.uid
+WHERE
+custom.uns_deivce_power_status.power = 'on' AND
+sd.equipment.type = '0300'";
+            /*
+             SELECT
+public._gps_log._uid,
+public._gps_log._time
+FROM
+public._gps_log
+WHERE
+public._gps_log._uid = '911200' AND
+public._gps_log._time <= current_timestamp- interval '5 minutes'
+ORDER BY
+public._gps_log._time DESC
+LIMIT 1
+             */
+            List<string> sendPowerOffToAvlsList = new List<string>();
+            using (DataTable dt = SendToAvlsPowerOffIfPowerOnTimeOutSqlClient.get_DataTable(sqlcmd))
+            {
+                string uid = string.Empty;
+                string type = string.Empty;
+                string timeOut = ConfigurationManager.AppSettings["FixStationTimeOut"];
+                if (dt != null && dt.Rows.Count != 0)
+                    foreach (DataRow row in dt.Rows)
+                    {
+                        uid = row[0].ToString();
+                        type = row[1].ToString();
+                        sqlcmd = @"SELECT
+public._gps_log._uid,
+public._gps_log._time
+FROM
+public._gps_log
+WHERE
+public._gps_log._uid = '" + uid + @"' AND
+public._gps_log._time >= current_timestamp- interval '" + timeOut + @"' AND
+public._gps_log._time <= current_timestamp
+";
+                        using (DataTable dt2 = SendToAvlsPowerOffIfPowerOnTimeOutSqlClient.get_DataTable(sqlcmd))
+                        {
+                            if (dt2 != null && dt2.Rows.Count != 0)
+                            {
+                            }
+                            else
+                                sendPowerOffToAvlsList.Add(uid);
+                        }
+                    }
+
+            }
+
+            foreach (var id in sendPowerOffToAvlsList)
+            {
+                string id1 = id;
+                var sendPackageToAvlsOnlyByUidAndLocGetFromSql =
+                            new Thread(
+                                () =>
+                                    SendPackageToAvlsOnlyByUidAndLocGetFromSql(id1, "182", avlsTcpClient,
+                                        avlsNetworkStream));
+                sendPackageToAvlsOnlyByUidAndLocGetFromSql.Start();
+            }
+            SiAuto.Main.AddCheckpoint("-" + System.Reflection.MethodBase.GetCurrentMethod().Name);
+            Console.WriteLine("-" + System.Reflection.MethodBase.GetCurrentMethod().Name);
         }
         static SqlClient SendToAvlsPowerOffIfPowerOnTimeOutSqlClient = new SqlClient(
                 ConfigurationManager.AppSettings["SQL_SERVER_IP"],
