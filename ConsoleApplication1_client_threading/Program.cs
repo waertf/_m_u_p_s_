@@ -641,25 +641,21 @@ WHERE
             */
 
             var SendPowerOffIfPowerOnTimeOutFixStation =
-                new System.Timers.Timer(
-                    double.Parse(ConfigurationManager.AppSettings["SendPowerOffIfPowerOnTimeOutFixStation"]));
-            accessUnsDeivcePowerStatusSqlTable.Elapsed +=
-                (sender, e) => { SendPowerOffIfPowerOnTimeOutForFixStation(avlsTcpClient, avlsNetworkStream); };
-            SendPowerOffIfPowerOnTimeOutFixStation.Enabled = true;
+                new System.Threading.Timer(state => SendPowerOffIfPowerOnTimeOutForFixStation(avlsTcpClient, avlsNetworkStream),null,
+                    uint.Parse(ConfigurationManager.AppSettings["SendPowerOffIfPowerOnTimeOutFixStation"]),
+                    uint.Parse(ConfigurationManager.AppSettings["SendPowerOffIfPowerOnTimeOutFixStation"]));
 
             var SendPowerOffIfPowerOnTimeOutMobile =
-                new System.Timers.Timer(
-                    double.Parse(ConfigurationManager.AppSettings["SendPowerOffIfPowerOnTimeOutMobile"]));
-            accessUnsDeivcePowerStatusSqlTable.Elapsed +=
-                (sender, e) => { SendPowerOffIfPowerOnTimeOutForMobile(avlsTcpClient, avlsNetworkStream); };
-            SendPowerOffIfPowerOnTimeOutMobile.Enabled = true;
+                new System.Threading.Timer(state => SendPowerOffIfPowerOnTimeOutForMobile(avlsTcpClient, avlsNetworkStream), null,
+                    uint.Parse(ConfigurationManager.AppSettings["SendPowerOffIfPowerOnTimeOutMobile"]),
+                    uint.Parse(ConfigurationManager.AppSettings["SendPowerOffIfPowerOnTimeOutMobile"]));
+ 
 
             var SendPowerOffIfPowerOnTimeOutOthres =
-                new System.Timers.Timer(
-                    double.Parse(ConfigurationManager.AppSettings["SendPowerOffIfPowerOnTimeOutOthres"]));
-            accessUnsDeivcePowerStatusSqlTable.Elapsed +=
-                (sender, e) => { SendPowerOffIfPowerOnTimeOutForOthres(avlsTcpClient, avlsNetworkStream); };
-            SendPowerOffIfPowerOnTimeOutOthres.Enabled = true;
+                new System.Threading.Timer(state => SendPowerOffIfPowerOnTimeOutForOthres(avlsTcpClient, avlsNetworkStream), null,
+                    uint.Parse(ConfigurationManager.AppSettings["SendPowerOffIfPowerOnTimeOutOthres"]),
+                    uint.Parse(ConfigurationManager.AppSettings["SendPowerOffIfPowerOnTimeOutOthres"]));
+            
 
             if (bool.Parse(ConfigurationManager.AppSettings["IsEvery30SecondSendUidEqlSixZeroToAvls"]))
             {
