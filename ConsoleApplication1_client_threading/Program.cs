@@ -660,7 +660,7 @@ WHERE
             {
                 while (true)
                 {
-                    Thread.Sleep(int.Parse(ConfigurationManager.AppSettings["SendPowerOffIfPowerOnTimeOutFixStation"]));
+                    Thread.Sleep(new TimeSpan(0, int.Parse(ConfigurationManager.AppSettings["SendPowerOffIfPowerOnTimeOutFixStation"]),0));
                     SendPowerOffIfPowerOnTimeOutForFixStation(avlsTcpClient, avlsNetworkStream);
                 }
             });
@@ -668,7 +668,7 @@ WHERE
             {
                 while (true)
                 {
-                    Thread.Sleep(int.Parse(ConfigurationManager.AppSettings["SendPowerOffIfPowerOnTimeOutMobile"]));
+                    Thread.Sleep(new TimeSpan(0, int.Parse(ConfigurationManager.AppSettings["SendPowerOffIfPowerOnTimeOutMobile"]), 0));
                     SendPowerOffIfPowerOnTimeOutForMobile(avlsTcpClient, avlsNetworkStream);
                 }
             });
@@ -676,7 +676,7 @@ WHERE
             {
                 while (true)
                 {
-                    Thread.Sleep(int.Parse(ConfigurationManager.AppSettings["SendPowerOffIfPowerOnTimeOutOthres"]));
+                    Thread.Sleep(new TimeSpan(0, int.Parse(ConfigurationManager.AppSettings["SendPowerOffIfPowerOnTimeOutOthres"]), 0));
                     SendPowerOffIfPowerOnTimeOutForOthres(avlsTcpClient, avlsNetworkStream);
                 }
             });
