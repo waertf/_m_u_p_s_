@@ -639,7 +639,7 @@ WHERE
                 (sender, e) => { SendToAvlsPowerOffIfPowerOnTimeOut(avlsTcpClient, avlsNetworkStream); };
             sendPowerOffIfPowerOnTimeOut.Enabled = false;
             */
-
+            /*
             var SendPowerOffIfPowerOnTimeOutFixStation =
                 new System.Threading.Timer(state => SendPowerOffIfPowerOnTimeOutForFixStation(avlsTcpClient, avlsNetworkStream),null,
                     uint.Parse(ConfigurationManager.AppSettings["SendPowerOffIfPowerOnTimeOutFixStation"]),
@@ -655,6 +655,31 @@ WHERE
                 new System.Threading.Timer(state => SendPowerOffIfPowerOnTimeOutForOthres(avlsTcpClient, avlsNetworkStream), null,
                     uint.Parse(ConfigurationManager.AppSettings["SendPowerOffIfPowerOnTimeOutOthres"]),
                     uint.Parse(ConfigurationManager.AppSettings["SendPowerOffIfPowerOnTimeOutOthres"]));
+            */
+            Task.Factory.StartNew(() =>
+            {
+                while (true)
+                {
+                    Thread.Sleep(int.Parse(ConfigurationManager.AppSettings["SendPowerOffIfPowerOnTimeOutFixStation"]));
+                    SendPowerOffIfPowerOnTimeOutForFixStation(avlsTcpClient, avlsNetworkStream);
+                }
+            });
+            Task.Factory.StartNew(() =>
+            {
+                while (true)
+                {
+                    Thread.Sleep(int.Parse(ConfigurationManager.AppSettings["SendPowerOffIfPowerOnTimeOutMobile"]));
+                    SendPowerOffIfPowerOnTimeOutForMobile(avlsTcpClient, avlsNetworkStream);
+                }
+            });
+            Task.Factory.StartNew(() =>
+            {
+                while (true)
+                {
+                    Thread.Sleep(int.Parse(ConfigurationManager.AppSettings["SendPowerOffIfPowerOnTimeOutOthres"]));
+                    SendPowerOffIfPowerOnTimeOutForOthres(avlsTcpClient, avlsNetworkStream);
+                }
+            });
             
 
             if (bool.Parse(ConfigurationManager.AppSettings["IsEvery30SecondSendUidEqlSixZeroToAvls"]))
