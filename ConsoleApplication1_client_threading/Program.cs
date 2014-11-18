@@ -3392,7 +3392,15 @@ LIMIT 1";
                 {
                     //Console.WriteLine(@"+if (htable.ContainsKey(""info_time""))");
                     //Console.WriteLine(htable["info_time"].ToString());
-                    avls_package.Date_Time = htable["info_time"].ToString().Substring(2) + ",";
+                    DateTime today = DateTime.ParseExact(htable["info_time"].ToString(), "yyyyMMddHHmmss", CultureInfo.InvariantCulture);
+                    if (today.Date == DateTime.Today)
+                        avls_package.Date_Time = htable["info_time"].ToString().Substring(2) + ",";
+                    else
+                    {
+                        DateTime tempDatetime = DateTime.Now.ToUniversalTime();
+                        avls_package.Date_Time = tempDatetime.ToString("yyMMddHHmmss") + ",";
+                        //avls_package.Date_Time = string.Format("{0:yyMMddHHmmss}", DateTime.Now) + ",";
+                    }
                     //Console.WriteLine(@"-if (htable.ContainsKey(""info_time""))");
                 }
                 else
