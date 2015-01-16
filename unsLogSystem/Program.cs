@@ -71,7 +71,7 @@ namespace unsLogSystem
         {
             byte[] bytes;
             byte[] bytes_length;
-            IPEndPoint localEndPoint = new IPEndPoint(IPAddress.Any, int.Parse(ConfigurationManager.AppSettings["MUPS_SERVER_PORT"]));
+            IPEndPoint localEndPoint = new IPEndPoint(IPAddress.Any, port);
             // Create a TCP/IP socket.
             Socket listener = new Socket(AddressFamily.InterNetwork,
                 SocketType.Stream, ProtocolType.Tcp);
