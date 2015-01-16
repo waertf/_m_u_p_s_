@@ -1,0 +1,117 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Configuration;
+using System.Linq;
+using System.Net;
+using System.Net.Sockets;
+using System.Text;
+using System.Threading;
+using keeplive;
+
+namespace unsLogSystem
+{
+    class Program
+    {
+        public static Socket WavegisHandler;
+        private static TcpClient unsTcpClient;
+        static readonly string ipAddress = ConfigurationManager.AppSettings["MUPS_SERVER_IP"];
+        static readonly int port = int.Parse(ConfigurationManager.AppSettings["MUPS_SERVER_PORT"]);
+        private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+        private volatile static NetworkStream  unsNetworkStream;
+
+        static void Main(string[] args)
+        {
+            ConnectToUnsServer();
+            
+            Thread wavegisToUnsThread = new Thread
+              (delegate()
+              {
+                  WavegisToUnsListening();
+              });
+            wavegisToUnsThread.Start();
+                Thread unsToWavegisThread = new Thread
+              (delegate()
+              {
+                  unsToWavegis();
+              });
+                unsToWavegisThread.Start();
+        }
+
+        private static void unsToWavegis()
+        {
+            while (true)
+            {
+                byte[] bytes;
+                byte[] bytes_length = new byte[2];
+                int numBytesRead = unsNetworkStream.Read(bytes_length, 0, bytes_length.Length);
+                int data_length = GetLittleEndianIntegerFromByteArray(bytes_length, 0);
+                bytes = new byte[data_length];
+                int bytesRec = unsNetworkStream.Read(bytes, 0, bytes.Length);
+                ThreadPool.QueueUserWorkItem(delegate
+                {
+                    log.Info(Encoding.ASCII.GetString(bytes, 0, bytes.Length));
+                });
+                WavegisHandler.Send(Combine(bytes_length, bytes));
+                Thread.Sleep(1);
+            }
+        }
+
+        private static void ConnectToUnsServer()
+        {
+            Console.WriteLine("+unsConnectDone connect");
+            unsTcpClient = new TcpClient();
+            unsTcpClient.Connect(ipAddress, port);
+            Console.WriteLine("-unsConnectDone connect");
+            Keeplive.keep(unsTcpClient.Client);
+            NetworkStream netStream = unsTcpClient.GetStream();
+            unsNetworkStream = netStream;
+        }
+
+        private static void WavegisToUnsListening()
+        {
+            byte[] bytes;
+            byte[] bytes_length;
+            IPEndPoint localEndPoint = new IPEndPoint(IPAddress.Any, int.Parse(ConfigurationManager.AppSettings["MUPS_SERVER_PORT"]));
+            // Create a TCP/IP socket.
+            Socket listener = new Socket(AddressFamily.InterNetwork,
+                SocketType.Stream, ProtocolType.Tcp);
+
+            Console.WriteLine("Waiting for a connection...");
+            listener.Bind(localEndPoint);
+            listener.Listen(10);
+            WavegisHandler = listener.Accept();
+            Console.WriteLine("Waiting for data...");
+            // Start listening for connections.
+            while (true)
+            {
+                string data = null;
+                bytes_length = new byte[2];
+                int numBytesRead = WavegisHandler.Receive(bytes_length);
+                int data_length = GetLittleEndianIntegerFromByteArray(bytes_length, 0);
+                bytes = new byte[data_length];
+                int bytesRec = WavegisHandler.Receive(bytes);
+                unsNetworkStream.Write(Combine(bytes_length, bytes), 0, numBytesRead + bytesRec);
+                Thread.Sleep(1);
+            }
+            
+        }
+        static int GetLittleEndianIntegerFromByteArray(byte[] data, int startIndex)
+        {
+            return (data[startIndex])
+                 | (data[startIndex + 1] << 8);
+            //| (data[startIndex + 2] << 8)
+            //| data[startIndex + 3];
+        }
+        static byte[] Combine(params byte[][] arrays)
+        {
+            byte[] rv = new byte[arrays.Sum(a => a.Length)];
+            int offset = 0;
+            foreach (byte[] array in arrays)
+            {
+                Buffer.BlockCopy(array, 0, rv, offset, array.Length);
+                offset += array.Length;
+            }
+            return rv;
+        }
+    }
+}
