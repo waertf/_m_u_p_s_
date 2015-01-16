@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Configuration;
+using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
@@ -18,9 +19,14 @@ namespace unsLogSystem
         static readonly int port = int.Parse(ConfigurationManager.AppSettings["MUPS_SERVER_PORT"]);
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
         private volatile static NetworkStream  unsNetworkStream;
+        static Mutex _mutex = new Mutex(false, "unsLogSystem.exe");
 
         static void Main(string[] args)
         {
+            if (!_mutex.WaitOne(1000, false))
+                return;
+            AppDomain.CurrentDomain.ProcessExit += CurrentDomain_ProcessExit;
+            AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
             ConnectToUnsServer();
             
             Thread wavegisToUnsThread = new Thread
@@ -35,6 +41,27 @@ namespace unsLogSystem
                   unsToWavegis();
               });
                 unsToWavegisThread.Start();
+        }
+
+        static void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
+        {
+            var exception = e.ExceptionObject as Exception;
+            if (exception != null)
+            {
+                log.Fatal("Restart:" + exception.ToString());
+            }
+
+            Environment.Exit(1);
+        }
+
+        static void CurrentDomain_ProcessExit(object sender, EventArgs e)
+        {
+            string logMsg = string.Empty;
+            logMsg = "Close time:" + DateTime.Now.ToString("G") + Environment.NewLine +
+                  "Memory usage:" +
+                  Process.GetCurrentProcess().WorkingSet64 / 1024.0 / 1024.0;
+            log.Fatal(logMsg);
+            _mutex.ReleaseMutex();
         }
 
         private static void unsToWavegis()
