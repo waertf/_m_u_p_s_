@@ -7,6 +7,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
+using System.Xml.Linq;
 using keeplive;
 
 namespace unsLogSystem
@@ -76,11 +77,14 @@ namespace unsLogSystem
                 int bytesRec = unsNetworkStream.Read(bytes, 0, bytes.Length);
                 ThreadPool.QueueUserWorkItem(delegate
                 {
-                    string msg = null;
+                    string msg = null, logData=null;
                     msg = Encoding.ASCII.GetString(bytes, 0, bytes.Length);
-                    log.Info(msg);
+                    XDocument xml_data = null;
+                    xml_data = XDocument.Parse(msg);
+                    logData = xml_data.ToString();
+                    log.Info(logData);
                     Console.WriteLine(DateTime.UtcNow.ToString("G"));
-                    Console.WriteLine(msg);
+                    Console.WriteLine(logData);
                     Console.WriteLine();
                 });
                 WavegisHandler.Send(Combine(bytes_length, bytes));
