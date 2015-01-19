@@ -76,7 +76,12 @@ namespace unsLogSystem
                 int bytesRec = unsNetworkStream.Read(bytes, 0, bytes.Length);
                 ThreadPool.QueueUserWorkItem(delegate
                 {
-                    log.Info(Encoding.ASCII.GetString(bytes, 0, bytes.Length));
+                    string msg = null;
+                    msg = Encoding.ASCII.GetString(bytes, 0, bytes.Length);
+                    log.Info(msg);
+                    Console.WriteLine(DateTime.UtcNow.ToString("G"));
+                    Console.WriteLine(msg);
+                    Console.WriteLine();
                 });
                 WavegisHandler.Send(Combine(bytes_length, bytes));
                 Thread.Sleep(1);
