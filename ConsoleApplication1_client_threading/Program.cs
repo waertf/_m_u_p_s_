@@ -2445,6 +2445,9 @@ Select 1-6 then press enter to send package
             //Restart();
         }
 
+        private static bool filter = true;
+        private static int device_counter=0;
+        private static int device_max = 1786;
         //private static void xml_parse(TcpClient tcpClient, NetworkStream netStream, string returndata, TcpClient avlsTcpClient)
         private static void xml_parse(object o)
         {
@@ -2456,6 +2459,18 @@ Select 1-6 then press enter to send package
             xml_data = XDocument.Parse(returndata);
             returndata = null;
             string xml_root_tag = xml_data.Root.Name.ToString();
+
+            if (filter)
+            {
+                device_counter++;
+                if (xml_root_tag.Equals("Triggered-Location-Report") && device_counter>device_max)
+                    filter = false;
+                else
+                {
+                    return;
+                }
+            }
+
             string logData = xml_data.ToString();
             //using (StreamWriter w = File.AppendText("log.txt"))
             {
