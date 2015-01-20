@@ -17,12 +17,11 @@ namespace ConsoleApplication1_client_threading
     {
 
         //PgSqlConnection pgSqlConnection; 
-        PgSqlConnection pgSqlConnection2;
         PgSqlConnectionStringBuilder pgCSB2 = new PgSqlConnectionStringBuilder();
         PgSqlConnectionStringBuilder pgCSB = new PgSqlConnectionStringBuilder();
         public bool IsConnected { get; set; }
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
-        object accessLock = new object();
+        readonly object accessLock = new object();
         public SqlClient(string ip, string port, string user_id, string password, string database, string Pooling, string MinPoolSize, string MaxPoolSize, string ConnectionLifetime)
         {
             //PgSqlConnectionStringBuilder pgCSB = new PgSqlConnectionStringBuilder();
@@ -402,7 +401,7 @@ namespace ConsoleApplication1_client_threading
             //Stopwatch stopWatch = new Stopwatch();
             PgSqlCommand command = null;
             PgSqlTransaction myTrans = null;
-            using (pgSqlConnection2 = new PgSqlConnection(pgCSB2.ConnectionString))
+            using (var pgSqlConnection2 = new PgSqlConnection(pgCSB2.ConnectionString))
             try
             {
                 
