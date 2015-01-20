@@ -78,10 +78,19 @@ namespace unsLogSystem
                 ThreadPool.QueueUserWorkItem(delegate
                 {
                     string msg = null, logData=null;
-                    msg = Encoding.ASCII.GetString(bytes, 0, bytes.Length);
+                    msg = Encoding.ASCII.GetString(bytes, 0, bytes.Length).Trim();
                     XDocument xml_data = null;
-                    xml_data = XDocument.Parse(msg);
-                    logData = xml_data.ToString();
+                    try
+                    {
+                        xml_data = XDocument.Parse(msg);//error
+                        logData = xml_data.ToString();
+                    }
+                    catch (Exception)
+                    {
+                        log.Warn("error format msg"+Environment.NewLine+msg);
+                        logData=msg;
+                    }
+                    
                     log.Info(logData);
                     Console.WriteLine(DateTime.UtcNow.ToString("G"));
                     Console.WriteLine(logData);
@@ -122,7 +131,7 @@ namespace unsLogSystem
             {
                 string data = null;
                 bytes_length = new byte[2];
-                int numBytesRead = WavegisHandler.Receive(bytes_length);
+                int numBytesRead = WavegisHandler.Receive(bytes_length);//error
                 int data_length = GetLittleEndianIntegerFromByteArray(bytes_length, 0);
                 bytes = new byte[data_length];
                 int bytesRec = WavegisHandler.Receive(bytes);
