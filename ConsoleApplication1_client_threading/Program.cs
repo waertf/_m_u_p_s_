@@ -983,10 +983,23 @@ public._gps_log._time <= current_timestamp
                     }
 
             }
-
+            StringBuilder updatePowerTableInSql = new StringBuilder();
+            string unsUpdateTimeStamp = string.Empty;
+            string unsSqlCmd = string.Empty;
             foreach (var id in sendPowerOffToAvlsList)
             {
                 string id1 = id;
+                unsUpdateTimeStamp = DateTime.Now.ToString("yyyyMMdd HHmmss+8");
+                unsSqlCmd = @"UPDATE 
+  custom.uns_deivce_power_status
+SET
+  power = 'off',
+""updateTime"" = '" + unsUpdateTimeStamp + @"'::timestamp
+WHERE
+  custom.uns_deivce_power_status.uid = '" + id1 + @"'" + @" AND 
+  (custom.uns_deivce_power_status.power <> 'off' OR 
+  custom.uns_deivce_power_status.power IS NULL);";
+                updatePowerTableInSql.Append(unsSqlCmd);
                 var sendPackageToAvlsOnlyByUidAndLocGetFromSql =
                             new Thread(
                                 () =>
@@ -994,6 +1007,7 @@ public._gps_log._time <= current_timestamp
                                         avlsNetworkStream));
                 sendPackageToAvlsOnlyByUidAndLocGetFromSql.Start();
             }
+            SendToAvlsPowerOffIfPowerOnTimeOutSqlClientMobile.modify(updatePowerTableInSql.ToString());
             SiAuto.Main.AddCheckpoint("-" + System.Reflection.MethodBase.GetCurrentMethod().Name);
             Console.WriteLine("-" + System.Reflection.MethodBase.GetCurrentMethod().Name);
         }
