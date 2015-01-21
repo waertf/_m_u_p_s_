@@ -79,6 +79,7 @@ namespace unsLogSystem
                 {
                     string msg = null, logData=null;
                     msg = Encoding.ASCII.GetString(bytes, 0, bytes.Length).Trim();
+                    /*
                     XDocument xml_data = null;
                     try
                     {
@@ -90,8 +91,8 @@ namespace unsLogSystem
                         log.Warn("error format msg"+Environment.NewLine+msg);
                         logData=msg;
                     }
-                    
-                    log.Info(logData);
+                    */
+                    log.Info(msg);
                     Console.WriteLine(DateTime.UtcNow.ToString("G"));
                     Console.WriteLine(logData);
                     Console.WriteLine();
