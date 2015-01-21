@@ -115,7 +115,7 @@ namespace unsLogSystem
 
         private static void WavegisToUnsListening()
         {
-            byte[] bytes;
+            byte[] bytes = null;
             byte[] bytes_length;
             IPEndPoint localEndPoint = new IPEndPoint(IPAddress.Any, port);
             // Create a TCP/IP socket.
@@ -132,12 +132,31 @@ namespace unsLogSystem
             {
                 string data = null;
                 bytes_length = new byte[2];
-                int numBytesRead = WavegisHandler.Receive(bytes_length);//error
-                int data_length = GetLittleEndianIntegerFromByteArray(bytes_length, 0);
-                bytes = new byte[data_length];
-                int bytesRec = WavegisHandler.Receive(bytes);
-                unsNetworkStream.Write(Combine(bytes_length, bytes), 0, numBytesRead + bytesRec);
-                Thread.Sleep(1);
+                int numBytesRead=0, data_length=0, bytesRec=0;
+
+                try
+                {
+                    numBytesRead = WavegisHandler.Receive(bytes_length);//error
+                    data_length = GetLittleEndianIntegerFromByteArray(bytes_length, 0);
+                    bytes = new byte[data_length];
+                    bytesRec = WavegisHandler.Receive(bytes);
+                    unsNetworkStream.Write(Combine(bytes_length, bytes), 0, numBytesRead + bytesRec);
+                    Thread.Sleep(1);   
+                }
+                catch (Exception ex)
+                {
+                    
+                    log.Error(ex.ToString());
+                    if (WavegisHandler != null)
+                    {
+                        WavegisHandler.Shutdown(SocketShutdown.Both);
+                        WavegisHandler.Close();
+                        WavegisHandler = null;
+                    }
+                    WavegisHandler = listener.Accept();
+                    Console.WriteLine("Waiting for data...");
+                    break;
+                }
             }
             
         }
