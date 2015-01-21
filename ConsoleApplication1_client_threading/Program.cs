@@ -4546,6 +4546,38 @@ WHERE
                 }
 
                 #endregion
+
+            #region write power on to sql when receive Triggered-Location-Report and Immediate-Location-Report
+
+            switch (xml_root_tag)
+                {
+                    case "Triggered-Location-Report":
+                    case "Immediate-Location-Report":
+                    string unsUpdateTimeStamp = string.Empty;
+                    string unsSqlCmd = string.Empty;
+                        if (!string.IsNullOrEmpty(deviceID))//&& CheckIfUidExist(deviceID))
+                        {
+                            unsUpdateTimeStamp = DateTime.Now.ToString("yyyyMMdd HHmmss+8");
+                            unsSqlCmd = @"UPDATE 
+  custom.uns_deivce_power_status
+SET
+  power = 'on',
+""updateTime"" = '" + unsUpdateTimeStamp + @"'::timestamp
+WHERE
+  custom.uns_deivce_power_status.uid = '" + deviceID + @"'" + @" AND 
+  (custom.uns_deivce_power_status.power <> 'on' OR 
+  custom.uns_deivce_power_status.power IS NULL) ";
+                            //while (!sql_client.connect())
+                            {
+                                //Thread.Sleep(30);
+                            }
+                            //lock (access_uns_deivce_power_status_Lock)
+                            accessSqlServerClient.modify(unsSqlCmd);
+                            //sql_client.disconnect();
+                        }
+                    break;
+                }
+            #endregion write power on to sql when receive Triggered-Location-Report and Immediate-Location-Report
             if (htable.ContainsKey("result_msg"))
             {
                 //avls_package.Message = htable["result_msg"].ToString();
