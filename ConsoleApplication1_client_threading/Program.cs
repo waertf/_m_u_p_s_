@@ -725,8 +725,8 @@ WHERE
                 var avlsTimer = new System.Timers.Timer(5);
                 avlsTimer.Elapsed += (sender, e) =>
                 {
-                    //ThreadPool.QueueUserWorkItem(delegate
-                        //{
+                    ThreadPool.QueueUserWorkItem(delegate
+                        {
                     AvlsClass a;
                     if (avlsLinkedList.TryDequeue(out a))
                     {
@@ -736,7 +736,7 @@ WHERE
                         
                     }
                     a = null;
-                    //});
+                    });
                 };
                 avlsTimer.Enabled = true;
             }
@@ -2320,10 +2320,10 @@ Select 1-6 then press enter to send package
                 //Console.ResetColor();
                 */
                 //xmlQueue.Enqueue(returndata);
-                xml_parse(returndata);
+                //xml_parse(returndata);
                 //Thread.Sleep(200);
-				//Thread xmlParseThread = new Thread(xml_parse);
-                //xmlParseThread.Start(returndata);
+				Thread xmlParseThread = new Thread(xml_parse);
+                xmlParseThread.Start(returndata);
                 //xmlParseThread.Join(int.Parse(ConfigurationManager.AppSettings["xmlParseJoinTimeout"]));
                 //Thread.Sleep(1);
 				//xml_parse(new XmlClass(unsTcpClient, fStream, returndata, avlsTcpClient));
