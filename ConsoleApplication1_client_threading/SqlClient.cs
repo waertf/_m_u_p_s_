@@ -133,16 +133,16 @@ namespace ConsoleApplication1_client_threading
                     int RowsAffected;
                     
                     
-                    lock (accessLock)
+                    //lock (accessLock)
                     {
                         pgSqlConnection.Open();
-                        myTrans = pgSqlConnection.BeginTransaction(IsolationLevel.ReadCommitted);
-                        command.Transaction = myTrans;
+                        //myTrans = pgSqlConnection.BeginTransaction(IsolationLevel.ReadCommitted);
+                        //command.Transaction = myTrans;
                         //IAsyncResult cres = command.BeginExecuteNonQuery();
                         //RowsAffected = command.EndExecuteNonQuery(cres);
                         //lock (accessLock)
                         RowsAffected = command.ExecuteNonQuery();
-                        myTrans.Commit();
+                        //myTrans.Commit();
                         pgSqlConnection.Close();
                     }
                 
@@ -271,7 +271,7 @@ namespace ConsoleApplication1_client_threading
                         //PgSqlDataReader myReader = command.ExecuteReader();
                         //try
                         //{
-                            lock (accessLock)
+                            //lock (accessLock)
                             {
 
                                 Stopwatch stopWatch = new Stopwatch();
@@ -422,13 +422,13 @@ namespace ConsoleApplication1_client_threading
                     //lock (accessLock)
                     //{
                     pgSqlConnection2.Open();
-                        myTrans = pgSqlConnection2.BeginTransaction(IsolationLevel.ReadCommitted);
-                        command.Transaction = myTrans;
+                        //myTrans = pgSqlConnection2.BeginTransaction(IsolationLevel.ReadCommitted);
+                        //command.Transaction = myTrans;
                         //IAsyncResult cres = command.BeginExecuteNonQuery();
                         //RowsAffected = command.EndExecuteNonQuery(cres);
                         //lock (accessLock)
                         RowsAffected = command.ExecuteNonQuery();
-                        myTrans.Commit();
+                       // myTrans.Commit();
                     //}
                     pgSqlConnection2.Close();
                     //IAsyncResult cres=command.BeginExecuteNonQuery(null,null);
