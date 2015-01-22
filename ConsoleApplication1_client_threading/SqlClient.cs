@@ -209,7 +209,7 @@ namespace ConsoleApplication1_client_threading
 
             }
 
-            accessDb2Thread.Join();
+            //accessDb2Thread.Join();
         }
         void EndModify(IAsyncResult ar)
         {
