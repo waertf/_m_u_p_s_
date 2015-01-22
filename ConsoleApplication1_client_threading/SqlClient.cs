@@ -105,14 +105,17 @@ namespace ConsoleApplication1_client_threading
         //For UPDATE, INSERT, and DELETE statements
         public void modify(string cmd)
         {
+            /*
             System.Threading.Thread accessDb2Thread = new System.Threading.Thread
       (delegate()
       {
           modifyDB2(cmd);
       });
             accessDb2Thread.Start();
+            */
+            modifyDB2(cmd);
             Stopwatch stopWatch = new Stopwatch();
-            PgSqlCommand command = null;
+            //PgSqlCommand command = null;
             PgSqlTransaction myTrans = null;
             using (var pgSqlConnection = new PgSqlConnection(pgCSB.ConnectionString))
             try
@@ -122,7 +125,8 @@ namespace ConsoleApplication1_client_threading
                 //{
                     //insert
                     //pgSqlConnection.Open();
-                    command = pgSqlConnection.CreateCommand();
+                    PgSqlCommand command = new PgSqlCommand();
+                    command.Connection = pgSqlConnection;
                     command.UnpreparedExecute = true;
                     command.CommandText = cmd;
                     //command.CommandTimeout = 30;
@@ -205,7 +209,7 @@ namespace ConsoleApplication1_client_threading
                 Console.ResetColor();
                 //pgSqlConnection.Rollback();
                 //command.Dispose();
-                command = null;
+                //command = null;
 
             }
 
@@ -399,7 +403,7 @@ namespace ConsoleApplication1_client_threading
         void modifyDB2(string cmd)
         {
             //Stopwatch stopWatch = new Stopwatch();
-            PgSqlCommand command = null;
+            //PgSqlCommand command = null;
             PgSqlTransaction myTrans = null;
             using (var pgSqlConnection2 = new PgSqlConnection(pgCSB2.ConnectionString))
             try
@@ -408,7 +412,8 @@ namespace ConsoleApplication1_client_threading
                 //{
                     //pgSqlConnection2.Open();
                     //insert
-                    command = pgSqlConnection2.CreateCommand();
+                    PgSqlCommand command = new PgSqlCommand();
+                    command.Connection = pgSqlConnection2;
                     command.UnpreparedExecute = true;
                     command.CommandText = cmd;
                     //command.CommandTimeout = 30;
@@ -490,7 +495,7 @@ namespace ConsoleApplication1_client_threading
                 Console.ResetColor();
                 //pgSqlConnection.Rollback();
                 //command.Dispose();
-                command = null;
+                //command = null;
                 pgSqlConnection2.Close();
 
             }
