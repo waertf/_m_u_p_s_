@@ -722,11 +722,11 @@ WHERE
             xmlParseTimer.Enabled = true;
             */
             {
-                var avlsTimer = new System.Timers.Timer(5);
+                var avlsTimer = new System.Timers.Timer(10);
                 avlsTimer.Elapsed += (sender, e) =>
                 {
-                    ThreadPool.QueueUserWorkItem(delegate
-                        {
+                    //ThreadPool.QueueUserWorkItem(delegate
+                        //{
                     AvlsClass a;
                     if (avlsLinkedList.TryDequeue(out a))
                     {
@@ -736,7 +736,7 @@ WHERE
                         
                     }
                     a = null;
-                    });
+                    //});
                 };
                 avlsTimer.Enabled = true;
             }
