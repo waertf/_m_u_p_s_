@@ -738,7 +738,7 @@ WHERE
                     a = null;
                     //});
                 };
-                //avlsTimer.Enabled = true;
+                avlsTimer.Enabled = true;
             }
             {
                 var sqlTimer = new System.Timers.Timer(10);
@@ -757,7 +757,7 @@ WHERE
                     s = null;
                     //});
                 };
-                //sqlTimer.Enabled = true;
+                sqlTimer.Enabled = true;
             }
             while (false)
             {
@@ -2710,20 +2710,20 @@ Select 1-6 then press enter to send package
                             {
                                 
                                 //avlsSendDone.Reset();
-                                 access_avls = new Thread(access_avls_server);
-                                access_avls.IsBackground = true;
+                                 //access_avls = new Thread(access_avls_server);
+                                //access_avls.IsBackground = true;
                                 //access_avls.Priority = ThreadPriority.BelowNormal;
-                                access_avls.Start(new AvlsClass(xml_root_tag, htable, null,
-                                    null, null, elements,
-                                    logData, getMessage));
+                                //access_avls.Start(new AvlsClass(xml_root_tag, htable, null,
+                                    //null, null, elements,
+                                    //logData, getMessage));
                                 
                                 //lock(avlsObject){
                                     //avlsLinkedList.Enqueue(new AvlsClass(xml_root_tag, htable, sensor_name.ToList(),
                                     //sensor_type.ToList(), sensor_value.ToList(), elements,
                                     //logData, getMessage));
-                                //avlsLinkedList.Enqueue(new AvlsClass(xml_root_tag, htable, null,
-                                    //null, null, elements,
-                                    //logData, getMessage));
+                                avlsLinkedList.Enqueue(new AvlsClass(xml_root_tag, htable, null,
+                                    null, null, elements,
+                                    logData, getMessage));
                                 //access_avls_server(new AvlsClass(xml_root_tag, htable, null,
                                     //null, null, elements,
                                     //logData, getMessage));
@@ -2738,17 +2738,17 @@ Select 1-6 then press enter to send package
                             {
                                 
                                 //sqlAccessEvent.Reset();
-                                 access_sql = new Thread(access_sql_server);
-                                access_sql.IsBackground = true;
-                                access_sql.Start(new SqlClass(xml_root_tag, htable, null, null, null, elements,
-                                    logData, getMessage));
+                                 //access_sql = new Thread(access_sql_server);
+                                //access_sql.IsBackground = true;
+                                //access_sql.Start(new SqlClass(xml_root_tag, htable, null, null, null, elements,
+                                    //logData, getMessage));
                                 
                                 //lock(sqlObject)
                                 //sqlLinkedList.Enqueue(new SqlClass(xml_root_tag, htable, sensor_name.ToList(),
                                     //sensor_type.ToList(), sensor_value.ToList(), elements,
                                     //logData, getMessage));
-                                //sqlLinkedList.Enqueue(new SqlClass(xml_root_tag, htable, null,null,null, elements,
-                                    //logData, getMessage));
+                                sqlLinkedList.Enqueue(new SqlClass(xml_root_tag, htable, null,null,null, elements,
+                                    logData, getMessage));
                                 //access_sql_server(new SqlClass(xml_root_tag, htable, null, null, null, elements,
                                     //logData, getMessage));
                                 //ThreadPool.QueueUserWorkItem(new WaitCallback(access_sql_server), new SqlClass(xml_root_tag, htable, sensor_name.ToList(), sensor_type.ToList(), sensor_value.ToList(), XmlGetAllElementsXname(xml_data), logData, getMessage));
@@ -2876,16 +2876,16 @@ Select 1-6 then press enter to send package
                     
                     if (bool.Parse(ConfigurationManager.AppSettings["SQL_ACCESS"]))
                     {
-                        Thread access_sql = new Thread(access_sql_server);
-                        access_sql.Start(new SqlClass(xml_root_tag, htable, null, null, null, elements, logData, null)); ;
+                        //Thread access_sql = new Thread(access_sql_server);
+                        //access_sql.Start(new SqlClass(xml_root_tag, htable, null, null, null, elements, logData, null)); ;
                         //lock(sqlObject)
                             //sqlLinkedList.Enqueue(new SqlClass(xml_root_tag, htable, sensor_name.ToList(), sensor_type.ToList(), sensor_value.ToList(), elements, logData, null)); ;
-                        //sqlLinkedList.Enqueue(new SqlClass(xml_root_tag, htable, null,null,null, elements, logData, null)); ;
+                        sqlLinkedList.Enqueue(new SqlClass(xml_root_tag, htable, null,null,null, elements, logData, null)); ;
                         //access_sql_server(new SqlClass(xml_root_tag, htable, null, null, null, elements, logData, null)); ;
                         
                         //ThreadPool.QueueUserWorkItem(new WaitCallback(access_sql_server), new SqlClass(xml_root_tag, htable, sensor_name.ToList(), sensor_type.ToList(), sensor_value.ToList(), XmlGetAllElementsXname(xml_data), logData, null));
                             
-                        access_sql.Join();
+                        //access_sql.Join();
                     }
                     break;
                 case "Immediate-Location-Answer":
