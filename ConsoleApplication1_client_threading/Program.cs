@@ -660,7 +660,7 @@ WHERE
             {
                 while (true)
                 {
-                    Thread.Sleep(new TimeSpan(0, int.Parse(ConfigurationManager.AppSettings["SendPowerOffIfPowerOnTimeOutFixStation"]),0));
+                    Thread.Sleep(new TimeSpan(0, int.Parse(ConfigurationManager.AppSettings["SendPowerOffIfPowerOnTimeOutFixStation"])/2,0));
                     SendPowerOffIfPowerOnTimeOutForFixStation(avlsTcpClient, avlsNetworkStream);
                 }
             });
