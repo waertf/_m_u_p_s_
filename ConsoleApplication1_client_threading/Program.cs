@@ -345,7 +345,8 @@ WHERE
         static  string subMinPoolSize = ConfigurationManager.AppSettings["subMinPoolSize"];
         static  string subMaxPoolSize = ConfigurationManager.AppSettings["subMaxPoolSize"];
         static  string subConnectionLifetime = ConfigurationManager.AppSettings["subConnectionLifetime"];
-        
+        static ConcurrentDictionary<string, Location> _locations =
+    new ConcurrentDictionary<string, Location>();
         private static void Main(string[] args)
         {
             Console.WriteLine(System.Reflection.MethodBase.GetCurrentMethod().Name);
@@ -820,6 +821,23 @@ WHERE
 
 
             //unsTcpClient.Close();
+        }
+
+        static void StartLocationsThread()
+        {
+            string sqlcmd = @"SELECT  DISTINCT ON (public._gps_log._uid)
+public._gps_log._uid,
+public._gps_log._lat,
+public._gps_log._lon
+FROM
+public._gps_log
+INNER JOIN sd.equipment ON public._gps_log._uid = sd.equipment.uid
+WHERE
+public._gps_log._time < now()
+
+ORDER BY
+public._gps_log._uid,
+public._gps_log._time DESC";
         }
         static SqlClient SendToAvlsPowerOffIfPowerOnTimeOutSqlClientFixStation = new SqlClient(
                 ConfigurationManager.AppSettings["SQL_SERVER_IP"],
