@@ -138,6 +138,7 @@
     <Compile Include="EAB2.cs" />
     <Compile Include="GeoAngle.cs" />
     <Compile Include="GeoCodeCalc.cs" />
+    <Compile Include="Location.cs" />
     <Compile Include="MessageReader.cs" />
     <Compile Include="Program.cs">
     </Compile>
