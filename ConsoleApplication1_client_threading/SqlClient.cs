@@ -240,7 +240,7 @@ namespace ConsoleApplication1_client_threading
             }
         }
         //For SELECT statements
-        public DataTable get_DataTable(string cmd)
+        public DataTable get_DataTable(string cmd,int timeout=30)
         {
             
             using (DataTable datatable = new DataTable())
@@ -256,6 +256,7 @@ namespace ConsoleApplication1_client_threading
                         command.Connection = pgSqlConnection;
                     command.UnpreparedExecute = true;
                         command.CommandText = cmd;
+                    command.CommandTimeout = timeout;
                         //command.CommandTimeout = 30;
                         //Console.WriteLine("Starting asynchronous retrieval of data...");
                         PgSqlDataReader myReader;
