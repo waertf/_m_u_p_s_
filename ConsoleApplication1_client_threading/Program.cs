@@ -5080,7 +5080,7 @@ VALUES(
                                 {
                                     //Thread.Sleep(30);
                                 }
-                                accessSqlServerClient.modify(unsSqlCmd);
+                                //accessSqlServerClient.modify(unsSqlCmd);
                                 //sql_client.disconnect();
                                 #endregion insert into unsPowerStatusHistory
                                 /*
@@ -5180,7 +5180,7 @@ VALUES(
                                 {
                                     //Thread.Sleep(30);
                                 }
-                                accessSqlServerClient.modify(unsSqlCmd);
+                                //accessSqlServerClient.modify(unsSqlCmd);
                                 //sql_client.disconnect();
                                 #endregion insert into unsPowerStatusHistory
                                 /*
