@@ -4596,7 +4596,7 @@ FROM
                 oo = null;
             Thread.CurrentThread.CurrentUICulture = new CultureInfo("en-us");
                 DateTime dtime;
-            lock (timeLock)
+            //lock (timeLock)
                 {
                     dtime = DateTime.Now;
                 }
