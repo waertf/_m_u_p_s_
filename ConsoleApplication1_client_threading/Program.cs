@@ -350,6 +350,7 @@ WHERE
         private static void Main(string[] args)
         {
             Console.WriteLine(System.Reflection.MethodBase.GetCurrentMethod().Name);
+            //_locations.AddOrUpdate("test", new Location(), (a, b) => b);
             if (!_mutex.WaitOne(1000, false))
                 return;
             //Console.WriteLine(AppDomain.CurrentDomain.BaseDirectory + "Client.exe");
@@ -428,6 +429,7 @@ WHERE
             //Console.WriteLine(DateTime.Now.ToString("yyyyMMdd HHmmss+8"));
             //Console.WriteLine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location));
             //test();
+            StartLocations();
             Console.WriteLine("+sql clients connect");
             avlsSqlClient.connect();
             CheckIfUidExistSqlClient.connect();
@@ -823,8 +825,19 @@ WHERE
             //unsTcpClient.Close();
         }
 
-        static void StartLocationsThread()
+        static void StartLocations()
         {
+            Console.WriteLine(DateTime.Now+":+" + MethodBase.GetCurrentMethod().Name);
+            var sql_client = new SqlClient(ConfigurationManager.AppSettings["SQL_SERVER_IP"],
+                ConfigurationManager.AppSettings["SQL_SERVER_PORT"],
+                ConfigurationManager.AppSettings["SQL_SERVER_USER_ID"],
+                ConfigurationManager.AppSettings["SQL_SERVER_PASSWORD"],
+                ConfigurationManager.AppSettings["SQL_SERVER_DATABASE"],
+                ConfigurationManager.AppSettings["Pooling"],
+                ConfigurationManager.AppSettings["MinPoolSize"],
+                ConfigurationManager.AppSettings["MaxPoolSize"],
+                ConfigurationManager.AppSettings["ConnectionLifetime"]);
+
             string sqlcmd = @"SELECT  DISTINCT ON (public._gps_log._uid)
 public._gps_log._uid,
 public._gps_log._lat,
@@ -838,6 +851,22 @@ public._gps_log._time < now()
 ORDER BY
 public._gps_log._uid,
 public._gps_log._time DESC";
+
+            using (DataTable dt = sql_client.get_DataTable(sqlcmd))
+            {
+                if (dt != null && dt.Rows.Count != 0)
+                {
+                    foreach (DataRow row in dt.Rows)
+                    {
+                        //uid = row[0].ToString();
+                        Location myLocation = new Location();
+                        myLocation.SetLat(double.Parse(row[1].ToString()));
+                        myLocation.SetLon(double.Parse(row[2].ToString()));
+                        _locations.AddOrUpdate(row[0].ToString(), myLocation,(a,b)=>b);
+                    }
+                }
+            }
+            Console.WriteLine(DateTime.Now + ":-" + MethodBase.GetCurrentMethod().Name);
         }
         static SqlClient SendToAvlsPowerOffIfPowerOnTimeOutSqlClientFixStation = new SqlClient(
                 ConfigurationManager.AppSettings["SQL_SERVER_IP"],
