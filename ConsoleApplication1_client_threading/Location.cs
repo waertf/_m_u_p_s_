@@ -7,25 +7,25 @@ namespace ConsoleApplication1_client_threading
 {
     class Location
     {
-        private double lat { get; set; }
-        private double lon { get; set; }
+        private string lat { get; set; }
+        private string lon { get; set; }
 
-        public double GetLon()
+        public string GetLon()
         {
             return lon;
         }
 
-        public double GetLat()
+        public string GetLat()
         {
             return lat;
         }
 
-        public void SetLon(double tmplon)
+        public void SetLon(string tmplon)
         {
             lon = tmplon;
         }
 
-        public void SetLat(double tmplat)
+        public void SetLat(string tmplat)
         {
             lat = tmplat;
         }
