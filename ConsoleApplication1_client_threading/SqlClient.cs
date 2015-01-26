@@ -138,7 +138,7 @@ namespace ConsoleApplication1_client_threading
                     
                     
                     //lock (accessLock)
-                    {
+                    //{
                         pgSqlConnection.Open();
                         //myTrans = pgSqlConnection.BeginTransaction(IsolationLevel.ReadCommitted);
                         //command.Transaction = myTrans;
@@ -147,16 +147,16 @@ namespace ConsoleApplication1_client_threading
                         //lock (accessLock)
                         RowsAffected = command.ExecuteNonQuery();
                         //myTrans.Commit();
-                        pgSqlConnection.Close();
-                    }
+                        //pgSqlConnection.Close();
+                    //}
                 
                     //IAsyncResult cres=command.BeginExecuteNonQuery(null,null);
                     //Console.Write("In progress...");
                     //while (!cres.IsCompleted)
-                    {
+                    //{
                         //Console.Write(".");
                         //Perform here any operation you need
-                    }
+                    //}
                     /*
                     if (cres.IsCompleted)
                         Console.WriteLine("Completed.");
@@ -242,18 +242,18 @@ namespace ConsoleApplication1_client_threading
         //For SELECT statements
         public DataTable get_DataTable(string cmd)
         {
-            PgSqlCommand command = null;
             
             using (DataTable datatable = new DataTable())
             using (var pgSqlConnection = new PgSqlConnection(pgCSB.ConnectionString))
             {
+                PgSqlCommand command = new PgSqlCommand();
                 try
                 {
                     //if (pgSqlConnection != null && IsConnected)
                     //{
                         //pgSqlConnection.Open();
                         //DataTable datatable = new DataTable();
-                        command = pgSqlConnection.CreateCommand();
+                        command.Connection = pgSqlConnection;
                         command.CommandText = cmd;
                         //command.CommandTimeout = 30;
                         //Console.WriteLine("Starting asynchronous retrieval of data...");
@@ -293,24 +293,24 @@ namespace ConsoleApplication1_client_threading
                                 string elapsedTime = String.Format("{0:00}:{1:00}:{2:00}.{3:00}",
                                     ts.Hours, ts.Minutes, ts.Seconds,
                                     ts.Milliseconds / 10);
-                                SiAuto.Main.AddCheckpoint(Level.Debug, "sql query1 take time:" + elapsedTime, cmd);
+                                SiAuto.Main.AddCheckpoint(Level.Debug, "sql query take time:" + elapsedTime, cmd);
                                 // printing the column names
                                 stopWatch.Reset();
-                                stopWatch.Start();
+                                //stopWatch.Start();
                                 for (int i = 0; i < myReader.FieldCount; i++)
                                 {
                                     //Console.Write(myReader.GetName(i).ToString() + "\t");
                                     datatable.Columns.Add(myReader.GetName(i).ToString(), typeof (string));
                                 }
                                 //stopWatch.Stop();
-                                ts = stopWatch.Elapsed;
-                                elapsedTime = String.Format("{0:00}:{1:00}:{2:00}.{3:00}",
-                                    ts.Hours, ts.Minutes, ts.Seconds,
-                                    ts.Milliseconds / 10);
-                                SiAuto.Main.AddCheckpoint(Level.Debug, "sql query2 take time:" + elapsedTime, cmd);
+                                //ts = stopWatch.Elapsed;
+                                //elapsedTime = String.Format("{0:00}:{1:00}:{2:00}.{3:00}",
+                                    //ts.Hours, ts.Minutes, ts.Seconds,
+                                    //ts.Milliseconds / 10);
+                                //SiAuto.Main.AddCheckpoint(Level.Debug, "sql query2 take time:" + elapsedTime, cmd);
                                 //Console.Write(Environment.NewLine);
-                                stopWatch.Reset();
-                                stopWatch.Start();
+                                //stopWatch.Reset();
+                                //stopWatch.Start();
                                 while (myReader.Read())
                                 {
                                     DataRow dr = datatable.NewRow();
@@ -325,13 +325,13 @@ namespace ConsoleApplication1_client_threading
                                     //Console.WriteLine(myReader.GetInt32(0) + "\t" + myReader.GetString(1) + "\t");
                                 }
                                 myReader.Close();
-                                pgSqlConnection.Close();
-                                stopWatch.Stop();
-                                ts = stopWatch.Elapsed;
-                                elapsedTime = String.Format("{0:00}:{1:00}:{2:00}.{3:00}",
-                                    ts.Hours, ts.Minutes, ts.Seconds,
-                                    ts.Milliseconds / 10);
-                                SiAuto.Main.AddCheckpoint(Level.Debug, "sql query3 take time:" + elapsedTime, cmd);
+                                //pgSqlConnection.Close();
+                                //stopWatch.Stop();
+                                //ts = stopWatch.Elapsed;
+                               // elapsedTime = String.Format("{0:00}:{1:00}:{2:00}.{3:00}",
+                                    //ts.Hours, ts.Minutes, ts.Seconds,
+                                    //ts.Milliseconds / 10);
+                                //SiAuto.Main.AddCheckpoint(Level.Debug, "sql query3 take time:" + elapsedTime, cmd);
                                 //myReader.Dispose();
                             }
                         //}
@@ -351,15 +351,15 @@ namespace ConsoleApplication1_client_threading
                             }
                         }
                         */
-                        Stopwatch stopWatch2= new Stopwatch();
-                        stopWatch2.Start();
+                        //Stopwatch stopWatch2= new Stopwatch();
+                        //stopWatch2.Start();
                         //if (command != null)
                             //command.Dispose();
                         command = null;
                         using (DataTable returnTable = datatable.Copy())
                         {
-                            stopWatch2.Stop();
-                            SiAuto.Main.AddCheckpoint(Level.Debug, "sql query4 take time(ms):" + stopWatch2.ElapsedMilliseconds, cmd);
+                            //stopWatch2.Stop();
+                            //SiAuto.Main.AddCheckpoint(Level.Debug, "sql query4 take time(ms):" + stopWatch2.ElapsedMilliseconds, cmd);
                             return returnTable;
                         }
                         //DataTable returnTable = datatable.Copy();
@@ -435,7 +435,7 @@ namespace ConsoleApplication1_client_threading
                         RowsAffected = command.ExecuteNonQuery();
                        // myTrans.Commit();
                     //}
-                    pgSqlConnection2.Close();
+                    //pgSqlConnection2.Close();
                     //IAsyncResult cres=command.BeginExecuteNonQuery(null,null);
                     //Console.Write("In progress...");
                     //while (!cres.IsCompleted)
@@ -496,7 +496,7 @@ namespace ConsoleApplication1_client_threading
                 //pgSqlConnection.Rollback();
                 //command.Dispose();
                 //command = null;
-                pgSqlConnection2.Close();
+                //pgSqlConnection2.Close();
 
             }
 
