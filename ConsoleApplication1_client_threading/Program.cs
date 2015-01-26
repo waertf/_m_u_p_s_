@@ -862,6 +862,14 @@ ORDER BY
 public._gps_log._uid,
 public._gps_log._time DESC";
 
+            sqlcmd = @"SELECT 
+public._gps_in_time._uid,
+public._gps_in_time._lat,
+public._gps_in_time._lon
+FROM
+public._gps_in_time
+INNER JOIN sd.equipment ON public._gps_in_time._uid = sd.equipment.uid";
+
             using (DataTable dt = sql_client.get_DataTable(sqlcmd,0))
             {
                 if (dt != null && dt.Rows.Count != 0)
