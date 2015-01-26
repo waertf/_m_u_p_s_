@@ -827,6 +827,14 @@ WHERE
             //unsTcpClient.Close();
         }
 
+        static void updateLocations(string uid,string lat,string lon)
+        {
+            Location myLocation=new Location();
+            myLocation.SetLat(lat);
+            myLocation.SetLon(lon);
+            _locations.AddOrUpdate(uid, myLocation, (a, b) => b);
+        }
+
         static void StartLocations()
         {
             Console.WriteLine(DateTime.Now+":+" + MethodBase.GetCurrentMethod().Name);
@@ -862,8 +870,8 @@ public._gps_log._time DESC";
                     {
                         //uid = row[0].ToString();
                         Location myLocation = new Location();
-                        myLocation.SetLat(double.Parse(row[1].ToString()));
-                        myLocation.SetLon(double.Parse(row[2].ToString()));
+                        myLocation.SetLat(row[1].ToString());
+                        myLocation.SetLon(row[2].ToString());
                         _locations.AddOrUpdate(row[0].ToString(), myLocation,(a,b)=>b);
                     }
                 }
@@ -2620,6 +2628,7 @@ Select 1-6 then press enter to send package
                                             htable.Add("long_value", XmlGetTagValue(xml_data, "long"));
                                             //Console.WriteLine("lat_value:{0}", lat_value);
                                             //Console.WriteLine("long_value:{0}", long_value);
+                                            updateLocations(htable["suaddr"].ToString(), htable["lat_value"].ToString(), htable["long_value"].ToString());
                                         }
                                         break;
                                     case "point-3d":
@@ -2630,6 +2639,7 @@ Select 1-6 then press enter to send package
                                             //Console.WriteLine("lat_value:{0}", lat_value);
                                             //Console.WriteLine("long_value:{0}", long_value);
                                             //Console.WriteLine("altitude_value:{0}", altitude_value);
+                                            updateLocations(htable["suaddr"].ToString(), htable["lat_value"].ToString(), htable["long_value"].ToString());
                                         }
                                         break;
                                     case "circle-2d":
@@ -2650,6 +2660,7 @@ Select 1-6 then press enter to send package
                                             //Console.WriteLine("long_value:{0}", long_value);
                                             //Console.WriteLine("altitude_value:{0}", altitude_value);
                                             //Console.WriteLine("radius_value:{0}", radius_value);
+                                            updateLocations(htable["suaddr"].ToString(), htable["lat_value"].ToString(), htable["long_value"].ToString());
                                         }
                                         break;
                                 }
