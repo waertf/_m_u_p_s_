@@ -254,6 +254,7 @@ namespace ConsoleApplication1_client_threading
                         //pgSqlConnection.Open();
                         //DataTable datatable = new DataTable();
                         command.Connection = pgSqlConnection;
+                    command.UnpreparedExecute = true;
                         command.CommandText = cmd;
                         //command.CommandTimeout = 30;
                         //Console.WriteLine("Starting asynchronous retrieval of data...");
