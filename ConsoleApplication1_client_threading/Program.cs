@@ -2894,6 +2894,7 @@ Select 1-6 then press enter to send package
                                 //Console.WriteLine("SQL Access Enable");
                                 //sqlAccessEvent.WaitOne();
                             }
+                            /*
                             switch (ConfigurationManager.AppSettings["xmlSleepOrJoin"])
                             {
                                 case    "sleep":
@@ -2908,7 +2909,7 @@ Select 1-6 then press enter to send package
                                     access_sql.Join();
                                     break;
                             }
-                            
+                            */
                             
 
                             //if (access_sql != null) access_sql.Join(int.Parse(ConfigurationManager.AppSettings["accessSqlJoinTimeout"]));
