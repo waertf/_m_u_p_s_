@@ -852,7 +852,7 @@ ORDER BY
 public._gps_log._uid,
 public._gps_log._time DESC";
 
-            using (DataTable dt = sql_client.get_DataTable(sqlcmd))
+            using (DataTable dt = sql_client.get_DataTable(sqlcmd,0))
             {
                 if (dt != null && dt.Rows.Count != 0)
                 {
