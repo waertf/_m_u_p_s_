@@ -743,7 +743,7 @@ WHERE
                     a = null;
                     //});
                 };
-                avlsTimer.Enabled = true;
+                //avlsTimer.Enabled = true;
             }
             {
                 var sqlTimer = new System.Timers.Timer(10);
@@ -2842,26 +2842,26 @@ Select 1-6 then press enter to send package
 
                         
                         {
-                            Thread access_sql = null, access_avls = null;
+                            //Thread access_sql = null, access_avls = null;
                             if (GetGidAndFullnameFrom != null) getMessage = GetGidAndFullnameFrom.Result;
                             if (bool.Parse(ConfigurationManager.AppSettings["AVLS_ACCESS"]))
                             {
-                                
+                                Thread access_avls = null;
                                 //avlsSendDone.Reset();
-                                 //access_avls = new Thread(access_avls_server);
+                                 access_avls = new Thread(access_avls_server);
                                 //access_avls.IsBackground = true;
                                 //access_avls.Priority = ThreadPriority.BelowNormal;
-                                //access_avls.Start(new AvlsClass(xml_root_tag, htable, null,
-                                    //null, null, elements,
-                                    //logData, getMessage));
+                                access_avls.Start(new AvlsClass(xml_root_tag, htable, null,
+                                    null, null, elements,
+                                    logData, getMessage));
                                 
                                 //lock(avlsObject){
                                     //avlsLinkedList.Enqueue(new AvlsClass(xml_root_tag, htable, sensor_name.ToList(),
                                     //sensor_type.ToList(), sensor_value.ToList(), elements,
                                     //logData, getMessage));
-                                avlsLinkedList.Enqueue(new AvlsClass(xml_root_tag, htable, null,
-                                    null, null, elements,
-                                    logData, getMessage));
+                                //avlsLinkedList.Enqueue(new AvlsClass(xml_root_tag, htable, null,
+                                    //null, null, elements,
+                                    //logData, getMessage));
                                 //access_avls_server(new AvlsClass(xml_root_tag, htable, null,
                                     //null, null, elements,
                                     //logData, getMessage));
