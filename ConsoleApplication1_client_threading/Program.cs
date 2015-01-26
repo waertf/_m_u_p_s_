@@ -529,6 +529,7 @@ WHERE
             }
             //DataTable dt = sql_client.get_DataTable(regSqlCmd);
             //sql_client.disconnect();
+            Console.WriteLine(DateTime.Now + ":+initial uns_deivce_power_status table");
             using (DataTable dt = sql_client.get_DataTable(regSqlCmd))
             {
                 if (dt != null && dt.Rows.Count != 0)
@@ -550,11 +551,12 @@ WHERE
                         //Console.WriteLine("find:{0}", uid);
                     }
                     sql_client.modify(sbBuilder.ToString());
-                    Console.WriteLine(sbBuilder.ToString());
+                    //Console.WriteLine(sbBuilder.ToString());
                     sbBuilder.Clear();
                 }
 
             }
+            Console.WriteLine(DateTime.Now + ":-initial uns_deivce_power_status table");
             
 
             #endregion
