@@ -762,7 +762,7 @@ WHERE
                     s = null;
                     //});
                 };
-                sqlTimer.Enabled = true;
+                //sqlTimer.Enabled = true;
             }
             while (false)
             {
@@ -2852,7 +2852,7 @@ Select 1-6 then press enter to send package
                         {
                             //Thread access_sql = null, access_avls = null;
                             if (GetGidAndFullnameFrom != null) getMessage = GetGidAndFullnameFrom.Result;
-                            if (bool.Parse(ConfigurationManager.AppSettings["AVLS_ACCESS"]))
+                            //if (bool.Parse(ConfigurationManager.AppSettings["AVLS_ACCESS"]))
                             {
                                 Thread access_avls = null;
                                 //avlsSendDone.Reset();
@@ -2880,23 +2880,23 @@ Select 1-6 then press enter to send package
                                 //Console.WriteLine("AVLS Access Enable");
                                 //avlsSendDone.WaitOne();
                             }
-                            if (bool.Parse(ConfigurationManager.AppSettings["SQL_ACCESS"]))
+                            //if (bool.Parse(ConfigurationManager.AppSettings["SQL_ACCESS"]))
                             {
-                                
+                                Thread access_sql = null;
                                 //sqlAccessEvent.Reset();
-                                 //access_sql = new Thread(access_sql_server);
+                                access_sql = new Thread(access_sql_server);
                                 //access_sql.IsBackground = true;
-                                //access_sql.Start(new SqlClass(xml_root_tag, htable, null, null, null, elements,
-                                    //logData, getMessage));
-                                
+                                access_sql.Start(new SqlClass(xml_root_tag, htable, null, null, null, elements,
+                                logData, getMessage));
+
                                 //lock(sqlObject)
                                 //sqlLinkedList.Enqueue(new SqlClass(xml_root_tag, htable, sensor_name.ToList(),
-                                    //sensor_type.ToList(), sensor_value.ToList(), elements,
-                                    //logData, getMessage));
-                                sqlLinkedList.Enqueue(new SqlClass(xml_root_tag, htable, null,null,null, elements,
-                                    logData, getMessage));
+                                //sensor_type.ToList(), sensor_value.ToList(), elements,
+                                //logData, getMessage));
+                                //sqlLinkedList.Enqueue(new SqlClass(xml_root_tag, htable, null,null,null, elements,
+                                //logData, getMessage));
                                 //access_sql_server(new SqlClass(xml_root_tag, htable, null, null, null, elements,
-                                    //logData, getMessage));
+                                //logData, getMessage));
                                 //ThreadPool.QueueUserWorkItem(new WaitCallback(access_sql_server), new SqlClass(xml_root_tag, htable, sensor_name.ToList(), sensor_type.ToList(), sensor_value.ToList(), XmlGetAllElementsXname(xml_data), logData, getMessage));
                                 //access_sql.Join();
                                 //Console.WriteLine("SQL Access Enable");
@@ -3021,13 +3021,13 @@ Select 1-6 then press enter to send package
                              * */
                         }
                     
-                    if (bool.Parse(ConfigurationManager.AppSettings["SQL_ACCESS"]))
+                    //if (bool.Parse(ConfigurationManager.AppSettings["SQL_ACCESS"]))
                     {
-                        //Thread access_sql = new Thread(access_sql_server);
-                        //access_sql.Start(new SqlClass(xml_root_tag, htable, null, null, null, elements, logData, null)); ;
+                        Thread access_sql = new Thread(access_sql_server);
+                        access_sql.Start(new SqlClass(xml_root_tag, htable, null, null, null, elements, logData, null)); ;
                         //lock(sqlObject)
                             //sqlLinkedList.Enqueue(new SqlClass(xml_root_tag, htable, sensor_name.ToList(), sensor_type.ToList(), sensor_value.ToList(), elements, logData, null)); ;
-                        sqlLinkedList.Enqueue(new SqlClass(xml_root_tag, htable, null,null,null, elements, logData, null)); ;
+                        //sqlLinkedList.Enqueue(new SqlClass(xml_root_tag, htable, null,null,null, elements, logData, null)); ;
                         //access_sql_server(new SqlClass(xml_root_tag, htable, null, null, null, elements, logData, null)); ;
                         
                         //ThreadPool.QueueUserWorkItem(new WaitCallback(access_sql_server), new SqlClass(xml_root_tag, htable, sensor_name.ToList(), sensor_type.ToList(), sensor_value.ToList(), XmlGetAllElementsXname(xml_data), logData, null));
