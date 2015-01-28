@@ -955,14 +955,14 @@ LIMIT 1
                         uid = row[0].ToString();
                         type = row[1].ToString();
                         sqlcmd = @"SELECT
-public._gps_log._uid,
-public._gps_log._time
+public._gps_in_time._uid,
+public._gps_in_time._time
 FROM
-public._gps_log
+public._gps_in_time
 WHERE
-public._gps_log._uid = '" + uid + @"' AND
-public._gps_log._time >= current_timestamp- interval '" + timeOut + @"' AND
-public._gps_log._time <= current_timestamp
+public._gps_in_time._uid = '" + uid + @"' AND
+public._gps_in_time._time >= current_timestamp- interval '" + timeOut + @"' AND
+public._gps_in_time._time <= current_timestamp
 ";
                         using (DataTable dt2 = SendToAvlsPowerOffIfPowerOnTimeOutSqlClientOthers.get_DataTable(sqlcmd))
                         {
@@ -1042,14 +1042,14 @@ LIMIT 1
                         uid = row[0].ToString();
                         type = row[1].ToString();
                         sqlcmd = @"SELECT
-public._gps_log._uid,
-public._gps_log._time
+public._gps_in_time._uid,
+public._gps_in_time._time
 FROM
-public._gps_log
+public._gps_in_time
 WHERE
-public._gps_log._uid = '" + uid + @"' AND
-public._gps_log._time >= current_timestamp- interval '" + timeOut + @"' AND
-public._gps_log._time <= current_timestamp
+public._gps_in_time._uid = '" + uid + @"' AND
+public._gps_in_time._time >= current_timestamp- interval '" + timeOut + @"' AND
+public._gps_in_time._time <= current_timestamp
 ";
                         using (DataTable dt2 = SendToAvlsPowerOffIfPowerOnTimeOutSqlClientMobile.get_DataTable(sqlcmd))
                         {
@@ -1129,14 +1129,14 @@ LIMIT 1
                         uid = row[0].ToString();
                         type = row[1].ToString();
                         sqlcmd = @"SELECT
-public._gps_log._uid,
-public._gps_log._time
+public._gps_in_time._uid,
+public._gps_in_time._time
 FROM
-public._gps_log
+public._gps_in_time
 WHERE
-public._gps_log._uid = '" + uid + @"' AND
-public._gps_log._time >= current_timestamp- interval '" + timeOut + @"' AND
-public._gps_log._time <= current_timestamp
+public._gps_in_time._uid = '" + uid + @"' AND
+public._gps_in_time._time >= current_timestamp- interval '" + timeOut + @"' AND
+public._gps_in_time._time <= current_timestamp
 ";
                         using (DataTable dt2 = SendToAvlsPowerOffIfPowerOnTimeOutSqlClientFixStation.get_DataTable(sqlcmd))
                         {
@@ -1528,15 +1528,15 @@ WHERE
                 {
 
                     string avlsSqlCmd = @"SELECT 
-  public._gps_log._lat,
-  public._gps_log._lon
+  public._gps_in_time._lat,
+  public._gps_in_time._lon
 FROM
-  public._gps_log
+  public._gps_in_time
 WHERE
-  public._gps_log._time < now() AND 
-  public._gps_log._uid = '" + avls_package.ID + @"'
+  public._gps_in_time._time < now() AND 
+  public._gps_in_time._uid = '" + avls_package.ID + @"'
 ORDER BY
-  public._gps_log._time DESC
+  public._gps_in_time._time DESC
 LIMIT 1";
                     log.Info("avlsSqlCmd=" + Environment.NewLine + avlsSqlCmd);
                     //SendPackageToAvlsOnlyByUidAndLocGetFromSqlSqlClient.connect();
@@ -3450,15 +3450,15 @@ WHERE
                         {
 
                             string avlsSqlCmd = @"SELECT 
-  public._gps_log._lat,
-  public._gps_log._lon
+  public._gps_in_time._lat,
+  public._gps_in_time._lon
 FROM
-  public._gps_log
+  public._gps_in_time
 WHERE
-  public._gps_log._time < now() AND 
-  public._gps_log._uid = '" + avls_package.ID + @"'
+  public._gps_in_time._time < now() AND 
+  public._gps_in_time._uid = '" + avls_package.ID + @"'
 ORDER BY
-  public._gps_log._time DESC
+  public._gps_in_time._time DESC
 LIMIT 1";
                             //Console.WriteLine("+c");
                             //while (!avlsSqlClient.connect())
@@ -3652,15 +3652,15 @@ LIMIT 1";
                         {
 
                             string avlsSqlCmd = @"SELECT 
-  public._gps_log._lat,
-  public._gps_log._lon
+  public._gps_in_time._lat,
+  public._gps_in_time._lon
 FROM
-  public._gps_log
+  public._gps_in_time
 WHERE
-  public._gps_log._time < now() AND 
-  public._gps_log._uid = '" + avls_package.ID + @"'
+  public._gps_in_time._time < now() AND 
+  public._gps_in_time._uid = '" + avls_package.ID + @"'
 ORDER BY
-  public._gps_log._time DESC
+  public._gps_in_time._time DESC
 LIMIT 1";
                             //Console.WriteLine("+c1");
                             //while (!avlsSqlClient.connect())
@@ -5300,15 +5300,15 @@ VALUES(
                         }
                         */
                         string sqlCmd = @"SELECT 
-      public._gps_log._lat,
-      public._gps_log._lon
+      public._gps_in_time._lat,
+      public._gps_in_time._lon
     FROM
-      public._gps_log
+      public._gps_in_time
     WHERE
-      public._gps_log._time < now() AND 
-      public._gps_log._uid = '" + deviceID + @"'
+      public._gps_in_time._time < now() AND 
+      public._gps_in_time._uid = '" + deviceID + @"'
     ORDER BY
-      public._gps_log._time DESC
+      public._gps_in_time._time DESC
     LIMIT 1";
                         //while (!sql_client.connect())
                         {
@@ -6350,14 +6350,14 @@ LIMIT 1";
             dt2 = null;
             */
             sqlCmd = @"SELECT
-public._gps_log._lat,
-public._gps_log._lon
+public._gps_in_time._lat,
+public._gps_in_time._lon
 FROM
-public._gps_log
+public._gps_in_time
 WHERE
-public._gps_log._time <= now() AND
-public._gps_log._time >= now() - interval '" + stayTimeInMin + @" minute' AND
-public._gps_log._uid = '" + deviceID + @"'
+public._gps_in_time._time <= now() AND
+public._gps_in_time._time >= now() - interval '" + stayTimeInMin + @" minute' AND
+public._gps_in_time._uid = '" + deviceID + @"'
 ";
 
             //while (!CheckIfStayOverTimeSql_client.connect())
@@ -6537,14 +6537,14 @@ public._gps_log._uid = '" + deviceID + @"'
             */
             
             sqlCmd = @"SELECT
-public._gps_log._lat,
-public._gps_log._lon
+public._gps_in_time._lat,
+public._gps_in_time._lon
 FROM
-public._gps_log
+public._gps_in_time
 WHERE
-public._gps_log._time <= now() AND
-public._gps_log._time >= now() - interval '"+stayTimeInMin+@" minute' AND
-public._gps_log._uid = '"+deviceID+@"'
+public._gps_in_time._time <= now() AND
+public._gps_in_time._time >= now() - interval '" + stayTimeInMin + @" minute' AND
+public._gps_in_time._uid = '" + deviceID + @"'
 ";
             
             //while (!CheckIfStayOverTimeSql_client.connect())
@@ -7056,15 +7056,15 @@ public._gps_log._uid = '"+deviceID+@"'
                         {
 
                             string avlsSqlCmd = @"SELECT 
-  public._gps_log._lat,
-  public._gps_log._lon
+  public._gps_in_time._lat,
+  public._gps_in_time._lon
 FROM
-  public._gps_log
+  public._gps_in_time
 WHERE
-  public._gps_log._time < now() AND 
-  public._gps_log._uid = '" + avls_package.ID + @"'
+  public._gps_in_time._time < now() AND 
+  public._gps_in_time._uid = '" + avls_package.ID + @"'
 ORDER BY
-  public._gps_log._time DESC
+  public._gps_in_time._time DESC
 LIMIT 1";
                             //Console.WriteLine("+c");
                             //while (!avlsSqlClient.connect())
@@ -7250,15 +7250,15 @@ LIMIT 1";
                         {
 
                             string avlsSqlCmd = @"SELECT 
-  public._gps_log._lat,
-  public._gps_log._lon
+  public._gps_in_time._lat,
+  public._gps_in_time._lon
 FROM
-  public._gps_log
+  public._gps_in_time
 WHERE
-  public._gps_log._time < now() AND 
-  public._gps_log._uid = '" + avls_package.ID + @"'
+  public._gps_in_time._time < now() AND 
+  public._gps_in_time._uid = '" + avls_package.ID + @"'
 ORDER BY
-  public._gps_log._time DESC
+  public._gps_in_time._time DESC
 LIMIT 1";
                             //Console.WriteLine("+c1");
                             //while (!avlsSqlClient.connect())
