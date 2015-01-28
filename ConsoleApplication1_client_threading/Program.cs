@@ -347,6 +347,8 @@ WHERE
         static  string subConnectionLifetime = ConfigurationManager.AppSettings["subConnectionLifetime"];
         static ConcurrentDictionary<string, Location> _locations =
     new ConcurrentDictionary<string, Location>();
+        static Random rand = new Random();
+        static Object randLock = new object();
         private static void Main(string[] args)
         {
             Console.WriteLine(System.Reflection.MethodBase.GetCurrentMethod().Name);
@@ -4596,7 +4598,7 @@ FROM
                 oo = null;
             Thread.CurrentThread.CurrentUICulture = new CultureInfo("en-us");
                 DateTime dtime;
-            //lock (timeLock)
+            lock (timeLock)
                 {
                     dtime = DateTime.Now;
                 }
@@ -5857,8 +5859,13 @@ LIMIT 1";
             SiAuto.Main.LogMessage("access_sql_server spend10 time(ms):" + stopWatch.ElapsedMilliseconds);
             stopWatch.Reset();
             stopWatch.Start();
-            
-
+                
+            int randumber;
+            lock (randLock)
+            {
+                randumber = rand.Next(5000);
+            }
+                
             //while (!sql_client.connect())
             {
                 //Thread.Sleep(30);
@@ -5924,7 +5931,8 @@ LIMIT 1";
                     {
                         //Thread.Sleep(30);
                     }
-                    cgaEventLogIdCount = "-0";
+
+                    cgaEventLogIdCount = "-0" + "-" + randumber;
                     string sn = "\'" + deviceID + now + cgaEventLogIdCount + "\'";
                     string table_columns =
                         "serial_no ,uid ,type ,lat ,lon,altitude ,speed ,course ,radius ,info_time ,server_time ,create_user ,create_ip,start_time,create_time";
@@ -6161,7 +6169,7 @@ LIMIT 1";
               {
                   case "in"://stay over time
                       bundaryEventNumber = "5";
-                      cgaEventLogIdCount = "-1";
+                      cgaEventLogIdCount = "-1" + "-" + randumber;
                       //insert into custom.cga_event_log
                       //while (!sql_client.connect())
                       {
@@ -6199,7 +6207,8 @@ LIMIT 1";
       //lock (cgaEventAccessSqlLock)
       {
           #region insert into custom.cga_event_log
-          cgaEventLogIdCount = "-2";
+
+          cgaEventLogIdCount = "-2" + "-" + randumber;
 
           {
               try
