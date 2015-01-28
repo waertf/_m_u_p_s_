@@ -349,6 +349,7 @@ WHERE
     new ConcurrentDictionary<string, Location>();
         static Random rand = new Random();
         static Object randLock = new object();
+        private static bool _locationsEnable = false;
         private static void Main(string[] args)
         {
             Console.WriteLine(System.Reflection.MethodBase.GetCurrentMethod().Name);
@@ -831,10 +832,14 @@ WHERE
 
         static void updateLocations(string uid,string lat,string lon)
         {
-            Location myLocation=new Location();
-            myLocation.SetLat(lat);
-            myLocation.SetLon(lon);
-            _locations.AddOrUpdate(uid, myLocation, (a, b) => b);
+            if (_locationsEnable)
+            {
+                Location myLocation = new Location();
+                myLocation.SetLat(lat);
+                myLocation.SetLon(lon);
+                _locations.AddOrUpdate(uid, myLocation, (a, b) => b);
+            }
+            
         }
 
         static void StartLocations()
@@ -871,21 +876,24 @@ public._gps_in_time._lon
 FROM
 public._gps_in_time
 INNER JOIN sd.equipment ON public._gps_in_time._uid = sd.equipment.uid";
-
-            using (DataTable dt = sql_client.get_DataTable(sqlcmd,0))
+            if (_locationsEnable)
             {
-                if (dt != null && dt.Rows.Count != 0)
+                using (DataTable dt = sql_client.get_DataTable(sqlcmd, 0))
                 {
-                    foreach (DataRow row in dt.Rows)
+                    if (dt != null && dt.Rows.Count != 0)
                     {
-                        //uid = row[0].ToString();
-                        Location myLocation = new Location();
-                        myLocation.SetLat(row[1].ToString());
-                        myLocation.SetLon(row[2].ToString());
-                        _locations.AddOrUpdate(row[0].ToString(), myLocation,(a,b)=>b);
+                        foreach (DataRow row in dt.Rows)
+                        {
+                            //uid = row[0].ToString();
+                            Location myLocation = new Location();
+                            myLocation.SetLat(row[1].ToString());
+                            myLocation.SetLon(row[2].ToString());
+                            _locations.AddOrUpdate(row[0].ToString(), myLocation, (a, b) => b);
+                        }
                     }
                 }
             }
+            
             Console.WriteLine(DateTime.Now + ":-" + MethodBase.GetCurrentMethod().Name);
         }
         static SqlClient SendToAvlsPowerOffIfPowerOnTimeOutSqlClientFixStation = new SqlClient(
@@ -1512,7 +1520,7 @@ WHERE
             avls_package.ID = uid;
             avls_package.GPS_Valid = "A,";
             Location mylocation;
-            if (_locations.TryGetValue(avls_package.ID, out mylocation))
+            if (_locationsEnable && _locations.TryGetValue(avls_package.ID, out mylocation))
             {
                 string avlsLat = mylocation.GetLat(), avlsLon = mylocation.GetLon();
                 string zero = "0";
@@ -3434,7 +3442,7 @@ WHERE
                     DateTime tempDatetime = DateTime.Now.ToUniversalTime();
                     avls_package.Date_Time = tempDatetime.ToString("yyMMddHHmmss") + ",";
                     Location mylocation;
-                    if (_locations.TryGetValue(avls_package.ID, out mylocation))
+                    if (_locationsEnable && _locations.TryGetValue(avls_package.ID, out mylocation))
                     {
                         string avlsLat = mylocation.GetLat(), avlsLon = mylocation.GetLon();
                         string zero = "0";
@@ -3636,7 +3644,7 @@ LIMIT 1";
                     //return;
                     //avls_package.Loc = "N" + last_avls_lat + "E" + last_avls_lon + ",";
                     Location mylocation;
-                    if (_locations.TryGetValue(avls_package.ID, out mylocation))
+                    if (_locationsEnable && _locations.TryGetValue(avls_package.ID, out mylocation))
                     {
                         string avlsLat = mylocation.GetLat(), avlsLon = mylocation.GetLon();
                         string zero = "0";
@@ -5269,7 +5277,7 @@ VALUES(
                 {
                     //if (htable.ContainsKey("suaddr") || !string.IsNullOrEmpty(deviceID))
                     Location mylocation;
-                    if (_locations.TryGetValue(deviceID, out mylocation))
+                    if (_locationsEnable && _locations.TryGetValue(deviceID, out mylocation))
                     {
                         string avlsLat = mylocation.GetLat(), avlsLon = mylocation.GetLon();
                         string zero = "0";
@@ -7047,7 +7055,7 @@ public._gps_in_time._uid = '" + deviceID + @"'
                     avls_package.Date_Time = tempDatetime.ToString("yyMMddHHmmss") + ",";
 
                     Location mylocation;
-                    if (_locations.TryGetValue(avls_package.ID, out mylocation))
+                    if (_locationsEnable && _locations.TryGetValue(avls_package.ID, out mylocation))
                     {
                         string avlsLat = mylocation.GetLat(), avlsLon = mylocation.GetLon();
                         string zero = "0";
@@ -7238,7 +7246,7 @@ LIMIT 1";
                 else
                 {
                     Location mylocation;
-                    if (_locations.TryGetValue(avls_package.ID, out mylocation))
+                    if (_locationsEnable && _locations.TryGetValue(avls_package.ID, out mylocation))
                     {
                         string avlsLat = mylocation.GetLat(), avlsLon = mylocation.GetLon();
                         string zero = "0";
