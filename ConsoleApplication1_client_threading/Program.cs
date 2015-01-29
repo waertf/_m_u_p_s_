@@ -2354,6 +2354,7 @@ Select 1-6 then press enter to send package
 
         private static void ReadRecovery(NetworkStream myNetworkStream)
         {
+            log.Error("+ReadRecovery");
                 if (unsTcpClient != null)
                 {
                     if (myNetworkStream != null)
@@ -2423,7 +2424,8 @@ Select 1-6 then press enter to send package
 			sql_client=null;
             Thread readlineThread = new Thread(ReadLine);
             readlineThread.Start(unsTcpClient);
-                //ReadLine(unsTcpClient, 2);          
+                //ReadLine(unsTcpClient, 2);      
+            log.Error("-ReadRecovery");
         }
 
         private static void FinishRead(IAsyncResult result)
