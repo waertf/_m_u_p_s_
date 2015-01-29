@@ -105,13 +105,14 @@ namespace ConsoleApplication1_client_threading
         //For UPDATE, INSERT, and DELETE statements
         public void modify(string cmd)
         {
-            
+            if(string.IsNullOrEmpty(cmd))
+                return;;
             System.Threading.Thread accessDb2Thread = new System.Threading.Thread
       (delegate()
       {
           modifyDB2(cmd);
       });
-            accessDb2Thread.Start();
+            //accessDb2Thread.Start();
             
             //modifyDB2(cmd);
             Stopwatch stopWatch = new Stopwatch();
@@ -128,8 +129,8 @@ namespace ConsoleApplication1_client_threading
                     PgSqlCommand command = new PgSqlCommand();
                     command.Connection = pgSqlConnection;
                     command.UnpreparedExecute = true;
-                    command.CommandText = cmd;
                     command.CommandType=CommandType.Text;
+                    command.CommandText = string.Copy(cmd);
                     //command.CommandTimeout = 30;
 
                     //cmd.CommandText = "INSERT INTO public.test (id) VALUES (1)";
@@ -405,6 +406,8 @@ namespace ConsoleApplication1_client_threading
         //} 
         void modifyDB2(string cmd)
         {
+            if (string.IsNullOrEmpty(cmd))
+                return; ;
             //Stopwatch stopWatch = new Stopwatch();
             //PgSqlCommand command = null;
             PgSqlTransaction myTrans = null;
@@ -418,8 +421,8 @@ namespace ConsoleApplication1_client_threading
                     PgSqlCommand command = new PgSqlCommand();
                     command.Connection = pgSqlConnection2;
                     command.UnpreparedExecute = true;
-                    command.CommandText = cmd;
                     command.CommandType = CommandType.Text;
+                    command.CommandText = string.Copy(cmd);
                     //command.CommandTimeout = 30;
 
                     //cmd.CommandText = "INSERT INTO public.test (id) VALUES (1)";
