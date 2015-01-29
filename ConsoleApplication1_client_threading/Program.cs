@@ -1010,6 +1010,7 @@ WHERE
                                         avlsNetworkStream));
                 sendPackageToAvlsOnlyByUidAndLocGetFromSql.Start();
             }
+            if (updatePowerTableInSql.Length>0)
             SendToAvlsPowerOffIfPowerOnTimeOutSqlClientOthers.modify(updatePowerTableInSql.ToString());
             SiAuto.Main.AddCheckpoint("-" + System.Reflection.MethodBase.GetCurrentMethod().Name);
             Console.WriteLine("-" + System.Reflection.MethodBase.GetCurrentMethod().Name);
@@ -1097,6 +1098,7 @@ WHERE
                                         avlsNetworkStream));
                 sendPackageToAvlsOnlyByUidAndLocGetFromSql.Start();
             }
+            if (updatePowerTableInSql.Length>0)
             SendToAvlsPowerOffIfPowerOnTimeOutSqlClientMobile.modify(updatePowerTableInSql.ToString());
             SiAuto.Main.AddCheckpoint("-" + System.Reflection.MethodBase.GetCurrentMethod().Name);
             Console.WriteLine("-" + System.Reflection.MethodBase.GetCurrentMethod().Name);
@@ -1184,6 +1186,7 @@ WHERE
                                         avlsNetworkStream));
                 sendPackageToAvlsOnlyByUidAndLocGetFromSql.Start();
             }
+            if (updatePowerTableInSql.Length>0)
             SendToAvlsPowerOffIfPowerOnTimeOutSqlClientFixStation.modify(updatePowerTableInSql.ToString());
             SiAuto.Main.AddCheckpoint("-" + System.Reflection.MethodBase.GetCurrentMethod().Name);
             Console.WriteLine("-" + System.Reflection.MethodBase.GetCurrentMethod().Name);
