@@ -413,11 +413,12 @@ WHERE
             Thread.CurrentThread.CurrentUICulture = new CultureInfo("en-us");
             ConfigurationManager.RefreshSection(sectionName);
 
-            SiAuto.Si.Enabled = true;
-            SiAuto.Si.Level = Level.Debug;
+            
             SiAuto.Si.Connections = @"file(filename=""" +
                                     Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) +
                                     "\\log.sil\",rotate=weekly,append=true,maxparts=5,maxsize=500MB)";
+            SiAuto.Si.Enabled = true;
+            SiAuto.Si.Level = Level.Debug;
             string logMsg = string.Empty;
             logMsg = "Start time:" + DateTime.Now.ToString("G");
             SiAuto.Main.LogError(logMsg);
@@ -4026,6 +4027,7 @@ LIMIT 1";
             string connString = string.Format("Data Source={0}", datalogicFilePath);
             string message = string.Empty;
             using (StayCheck sqlCEdb = new StayCheck(connString))
+            using (StayCheck sqlCEdb2 = new StayCheck(connString))
             {
                 /*
            try
@@ -4047,7 +4049,7 @@ LIMIT 1";
                     //searchID = (from p in sqlCEdb.CheckIfOverTime where p.Uid == id select p.Uid).First();
                     //searchID2 = (from p in sqlCEdb.CheckIfOverTime2 where p.Uid == id select p.Uid).First();
                     searchID = SqlCeCompiledQuery.SearchID1(sqlCEdb, id).First();
-                    searchID2 = SqlCeCompiledQuery.SearchID2(sqlCEdb, id).First();
+                    searchID2 = SqlCeCompiledQuery.SearchID2(sqlCEdb2, id).First();//error
                 }
                 catch (Exception)
                 {
@@ -4066,10 +4068,11 @@ LIMIT 1";
                             //not found id in sql->add new row with id
                             CheckIfOverTime2 newRow2 = new CheckIfOverTime2();
                             newRow2.Uid = id;
-                            sqlCEdb.CheckIfOverTime2.InsertOnSubmit(newRow2);
+                            sqlCEdb2.CheckIfOverTime2.InsertOnSubmit(newRow2);
                             //sqlCEdb.SubmitChanges();
                         }
                         sqlCEdb.SubmitChanges();
+                        sqlCEdb2.SubmitChanges();
                     }
                     catch (Exception ex)
                     {
@@ -4274,12 +4277,12 @@ now() <= end_time::timestamp ";
                         //SiAuto.Main.AddCheckpoint(Level.Debug, id + "-find data from sql", regSqlCmdForLocationTable);
                         try
                         {
-                            CheckIfOverTime2 getRow = sqlCEdb.CheckIfOverTime2.FirstOrDefault(p => p.CreateTime == null && p.Uid == id);
+                            CheckIfOverTime2 getRow = sqlCEdb2.CheckIfOverTime2.FirstOrDefault(p => p.CreateTime == null && p.Uid == id);
                             if (getRow != null)
                             {
                                 //SiAuto.Main.AddCheckpoint(Level.Debug, id + " assign time");
                                 getRow.CreateTime = DateTime.Now;
-                                sqlCEdb.SubmitChanges();
+                                sqlCEdb2.SubmitChanges();
                                 #region send with location data
                                 foreach (DataRow row in dt3.Rows)
                                 {
@@ -4324,7 +4327,7 @@ now() <= end_time::timestamp ";
 
                                 //SiAuto.Main.WatchDouble(Level.Debug, "stayTimeInMin", stayTimeInMin);
                                 DateTime getTime = new DateTime();
-                                var dateTime = (from p in sqlCEdb.CheckIfOverTime2 where p.Uid == id select p.CreateTime).FirstOrDefault();
+                                var dateTime = (from p in sqlCEdb2.CheckIfOverTime2 where p.Uid == id select p.CreateTime).FirstOrDefault();
                                 if (dateTime != default(DateTime))
                                     getTime = dateTime.Value;
                                 //SiAuto.Main.WatchDateTime(Level.Debug, "getTime", getTime);
@@ -4379,12 +4382,12 @@ now() <= end_time::timestamp ";
                     {
                         try
                         {
-                            CheckIfOverTime2 getRow = sqlCEdb.CheckIfOverTime2.FirstOrDefault(p => p.CreateTime != null && p.Uid == id);
+                            CheckIfOverTime2 getRow = sqlCEdb2.CheckIfOverTime2.FirstOrDefault(p => p.CreateTime != null && p.Uid == id);
                             if (getRow != null)
                             {
                                 //SiAuto.Main.AddCheckpoint(Level.Debug, id + " remove time");
                                 getRow.CreateTime = null;
-                                sqlCEdb.SubmitChanges();
+                                sqlCEdb2.SubmitChanges();
 
                                 #region send with location data
                                 //foreach (DataRow row in dt.Rows)
