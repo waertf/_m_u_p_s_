@@ -129,6 +129,7 @@ namespace ConsoleApplication1_client_threading
                     command.Connection = pgSqlConnection;
                     command.UnpreparedExecute = true;
                     command.CommandText = cmd;
+                    command.CommandType=CommandType.Text;
                     //command.CommandTimeout = 30;
 
                     //cmd.CommandText = "INSERT INTO public.test (id) VALUES (1)";
@@ -418,6 +419,7 @@ namespace ConsoleApplication1_client_threading
                     command.Connection = pgSqlConnection2;
                     command.UnpreparedExecute = true;
                     command.CommandText = cmd;
+                    command.CommandType = CommandType.Text;
                     //command.CommandTimeout = 30;
 
                     //cmd.CommandText = "INSERT INTO public.test (id) VALUES (1)";
