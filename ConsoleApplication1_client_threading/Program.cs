@@ -349,7 +349,7 @@ WHERE
     new ConcurrentDictionary<string, Location>();
         static Random rand = new Random();
         static Object randLock = new object();
-        private static bool _locationsEnable = false;
+        private static bool _locationsEnable = true;
         private static void Main(string[] args)
         {
             Console.WriteLine(System.Reflection.MethodBase.GetCurrentMethod().Name);
@@ -2774,7 +2774,7 @@ Select 1-6 then press enter to send package
                             prohibitedTableName = "public.p_prohibited";
                             locationTableName = "public.patrol_location";
                             
-                            //lock (getGidAndFullnameLock)
+                            ////lock (getGidAndFullnameLock)
                             {
                                 if (htable.ContainsKey("lat_value") && htable.ContainsKey("long_value") &&
                                     htable.ContainsKey("suaddr"))
@@ -3863,7 +3863,7 @@ LIMIT 1";
                 prohibitedTableName = "public.p_prohibited";
                 locationTableName = "public.patrol_location";
                 //string getMessage = string.Empty;
-                //lock (getGidAndFullnameLock)
+                ////lock (getGidAndFullnameLock)
                 {
                     send_string = "%%" + avls_package.ID + avls_package.GPS_Valid + now + avls_package.Loc + avls_package.Speed + avls_package.Dir + avls_package.Temp + avls_package.Status + "0,";
                     //getMessage = GetGidAndFullnameFromP_prohibitedAndPatrol_locationFromSql(prohibitedTableName,
@@ -3950,7 +3950,7 @@ LIMIT 1";
                     prohibitedTableName = "public.p_prohibited";
                     locationTableName = "public.patrol_location";
                     //string getMessage = string.Empty;
-                    lock (getGidAndFullnameLock)
+                    //lock (getGidAndFullnameLock)
                     {
                         send_string = "%%" + avls_package.ID + avls_package.GPS_Valid + avls_package.Date_Time + avls_package.Loc + avls_package.Speed + avls_package.Dir + avls_package.Temp + avls_package.Status + avls_package.Event;
                         //getMessage = GetGidAndFullnameFromP_prohibitedAndPatrol_locationFromSql(prohibitedTableName,
@@ -4051,9 +4051,9 @@ LIMIT 1";
                 {
                     //searchID = (from p in sqlCEdb.CheckIfOverTime where p.Uid == id select p.Uid).First();
                     //searchID2 = (from p in sqlCEdb.CheckIfOverTime2 where p.Uid == id select p.Uid).First();
-                    lock (getGidAndFullnameLock)
+                    //lock (getGidAndFullnameLock)
                     searchID = SqlCeCompiledQuery.SearchID1(sqlCEdb, id).First();
-                    lock (getGidAndFullnameLock)
+                    //lock (getGidAndFullnameLock)
                     searchID2 = SqlCeCompiledQuery.SearchID2(sqlCEdb, id).First();//error
                 }
                 catch (Exception)
@@ -4065,7 +4065,7 @@ LIMIT 1";
                             //not found id in sql->add new row with id
                             CheckIfOverTime newRow = new CheckIfOverTime();
                             newRow.Uid = id;
-                            lock (getGidAndFullnameLock)
+                            //lock (getGidAndFullnameLock)
                             sqlCEdb.CheckIfOverTime.InsertOnSubmit(newRow);
                             //sqlCEdb.SubmitChanges();
                         }
@@ -4074,12 +4074,12 @@ LIMIT 1";
                             //not found id in sql->add new row with id
                             CheckIfOverTime2 newRow2 = new CheckIfOverTime2();
                             newRow2.Uid = id;
-                            lock (getGidAndFullnameLock)
+                            //lock (getGidAndFullnameLock)
                             sqlCEdb.CheckIfOverTime2.InsertOnSubmit(newRow2);
                             //sqlCEdb.SubmitChanges();
                         }
                         //sqlCEdb.SubmitChanges();
-                        lock (getGidAndFullnameLock)
+                        //lock (getGidAndFullnameLock)
                         sqlCEdb.SubmitChanges();
                     }
                     catch (Exception ex)
@@ -4122,13 +4122,13 @@ now() <= end_time::timestamp ";
                         try
                         {
                             CheckIfOverTime getRow;
-                            lock (getGidAndFullnameLock)
+                            //lock (getGidAndFullnameLock)
                             getRow = sqlCEdb.CheckIfOverTime.FirstOrDefault(p => p.CreateTime == null && p.Uid == id);
                             if (getRow != null)
                             {
                                 //SiAuto.Main.AddCheckpoint(Level.Debug, id+" assign time");
                                 getRow.CreateTime = DateTime.Now;
-                                lock (getGidAndFullnameLock)
+                                //lock (getGidAndFullnameLock)
                                 sqlCEdb.SubmitChanges();
                                 #region send with prohibite data
 
@@ -4177,7 +4177,7 @@ now() <= end_time::timestamp ";
                                 //SiAuto.Main.WatchDouble(Level.Debug, "stayTimeInMin", stayTimeInMin);
                                 DateTime getTime = new DateTime();
 
-                                lock (getGidAndFullnameLock)
+                                //lock (getGidAndFullnameLock)
                                 {
                                     var dateTime =
                                         (from p in sqlCEdb.CheckIfOverTime where p.Uid == id select p.CreateTime)
@@ -4247,13 +4247,13 @@ now() <= end_time::timestamp ";
                         try
                         {
                             CheckIfOverTime getRow;
-                            lock (getGidAndFullnameLock)
+                            //lock (getGidAndFullnameLock)
                             getRow = sqlCEdb.CheckIfOverTime.FirstOrDefault(p => p.CreateTime != null && p.Uid == id);
                             if (getRow != null)
                             {
                                 //SiAuto.Main.AddCheckpoint(Level.Debug,id+" remove time");
                                 getRow.CreateTime = null;
-                                lock (getGidAndFullnameLock)
+                                //lock (getGidAndFullnameLock)
                                 sqlCEdb.SubmitChanges();
 
                                 #region send with prohibite data
@@ -4298,13 +4298,13 @@ now() <= end_time::timestamp ";
                         try
                         {
                             CheckIfOverTime2 getRow;
-                            lock (getGidAndFullnameLock)
+                            //lock (getGidAndFullnameLock)
                             getRow = sqlCEdb.CheckIfOverTime2.FirstOrDefault(p => p.CreateTime == null && p.Uid == id);
                             if (getRow != null)
                             {
                                 //SiAuto.Main.AddCheckpoint(Level.Debug, id + " assign time");
                                 getRow.CreateTime = DateTime.Now;
-                                lock (getGidAndFullnameLock)
+                                //lock (getGidAndFullnameLock)
                                 sqlCEdb.SubmitChanges();
                                 #region send with location data
                                 foreach (DataRow row in dt3.Rows)
@@ -4350,7 +4350,7 @@ now() <= end_time::timestamp ";
 
                                 //SiAuto.Main.WatchDouble(Level.Debug, "stayTimeInMin", stayTimeInMin);
                                 DateTime getTime = new DateTime();
-                                lock (getGidAndFullnameLock)
+                                //lock (getGidAndFullnameLock)
                                 {
                                 var dateTime = (from p in sqlCEdb.CheckIfOverTime2 where p.Uid == id select p.CreateTime).FirstOrDefault();
                                 if (dateTime != default(DateTime))
@@ -4409,13 +4409,13 @@ now() <= end_time::timestamp ";
                         try
                         {
                             CheckIfOverTime2 getRow;
-                            lock (getGidAndFullnameLock)
+                            //lock (getGidAndFullnameLock)
                             getRow = sqlCEdb.CheckIfOverTime2.FirstOrDefault(p => p.CreateTime != null && p.Uid == id);
                             if (getRow != null)
                             {
                                 //SiAuto.Main.AddCheckpoint(Level.Debug, id + " remove time");
                                 getRow.CreateTime = null;
-                                lock (getGidAndFullnameLock)
+                                //lock (getGidAndFullnameLock)
                                 sqlCEdb.SubmitChanges();
 
                                 #region send with location data
@@ -6003,7 +6003,7 @@ LIMIT 1";
                 }
             }
                 /*
-            //lock (getGidAndFullnameLock)
+            ////lock (getGidAndFullnameLock)
             {
 
                  
@@ -7500,7 +7500,7 @@ LIMIT 1";
                 prohibitedTableName = "public.p_prohibited";
                 locationTableName = "public.patrol_location";
                 //string getMessage = string.Empty;
-                //lock (getGidAndFullnameLock)
+                ////lock (getGidAndFullnameLock)
                 {
                     send_string = "%%" + avls_package.ID + avls_package.GPS_Valid + now + avls_package.Loc + avls_package.Speed + avls_package.Dir + avls_package.Temp + avls_package.Status + "0,";
                     //getMessage = GetGidAndFullnameFromP_prohibitedAndPatrol_locationFromSql(prohibitedTableName,
@@ -7587,7 +7587,7 @@ LIMIT 1";
                     prohibitedTableName = "public.p_prohibited";
                     locationTableName = "public.patrol_location";
                     //string getMessage = string.Empty;
-                    lock (getGidAndFullnameLock)
+                    //lock (getGidAndFullnameLock)
                     {
                         send_string = "%%" + avls_package.ID + avls_package.GPS_Valid + avls_package.Date_Time + avls_package.Loc + avls_package.Speed + avls_package.Dir + avls_package.Temp + avls_package.Status + avls_package.Event;
                         //getMessage = GetGidAndFullnameFromP_prohibitedAndPatrol_locationFromSql(prohibitedTableName,
