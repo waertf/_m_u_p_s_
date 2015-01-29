@@ -349,7 +349,7 @@ WHERE
     new ConcurrentDictionary<string, Location>();
         static Random rand = new Random();
         static Object randLock = new object();
-        private static bool _locationsEnable = false;
+        private static bool _locationsEnable = true;
         private static void Main(string[] args)
         {
             Console.WriteLine(System.Reflection.MethodBase.GetCurrentMethod().Name);
@@ -370,9 +370,9 @@ WHERE
             ThreadPool.SetMaxThreads(int.Parse(ConfigurationManager.AppSettings["MaxWorkerThreads"]), int.Parse(ConfigurationManager.AppSettings["MaxCompletionPortThreads"]));
             */
             //Thread.Sleep(5000);
-            AppDomain.CurrentDomain.ProcessExit += new EventHandler(CurrentDomain_ProcessExit);
-            AppDomain.CurrentDomain.UnhandledException +=
-                new UnhandledExceptionEventHandler(CurrentDomain_UnhandledException);
+            //AppDomain.CurrentDomain.ProcessExit += new EventHandler(CurrentDomain_ProcessExit);
+            //AppDomain.CurrentDomain.UnhandledException +=
+                //new UnhandledExceptionEventHandler(CurrentDomain_UnhandledException);
             string StartupPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
             string datalogicFilePath = Path.Combine(StartupPath, "StayCheck.sdf");
             string connString = string.Format("Data Source={0}", datalogicFilePath);
@@ -4025,151 +4025,172 @@ LIMIT 1";
             string datalogicFilePath = Path.Combine(startupPath, "StayCheck.sdf");
             string connString = string.Format("Data Source={0}", datalogicFilePath);
             string message = string.Empty;
-            StayCheck sqlCEdb;
-            try
+            using (StayCheck sqlCEdb = new StayCheck(connString))
             {
-                sqlCEdb = new StayCheck(connString);
-            }
-            catch (Exception ex)
-            {
+                /*
+           try
+           {
+               sqlCEdb = new StayCheck(connString);
+           }
+           catch (Exception ex)
+           {
                 
-                SiAuto.Main.LogError(ex.ToString());
-                return string.Empty;
-            }
-            string searchID = string.Empty, searchID2 = string.Empty;
-            double  stayTimeInMin =0;
-            
-            try
-            {
-                //searchID = (from p in sqlCEdb.CheckIfOverTime where p.Uid == id select p.Uid).First();
-                //searchID2 = (from p in sqlCEdb.CheckIfOverTime2 where p.Uid == id select p.Uid).First();
-                searchID = SqlCeCompiledQuery.SearchID1(sqlCEdb, id).First();
-                searchID2 = SqlCeCompiledQuery.SearchID2(sqlCEdb, id).First();
-            }
-            catch (Exception)
-            {
+               SiAuto.Main.LogError(ex.ToString());
+               return string.Empty;
+           }
+           */
+                string searchID = string.Empty, searchID2 = string.Empty;
+                double stayTimeInMin = 0;
+
                 try
                 {
-                    if (string.IsNullOrEmpty(searchID))
-                    {
-                        //not found id in sql->add new row with id
-                        CheckIfOverTime newRow = new CheckIfOverTime();
-                        newRow.Uid = id;
-                        sqlCEdb.CheckIfOverTime.InsertOnSubmit(newRow);
-                        //sqlCEdb.SubmitChanges();
-                    }
-                    if (string.IsNullOrEmpty(searchID2))
-                    {
-                        //not found id in sql->add new row with id
-                        CheckIfOverTime2 newRow2 = new CheckIfOverTime2();
-                        newRow2.Uid = id;
-                        sqlCEdb.CheckIfOverTime2.InsertOnSubmit(newRow2);
-                        //sqlCEdb.SubmitChanges();
-                    }
-                    sqlCEdb.SubmitChanges();
+                    //searchID = (from p in sqlCEdb.CheckIfOverTime where p.Uid == id select p.Uid).First();
+                    //searchID2 = (from p in sqlCEdb.CheckIfOverTime2 where p.Uid == id select p.Uid).First();
+                    searchID = SqlCeCompiledQuery.SearchID1(sqlCEdb, id).First();
+                    searchID2 = SqlCeCompiledQuery.SearchID2(sqlCEdb, id).First();
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
+                    try
+                    {
+                        if (string.IsNullOrEmpty(searchID))
+                        {
+                            //not found id in sql->add new row with id
+                            CheckIfOverTime newRow = new CheckIfOverTime();
+                            newRow.Uid = id;
+                            sqlCEdb.CheckIfOverTime.InsertOnSubmit(newRow);
+                            //sqlCEdb.SubmitChanges();
+                        }
+                        if (string.IsNullOrEmpty(searchID2))
+                        {
+                            //not found id in sql->add new row with id
+                            CheckIfOverTime2 newRow2 = new CheckIfOverTime2();
+                            newRow2.Uid = id;
+                            sqlCEdb.CheckIfOverTime2.InsertOnSubmit(newRow2);
+                            //sqlCEdb.SubmitChanges();
+                        }
+                        sqlCEdb.SubmitChanges();
+                    }
+                    catch (Exception ex)
+                    {
 
-                    SiAuto.Main.LogError(ex.ToString());
+                        SiAuto.Main.LogError(ex.ToString());
+                    }
+
                 }
-                
-            }
 
 
-            
-            string regSqlCmdForProhibitedTable = string.Empty;
-            string regSqlCmdForLocationTable = string.Empty;
-            regSqlCmdForProhibitedTable = @"select gid, fullname
+
+                string regSqlCmdForProhibitedTable = string.Empty;
+                string regSqlCmdForLocationTable = string.Empty;
+                regSqlCmdForProhibitedTable = @"select gid, fullname
 from p_prohibited
-where st_intersects(the_geom, st_geomfromtext('POINT(" +initialLon+" "+initialLat+ @")', 4326)) AND
+where st_intersects(the_geom, st_geomfromtext('POINT(" + initialLon + " " + initialLat + @")', 4326)) AND
 now() >= start_time::timestamp AND
 now() <= end_time::timestamp ";
-            regSqlCmdForLocationTable = @"select gid, fullname
+                regSqlCmdForLocationTable = @"select gid, fullname
 from patrol_location
 where st_intersects(st_buffer(the_geom, 0.0009009/100*raidus), st_geomfromtext('POINT(" + initialLon + " " + initialLat + @")', 4326))AND
 now() >= start_time::timestamp AND
 now() <= end_time::timestamp ";
 
-            log.Info(deviceID+":p_prohibited:sql cmd:" + Environment.NewLine + regSqlCmdForProhibitedTable);
-            log.Info(deviceID + ":patrol_location:sql cmd:" + Environment.NewLine + regSqlCmdForLocationTable);
-            //while (!GetGidAndFullnameFromP_prohibitedAndPatrol_locationFromSql_SqlClient.connect())
-            {
-                //Thread.Sleep(30);
-            }
-            //DataTable dt = GetGidAndFullnameFromP_prohibitedAndPatrol_locationFromSql_SqlClient.get_DataTable(regSqlCmdForProhibitedTable);
-            //sql_client.disconnect();
-            //List<EAB2> prohibitedEab2s= new List<EAB2>();
-            using (DataTable dt = GetGidAndFullnameFromP_prohibitedAndPatrol_locationFromSql_SqlClient.get_DataTable(regSqlCmdForProhibitedTable))
-            {
-                if (dt != null && dt.Rows.Count != 0)
+                log.Info(deviceID + ":p_prohibited:sql cmd:" + Environment.NewLine + regSqlCmdForProhibitedTable);
+                log.Info(deviceID + ":patrol_location:sql cmd:" + Environment.NewLine + regSqlCmdForLocationTable);
+                //while (!GetGidAndFullnameFromP_prohibitedAndPatrol_locationFromSql_SqlClient.connect())
                 {
-                    //SiAuto.Main.AddCheckpoint(Level.Debug,id+"-find data from sql", regSqlCmdForProhibitedTable);
-                    try
+                    //Thread.Sleep(30);
+                }
+                //DataTable dt = GetGidAndFullnameFromP_prohibitedAndPatrol_locationFromSql_SqlClient.get_DataTable(regSqlCmdForProhibitedTable);
+                //sql_client.disconnect();
+                //List<EAB2> prohibitedEab2s= new List<EAB2>();
+                using (DataTable dt = GetGidAndFullnameFromP_prohibitedAndPatrol_locationFromSql_SqlClient.get_DataTable(regSqlCmdForProhibitedTable))
+                {
+                    if (dt != null && dt.Rows.Count != 0)
                     {
-                        CheckIfOverTime getRow = sqlCEdb.CheckIfOverTime.FirstOrDefault(p => p.CreateTime == null && p.Uid == id);
-                        if (getRow != null)
+                        //SiAuto.Main.AddCheckpoint(Level.Debug,id+"-find data from sql", regSqlCmdForProhibitedTable);
+                        try
                         {
-                            //SiAuto.Main.AddCheckpoint(Level.Debug, id+" assign time");
-                            getRow.CreateTime = DateTime.Now;
-                            sqlCEdb.SubmitChanges();
-                            #region send with prohibite data
-
-
-
-                            foreach (DataRow row in dt.Rows)
+                            CheckIfOverTime getRow = sqlCEdb.CheckIfOverTime.FirstOrDefault(p => p.CreateTime == null && p.Uid == id);
+                            if (getRow != null)
                             {
-                                //prohibitedEab2s.Add(new EAB2("p_prohibited", row[0].ToString(), row[1].ToString()));
-                                //lock (mylock)
+                                //SiAuto.Main.AddCheckpoint(Level.Debug, id+" assign time");
+                                getRow.CreateTime = DateTime.Now;
+                                sqlCEdb.SubmitChanges();
+                                #region send with prohibite data
+
+
+
+                                foreach (DataRow row in dt.Rows)
                                 {
-                                    message += ";" + "p_prohibited" + "#" + row[0].ToString() + "#" + row[1].ToString();
-                                }
-
-                            }
-                            #endregion send with prohibite data
-                        }
-                        else
-                        {
-                            //SiAuto.Main.AddCheckpoint(Level.Debug, id+" has time");
-                            //table:p_config
-                            //column:stay_time
-                            //unit:min
-
-                            //check if over time 
-                            //over->send msg with prohibited data
-                            //not over -> do nothing
-                            string sqlCmd = @"select stay_time from p_config";
-
-                            //while (!sql_client.connect())
-                            {
-                                //Thread.Sleep(30);
-                            }
-                            //DataTable dt2 = GetGidAndFullnameFromP_prohibitedAndPatrol_locationFromSql_SqlClient.get_DataTable(sqlCmd);
-                            //sql_client.disconnect();
-                            using (DataTable dt2 = GetGidAndFullnameFromP_prohibitedAndPatrol_locationFromSql_SqlClient.get_DataTable(sqlCmd))
-                            {
-                                if (dt2 != null && dt2.Rows.Count != 0)
-                                {
-                                    foreach (DataRow row in dt2.Rows)
+                                    //prohibitedEab2s.Add(new EAB2("p_prohibited", row[0].ToString(), row[1].ToString()));
+                                    //lock (mylock)
                                     {
-                                        stayTimeInMin = double.Parse(row[0].ToString());
+                                        message += ";" + "p_prohibited" + "#" + row[0].ToString() + "#" + row[1].ToString();
+                                    }
+
+                                }
+                                #endregion send with prohibite data
+                            }
+                            else
+                            {
+                                //SiAuto.Main.AddCheckpoint(Level.Debug, id+" has time");
+                                //table:p_config
+                                //column:stay_time
+                                //unit:min
+
+                                //check if over time 
+                                //over->send msg with prohibited data
+                                //not over -> do nothing
+                                string sqlCmd = @"select stay_time from p_config";
+
+                                //while (!sql_client.connect())
+                                {
+                                    //Thread.Sleep(30);
+                                }
+                                //DataTable dt2 = GetGidAndFullnameFromP_prohibitedAndPatrol_locationFromSql_SqlClient.get_DataTable(sqlCmd);
+                                //sql_client.disconnect();
+                                using (DataTable dt2 = GetGidAndFullnameFromP_prohibitedAndPatrol_locationFromSql_SqlClient.get_DataTable(sqlCmd))
+                                {
+                                    if (dt2 != null && dt2.Rows.Count != 0)
+                                    {
+                                        foreach (DataRow row in dt2.Rows)
+                                        {
+                                            stayTimeInMin = double.Parse(row[0].ToString());
+                                        }
                                     }
                                 }
-                            }
 
-                            //SiAuto.Main.WatchDouble(Level.Debug, "stayTimeInMin", stayTimeInMin);
-                            DateTime getTime = new DateTime();
-                            var dateTime = (from p in sqlCEdb.CheckIfOverTime where p.Uid == id select p.CreateTime).FirstOrDefault();
-                            if (dateTime != default(DateTime))
-                                getTime = dateTime.Value;
-                            //SiAuto.Main.WatchDateTime(Level.Debug, "getTime", getTime);
-                            int result;
-                            result = DateTime.Compare(DateTime.Now, getTime.AddMinutes(stayTimeInMin));
-                            //SiAuto.Main.LogText(Level.Debug, id + "-result-" + result,
-                            //DateTime.Now + "--" + getTime.AddMinutes(stayTimeInMin));
-                            if (isStayTimeEnable)
-                            {
-                                if (result > 0)
+                                //SiAuto.Main.WatchDouble(Level.Debug, "stayTimeInMin", stayTimeInMin);
+                                DateTime getTime = new DateTime();
+                                var dateTime = (from p in sqlCEdb.CheckIfOverTime where p.Uid == id select p.CreateTime).FirstOrDefault();
+                                if (dateTime != default(DateTime))
+                                    getTime = dateTime.Value;
+                                //SiAuto.Main.WatchDateTime(Level.Debug, "getTime", getTime);
+                                int result;
+                                result = DateTime.Compare(DateTime.Now, getTime.AddMinutes(stayTimeInMin));
+                                //SiAuto.Main.LogText(Level.Debug, id + "-result-" + result,
+                                //DateTime.Now + "--" + getTime.AddMinutes(stayTimeInMin));
+                                if (isStayTimeEnable)
+                                {
+                                    if (result > 0)
+                                    {
+                                        #region send with prohibite data
+
+
+
+                                        foreach (DataRow row in dt.Rows)
+                                        {
+                                            //prohibitedEab2s.Add(new EAB2("p_prohibited", row[0].ToString(), row[1].ToString()));
+                                            //lock (mylock)
+                                            {
+                                                message += ";" + "p_prohibited" + "#" + row[0].ToString() + "#" + row[1].ToString();
+                                            }
+
+                                        }
+                                        #endregion send with prohibite data
+                                    }
+                                }
+                                else
                                 {
                                     #region send with prohibite data
 
@@ -4186,169 +4207,79 @@ now() <= end_time::timestamp ";
                                     }
                                     #endregion send with prohibite data
                                 }
+
+
+
                             }
-                            else
+
+                        }
+                        catch (Exception ex)
+                        {
+
+                            SiAuto.Main.LogText(Level.Debug, id + ":sqlCEException", ex.ToString());
+                        }
+
+
+
+                    }
+                    else
+                    {
+                        try
+                        {
+                            CheckIfOverTime getRow = sqlCEdb.CheckIfOverTime.FirstOrDefault(p => p.CreateTime != null && p.Uid == id);
+                            if (getRow != null)
                             {
+                                //SiAuto.Main.AddCheckpoint(Level.Debug,id+" remove time");
+                                getRow.CreateTime = null;
+                                sqlCEdb.SubmitChanges();
+
                                 #region send with prohibite data
 
 
 
-                                foreach (DataRow row in dt.Rows)
+                                // foreach (DataRow row in dt.Rows)
                                 {
                                     //prohibitedEab2s.Add(new EAB2("p_prohibited", row[0].ToString(), row[1].ToString()));
                                     //lock (mylock)
                                     {
-                                        message += ";" + "p_prohibited" + "#" + row[0].ToString() + "#" + row[1].ToString();
+                                        message += ";" + "p_prohibited_out";
+                                        //SiAuto.Main.LogMessage(message);
                                     }
 
                                 }
                                 #endregion send with prohibite data
                             }
+                        }
+                        catch (Exception ex)
+                        {
 
-
-
+                            SiAuto.Main.LogError(id + "sqlce excep 1", ex.ToString());
                         }
 
                     }
-                    catch (Exception ex)
+
+                    //while (!sql_client.connect())
                     {
-
-                        SiAuto.Main.LogText(Level.Debug, id + ":sqlCEException", ex.ToString());
+                        //Thread.Sleep(30);
                     }
-
-
-
-                }
-                else
-                {
-                    try
-                    {
-                        CheckIfOverTime getRow = sqlCEdb.CheckIfOverTime.FirstOrDefault(p => p.CreateTime != null && p.Uid == id);
-                        if (getRow != null)
-                        {
-                            //SiAuto.Main.AddCheckpoint(Level.Debug,id+" remove time");
-                            getRow.CreateTime = null;
-                            sqlCEdb.SubmitChanges();
-
-                            #region send with prohibite data
-
-
-
-                            // foreach (DataRow row in dt.Rows)
-                            {
-                                //prohibitedEab2s.Add(new EAB2("p_prohibited", row[0].ToString(), row[1].ToString()));
-                                //lock (mylock)
-                                {
-                                    message += ";" + "p_prohibited_out";
-                                    //SiAuto.Main.LogMessage(message);
-                                }
-
-                            }
-                            #endregion send with prohibite data
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-
-                        SiAuto.Main.LogError(id + "sqlce excep 1", ex.ToString());
-                    }
-
                 }
 
-                //while (!sql_client.connect())
+                //DataTable dt3 = GetGidAndFullnameFromP_prohibitedAndPatrol_locationFromSql_SqlClient.get_DataTable(regSqlCmdForLocationTable);
+                //sql_client.disconnect();
+                //List<EAB2> locationEab2s = new List<EAB2>();
+                using (DataTable dt3 = GetGidAndFullnameFromP_prohibitedAndPatrol_locationFromSql_SqlClient.get_DataTable(regSqlCmdForLocationTable))
                 {
-                    //Thread.Sleep(30);
-                }
-            }
-            
-            //DataTable dt3 = GetGidAndFullnameFromP_prohibitedAndPatrol_locationFromSql_SqlClient.get_DataTable(regSqlCmdForLocationTable);
-            //sql_client.disconnect();
-            //List<EAB2> locationEab2s = new List<EAB2>();
-            using (DataTable dt3 = GetGidAndFullnameFromP_prohibitedAndPatrol_locationFromSql_SqlClient.get_DataTable(regSqlCmdForLocationTable))
-            {
-                if (dt3 != null && dt3.Rows.Count != 0)
-                {
-                    //SiAuto.Main.AddCheckpoint(Level.Debug, id + "-find data from sql", regSqlCmdForLocationTable);
-                    try
+                    if (dt3 != null && dt3.Rows.Count != 0)
                     {
-                        CheckIfOverTime2 getRow = sqlCEdb.CheckIfOverTime2.FirstOrDefault(p => p.CreateTime == null && p.Uid == id);
-                        if (getRow != null)
+                        //SiAuto.Main.AddCheckpoint(Level.Debug, id + "-find data from sql", regSqlCmdForLocationTable);
+                        try
                         {
-                            //SiAuto.Main.AddCheckpoint(Level.Debug, id + " assign time");
-                            getRow.CreateTime = DateTime.Now;
-                            sqlCEdb.SubmitChanges();
-                            #region send with location data
-                            foreach (DataRow row in dt3.Rows)
+                            CheckIfOverTime2 getRow = sqlCEdb.CheckIfOverTime2.FirstOrDefault(p => p.CreateTime == null && p.Uid == id);
+                            if (getRow != null)
                             {
-                                //locationEab2s.Add(new EAB2("patrol_location", row[0].ToString(), row[1].ToString()));
-                                //lock (mylock)
-                                {
-                                    message += ";" + "patrol_location" + "#" + row[0].ToString() + "#" + row[1].ToString();
-                                }
-
-                            }
-                            #endregion send with location data
-                        }
-                        else
-                        {
-                            //SiAuto.Main.AddCheckpoint(Level.Debug, id + " has time");
-                            //table:p_config
-                            //column:stay_time
-                            //unit:min
-
-                            //check if over time 
-                            //over->send msg with prohibited data
-                            //not over -> do nothing
-
-                            string sqlCmd = @"select stay_time from p_config";
-
-                            //while (!sql_client.connect())
-                            {
-                                //Thread.Sleep(30);
-                            }
-                            //DataTable dt2 = GetGidAndFullnameFromP_prohibitedAndPatrol_locationFromSql_SqlClient.get_DataTable(sqlCmd);
-                            //sql_client.disconnect();
-                            using (DataTable dt2 = GetGidAndFullnameFromP_prohibitedAndPatrol_locationFromSql_SqlClient.get_DataTable(sqlCmd))
-                            {
-                                if (dt2 != null && dt2.Rows.Count != 0)
-                                {
-                                    foreach (DataRow row in dt2.Rows)
-                                    {
-                                        stayTimeInMin = double.Parse(row[0].ToString());
-                                    }
-                                }
-                            }
-
-                            //SiAuto.Main.WatchDouble(Level.Debug, "stayTimeInMin", stayTimeInMin);
-                            DateTime getTime = new DateTime();
-                            var dateTime = (from p in sqlCEdb.CheckIfOverTime2 where p.Uid == id select p.CreateTime).FirstOrDefault();
-                            if (dateTime != default(DateTime))
-                                getTime = dateTime.Value;
-                            //SiAuto.Main.WatchDateTime(Level.Debug, "getTime", getTime);
-                            int result;
-                            result = DateTime.Compare(DateTime.Now, getTime.AddMinutes(stayTimeInMin));
-                            //SiAuto.Main.LogText(Level.Debug, id + "-result-" + result,
-                            //DateTime.Now + "--" + getTime.AddMinutes(stayTimeInMin));
-                            if (isStayTimeEnable)
-                            {
-                                if (result > 0)
-                                {
-
-                                    #region send with location data
-                                    foreach (DataRow row in dt3.Rows)
-                                    {
-                                        //locationEab2s.Add(new EAB2("patrol_location", row[0].ToString(), row[1].ToString()));
-                                        //lock (mylock)
-                                        {
-                                            message += ";" + "patrol_location" + "#" + row[0].ToString() + "#" + row[1].ToString();
-                                        }
-
-                                    }
-                                    #endregion send with location data
-                                }
-                            }
-                            else
-                            {
+                                //SiAuto.Main.AddCheckpoint(Level.Debug, id + " assign time");
+                                getRow.CreateTime = DateTime.Now;
+                                sqlCEdb.SubmitChanges();
                                 #region send with location data
                                 foreach (DataRow row in dt3.Rows)
                                 {
@@ -4361,58 +4292,132 @@ now() <= end_time::timestamp ";
                                 }
                                 #endregion send with location data
                             }
-
-
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-
-                        SiAuto.Main.LogError(id + ":sqlce excep 3", ex.ToString());
-                    }
-
-                }
-                else
-                {
-                    try
-                    {
-                        CheckIfOverTime2 getRow = sqlCEdb.CheckIfOverTime2.FirstOrDefault(p => p.CreateTime != null && p.Uid == id);
-                        if (getRow != null)
-                        {
-                            //SiAuto.Main.AddCheckpoint(Level.Debug, id + " remove time");
-                            getRow.CreateTime = null;
-                            sqlCEdb.SubmitChanges();
-
-                            #region send with location data
-                            //foreach (DataRow row in dt.Rows)
+                            else
                             {
-                                //locationEab2s.Add(new EAB2("patrol_location", row[0].ToString(), row[1].ToString()));
-                                //lock (mylock)
+                                //SiAuto.Main.AddCheckpoint(Level.Debug, id + " has time");
+                                //table:p_config
+                                //column:stay_time
+                                //unit:min
+
+                                //check if over time 
+                                //over->send msg with prohibited data
+                                //not over -> do nothing
+
+                                string sqlCmd = @"select stay_time from p_config";
+
+                                //while (!sql_client.connect())
                                 {
-                                    //message += ";" + "patrol_location" + "#" + "lout";
+                                    //Thread.Sleep(30);
+                                }
+                                //DataTable dt2 = GetGidAndFullnameFromP_prohibitedAndPatrol_locationFromSql_SqlClient.get_DataTable(sqlCmd);
+                                //sql_client.disconnect();
+                                using (DataTable dt2 = GetGidAndFullnameFromP_prohibitedAndPatrol_locationFromSql_SqlClient.get_DataTable(sqlCmd))
+                                {
+                                    if (dt2 != null && dt2.Rows.Count != 0)
+                                    {
+                                        foreach (DataRow row in dt2.Rows)
+                                        {
+                                            stayTimeInMin = double.Parse(row[0].ToString());
+                                        }
+                                    }
                                 }
 
+                                //SiAuto.Main.WatchDouble(Level.Debug, "stayTimeInMin", stayTimeInMin);
+                                DateTime getTime = new DateTime();
+                                var dateTime = (from p in sqlCEdb.CheckIfOverTime2 where p.Uid == id select p.CreateTime).FirstOrDefault();
+                                if (dateTime != default(DateTime))
+                                    getTime = dateTime.Value;
+                                //SiAuto.Main.WatchDateTime(Level.Debug, "getTime", getTime);
+                                int result;
+                                result = DateTime.Compare(DateTime.Now, getTime.AddMinutes(stayTimeInMin));
+                                //SiAuto.Main.LogText(Level.Debug, id + "-result-" + result,
+                                //DateTime.Now + "--" + getTime.AddMinutes(stayTimeInMin));
+                                if (isStayTimeEnable)
+                                {
+                                    if (result > 0)
+                                    {
+
+                                        #region send with location data
+                                        foreach (DataRow row in dt3.Rows)
+                                        {
+                                            //locationEab2s.Add(new EAB2("patrol_location", row[0].ToString(), row[1].ToString()));
+                                            //lock (mylock)
+                                            {
+                                                message += ";" + "patrol_location" + "#" + row[0].ToString() + "#" + row[1].ToString();
+                                            }
+
+                                        }
+                                        #endregion send with location data
+                                    }
+                                }
+                                else
+                                {
+                                    #region send with location data
+                                    foreach (DataRow row in dt3.Rows)
+                                    {
+                                        //locationEab2s.Add(new EAB2("patrol_location", row[0].ToString(), row[1].ToString()));
+                                        //lock (mylock)
+                                        {
+                                            message += ";" + "patrol_location" + "#" + row[0].ToString() + "#" + row[1].ToString();
+                                        }
+
+                                    }
+                                    #endregion send with location data
+                                }
+
+
                             }
-                            #endregion send with location data
                         }
+                        catch (Exception ex)
+                        {
+
+                            SiAuto.Main.LogError(id + ":sqlce excep 3", ex.ToString());
+                        }
+
                     }
-                    catch (Exception ex)
+                    else
                     {
+                        try
+                        {
+                            CheckIfOverTime2 getRow = sqlCEdb.CheckIfOverTime2.FirstOrDefault(p => p.CreateTime != null && p.Uid == id);
+                            if (getRow != null)
+                            {
+                                //SiAuto.Main.AddCheckpoint(Level.Debug, id + " remove time");
+                                getRow.CreateTime = null;
+                                sqlCEdb.SubmitChanges();
 
-                        SiAuto.Main.LogError(id + "sqlce excep 2", ex.ToString());
+                                #region send with location data
+                                //foreach (DataRow row in dt.Rows)
+                                {
+                                    //locationEab2s.Add(new EAB2("patrol_location", row[0].ToString(), row[1].ToString()));
+                                    //lock (mylock)
+                                    {
+                                        //message += ";" + "patrol_location" + "#" + "lout";
+                                    }
+
+                                }
+                                #endregion send with location data
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+
+                            SiAuto.Main.LogError(id + "sqlce excep 2", ex.ToString());
+                        }
+
                     }
-
                 }
-            }
-            
-            //sql_client.Dispose();
-			//sql_client=null;
-            //sql_client = null;
-            //GC.Collect();
-            //GC.WaitForPendingFinalizers();
-            //if (message.Contains("p_prohibited"))
-                //SiAuto.Main.LogMessage(message);
 
+                //sql_client.Dispose();
+                //sql_client=null;
+                //sql_client = null;
+                //GC.Collect();
+                //GC.WaitForPendingFinalizers();
+                //if (message.Contains("p_prohibited"))
+                //SiAuto.Main.LogMessage(message);
+            
+            }
+           
             return message;
         }
 
