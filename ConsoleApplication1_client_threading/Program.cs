@@ -3328,7 +3328,7 @@ WHERE
             string initialLat = string.Empty, initialLon = string.Empty;
             AVLS_UNIT_Report_Packet avls_package = new AVLS_UNIT_Report_Packet();
             avls_package.Message = "null";
-            
+            bool sendToAVLS = true;
              
 
             
@@ -3799,32 +3799,36 @@ LIMIT 1";
                         case "Unit Present":
                             if (checkPower(avls_package.ID, "on"))
                             {
-                                htable.Clear();
-                                htable = null;
-                                return;
+                                sendToAVLS = false;
                             }
-                            avls_package.Event = "181,";
-                            avls_package.Status = "00000000,";
-                            avls_package.Message = "power_on";
-                            avlsAccessCount++;
-                            //netStream.Close();
-                            //avls_tcpClient.Close();
-                            //return;
+                            else
+                            {
+                                avls_package.Event = "181,";
+                                avls_package.Status = "00000000,";
+                                avls_package.Message = "power_on";
+                                avlsAccessCount++;
+                                //netStream.Close();
+                                //avls_tcpClient.Close();
+                                //return;
+                            }
+                            
                             break;
                         case "Unit Absent":
                             if (checkPower(avls_package.ID, "off"))
                             {
-                                htable.Clear();
-                                htable = null;
-                                return;
+                                sendToAVLS = false;
                             }
-                            avls_package.Event = "182,";
-                            avls_package.Status = "00000000,";
-                            avls_package.Message = "power_off";
-                            avlsAccessCount++;
-                            //netStream.Close();
-                            //avls_tcpClient.Close();
-                            //return;
+                            else
+                            {
+                                avls_package.Event = "182,";
+                                avls_package.Status = "00000000,";
+                                avls_package.Message = "power_off";
+                                avlsAccessCount++;
+                                //netStream.Close();
+                                //avls_tcpClient.Close();
+                                //return;
+                            }
+                            
                             break;
                         case "Ignition Off":
                             avls_package.Event = "0,";
@@ -3856,6 +3860,7 @@ LIMIT 1";
 
             send_string = "%%" + avls_package.ID + avls_package.GPS_Valid + avls_package.Date_Time + avls_package.Loc + avls_package.Speed + avls_package.Dir + avls_package.Temp + avls_package.Status + avls_package.Event + avls_package.Message + "\r\n";
             avlsSendPackage = send_string;
+            if (sendToAVLS)
             avls_WriteLine(avlsNetworkStream, System.Text.Encoding.UTF8.GetBytes(send_string), send_string);
             SiAuto.Main.LogMessage(send_string);
             avlsFlag = true;
