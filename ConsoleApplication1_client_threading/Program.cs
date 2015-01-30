@@ -4048,7 +4048,7 @@ custom.uns_deivce_power_status
 WHERE
 custom.uns_deivce_power_status.power = '"+power+@"' AND
 custom.uns_deivce_power_status.uid = '"+uid+@"'";
-            using (DataTable dt = avlsSqlClient.get_DataTable(sqlcmd))
+            using (DataTable dt = checkPowerSqlClient.get_DataTable(sqlcmd))
             {
                 if (dt != null && dt.Rows.Count != 0)
                 {
