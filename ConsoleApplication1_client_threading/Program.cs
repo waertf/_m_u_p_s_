@@ -3797,6 +3797,12 @@ LIMIT 1";
                             avls_package.Message = htable["event_info"].ToString();
                             break;
                         case "Unit Present":
+                            if (checkPower(avls_package.ID, "on"))
+                            {
+                                htable.Clear();
+                                htable = null;
+                                return;
+                            }
                             avls_package.Event = "181,";
                             avls_package.Status = "00000000,";
                             avls_package.Message = "power_on";
@@ -3806,6 +3812,12 @@ LIMIT 1";
                             //return;
                             break;
                         case "Unit Absent":
+                            if (checkPower(avls_package.ID, "off"))
+                            {
+                                htable.Clear();
+                                htable = null;
+                                return;
+                            }
                             avls_package.Event = "182,";
                             avls_package.Status = "00000000,";
                             avls_package.Message = "power_off";
@@ -4016,6 +4028,39 @@ LIMIT 1";
             stopWatch.Stop();
             SiAuto.Main.LogMessage("access_avls_server spend time(ms):" + stopWatch.ElapsedMilliseconds);
         }
+        static SqlClient checkPowerSqlClient = new SqlClient(
+                            ConfigurationManager.AppSettings["SQL_SERVER_IP"],
+                            ConfigurationManager.AppSettings["SQL_SERVER_PORT"],
+                            ConfigurationManager.AppSettings["SQL_SERVER_USER_ID"],
+                            ConfigurationManager.AppSettings["SQL_SERVER_PASSWORD"],
+                            ConfigurationManager.AppSettings["SQL_SERVER_DATABASE"],
+                            ConfigurationManager.AppSettings["Pooling"],
+                            ConfigurationManager.AppSettings["subMinPoolSize"],
+                            ConfigurationManager.AppSettings["subMaxPoolSize"],
+                            ConfigurationManager.AppSettings["subConnectionLifetime"]);
+
+        private static bool checkPower(string uid, string power)
+        {
+            string sqlcmd = @"SELECT
+custom.uns_deivce_power_status.power
+FROM
+custom.uns_deivce_power_status
+WHERE
+custom.uns_deivce_power_status.power = '"+power+@"' AND
+custom.uns_deivce_power_status.uid = '"+uid+@"'";
+            using (DataTable dt = avlsSqlClient.get_DataTable(sqlcmd))
+            {
+                if (dt != null && dt.Rows.Count != 0)
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+        }
+
         static SqlClient GetGidAndFullnameFromP_prohibitedAndPatrol_locationFromSql_SqlClient = new SqlClient(
                 ConfigurationManager.AppSettings["SQL_SERVER_IP"],
                 ConfigurationManager.AppSettings["SQL_SERVER_PORT"],
