@@ -4725,6 +4725,7 @@ FROM
             dt = null;
         }
         */
+        static object avlsWriteLock = new object();
         private static void avls_WriteLine(NetworkStream netStream, byte[] writeData, string write)
         {
             if (netStream.CanWrite)
@@ -4732,14 +4733,14 @@ FROM
                 //byte[] writeData = Encoding.ASCII.GetBytes(write);
                 try
                 {
-                    
+
                     //Console.WriteLine("S----------------------------------------------------------------------------");
                     //Console.WriteLine("Write:\r\n" + write);
                     //Console.WriteLine("E----------------------------------------------------------------------------");
 
                     //using (StreamWriter w = File.AppendText("log.txt"))
                     {
-                        log.Info("Write:\r\n"+write);
+                        log.Info("Write:\r\n" + write);
                         // Close the writer and underlying file.
                         //w.Close();
                     }
@@ -4753,13 +4754,15 @@ FROM
                     //IAsyncResult result = netStream.BeginWrite(writeData, 0, writeData.Length, new AsyncCallback(avls_myWriteCallBack), netStream);
                     //result.AsyncWaitHandle.WaitOne();
                     //result.AsyncWaitHandle.Close();
-                    netStream.WriteTimeout = 10;
+                    netStream.WriteTimeout = 10000;
+                    lock(avlsWriteLock)
                     netStream.Write(writeData, 0, writeData.Length);
                     //Console.ForegroundColor = ConsoleColor.Green;
                     Console.WriteLine("S----------------------------------------------------------------------------");
                     Console.WriteLine("avls write:\r\n" + write);
                     Console.WriteLine("E----------------------------------------------------------------------------");
                     //Console.ResetColor();
+                    
                 }
                 catch (Exception ex)
                 {
@@ -4774,18 +4777,18 @@ FROM
                         avlsTcpClient.Close();
                     avlsTcpClient = new TcpClient();
                     avlsConnectDone.Reset();
-                    avlsTcpClient.BeginConnect(avls_ipaddress, avls_port, new AsyncCallback(AvlsConnectCallback), avlsTcpClient);
+                    avlsTcpClient.BeginConnect(avls_ipaddress, avls_port, new AsyncCallback(AvlsConnectCallback),
+                        avlsTcpClient);
                     avlsConnectDone.WaitOne();
                     Keeplive.keep(avlsTcpClient.Client);
                     if (avlsTcpClient != null && avlsTcpClient.Client != null)
                     {
                         avlsNetworkStream = avlsTcpClient.GetStream();
-                        avls_WriteLine(avlsNetworkStream, System.Text.Encoding.UTF8.GetBytes(avlsSendPackage), avlsSendPackage);
+                        avls_WriteLine(avlsNetworkStream, System.Text.Encoding.UTF8.GetBytes(avlsSendPackage),
+                            avlsSendPackage);
                         SiAuto.Main.LogMessage(avlsSendPackage);
                     }
                 }
-
-
             }
         }
         public struct AUTO_SQL_DATA
