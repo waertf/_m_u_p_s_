@@ -4025,7 +4025,247 @@ LIMIT 1";
                 ConfigurationManager.AppSettings["MinPoolSize"],
                 ConfigurationManager.AppSettings["MaxPoolSize"],
                 ConfigurationManager.AppSettings["ConnectionLifetime"]);
-        private static string GetGidAndFullnameFromP_prohibitedAndPatrol_locationFromSql(string prohibitedTableName, string locationTableName, string initialLat, string initialLon,string id,bool isStayTimeEnable,string deviceID)
+
+        private static ConcurrentDictionary<string, DateTime?> _P_prohibitedAndPatrol_location1 =
+            new ConcurrentDictionary<string, DateTime?>();
+        private static ConcurrentDictionary<string, DateTime?> _P_prohibitedAndPatrol_location2 =
+            new ConcurrentDictionary<string, DateTime?>();
+        private static string GetGidAndFullnameFromP_prohibitedAndPatrol_locationFromSql(string prohibitedTableName, string locationTableName, string initialLat, string initialLon, string id, bool isStayTimeEnable, string deviceID)
+        {
+            string message = string.Empty;
+            double stayTimeInMin = 0;
+
+            if (!_P_prohibitedAndPatrol_location1.ContainsKey(id))
+                _P_prohibitedAndPatrol_location1.TryAdd(id, null);
+            if (!_P_prohibitedAndPatrol_location2.ContainsKey(id))
+                _P_prohibitedAndPatrol_location2.TryAdd(id, null);
+
+            string regSqlCmdForProhibitedTable = string.Empty;
+            string regSqlCmdForLocationTable = string.Empty;
+            regSqlCmdForProhibitedTable = @"select gid, fullname
+from p_prohibited
+where st_intersects(the_geom, st_geomfromtext('POINT(" + initialLon + " " + initialLat + @")', 4326)) AND
+now() >= start_time::timestamp AND
+now() <= end_time::timestamp ";
+            regSqlCmdForLocationTable = @"select gid, fullname
+from patrol_location
+where st_intersects(st_buffer(the_geom, 0.0009009/100*raidus), st_geomfromtext('POINT(" + initialLon + " " + initialLat + @")', 4326))AND
+now() >= start_time::timestamp AND
+now() <= end_time::timestamp ";
+
+            log.Info(deviceID + ":p_prohibited:sql cmd:" + Environment.NewLine + regSqlCmdForProhibitedTable);
+            log.Info(deviceID + ":patrol_location:sql cmd:" + Environment.NewLine + regSqlCmdForLocationTable);
+
+            using (
+                DataTable dt =
+                    GetGidAndFullnameFromP_prohibitedAndPatrol_locationFromSql_SqlClient.get_DataTable(
+                        regSqlCmdForProhibitedTable))
+            {
+                if (dt != null && dt.Rows.Count != 0)
+                {
+                    DateTime? myTime;
+                    if (_P_prohibitedAndPatrol_location1.TryGetValue(id, out myTime))
+                    {
+                        if (myTime.Equals(null))
+                        {
+                            _P_prohibitedAndPatrol_location1.TryUpdate(id, DateTime.Now, myTime);
+                            foreach (DataRow row in dt.Rows)
+                            {
+                                //prohibitedEab2s.Add(new EAB2("p_prohibited", row[0].ToString(), row[1].ToString()));
+                                //lock (mylock)
+                                {
+                                    message += ";" + "p_prohibited" + "#" + row[0].ToString() + "#" + row[1].ToString();
+                                }
+
+                            }
+                        }
+                        else
+                        {
+                            string sqlCmd = @"select stay_time from p_config";
+                            using (
+                                DataTable dt2 =
+                                    GetGidAndFullnameFromP_prohibitedAndPatrol_locationFromSql_SqlClient.get_DataTable(
+                                        sqlCmd))
+                            {
+                                if (dt2 != null && dt2.Rows.Count != 0)
+                                {
+                                    foreach (DataRow row in dt2.Rows)
+                                    {
+                                        stayTimeInMin = double.Parse(row[0].ToString());
+                                    }
+                                }
+                            }
+                            int result = 0;
+                            if (_P_prohibitedAndPatrol_location1.TryGetValue(id, out myTime))
+                            {
+                                if (myTime != null)
+                                    result = DateTime.Compare(DateTime.Now, myTime.Value.AddMinutes(stayTimeInMin));
+                            }
+                            if (isStayTimeEnable)
+                            {
+                                if (result > 0)
+                                {
+                                    #region send with prohibite data
+
+
+
+                                    foreach (DataRow row in dt.Rows)
+                                    {
+                                        //prohibitedEab2s.Add(new EAB2("p_prohibited", row[0].ToString(), row[1].ToString()));
+                                        //lock (mylock)
+                                        {
+                                            message += ";" + "p_prohibited" + "#" + row[0].ToString() + "#" + row[1].ToString();
+                                        }
+
+                                    }
+                                    #endregion send with prohibite data
+                                }
+                            }
+                            else
+                            {
+                                #region send with prohibite data
+
+
+
+                                foreach (DataRow row in dt.Rows)
+                                {
+                                    //prohibitedEab2s.Add(new EAB2("p_prohibited", row[0].ToString(), row[1].ToString()));
+                                    //lock (mylock)
+                                    {
+                                        message += ";" + "p_prohibited" + "#" + row[0].ToString() + "#" + row[1].ToString();
+                                    }
+
+                                }
+                                #endregion send with prohibite data
+                            }
+                        }
+                    }
+                    
+                }
+                else
+                {
+                    DateTime? myTime;
+                    if (_P_prohibitedAndPatrol_location1.TryGetValue(id, out myTime))
+                    {
+                        if (!myTime.Equals(null))
+                        {
+                            _P_prohibitedAndPatrol_location1.TryUpdate(id, null, myTime);
+                            #region send with prohibite data
+
+
+
+                            // foreach (DataRow row in dt.Rows)
+                            {
+                                //prohibitedEab2s.Add(new EAB2("p_prohibited", row[0].ToString(), row[1].ToString()));
+                                //lock (mylock)
+                                {
+                                    message += ";" + "p_prohibited_out";
+                                    //SiAuto.Main.LogMessage(message);
+                                }
+
+                            }
+                            #endregion send with prohibite data
+                        }
+                    }
+                }
+            }
+
+            using (
+                DataTable dt3 =
+                    GetGidAndFullnameFromP_prohibitedAndPatrol_locationFromSql_SqlClient.get_DataTable(
+                        regSqlCmdForLocationTable))
+            {
+                if (dt3 != null && dt3.Rows.Count != 0)
+                {
+                    DateTime? myTime;
+                    if (_P_prohibitedAndPatrol_location2.TryGetValue(id, out myTime))
+                    {
+                        if (myTime.Equals(null))
+                        {
+                            _P_prohibitedAndPatrol_location2.TryUpdate(id, DateTime.Now, myTime);
+                            #region send with location data
+                            foreach (DataRow row in dt3.Rows)
+                            {
+                                //locationEab2s.Add(new EAB2("patrol_location", row[0].ToString(), row[1].ToString()));
+                                //lock (mylock)
+                                {
+                                    message += ";" + "patrol_location" + "#" + row[0].ToString() + "#" + row[1].ToString();
+                                }
+
+                            }
+                            #endregion send with location data
+                        }
+                        else
+                        {
+                            string sqlCmd = @"select stay_time from p_config";
+                            using (DataTable dt2 = GetGidAndFullnameFromP_prohibitedAndPatrol_locationFromSql_SqlClient.get_DataTable(sqlCmd))
+                            {
+                                if (dt2 != null && dt2.Rows.Count != 0)
+                                {
+                                    foreach (DataRow row in dt2.Rows)
+                                    {
+                                        stayTimeInMin = double.Parse(row[0].ToString());
+                                    }
+                                }
+                            }
+                            int result = 0;
+                            if (_P_prohibitedAndPatrol_location2.TryGetValue(id, out myTime))
+                            {
+                                if (myTime != null)
+                                    result = DateTime.Compare(DateTime.Now, myTime.Value.AddMinutes(stayTimeInMin));
+                            }
+                            if (isStayTimeEnable)
+                            {
+                                if (result > 0)
+                                {
+
+                                    #region send with location data
+                                    foreach (DataRow row in dt3.Rows)
+                                    {
+                                        //locationEab2s.Add(new EAB2("patrol_location", row[0].ToString(), row[1].ToString()));
+                                        //lock (mylock)
+                                        {
+                                            message += ";" + "patrol_location" + "#" + row[0].ToString() + "#" + row[1].ToString();
+                                        }
+
+                                    }
+                                    #endregion send with location data
+                                }
+                                else
+                                {
+                                    #region send with location data
+                                    foreach (DataRow row in dt3.Rows)
+                                    {
+                                        //locationEab2s.Add(new EAB2("patrol_location", row[0].ToString(), row[1].ToString()));
+                                        //lock (mylock)
+                                        {
+                                            message += ";" + "patrol_location" + "#" + row[0].ToString() + "#" + row[1].ToString();
+                                        }
+
+                                    }
+                                    #endregion send with location data
+                                }
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    DateTime? myTime;
+                    if (_P_prohibitedAndPatrol_location2.TryGetValue(id, out myTime))
+                    {
+                        if (!myTime.Equals(null))
+                        {
+                            _P_prohibitedAndPatrol_location2.TryUpdate(id, null, myTime);
+                        }
+                    }
+                }
+            }
+            return message;
+        }
+
+        
+        private static string GetGidAndFullnameFromP_prohibitedAndPatrol_locationFromSql2(string prohibitedTableName, string locationTableName, string initialLat, string initialLon,string id,bool isStayTimeEnable,string deviceID)
         {
             object mylock = new object();
             string startupPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
@@ -4034,18 +4274,18 @@ LIMIT 1";
             string message = string.Empty;
             using (StayCheck sqlCEdb = new StayCheck(connString))
             {
-                /*
-           try
-           {
-               sqlCEdb = new StayCheck(connString);
-           }
-           catch (Exception ex)
-           {
+               // 
+           //try
+           //{
+               //sqlCEdb = new StayCheck(connString);
+           //}
+           //catch (Exception ex)
+           //{
                 
-               SiAuto.Main.LogError(ex.ToString());
-               return string.Empty;
-           }
-           */
+               //SiAuto.Main.LogError(ex.ToString());
+               //return string.Empty;
+           //}
+           //
                 string searchID = string.Empty, searchID2 = string.Empty;
                 double stayTimeInMin = 0;
 
@@ -4454,7 +4694,7 @@ now() <= end_time::timestamp ";
            
             return message;
         }
-
+        
         /*
         private static void GetRidAndGeomFromSqlTable(string table, out List<EAB> myList)
         {
