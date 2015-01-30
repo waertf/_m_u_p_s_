@@ -33,7 +33,7 @@ namespace ConsoleApplication1_client_threading
 
             //pgCSB.Pooling = bool.Parse(Pooling);
             //pgCSB.MinPoolSize = int.Parse(MinPoolSize);
-            //pgCSB.MaxPoolSize = int.Parse(MaxPoolSize);
+            pgCSB.MaxPoolSize = pgCSB2.MaxPoolSize = 20;
             //pgCSB.ConnectionLifetime = int.Parse(ConnectionLifetime); ;
             //pgCSB.ConnectionTimeout = 15;
             pgCSB.Unicode = true;
