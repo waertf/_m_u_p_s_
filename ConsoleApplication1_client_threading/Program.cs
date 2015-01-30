@@ -571,7 +571,7 @@ WHERE
             UnsTcpWriteLine(netStream, data_append_dataLength(registration_msg), registration_msg);
             //using (StreamWriter w = File.AppendText("log.txt"))
             {
-                log.Info("send:\r\n" + registration_msg);
+                log.Info("Main send:\r\n" + registration_msg);
                 // Close the writer and underlying file.
                 //w.Close();
             }
@@ -2384,7 +2384,7 @@ Select 1-6 then press enter to send package
                 UnsTcpWriteLine(myNetworkStream, data_append_dataLength(registration_msg), registration_msg);
                 //using (StreamWriter w = File.AppendText("log.txt"))
                 {
-                    log.Info("send:\r\n" + registration_msg);
+                    log.Info("ReadRecovery send:\r\n" + registration_msg);
                     // Close the writer and underlying file.
                     //w.Close();
                 }
