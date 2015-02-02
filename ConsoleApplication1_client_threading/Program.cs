@@ -6221,6 +6221,7 @@ LIMIT 1";
             locationTableName = "public.patrol_location";
             //string getMessage = string.Empty,bundaryEventNumber = string.Empty;
                 string bundaryEventNumber = string.Empty;
+                StringBuilder insert_custom_cga_event_logBuilder=new StringBuilder();
                 //lock (cgaEventAccessSqlLock)
             {
 
@@ -6292,8 +6293,9 @@ LIMIT 1";
                                                 "," + @"to_timestamp('" + yyyymmddhhmmss +
                                                 @"','YYYYMMDDHH24MISS')";
                     string cmd = "INSERT INTO custom.cga_event_log (" + table_columns + ") VALUES  (" +
-                                 table_column_value + ")";
-                    accessSqlServerClient.modify(cmd);
+                                 table_column_value + ");";
+                    insert_custom_cga_event_logBuilder.Append(cmd);
+                    //accessSqlServerClient.modify(cmd);
                     //sql_client.disconnect();
                 }
             }
@@ -6534,8 +6536,9 @@ LIMIT 1";
                                                   "," + @"to_timestamp('" + yyyymmddhhmmss +
                                                   @"','YYYYMMDDHH24MISS')";
                       string cmd = "INSERT INTO custom.cga_event_log (" + table_columns + ") VALUES  (" +
-                                   table_column_value + ")";
-                      accessSqlServerClient.modify(cmd);
+                                   table_column_value + ");";
+                      insert_custom_cga_event_logBuilder.Append(cmd);
+                      //accessSqlServerClient.modify(cmd);
                       //sql_client.disconnect();
                       break;
                   case "out":
@@ -6577,12 +6580,9 @@ LIMIT 1";
                                                           "," + @"to_timestamp('" + yyyymmddhhmmss +
                                                           @"','YYYYMMDDHH24MISS')";
                               string cmd = "INSERT INTO custom.cga_event_log (" + table_columns + ") VALUES  (" +
-                                           table_column_value + ")";
-                              //while (!sql_client.connect())
-                              {
-                                  //Thread.Sleep(30);
-                              }
-                              accessSqlServerClient.modify(cmd);
+                                           table_column_value + ");";
+                              insert_custom_cga_event_logBuilder.Append(cmd);
+                              //accessSqlServerClient.modify(cmd);
                               break;
                           case "Emergency Off":
 
@@ -6616,7 +6616,11 @@ LIMIT 1";
       getMessage = bundaryEventNumber = cgaEventLogIdCount = xml_root_tag=null;
   //});
             //t1.Start();
-                
+                if (insert_custom_cga_event_logBuilder.Length > 0)
+                {
+                    accessSqlServerClient.modify(insert_custom_cga_event_logBuilder.ToString());
+                    insert_custom_cga_event_logBuilder = null;
+                }
             
             htable.Clear();
                 htable = null;
