@@ -107,13 +107,14 @@ namespace ConsoleApplication1_client_threading
         {
             if(string.IsNullOrEmpty(cmd))
                 return;;
+            /*
             System.Threading.Thread accessDb2Thread = new System.Threading.Thread
       (delegate()
       {
           modifyDB2(cmd);
       });
-            //accessDb2Thread.Start();
-            
+            accessDb2Thread.Start();
+            */
             //modifyDB2(cmd);
             Stopwatch stopWatch = new Stopwatch();
             //PgSqlCommand command = null;
