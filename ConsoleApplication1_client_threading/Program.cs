@@ -1440,8 +1440,8 @@ WHERE
                         //SendToAvlsEventColumnSetNegativeOneIfPowerOffSqlClient.modify(unsSqlCmd);
                         SendToAvlsEventColumnSetNegativeOneIfPowerOffSqlClientThread.Start();
                         TSendPackageToAvlsOnlyByUidAndLocGetFromSql.Start();
-                        SendToAvlsEventColumnSetNegativeOneIfPowerOffSqlClientThread.Join();
-                        TSendPackageToAvlsOnlyByUidAndLocGetFromSql.Join();
+                        //SendToAvlsEventColumnSetNegativeOneIfPowerOffSqlClientThread.Join();
+                        //TSendPackageToAvlsOnlyByUidAndLocGetFromSql.Join();
                         //SendToAvlsEventColumnSetNegativeOneIfPowerOffSqlClient.disconnect();
                         //SendToAvlsEventColumnSetNegativeOneIfPowerOffSqlClient.Dispose();
                         //SendToAvlsEventColumnSetNegativeOneIfPowerOffSqlClient = null;
