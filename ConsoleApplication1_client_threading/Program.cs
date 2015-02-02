@@ -6339,7 +6339,7 @@ LIMIT 1";
                     }
                     cgaEventLogIdCount =
                        Convert.ToDouble(
-                           sql_client.get_DataTable("SELECT COUNT(uid)   FROM custom.cga_event_log WHERE uid = '" + deviceID + "\'").Rows[0].ItemArray[0]);
+                           //sql_client.get_DataTable("SELECT COUNT(uid)   FROM custom.cga_event_log WHERE uid = '" + deviceID + "\'").Rows[0].ItemArray[0]);
                     sql_client.disconnect();
                     //insert into custom.cga_event_log
                     while (!sql_client.connect())
@@ -6364,7 +6364,7 @@ LIMIT 1";
                                                 @"','YYYYMMDDHH24MISS')" +
                                                 "," + @"to_timestamp('" + yyyymmddhhmmss +
                                                 @"','YYYYMMDDHH24MISS')";
-                    string cmd = "INSERT INTO custom.cga_event_log (" + table_columns + ") VALUES  (" +
+                    //string cmd = "INSERT INTO custom.cga_event_log (" + table_columns + ") VALUES  (" +
                                  table_column_value + ")";
                     sql_client.modify(cmd);
                     sql_client.disconnect();
@@ -6414,7 +6414,7 @@ LIMIT 1";
                                                             @"','YYYYMMDDHH24MISS')" +
                                                             "," + @"to_timestamp('" + yyyymmddhhmmss +
                                                             @"','YYYYMMDDHH24MISS')";
-                                string cmd = "INSERT INTO custom.cga_event_log (" + table_columns + ") VALUES  (" +
+                                //string cmd = "INSERT INTO custom.cga_event_log (" + table_columns + ") VALUES  (" +
                                              table_column_value + ")";
                                 accessSqlServerClient.modify(cmd);
                                 //sql_client.disconnect();
@@ -6456,7 +6456,7 @@ LIMIT 1";
                                                                     @"','YYYYMMDDHH24MISS')" +
                                                                     "," + @"to_timestamp('" + yyyymmddhhmmss +
                                                                     @"','YYYYMMDDHH24MISS')";
-                                        string cmd = "INSERT INTO custom.cga_event_log (" + table_columns + ") VALUES  (" +
+                                        //string cmd = "INSERT INTO custom.cga_event_log (" + table_columns + ") VALUES  (" +
                                                      table_column_value + ")";
                                         //while (!sql_client.connect())
                                         {
