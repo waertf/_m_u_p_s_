@@ -2505,6 +2505,7 @@ Select 1-6 then press enter to send package
                 Console.WriteLine(output);
                 Console.WriteLine("############################################################################");
                  * */
+                /*
                 if (bool.Parse(ConfigurationManager.AppSettings["ManualSend"]))
                 {
                     Console.WriteLine(
@@ -2520,6 +2521,7 @@ Select 1-6 then press enter to send package
 ");
                     Console.Write("Select[1-6]:");
                 }
+                */
                 avlsConnectDone.WaitOne();
                 //OnMessageRead(fBuffer);
                 fStream.BeginRead(myReadBuffer, 0, myReadBuffer.Length,
