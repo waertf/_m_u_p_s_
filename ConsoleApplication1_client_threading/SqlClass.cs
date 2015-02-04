@@ -23,7 +23,8 @@ namespace ConsoleApplication1_client_threading
             string getMessage)
         {
             XmlRootTag = xml_root_tag;
-            Htable = new Hashtable(htable);
+            //Htable = new Hashtable(htable);
+            Htable = htable;
             //SensorName = new List<string>(sensor_name);
             //SensorType = new List<string>(sensor_type);
             //SensorValue = new List<string>(sensor_value);
@@ -31,6 +32,7 @@ namespace ConsoleApplication1_client_threading
             Log1 = log1;
             GetMessage = getMessage;
         }
+         /*
         ~SqlClass()
         {
             XmlRootTag = Log1 = GetMessage = null;
@@ -40,5 +42,6 @@ namespace ConsoleApplication1_client_threading
             SensorValue = null;
             Elements = null;
         }
+          * */
     }
 }

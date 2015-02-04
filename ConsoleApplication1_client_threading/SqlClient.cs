@@ -120,6 +120,7 @@ namespace ConsoleApplication1_client_threading
             //PgSqlCommand command = null;
             PgSqlTransaction myTrans = null;
             using (var pgSqlConnection = new PgSqlConnection(pgCSB.ConnectionString))
+            using (PgSqlCommand command = new PgSqlCommand())
             try
             {
                 //if (pgSqlConnection != null && IsConnected)
@@ -127,7 +128,7 @@ namespace ConsoleApplication1_client_threading
                 //{
                     //insert
                     //pgSqlConnection.Open();
-                    PgSqlCommand command = new PgSqlCommand();
+                    //PgSqlCommand command = new PgSqlCommand();
                     command.Connection = pgSqlConnection;
                     command.UnpreparedExecute = true;
                     command.CommandType=CommandType.Text;
@@ -173,7 +174,7 @@ namespace ConsoleApplication1_client_threading
                      //int aff = command.ExecuteNonQuery();
                     //Console.WriteLine(RowsAffected + " rows were affected.");
                      //command.Dispose();
-                    command = null;
+                    //command = null;
                     //pgSqlConnection.Commit();
                     /*
                     ThreadPool.QueueUserWorkItem(callback =>
@@ -248,8 +249,9 @@ namespace ConsoleApplication1_client_threading
             
             using (DataTable datatable = new DataTable())
             using (var pgSqlConnection = new PgSqlConnection(pgCSB.ConnectionString))
+            using (PgSqlCommand command = new PgSqlCommand())
             {
-                PgSqlCommand command = new PgSqlCommand();
+                
                 try
                 {
                     //if (pgSqlConnection != null && IsConnected)
@@ -360,7 +362,7 @@ namespace ConsoleApplication1_client_threading
                         //stopWatch2.Start();
                         //if (command != null)
                             //command.Dispose();
-                        command = null;
+                        //command = null;
                         using (DataTable returnTable = datatable.Copy())
                         {
                             //stopWatch2.Stop();
@@ -385,7 +387,7 @@ namespace ConsoleApplication1_client_threading
                     Console.ResetColor();
                     //if (command != null)
                         //command.Dispose();
-                    command = null;
+                    //command = null;
                     return null;
                 }
             }
@@ -413,13 +415,14 @@ namespace ConsoleApplication1_client_threading
             //PgSqlCommand command = null;
             PgSqlTransaction myTrans = null;
             using (var pgSqlConnection2 = new PgSqlConnection(pgCSB2.ConnectionString))
+            using (PgSqlCommand command = new PgSqlCommand())
             try
             {
                 
                 //{
                     //pgSqlConnection2.Open();
                     //insert
-                    PgSqlCommand command = new PgSqlCommand();
+                    //PgSqlCommand command = new PgSqlCommand();
                     command.Connection = pgSqlConnection2;
                     command.UnpreparedExecute = true;
                     command.CommandType = CommandType.Text;
@@ -464,7 +467,7 @@ namespace ConsoleApplication1_client_threading
                     //int aff = command.ExecuteNonQuery();
                     //Console.WriteLine(RowsAffected + " rows were affected.");
                     //command.Dispose();
-                    command = null;
+                    //command = null;
                     //pgSqlConnection.Commit();
                     /*
                     ThreadPool.QueueUserWorkItem(callback =>

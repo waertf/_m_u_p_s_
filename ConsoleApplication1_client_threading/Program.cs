@@ -2695,7 +2695,7 @@ Select 1-6 then press enter to send package
                             id = XmlGetTagValue(xml_data, "suaddr");
                             if (id.Equals(string.Empty))
                             {
-                                htable = null;
+                                //htable = null;
                                 xml_data = null;
                                 elements = null;
                                 xml_root_tag = null;
@@ -2713,7 +2713,7 @@ Select 1-6 then press enter to send package
                             {}
                             else
                             {
-                                htable = null;
+                                //htable = null;
                                 xml_data = null;
                                 elements = null;
                                 xml_root_tag = null;
@@ -3092,7 +3092,7 @@ Select 1-6 then press enter to send package
                             id = XmlGetTagValue(xml_data, "suaddr");
                             if (id.Equals(string.Empty))
                             {
-                                htable = null;
+                                //htable = null;
                                 xml_data = null;
                                 elements = null;
                                 xml_root_tag = null;
@@ -3110,7 +3110,7 @@ Select 1-6 then press enter to send package
                             { }
                             else
                             {
-                                htable = null;
+                                //htable = null;
                                 xml_data = null;
                                 elements = null;
                                 xml_root_tag = null;
@@ -3152,7 +3152,7 @@ Select 1-6 then press enter to send package
                             id = XmlGetTagValue(xml_data, "suaddr");
                             if (id.Equals(string.Empty))
                             {
-                                htable = null;
+                                //htable = null;
                                 xml_data = null;
                                 elements = null;
                                 xml_root_tag = null;
@@ -3168,7 +3168,7 @@ Select 1-6 then press enter to send package
                             { }
                             else
                             {
-                                htable = null;
+                                //htable = null;
                                 xml_data = null;
                                 elements = null;
                                 xml_root_tag = null;
@@ -4050,8 +4050,8 @@ LIMIT 1";
             //ReadLine(avls_tcpClient, netStream, send_string.Length);
             //netStream.Close();
             //avlsTcpClient.Close();
-            htable.Clear();
-            htable = null;
+            //htable.Clear();
+            //htable = null;
             //GC.Collect();
             //GC.WaitForPendingFinalizers();
             //Console.WriteLine("-access_avls_server");
@@ -6656,8 +6656,8 @@ LIMIT 1";
                     insert_custom_cga_event_logBuilder = null;
                 }
             
-            htable.Clear();
-                htable = null;
+            //htable.Clear();
+                //htable = null;
             //sql_client.Dispose();
                 //sql_client = null;
             //GC.Collect();
