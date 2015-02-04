@@ -2481,8 +2481,12 @@ Select 1-6 then press enter to send package
                 //xmlQueue.Enqueue(returndata);
                 //xml_parse(returndata);
                 //Thread.Sleep(200);
-				Thread xmlParseThread = new Thread(xml_parse);
-                xmlParseThread.Start(returndata);
+				//Thread xmlParseThread = new Thread(xml_parse);
+                //xmlParseThread.Start(returndata);
+                Task.Factory.StartNew(() =>
+                {
+                    xml_parse(returndata);
+                });
                 //xmlParseThread.Join(int.Parse(ConfigurationManager.AppSettings["xmlParseJoinTimeout"]));
                 //Thread.Sleep(1);
 				//xml_parse(new XmlClass(unsTcpClient, fStream, returndata, avlsTcpClient));
@@ -2873,6 +2877,7 @@ Select 1-6 then press enter to send package
                             if (GetGidAndFullnameFrom != null) getMessage = GetGidAndFullnameFrom.Result;
                             //if (bool.Parse(ConfigurationManager.AppSettings["AVLS_ACCESS"]))
                             {
+                                /*
                                 Thread access_avls = null;
                                 //avlsSendDone.Reset();
                                  access_avls = new Thread(access_avls_server);
@@ -2881,6 +2886,13 @@ Select 1-6 then press enter to send package
                                 access_avls.Start(new AvlsClass(xml_root_tag, htable, null,
                                     null, null, elements,
                                     logData, getMessage));
+                                */
+                                Task.Factory.StartNew(() =>
+                                {
+                                    access_avls_server(new AvlsClass(xml_root_tag, htable, null,
+                                    null, null, elements,
+                                    logData, getMessage));
+                                });
                                 
                                 //lock(avlsObject){
                                     //avlsLinkedList.Enqueue(new AvlsClass(xml_root_tag, htable, sensor_name.ToList(),
@@ -2901,13 +2913,19 @@ Select 1-6 then press enter to send package
                             }
                             //if (bool.Parse(ConfigurationManager.AppSettings["SQL_ACCESS"]))
                             {
+                                /*
                                 Thread access_sql = null;
                                 //sqlAccessEvent.Reset();
                                 access_sql = new Thread(access_sql_server);
                                 //access_sql.IsBackground = true;
                                 access_sql.Start(new SqlClass(xml_root_tag, htable, null, null, null, elements,
                                 logData, getMessage));
-
+                                */
+                                Task.Factory.StartNew(() =>
+                                {
+                                    access_sql_server(new SqlClass(xml_root_tag, htable, null, null, null, elements,
+                                logData, getMessage));
+                                });
                                 //lock(sqlObject)
                                 //sqlLinkedList.Enqueue(new SqlClass(xml_root_tag, htable, sensor_name.ToList(),
                                 //sensor_type.ToList(), sensor_value.ToList(), elements,
@@ -3042,8 +3060,14 @@ Select 1-6 then press enter to send package
                     
                     //if (bool.Parse(ConfigurationManager.AppSettings["SQL_ACCESS"]))
                     {
+                        /*
                         Thread access_sql = new Thread(access_sql_server);
                         access_sql.Start(new SqlClass(xml_root_tag, htable, null, null, null, elements, logData, null)); ;
+                        */
+                        Task.Factory.StartNew(() =>
+                        {
+                            access_sql_server(new SqlClass(xml_root_tag, htable, null, null, null, elements, logData, null));
+                        });
                         //lock(sqlObject)
                             //sqlLinkedList.Enqueue(new SqlClass(xml_root_tag, htable, sensor_name.ToList(), sensor_type.ToList(), sensor_value.ToList(), elements, logData, null)); ;
                         //sqlLinkedList.Enqueue(new SqlClass(xml_root_tag, htable, null,null,null, elements, logData, null)); ;
@@ -3183,11 +3207,13 @@ Select 1-6 then press enter to send package
                 //w.Close();
             }
             */
+            /*
             htable = null;
             xml_data = null;
             elements = null;
             xml_root_tag = null;
             logData = null;
+            */
             //sensor_name.Clear();
             //sensor_name = null;
             //sensor_value.Clear();
@@ -3197,7 +3223,7 @@ Select 1-6 then press enter to send package
             //GC.Collect();
             //GC.WaitForPendingFinalizers();
             
-            Console.WriteLine();
+            //Console.WriteLine();
             stopWatch.Stop();
             SiAuto.Main.LogMessage("xml_parse spend time(ms):"+stopWatch.ElapsedMilliseconds);
         }
@@ -3312,7 +3338,7 @@ WHERE
             }
                 
             //Console.ForegroundColor = ConsoleColor.DarkGreen;
-            Console.WriteLine("+" + myMethodName);
+            //Console.WriteLine("+" + myMethodName);
             //Console.ResetColor();
             var oo = o as AvlsClass;
 
@@ -3563,7 +3589,7 @@ LIMIT 1";
                     //avlsTcpClient.Close();
                     //Console.WriteLine("-access_avls_server");
                     //Console.ForegroundColor = ConsoleColor.DarkGreen;
-                    Console.WriteLine("-" + myMethodName);
+                    //Console.WriteLine("-" + myMethodName);
                     //Console.ResetColor();
                     stopWatch.Stop();
                     SiAuto.Main.LogMessage("access_avls_server spend time(ms):" + stopWatch.ElapsedMilliseconds);
@@ -3574,7 +3600,7 @@ LIMIT 1";
                     //netStream.Close();
                     //avlsTcpClient.Close();
                     //Console.ForegroundColor = ConsoleColor.DarkGreen;
-                    Console.WriteLine("-" + myMethodName);
+                    //Console.WriteLine("-" + myMethodName);
                     //Console.ResetColor();
                     stopWatch.Stop();
                     SiAuto.Main.LogMessage("access_avls_server spend time(ms):" + stopWatch.ElapsedMilliseconds);
@@ -3595,7 +3621,7 @@ LIMIT 1";
                    // netStream.Close();
                     //avlsTcpClient.Close();
                     //Console.ForegroundColor = ConsoleColor.DarkGreen;
-                    Console.WriteLine("-" + myMethodName);
+                    //Console.WriteLine("-" + myMethodName);
                     //Console.ResetColor();
                     stopWatch.Stop();
                     SiAuto.Main.LogMessage("access_avls_server spend time(ms):" + stopWatch.ElapsedMilliseconds);
@@ -4030,7 +4056,7 @@ LIMIT 1";
             //GC.WaitForPendingFinalizers();
             //Console.WriteLine("-access_avls_server");
             //Console.ForegroundColor = ConsoleColor.DarkGreen;
-            Console.WriteLine("-" + myMethodName);
+            //Console.WriteLine("-" + myMethodName);
             //Console.ResetColor();
             stopWatch.Stop();
             SiAuto.Main.LogMessage("access_avls_server spend time(ms):" + stopWatch.ElapsedMilliseconds);
@@ -4810,9 +4836,14 @@ FROM
                     lock(avlsWriteLock)
                     netStream.Write(writeData, 0, writeData.Length);
                     //Console.ForegroundColor = ConsoleColor.Green;
-                    Console.WriteLine("S----------------------------------------------------------------------------");
-                    Console.WriteLine("avls write:\r\n" + write);
-                    Console.WriteLine("E----------------------------------------------------------------------------");
+                    
+                    Task.Factory.StartNew(() =>
+                    {
+                        //Console.WriteLine("S----------------------------------------------------------------------------");
+                        Console.WriteLine("avls write:\r\n" + write);
+                        //Console.WriteLine("E----------------------------------------------------------------------------");
+                    });
+                    
                     //Console.ResetColor();
                     
                 }
@@ -4911,6 +4942,7 @@ FROM
                 ConfigurationManager.AppSettings["SQL_SERVER_DATABASE"], ConfigurationManager.AppSettings["Pooling"],
                 ConfigurationManager.AppSettings["MinPoolSize"], ConfigurationManager.AppSettings["MaxPoolSize"],
                 ConfigurationManager.AppSettings["ConnectionLifetime"]);
+        static string localIPAddress=LocalIPAddress();
         private static void access_sql_server(object o)
         {
              string myMethodName = MethodBase.GetCurrentMethod().Name;
@@ -4924,7 +4956,7 @@ FROM
                 }
                     
                 //Console.ForegroundColor = ConsoleColor.DarkCyan;
-                Console.WriteLine("+" + myMethodName);
+                //Console.WriteLine("+" + myMethodName);
                 //Console.ResetColor();
             //Console.WriteLine("+access_sql_server");
                 var oo = o as SqlClass;
@@ -5030,7 +5062,7 @@ FROM
                     log.Info("cannot find suaddr in htable");
                     //sql_client.Dispose();
                     //sql_client = null;
-                    Console.WriteLine("-" + myMethodName);
+                    //Console.WriteLine("-" + myMethodName);
                     return;
                     gps_log._uid = operation_log.eqp_id = "\'" + "null" + "\'";
                     gps_log._id = "\'" + "null" + "_" + now + "\'";
@@ -5475,7 +5507,7 @@ VALUES(
                         //sql_client.disconnect();
                         //sql_client.Dispose();
                         //sql_client = null;
-                        Console.WriteLine("-" + myMethodName);
+                        //Console.WriteLine("-" + myMethodName);
                         return;
                         break;
                     case "Unit Absent":
@@ -5577,7 +5609,7 @@ VALUES(
                     //sql_client.disconnect();
                     //sql_client.Dispose();
                     //sql_client = null;
-                    Console.WriteLine("-" + myMethodName);
+                    //Console.WriteLine("-" + myMethodName);
                         return;
                         break;
                     case "Ignition Off":
@@ -6288,7 +6320,7 @@ LIMIT 1";
                                                 gps_log._option0 + @",'YYYYMMDDHH24MISS')" +
                                                 "," + "to_timestamp(" +
                                                 gps_log._option1 + @",'YYYYMMDDHH24MISS')" +
-                                                "," + @"1" + "," + @"'" + LocalIPAddress().ToString() +
+                                                "," + @"1" + "," + @"'" + localIPAddress +
                                                 @"'" +
                                                 "," + @"to_timestamp('" + yyyymmddhhmmss +
                                                 @"','YYYYMMDDHH24MISS')" +
@@ -6531,7 +6563,7 @@ LIMIT 1";
                                                   gps_log._option0 + @",'YYYYMMDDHH24MISS')" +
                                                   "," + "to_timestamp(" +
                                                   gps_log._option1 + @",'YYYYMMDDHH24MISS')" +
-                                                  "," + @"1" + "," + @"'" + LocalIPAddress().ToString() +
+                                                  "," + @"1" + "," + @"'" + localIPAddress +
                                                   @"'" +
                                                   "," + @"to_timestamp('" + yyyymmddhhmmss +
                                                   @"','YYYYMMDDHH24MISS')" +
@@ -6575,7 +6607,7 @@ LIMIT 1";
                                                           gps_log._option0 + @",'YYYYMMDDHH24MISS')" +
                                                           "," + "to_timestamp(" +
                                                           gps_log._option1 + @",'YYYYMMDDHH24MISS')" +
-                                                          "," + @"1" + "," + @"'" + LocalIPAddress().ToString() +
+                                                          "," + @"1" + "," + @"'" + localIPAddress +
                                                           @"'" +
                                                           "," + @"to_timestamp('" + yyyymmddhhmmss +
                                                           @"','YYYYMMDDHH24MISS')" +
@@ -6631,7 +6663,7 @@ LIMIT 1";
             //GC.Collect();
             //GC.WaitForPendingFinalizers();
                 //Console.ForegroundColor = ConsoleColor.DarkCyan;
-                Console.WriteLine("-" + myMethodName);
+                //Console.WriteLine("-" + myMethodName);
                 //Console.ResetColor();
             //Console.WriteLine("-access_sql_server");
             //sqlAccessEvent.Set();
