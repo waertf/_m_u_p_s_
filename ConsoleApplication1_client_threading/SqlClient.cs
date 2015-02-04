@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading;
+using System.Threading.Tasks;
 using Devart.Data.PostgreSql;
 using System.Data;
 using Gurock.SmartInspect;
@@ -116,6 +117,12 @@ namespace ConsoleApplication1_client_threading
             accessDb2Thread.Start();
             */
             //modifyDB2(cmd);
+
+            Task.Factory.StartNew(() =>
+            {
+                modifyDB2(cmd);
+            });
+
             Stopwatch stopWatch = new Stopwatch();
             //PgSqlCommand command = null;
             PgSqlTransaction myTrans = null;
