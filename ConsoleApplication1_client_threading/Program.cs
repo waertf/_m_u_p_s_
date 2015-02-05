@@ -2430,7 +2430,11 @@ Select 1-6 then press enter to send package
 
         private static void FinishRead(IAsyncResult result)
         {
-            NetworkStream fStream = (NetworkStream)result.AsyncState;
+            NetworkStream fStream = null;
+
+            fStream = (NetworkStream)result.AsyncState ?? unsTcpClient.GetStream();
+            //if (fStream==null)
+                //return;
             try
             {
                 // Finish reading from our stream. 0 bytes read means stream was closed
