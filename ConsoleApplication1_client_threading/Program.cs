@@ -1599,13 +1599,7 @@ LIMIT 1";
                 
             }
             else
-            {
-                if (true)
-                {
-
-                    
-
-                }
+            {    
             }
             if (false)
             {
@@ -1671,6 +1665,7 @@ LIMIT 1";
                 
             }
             else
+/*
             {
                 string avlsLat = string.Empty, avlsLon = string.Empty;
                 GetInitialLocationFromSql(ref avlsLat, ref avlsLon, avls_package.ID);
@@ -1682,7 +1677,7 @@ LIMIT 1";
                 avls_package.Loc = "N" + lat_str + "E" + long_str + ",";
                 //avls_package.Loc = "N00000.0000E00000.0000,";
             }
-
+            */
             avls_package.Speed = "0,";
             avls_package.Dir = "0,";
             avls_package.Temp = "NA,";
