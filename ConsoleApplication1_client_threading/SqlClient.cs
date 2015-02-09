@@ -23,6 +23,8 @@ namespace ConsoleApplication1_client_threading
         public bool IsConnected { get; set; }
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
         readonly object accessLock = new object();
+        private readonly bool _db2Access = bool.Parse(ConfigurationManager.AppSettings["DB2_ACCESS"]);
+        private readonly bool _db1Access = bool.Parse(ConfigurationManager.AppSettings["DB1_ACCESS"]);
         public SqlClient(string ip, string port, string user_id, string password, string database, string Pooling, string MinPoolSize, string MaxPoolSize, string ConnectionLifetime)
         {
             //PgSqlConnectionStringBuilder pgCSB = new PgSqlConnectionStringBuilder();
@@ -120,25 +122,35 @@ namespace ConsoleApplication1_client_threading
 
             Task.Factory.StartNew(() =>
             {
-                modifyDB2(cmd);
+                if(_db2Access)
+                    modifyDB2(cmd);
             });
+            Task.Factory.StartNew(() =>
+            {
+                if (_db1Access)
+                    modifyDB1(cmd);
+            });
+            
+        }
 
+        void modifyDB1(string cmd)
+        {
             Stopwatch stopWatch = new Stopwatch();
             //PgSqlCommand command = null;
             PgSqlTransaction myTrans = null;
             using (var pgSqlConnection = new PgSqlConnection(pgCSB.ConnectionString))
             using (PgSqlCommand command = new PgSqlCommand())
-            try
-            {
-                //if (pgSqlConnection != null && IsConnected)
-                
-                //{
+                try
+                {
+                    //if (pgSqlConnection != null && IsConnected)
+
+                    //{
                     //insert
                     //pgSqlConnection.Open();
                     //PgSqlCommand command = new PgSqlCommand();
                     command.Connection = pgSqlConnection;
                     command.UnpreparedExecute = true;
-                    command.CommandType=CommandType.Text;
+                    command.CommandType = CommandType.Text;
                     command.CommandText = string.Copy(cmd);
                     //command.CommandTimeout = 30;
 
@@ -146,27 +158,27 @@ namespace ConsoleApplication1_client_threading
                     //pgSqlConnection.BeginTransaction();
                     //async
                     int RowsAffected;
-                    
-                    
+
+
                     //lock (accessLock)
                     //{
-                        pgSqlConnection.Open();
-                        //myTrans = pgSqlConnection.BeginTransaction(IsolationLevel.ReadCommitted);
-                        //command.Transaction = myTrans;
-                        //IAsyncResult cres = command.BeginExecuteNonQuery();
-                        //RowsAffected = command.EndExecuteNonQuery(cres);
-                        //lock (accessLock)
-                        RowsAffected = command.ExecuteNonQuery();
-                        //myTrans.Commit();
-                        //pgSqlConnection.Close();
+                    pgSqlConnection.Open();
+                    //myTrans = pgSqlConnection.BeginTransaction(IsolationLevel.ReadCommitted);
+                    //command.Transaction = myTrans;
+                    //IAsyncResult cres = command.BeginExecuteNonQuery();
+                    //RowsAffected = command.EndExecuteNonQuery(cres);
+                    //lock (accessLock)
+                    RowsAffected = command.ExecuteNonQuery();
+                    //myTrans.Commit();
+                    //pgSqlConnection.Close();
                     //}
-                
+
                     //IAsyncResult cres=command.BeginExecuteNonQuery(null,null);
                     //Console.Write("In progress...");
                     //while (!cres.IsCompleted)
                     //{
-                        //Console.Write(".");
-                        //Perform here any operation you need
+                    //Console.Write(".");
+                    //Perform here any operation you need
                     //}
                     /*
                     if (cres.IsCompleted)
@@ -176,11 +188,11 @@ namespace ConsoleApplication1_client_threading
                     */
                     //int RowsAffected = command.EndExecuteNonQuery(cres);
                     //Console.WriteLine("Done. Rows affected: " + RowsAffected.ToString());
-                    
-                     //sync
-                     //int aff = command.ExecuteNonQuery();
+
+                    //sync
+                    //int aff = command.ExecuteNonQuery();
                     //Console.WriteLine(RowsAffected + " rows were affected.");
-                     //command.Dispose();
+                    //command.Dispose();
                     //command = null;
                     //pgSqlConnection.Commit();
                     /*
@@ -207,22 +219,22 @@ namespace ConsoleApplication1_client_threading
                         ts.Hours, ts.Minutes, ts.Seconds,
                         ts.Milliseconds / 10);
                     SiAuto.Main.AddCheckpoint(Level.Debug, "sql modify take time:" + elapsedTime, cmd);
-                    
-                //}
 
-            }
-            catch (PgSqlException ex)
-            {
-                if (myTrans != null) myTrans.Rollback();
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine("Modify exception occurs: {0}" + Environment.NewLine + "{1}", ex.Error, cmd);
-                log.Error("Modify exception occurs: " + Environment.NewLine + ex.Error + Environment.NewLine + cmd);
-                Console.ResetColor();
-                //pgSqlConnection.Rollback();
-                //command.Dispose();
-                //command = null;
+                    //}
 
-            }
+                }
+                catch (PgSqlException ex)
+                {
+                    if (myTrans != null) myTrans.Rollback();
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine("Modify exception occurs: {0}" + Environment.NewLine + "{1}", ex.Error, cmd);
+                    log.Error("Modify exception occurs: " + Environment.NewLine + ex.Error + Environment.NewLine + cmd);
+                    Console.ResetColor();
+                    //pgSqlConnection.Rollback();
+                    //command.Dispose();
+                    //command = null;
+
+                }
 
             //accessDb2Thread.Join();
         }
@@ -416,8 +428,8 @@ namespace ConsoleApplication1_client_threading
         //} 
         void modifyDB2(string cmd)
         {
-            if (string.IsNullOrEmpty(cmd))
-                return; ;
+            //if (string.IsNullOrEmpty(cmd))
+                //return; ;
             //Stopwatch stopWatch = new Stopwatch();
             //PgSqlCommand command = null;
             PgSqlTransaction myTrans = null;
