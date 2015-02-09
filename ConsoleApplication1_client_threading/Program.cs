@@ -1530,17 +1530,7 @@ WHERE
                 string zero = "0";
                 if (avlsLat.Equals(zero) || avlsLon.Equals(zero))
                 {
-                    GetInitialLocationFromSql(ref avlsLat, ref avlsLon, avls_package.ID);
-                }
-                string lat_str = avlsLat, long_str = avlsLon;
-                ConvertLocToAvlsLoc(ref lat_str, ref long_str);
-                avls_package.Loc = "N" + lat_str + "E" + long_str + ",";
-            }
-            else
-            {
-                if (true)
-                {
-
+                    //GetInitialLocationFromSql(ref avlsLat, ref avlsLon, avls_package.ID);
                     string avlsSqlCmd = @"SELECT 
   public._gps_in_time._lat,
   public._gps_in_time._lon
@@ -1563,13 +1553,13 @@ LIMIT 1";
                         //SendPackageToAvlsOnlyByUidAndLocGetFromSqlSqlClient = null;
                         if (dt != null && dt.Rows.Count != 0)
                         {
-                            string avlsLat = string.Empty, avlsLon = string.Empty;
+                            avlsLat = string.Empty; avlsLon = string.Empty;
                             foreach (DataRow row in dt.Rows)
                             {
                                 avlsLat = row[0].ToString();
                                 avlsLon = row[1].ToString();
                             }
-                            string zero = "0";
+                            //string zero = "0";
                             if (avlsLat.Equals(zero) || avlsLon.Equals(zero))
                             {
                                 GetInitialLocationFromSql(ref avlsLat, ref avlsLon, avls_package.ID);
@@ -1585,7 +1575,7 @@ LIMIT 1";
                         }
                         else
                         {
-                            string avlsLat = string.Empty, avlsLon = string.Empty;
+                             avlsLat = string.Empty; avlsLon = string.Empty;
                             GetInitialLocationFromSql(ref avlsLat, ref avlsLon, avls_package.ID);
                             //GeoAngle lat_value = GeoAngle.FromDouble(Convert.ToDecimal(avlsLat));
                             //GeoAngle long_value = GeoAngle.FromDouble(Convert.ToDecimal(avlsLon));
@@ -1599,6 +1589,21 @@ LIMIT 1";
                         }
 
                     }
+                }
+                else
+                {
+                    string lat_str = avlsLat, long_str = avlsLon;
+                    ConvertLocToAvlsLoc(ref lat_str, ref long_str);
+                    avls_package.Loc = "N" + lat_str + "E" + long_str + ",";
+                }
+                
+            }
+            else
+            {
+                if (true)
+                {
+
+                    
 
                 }
             }
@@ -3487,18 +3492,10 @@ WHERE
                         string zero = "0";
                         if (avlsLat.Equals(zero) || avlsLon.Equals(zero))
                         {
-                            GetInitialLocationFromSql(ref avlsLat, ref avlsLon, avls_package.ID);
-                        }
-                        string lat_str = avlsLat, long_str = avlsLon;
-                        ConvertLocToAvlsLoc(ref lat_str, ref long_str);
-                        avls_package.Loc = "N" + lat_str + "E" + long_str + ",";
-                    }
-                    else
-                    {
-                        if (bool.Parse(ConfigurationManager.AppSettings["avlsGetLastLocation"]))
-                        {
+                            if (bool.Parse(ConfigurationManager.AppSettings["avlsGetLastLocation"]))
+                            {
 
-                            string avlsSqlCmd = @"SELECT 
+                                string avlsSqlCmd = @"SELECT 
   public._gps_in_time._lat,
   public._gps_in_time._lon
 FROM
@@ -3509,58 +3506,70 @@ WHERE
 ORDER BY
   public._gps_in_time._time DESC
 LIMIT 1";
-                            //Console.WriteLine("+c");
-                            //while (!avlsSqlClient.connect())
-                            {
-                                //Thread.Sleep(30);
-                            }
-                            //Console.WriteLine("-c");
-                            //Console.WriteLine("+d");
-                            //DataTable dt = avlsSqlClient.get_DataTable(avlsSqlCmd);
-                            //Console.WriteLine("-d");
-                            //avlsSqlClient.disconnect();
-                            //avlsSqlClient.Dispose();
-                            //avlsSqlClient=null;
-                            using (DataTable dt = avlsSqlClient.get_DataTable(avlsSqlCmd))
-                            {
-                                if (dt != null && dt.Rows.Count != 0)
+                                //Console.WriteLine("+c");
+                                //while (!avlsSqlClient.connect())
                                 {
-                                    string avlsLat = string.Empty, avlsLon = string.Empty;
-                                    foreach (DataRow row in dt.Rows)
+                                    //Thread.Sleep(30);
+                                }
+                                //Console.WriteLine("-c");
+                                //Console.WriteLine("+d");
+                                //DataTable dt = avlsSqlClient.get_DataTable(avlsSqlCmd);
+                                //Console.WriteLine("-d");
+                                //avlsSqlClient.disconnect();
+                                //avlsSqlClient.Dispose();
+                                //avlsSqlClient=null;
+                                using (DataTable dt = avlsSqlClient.get_DataTable(avlsSqlCmd))
+                                {
+                                    if (dt != null && dt.Rows.Count != 0)
                                     {
-                                        initialLat = avlsLat = row[0].ToString();
-                                        initialLon = avlsLon = row[1].ToString();
+                                        avlsLat = string.Empty; avlsLon = string.Empty;
+                                        foreach (DataRow row in dt.Rows)
+                                        {
+                                            initialLat = avlsLat = row[0].ToString();
+                                            initialLon = avlsLon = row[1].ToString();
+                                        }
+                                        zero = "0";
+                                        if (avlsLat.Equals(zero) || avlsLon.Equals(zero))
+                                        {
+                                            GetInitialLocationFromSql(ref avlsLat, ref avlsLon, avls_package.ID);
+                                        }
+                                        //GeoAngle lat_value = GeoAngle.FromDouble(Convert.ToDecimal(avlsLat));
+                                        //GeoAngle long_value = GeoAngle.FromDouble(Convert.ToDecimal(avlsLon));
+                                        //string lat_str = lat_value.Degrees.ToString() + lat_value.Minutes.ToString("D2") + "." + lat_value.Seconds.ToString("D2") + lat_value.Milliseconds.ToString("D3");
+                                        //string long_str = long_value.Degrees.ToString() + long_value.Minutes.ToString("D2") + "." + long_value.Seconds.ToString("D2") + long_value.Milliseconds.ToString("D3");
+                                        //avls_package.Loc = "N" + (Convert.ToDouble(htable["lat_value"])*100).ToString() + "E" + (Convert.ToDouble(htable["long_value"])*100).ToString()+ ",";
+                                        string lat_str = avlsLat, long_str = avlsLon;
+                                        ConvertLocToAvlsLoc(ref lat_str, ref long_str);
+                                        avls_package.Loc = "N" + lat_str + "E" + long_str + ",";
                                     }
-                                    string zero = "0";
-                                    if (avlsLat.Equals(zero) || avlsLon.Equals(zero))
+                                    else
                                     {
+                                        avlsLat = string.Empty; avlsLon = string.Empty;
                                         GetInitialLocationFromSql(ref avlsLat, ref avlsLon, avls_package.ID);
+                                        //GeoAngle lat_value = GeoAngle.FromDouble(Convert.ToDecimal(avlsLat));
+                                        //GeoAngle long_value = GeoAngle.FromDouble(Convert.ToDecimal(avlsLon));
+                                        //string lat_str = lat_value.Degrees.ToString() + lat_value.Minutes.ToString("D2") + "." + lat_value.Seconds.ToString("D2") + lat_value.Milliseconds.ToString("D3");
+                                        //string long_str = long_value.Degrees.ToString() + long_value.Minutes.ToString("D2") + "." + long_value.Seconds.ToString("D2") + long_value.Milliseconds.ToString("D3");
+                                        //avls_package.Loc = "N" + (Convert.ToDouble(htable["lat_value"])*100).ToString() + "E" + (Convert.ToDouble(htable["long_value"])*100).ToString()+ ",";
+                                        string lat_str = initialLat = avlsLat, long_str = initialLon = avlsLon;
+                                        ConvertLocToAvlsLoc(ref lat_str, ref long_str);
+                                        avls_package.Loc = "N" + lat_str + "E" + long_str + ",";
+                                        //avls_package.Loc = "N00000.0000E00000.0000,";
                                     }
-                                    //GeoAngle lat_value = GeoAngle.FromDouble(Convert.ToDecimal(avlsLat));
-                                    //GeoAngle long_value = GeoAngle.FromDouble(Convert.ToDecimal(avlsLon));
-                                    //string lat_str = lat_value.Degrees.ToString() + lat_value.Minutes.ToString("D2") + "." + lat_value.Seconds.ToString("D2") + lat_value.Milliseconds.ToString("D3");
-                                    //string long_str = long_value.Degrees.ToString() + long_value.Minutes.ToString("D2") + "." + long_value.Seconds.ToString("D2") + long_value.Milliseconds.ToString("D3");
-                                    //avls_package.Loc = "N" + (Convert.ToDouble(htable["lat_value"])*100).ToString() + "E" + (Convert.ToDouble(htable["long_value"])*100).ToString()+ ",";
-                                    string lat_str = avlsLat, long_str = avlsLon;
-                                    ConvertLocToAvlsLoc(ref lat_str, ref long_str);
-                                    avls_package.Loc = "N" + lat_str + "E" + long_str + ",";
-                                }
-                                else
-                                {
-                                    string avlsLat = string.Empty, avlsLon = string.Empty;
-                                    GetInitialLocationFromSql(ref avlsLat, ref avlsLon, avls_package.ID);
-                                    //GeoAngle lat_value = GeoAngle.FromDouble(Convert.ToDecimal(avlsLat));
-                                    //GeoAngle long_value = GeoAngle.FromDouble(Convert.ToDecimal(avlsLon));
-                                    //string lat_str = lat_value.Degrees.ToString() + lat_value.Minutes.ToString("D2") + "." + lat_value.Seconds.ToString("D2") + lat_value.Milliseconds.ToString("D3");
-                                    //string long_str = long_value.Degrees.ToString() + long_value.Minutes.ToString("D2") + "." + long_value.Seconds.ToString("D2") + long_value.Milliseconds.ToString("D3");
-                                    //avls_package.Loc = "N" + (Convert.ToDouble(htable["lat_value"])*100).ToString() + "E" + (Convert.ToDouble(htable["long_value"])*100).ToString()+ ",";
-                                    string lat_str = initialLat = avlsLat, long_str = initialLon = avlsLon;
-                                    ConvertLocToAvlsLoc(ref lat_str, ref long_str);
-                                    avls_package.Loc = "N" + lat_str + "E" + long_str + ",";
-                                    //avls_package.Loc = "N00000.0000E00000.0000,";
                                 }
                             }
+                        }
+                        else
+                        {
+                            string lat_str = avlsLat, long_str = avlsLon;
+                            ConvertLocToAvlsLoc(ref lat_str, ref long_str);
+                            avls_package.Loc = "N" + lat_str + "E" + long_str + ",";
+                        }
+                        
                     }
+                    else
+                    {
+                        
                     
                         
                         /*
@@ -3689,18 +3698,10 @@ LIMIT 1";
                         string zero = "0";
                         if (avlsLat.Equals(zero) || avlsLon.Equals(zero))
                         {
-                            GetInitialLocationFromSql(ref avlsLat, ref avlsLon, avls_package.ID);
-                        }
-                        string lat_str = avlsLat, long_str = avlsLon;
-                        ConvertLocToAvlsLoc(ref lat_str, ref long_str);
-                        avls_package.Loc = "N" + lat_str + "E" + long_str + ",";
-                    }
-                    else
-                    {
-                        if (bool.Parse(ConfigurationManager.AppSettings["avlsGetLastLocation"]))
-                        {
+                            if (bool.Parse(ConfigurationManager.AppSettings["avlsGetLastLocation"]))
+                            {
 
-                            string avlsSqlCmd = @"SELECT 
+                                string avlsSqlCmd = @"SELECT 
   public._gps_in_time._lat,
   public._gps_in_time._lon
 FROM
@@ -3711,86 +3712,98 @@ WHERE
 ORDER BY
   public._gps_in_time._time DESC
 LIMIT 1";
-                            //Console.WriteLine("+c1");
-                            //while (!avlsSqlClient.connect())
-                            {
-                                //Thread.Sleep(30);
-                            }
-                            //Console.WriteLine("-c1");
-                            //Console.WriteLine("+d2");
-                            //DataTable dt = avlsSqlClient.get_DataTable(avlsSqlCmd);
-                            //Console.WriteLine("-d2");
-                            //avlsSqlClient.disconnect();
-                            //avlsSqlClient.Dispose();
-                            //avlsSqlClient=null;
-                            using (DataTable dt = avlsSqlClient.get_DataTable(avlsSqlCmd))
-                            {
-                                if (dt != null && dt.Rows.Count != 0)
+                                //Console.WriteLine("+c1");
+                                //while (!avlsSqlClient.connect())
                                 {
-                                    string avlsLat = string.Empty, avlsLon = string.Empty;
-                                    foreach (DataRow row in dt.Rows)
+                                    //Thread.Sleep(30);
+                                }
+                                //Console.WriteLine("-c1");
+                                //Console.WriteLine("+d2");
+                                //DataTable dt = avlsSqlClient.get_DataTable(avlsSqlCmd);
+                                //Console.WriteLine("-d2");
+                                //avlsSqlClient.disconnect();
+                                //avlsSqlClient.Dispose();
+                                //avlsSqlClient=null;
+                                using (DataTable dt = avlsSqlClient.get_DataTable(avlsSqlCmd))
+                                {
+                                    if (dt != null && dt.Rows.Count != 0)
                                     {
-                                        avlsLat = row[0].ToString();
-                                        avlsLon = row[1].ToString();
+                                        avlsLat = string.Empty; avlsLon = string.Empty;
+                                        foreach (DataRow row in dt.Rows)
+                                        {
+                                            avlsLat = row[0].ToString();
+                                            avlsLon = row[1].ToString();
+                                        }
+                                        zero = "0";
+                                        if (avlsLat.Equals(zero) || avlsLon.Equals(zero))
+                                        {
+                                            GetInitialLocationFromSql(ref avlsLat, ref avlsLon, avls_package.ID);
+                                        }
+                                        //GeoAngle lat_value = GeoAngle.FromDouble(Convert.ToDecimal(avlsLat));
+                                        //GeoAngle long_value = GeoAngle.FromDouble(Convert.ToDecimal(avlsLon));
+                                        //string lat_str = lat_value.Degrees.ToString() + lat_value.Minutes.ToString("D2") + "." + lat_value.Seconds.ToString("D2") + lat_value.Milliseconds.ToString("D3");
+                                        //string long_str = long_value.Degrees.ToString() + long_value.Minutes.ToString("D2") + "." + long_value.Seconds.ToString("D2") + long_value.Milliseconds.ToString("D3");
+                                        //avls_package.Loc = "N" + (Convert.ToDouble(htable["lat_value"])*100).ToString() + "E" + (Convert.ToDouble(htable["long_value"])*100).ToString()+ ",";
+                                        string lat_str = initialLat = avlsLat, long_str = initialLon = avlsLon;
+                                        ConvertLocToAvlsLoc(ref lat_str, ref long_str);
+                                        avls_package.Loc = "N" + lat_str + "E" + long_str + ",";
                                     }
-                                    string zero = "0";
-                                    if (avlsLat.Equals(zero) || avlsLon.Equals(zero))
+                                    else
                                     {
+                                        avlsLat = string.Empty; avlsLon = string.Empty;
                                         GetInitialLocationFromSql(ref avlsLat, ref avlsLon, avls_package.ID);
+                                        //GeoAngle lat_value = GeoAngle.FromDouble(Convert.ToDecimal(avlsLat));
+                                        //GeoAngle long_value = GeoAngle.FromDouble(Convert.ToDecimal(avlsLon));
+                                        //string lat_str = lat_value.Degrees.ToString() + lat_value.Minutes.ToString("D2") + "." + lat_value.Seconds.ToString("D2") + lat_value.Milliseconds.ToString("D3");
+                                        //string long_str = long_value.Degrees.ToString() + long_value.Minutes.ToString("D2") + "." + long_value.Seconds.ToString("D2") + long_value.Milliseconds.ToString("D3");
+                                        //avls_package.Loc = "N" + (Convert.ToDouble(htable["lat_value"])*100).ToString() + "E" + (Convert.ToDouble(htable["long_value"])*100).ToString()+ ",";
+                                        string lat_str = initialLat = avlsLat, long_str = initialLon = avlsLon;
+                                        ConvertLocToAvlsLoc(ref lat_str, ref long_str);
+                                        avls_package.Loc = "N" + lat_str + "E" + long_str + ",";
+                                        //avls_package.Loc = "N00000.0000E00000.0000,";
                                     }
-                                    //GeoAngle lat_value = GeoAngle.FromDouble(Convert.ToDecimal(avlsLat));
-                                    //GeoAngle long_value = GeoAngle.FromDouble(Convert.ToDecimal(avlsLon));
-                                    //string lat_str = lat_value.Degrees.ToString() + lat_value.Minutes.ToString("D2") + "." + lat_value.Seconds.ToString("D2") + lat_value.Milliseconds.ToString("D3");
-                                    //string long_str = long_value.Degrees.ToString() + long_value.Minutes.ToString("D2") + "." + long_value.Seconds.ToString("D2") + long_value.Milliseconds.ToString("D3");
-                                    //avls_package.Loc = "N" + (Convert.ToDouble(htable["lat_value"])*100).ToString() + "E" + (Convert.ToDouble(htable["long_value"])*100).ToString()+ ",";
-                                    string lat_str = initialLat = avlsLat, long_str = initialLon = avlsLon;
-                                    ConvertLocToAvlsLoc(ref lat_str, ref long_str);
-                                    avls_package.Loc = "N" + lat_str + "E" + long_str + ",";
                                 }
-                                else
-                                {
-                                    string avlsLat = string.Empty, avlsLon = string.Empty;
-                                    GetInitialLocationFromSql(ref avlsLat, ref avlsLon, avls_package.ID);
-                                    //GeoAngle lat_value = GeoAngle.FromDouble(Convert.ToDecimal(avlsLat));
-                                    //GeoAngle long_value = GeoAngle.FromDouble(Convert.ToDecimal(avlsLon));
-                                    //string lat_str = lat_value.Degrees.ToString() + lat_value.Minutes.ToString("D2") + "." + lat_value.Seconds.ToString("D2") + lat_value.Milliseconds.ToString("D3");
-                                    //string long_str = long_value.Degrees.ToString() + long_value.Minutes.ToString("D2") + "." + long_value.Seconds.ToString("D2") + long_value.Milliseconds.ToString("D3");
-                                    //avls_package.Loc = "N" + (Convert.ToDouble(htable["lat_value"])*100).ToString() + "E" + (Convert.ToDouble(htable["long_value"])*100).ToString()+ ",";
-                                    string lat_str = initialLat = avlsLat, long_str = initialLon = avlsLon;
-                                    ConvertLocToAvlsLoc(ref lat_str, ref long_str);
-                                    avls_package.Loc = "N" + lat_str + "E" + long_str + ",";
-                                    //avls_package.Loc = "N00000.0000E00000.0000,";
-                                }
-                            }
 
-                            /*
-                             * SELECT 
-          public._gps_log._lat,
-          public._gps_log._lon
-        FROM
-          public._gps_log
-        WHERE
-          public._gps_log._time < now() AND 
-          public._gps_log._uid = 'avls_package.ID'
-        ORDER BY
-          public._gps_log._time DESC
-        LIMIT 1
-                             */
+                                /*
+                                 * SELECT 
+              public._gps_log._lat,
+              public._gps_log._lon
+            FROM
+              public._gps_log
+            WHERE
+              public._gps_log._time < now() AND 
+              public._gps_log._uid = 'avls_package.ID'
+            ORDER BY
+              public._gps_log._time DESC
+            LIMIT 1
+                                 */
+                            }
+                            else
+                            {
+                                avlsLat = string.Empty; avlsLon = string.Empty;
+                                GetInitialLocationFromSql(ref avlsLat, ref avlsLon, avls_package.ID);
+                                //GeoAngle lat_value = GeoAngle.FromDouble(Convert.ToDecimal(avlsLat));
+                                //GeoAngle long_value = GeoAngle.FromDouble(Convert.ToDecimal(avlsLon));
+                                //string lat_str = lat_value.Degrees.ToString() + lat_value.Minutes.ToString("D2") + "." + lat_value.Seconds.ToString("D2") + lat_value.Milliseconds.ToString("D3");
+                                //string long_str = long_value.Degrees.ToString() + long_value.Minutes.ToString("D2") + "." + long_value.Seconds.ToString("D2") + long_value.Milliseconds.ToString("D3");
+                                //avls_package.Loc = "N" + (Convert.ToDouble(htable["lat_value"])*100).ToString() + "E" + (Convert.ToDouble(htable["long_value"])*100).ToString()+ ",";
+                                string lat_str = initialLat = avlsLat, long_str = initialLon = avlsLon;
+                                ConvertLocToAvlsLoc(ref lat_str, ref long_str);
+                                avls_package.Loc = "N" + lat_str + "E" + long_str + ",";
+                                //avls_package.Loc = "N00000.0000E00000.0000,";
+                            }
                         }
                         else
                         {
-                            string avlsLat = string.Empty, avlsLon = string.Empty;
-                            GetInitialLocationFromSql(ref avlsLat, ref avlsLon, avls_package.ID);
-                            //GeoAngle lat_value = GeoAngle.FromDouble(Convert.ToDecimal(avlsLat));
-                            //GeoAngle long_value = GeoAngle.FromDouble(Convert.ToDecimal(avlsLon));
-                            //string lat_str = lat_value.Degrees.ToString() + lat_value.Minutes.ToString("D2") + "." + lat_value.Seconds.ToString("D2") + lat_value.Milliseconds.ToString("D3");
-                            //string long_str = long_value.Degrees.ToString() + long_value.Minutes.ToString("D2") + "." + long_value.Seconds.ToString("D2") + long_value.Milliseconds.ToString("D3");
-                            //avls_package.Loc = "N" + (Convert.ToDouble(htable["lat_value"])*100).ToString() + "E" + (Convert.ToDouble(htable["long_value"])*100).ToString()+ ",";
-                            string lat_str = initialLat = avlsLat, long_str = initialLon = avlsLon;
+                            string lat_str = avlsLat, long_str = avlsLon;
                             ConvertLocToAvlsLoc(ref lat_str, ref long_str);
                             avls_package.Loc = "N" + lat_str + "E" + long_str + ",";
-                            //avls_package.Loc = "N00000.0000E00000.0000,";
                         }
+                        
+                    }
+                    else
+                    {
+                        
                     }
                     
                         
@@ -5653,33 +5666,24 @@ VALUES(
                         string zero = "0";
                         if (avlsLat.Equals(zero) || avlsLon.Equals(zero))
                         {
-                            GetInitialLocationFromSql(ref avlsLat, ref avlsLon, deviceID);
-                        }
-                        string lat_str = avlsLat, long_str = avlsLon;
-                        ConvertLocToAvlsLoc(ref lat_str, ref long_str);
-                        //avls_package.Loc = "N" + lat_str + "E" + long_str + ",";
-                        gps_log._lat = gps_log._or_lat = operation_log.eqp_lat = avlsLat;
-                        gps_log._lon = gps_log._or_lon = operation_log.eqp_lon = avlsLon;
-                    }
-                    else
-                    {
-                        /*
-                        if (!string.IsNullOrEmpty(deviceID))
-                        {
-                        }
-                        else
-                        {
-                            log.Error("access_sql_server:1:deviceID is null");
-                            //Console.ForegroundColor = ConsoleColor.DarkCyan;
-                            Console.WriteLine("-access_sql_server");
-                            //Console.ResetColor();
-                            sql_client.disconnect();
-                            sql_client.Dispose();
-                            sql_client = null;
-                            return;
-                        }
-                        */
-                        string sqlCmd = @"SELECT 
+                            {
+                                /*
+                                if (!string.IsNullOrEmpty(deviceID))
+                                {
+                                }
+                                else
+                                {
+                                    log.Error("access_sql_server:1:deviceID is null");
+                                    //Console.ForegroundColor = ConsoleColor.DarkCyan;
+                                    Console.WriteLine("-access_sql_server");
+                                    //Console.ResetColor();
+                                    sql_client.disconnect();
+                                    sql_client.Dispose();
+                                    sql_client = null;
+                                    return;
+                                }
+                                */
+                                string sqlCmd = @"SELECT 
       public._gps_in_time._lat,
       public._gps_in_time._lon
     FROM
@@ -5690,49 +5694,62 @@ VALUES(
     ORDER BY
       public._gps_in_time._time DESC
     LIMIT 1";
-                        //while (!sql_client.connect())
-                        {
-                            //Thread.Sleep(30);
-                        }
-                        using (DataTable sqlDatetable = accessSqlServerClient.get_DataTable(sqlCmd))
-                        {
-                            if (sqlDatetable != null && sqlDatetable.Rows.Count != 0)
-                            {
-                                string avlsLat = string.Empty, avlsLon = string.Empty;
-                                foreach (DataRow row in sqlDatetable.Rows)
+                                //while (!sql_client.connect())
                                 {
-                                    gps_log._lat = gps_log._or_lat = operation_log.eqp_lat = row[0].ToString();
-                                    gps_log._lon = gps_log._or_lon = operation_log.eqp_lon = row[1].ToString();
+                                    //Thread.Sleep(30);
                                 }
-                                /*
-                                string zero = "0";
-                                if (gps_log._lat.Equals(zero) || gps_log._lon.Equals(zero))
+                                using (DataTable sqlDatetable = accessSqlServerClient.get_DataTable(sqlCmd))
                                 {
-                                    string lat = string.Empty, lon = string.Empty;
-                                    GetInitialLocationFromSql(ref lat, ref lon, deviceID);
-                                    log.Info("call GetInitialLocationFromSql1:"+deviceID);
-                                    gps_log._lat = gps_log._or_lat = operation_log.eqp_lat = lat;
-                                    gps_log._lon = gps_log._or_lon = operation_log.eqp_lon = lon;
-                                }
-                                */
-                            }
-                            else
-                            {
-                                //string zero = "0";
-                                //gps_log._lat = operation_log.eqp_lat = zero;
-                                //gps_log._lon = operation_log.eqp_lon = zero;
+                                    if (sqlDatetable != null && sqlDatetable.Rows.Count != 0)
+                                    {
+                                        avlsLat = string.Empty; avlsLon = string.Empty;
+                                        foreach (DataRow row in sqlDatetable.Rows)
+                                        {
+                                            gps_log._lat = gps_log._or_lat = operation_log.eqp_lat = row[0].ToString();
+                                            gps_log._lon = gps_log._or_lon = operation_log.eqp_lon = row[1].ToString();
+                                        }
+                                        /*
+                                        string zero = "0";
+                                        if (gps_log._lat.Equals(zero) || gps_log._lon.Equals(zero))
+                                        {
+                                            string lat = string.Empty, lon = string.Empty;
+                                            GetInitialLocationFromSql(ref lat, ref lon, deviceID);
+                                            log.Info("call GetInitialLocationFromSql1:"+deviceID);
+                                            gps_log._lat = gps_log._or_lat = operation_log.eqp_lat = lat;
+                                            gps_log._lon = gps_log._or_lon = operation_log.eqp_lon = lon;
+                                        }
+                                        */
+                                    }
+                                    else
+                                    {
+                                        //string zero = "0";
+                                        //gps_log._lat = operation_log.eqp_lat = zero;
+                                        //gps_log._lon = operation_log.eqp_lon = zero;
 
-                                string lat = string.Empty, lon = string.Empty;
-                                GetInitialLocationFromSql(ref lat, ref lon, deviceID);
-                                log.Info("call GetInitialLocationFromSql2:" + deviceID);
-                                gps_log._lat = gps_log._or_lat = operation_log.eqp_lat = lat;
-                                gps_log._lon = gps_log._or_lon = operation_log.eqp_lon = lon;
+                                        string lat = string.Empty, lon = string.Empty;
+                                        GetInitialLocationFromSql(ref lat, ref lon, deviceID);
+                                        log.Info("call GetInitialLocationFromSql2:" + deviceID);
+                                        gps_log._lat = gps_log._or_lat = operation_log.eqp_lat = lat;
+                                        gps_log._lon = gps_log._or_lon = operation_log.eqp_lon = lon;
+                                    }
+                                }
+                                //DataTable sqlDatetable = accessSqlServerClient.get_DataTable(sqlCmd);
+                                //sql_client.disconnect();
+
                             }
                         }
-                        //DataTable sqlDatetable = accessSqlServerClient.get_DataTable(sqlCmd);
-                        //sql_client.disconnect();
+                        else
+                        {
+                            string lat_str = avlsLat, long_str = avlsLon;
+                            ConvertLocToAvlsLoc(ref lat_str, ref long_str);
+                            //avls_package.Loc = "N" + lat_str + "E" + long_str + ",";
+                            gps_log._lat = gps_log._or_lat = operation_log.eqp_lat = avlsLat;
+                            gps_log._lon = gps_log._or_lon = operation_log.eqp_lon = avlsLon;
+                        }
                         
                     }
+
+                    
                         /*
                     else
                     {
@@ -7435,18 +7452,11 @@ public._gps_in_time._uid = '" + deviceID + @"'
                         string zero = "0";
                         if (avlsLat.Equals(zero) || avlsLon.Equals(zero))
                         {
-                            GetInitialLocationFromSql(ref avlsLat, ref avlsLon, avls_package.ID);
-                        }
-                        string lat_str = avlsLat, long_str = avlsLon;
-                        ConvertLocToAvlsLoc(ref lat_str, ref long_str);
-                        avls_package.Loc = "N" + lat_str + "E" + long_str + ",";
-                    }
-                    else
-                    {
-                        if (bool.Parse(ConfigurationManager.AppSettings["avlsGetLastLocation"]))
-                        {
+                            {
+                                if (bool.Parse(ConfigurationManager.AppSettings["avlsGetLastLocation"]))
+                                {
 
-                            string avlsSqlCmd = @"SELECT 
+                                    string avlsSqlCmd = @"SELECT 
   public._gps_in_time._lat,
   public._gps_in_time._lon
 FROM
@@ -7457,73 +7467,84 @@ WHERE
 ORDER BY
   public._gps_in_time._time DESC
 LIMIT 1";
-                            //Console.WriteLine("+c");
-                            //while (!avlsSqlClient.connect())
-                            {
-                                //Thread.Sleep(30);
-                            }
-                            //Console.WriteLine("-c");
-                            //Console.WriteLine("+d");
-                            //DataTable dt = avlsSqlClient.get_DataTable(avlsSqlCmd);
-                            //Console.WriteLine("-d");
-                            //avlsSqlClient.disconnect();
-                            //avlsSqlClient.Dispose();
-                            //avlsSqlClient=null;
-                            using (DataTable dt = avlsSqlClient.get_DataTable(avlsSqlCmd))
-                            {
-                                if (dt != null && dt.Rows.Count != 0)
-                                {
-                                    string avlsLat = string.Empty, avlsLon = string.Empty;
-                                    foreach (DataRow row in dt.Rows)
+                                    //Console.WriteLine("+c");
+                                    //while (!avlsSqlClient.connect())
                                     {
-                                        initialLat = avlsLat = row[0].ToString();
-                                        initialLon = avlsLon = row[1].ToString();
+                                        //Thread.Sleep(30);
                                     }
-                                    string zero = "0";
-                                    if (avlsLat.Equals(zero) || avlsLon.Equals(zero))
+                                    //Console.WriteLine("-c");
+                                    //Console.WriteLine("+d");
+                                    //DataTable dt = avlsSqlClient.get_DataTable(avlsSqlCmd);
+                                    //Console.WriteLine("-d");
+                                    //avlsSqlClient.disconnect();
+                                    //avlsSqlClient.Dispose();
+                                    //avlsSqlClient=null;
+                                    using (DataTable dt = avlsSqlClient.get_DataTable(avlsSqlCmd))
                                     {
-                                        GetInitialLocationFromSql(ref avlsLat, ref avlsLon, avls_package.ID);
+                                        if (dt != null && dt.Rows.Count != 0)
+                                        {
+                                            avlsLat = string.Empty; avlsLon = string.Empty;
+                                            foreach (DataRow row in dt.Rows)
+                                            {
+                                                initialLat = avlsLat = row[0].ToString();
+                                                initialLon = avlsLon = row[1].ToString();
+                                            }
+                                             zero = "0";
+                                            if (avlsLat.Equals(zero) || avlsLon.Equals(zero))
+                                            {
+                                                GetInitialLocationFromSql(ref avlsLat, ref avlsLon, avls_package.ID);
+                                            }
+                                            //GeoAngle lat_value = GeoAngle.FromDouble(Convert.ToDecimal(avlsLat));
+                                            //GeoAngle long_value = GeoAngle.FromDouble(Convert.ToDecimal(avlsLon));
+                                            //string lat_str = lat_value.Degrees.ToString() + lat_value.Minutes.ToString("D2") + "." + lat_value.Seconds.ToString("D2") + lat_value.Milliseconds.ToString("D3");
+                                            //string long_str = long_value.Degrees.ToString() + long_value.Minutes.ToString("D2") + "." + long_value.Seconds.ToString("D2") + long_value.Milliseconds.ToString("D3");
+                                            //avls_package.Loc = "N" + (Convert.ToDouble(htable["lat_value"])*100).ToString() + "E" + (Convert.ToDouble(htable["long_value"])*100).ToString()+ ",";
+                                            string lat_str = avlsLat, long_str = avlsLon;
+                                            //ConvertLocToAvlsLoc(ref lat_str, ref long_str);
+                                            avls_package.Loc = "N" + lat_str + "E" + long_str + ",";
+                                        }
+                                        else
+                                        {
+                                            avlsLat = string.Empty; avlsLon = string.Empty;
+                                            GetInitialLocationFromSql(ref avlsLat, ref avlsLon, avls_package.ID);
+                                            //GeoAngle lat_value = GeoAngle.FromDouble(Convert.ToDecimal(avlsLat));
+                                            //GeoAngle long_value = GeoAngle.FromDouble(Convert.ToDecimal(avlsLon));
+                                            //string lat_str = lat_value.Degrees.ToString() + lat_value.Minutes.ToString("D2") + "." + lat_value.Seconds.ToString("D2") + lat_value.Milliseconds.ToString("D3");
+                                            //string long_str = long_value.Degrees.ToString() + long_value.Minutes.ToString("D2") + "." + long_value.Seconds.ToString("D2") + long_value.Milliseconds.ToString("D3");
+                                            //avls_package.Loc = "N" + (Convert.ToDouble(htable["lat_value"])*100).ToString() + "E" + (Convert.ToDouble(htable["long_value"])*100).ToString()+ ",";
+                                            string lat_str = initialLat = avlsLat, long_str = initialLon = avlsLon;
+                                            //ConvertLocToAvlsLoc(ref lat_str, ref long_str);
+                                            avls_package.Loc = "N" + lat_str + "E" + long_str + ",";
+                                            //avls_package.Loc = "N00000.0000E00000.0000,";
+                                        }
                                     }
-                                    //GeoAngle lat_value = GeoAngle.FromDouble(Convert.ToDecimal(avlsLat));
-                                    //GeoAngle long_value = GeoAngle.FromDouble(Convert.ToDecimal(avlsLon));
-                                    //string lat_str = lat_value.Degrees.ToString() + lat_value.Minutes.ToString("D2") + "." + lat_value.Seconds.ToString("D2") + lat_value.Milliseconds.ToString("D3");
-                                    //string long_str = long_value.Degrees.ToString() + long_value.Minutes.ToString("D2") + "." + long_value.Seconds.ToString("D2") + long_value.Milliseconds.ToString("D3");
-                                    //avls_package.Loc = "N" + (Convert.ToDouble(htable["lat_value"])*100).ToString() + "E" + (Convert.ToDouble(htable["long_value"])*100).ToString()+ ",";
-                                    string lat_str = avlsLat, long_str = avlsLon;
-                                    //ConvertLocToAvlsLoc(ref lat_str, ref long_str);
-                                    avls_package.Loc = "N" + lat_str + "E" + long_str + ",";
-                                }
-                                else
-                                {
-                                    string avlsLat = string.Empty, avlsLon = string.Empty;
-                                    GetInitialLocationFromSql(ref avlsLat, ref avlsLon, avls_package.ID);
-                                    //GeoAngle lat_value = GeoAngle.FromDouble(Convert.ToDecimal(avlsLat));
-                                    //GeoAngle long_value = GeoAngle.FromDouble(Convert.ToDecimal(avlsLon));
-                                    //string lat_str = lat_value.Degrees.ToString() + lat_value.Minutes.ToString("D2") + "." + lat_value.Seconds.ToString("D2") + lat_value.Milliseconds.ToString("D3");
-                                    //string long_str = long_value.Degrees.ToString() + long_value.Minutes.ToString("D2") + "." + long_value.Seconds.ToString("D2") + long_value.Milliseconds.ToString("D3");
-                                    //avls_package.Loc = "N" + (Convert.ToDouble(htable["lat_value"])*100).ToString() + "E" + (Convert.ToDouble(htable["long_value"])*100).ToString()+ ",";
-                                    string lat_str = initialLat = avlsLat, long_str = initialLon = avlsLon;
-                                    //ConvertLocToAvlsLoc(ref lat_str, ref long_str);
-                                    avls_package.Loc = "N" + lat_str + "E" + long_str + ",";
-                                    //avls_package.Loc = "N00000.0000E00000.0000,";
-                                }
-                            }
 
-                            /*
-                             * SELECT 
-          public._gps_log._lat,
-          public._gps_log._lon
-        FROM
-          public._gps_log
-        WHERE
-          public._gps_log._time < now() AND 
-          public._gps_log._uid = 'avls_package.ID'
-        ORDER BY
-          public._gps_log._time DESC
-        LIMIT 1
-                             */
+                                    /*
+                                     * SELECT 
+                  public._gps_log._lat,
+                  public._gps_log._lon
+                FROM
+                  public._gps_log
+                WHERE
+                  public._gps_log._time < now() AND 
+                  public._gps_log._uid = 'avls_package.ID'
+                ORDER BY
+                  public._gps_log._time DESC
+                LIMIT 1
+                                     */
+                                }
+                            }
                         }
+                        else
+                        {
+                            string lat_str = avlsLat, long_str = avlsLon;
+                            ConvertLocToAvlsLoc(ref lat_str, ref long_str);
+                            avls_package.Loc = "N" + lat_str + "E" + long_str + ",";
+                        }
+                        
                     }
+                    //else
+                    
                     
                     //check range of initialLat/initialLon in exclusion_area_boundary then send event by avls_package.Event
                     avls_package.ID += ",";
@@ -7626,21 +7647,14 @@ LIMIT 1";
                         string zero = "0";
                         if (avlsLat.Equals(zero) || avlsLon.Equals(zero))
                         {
-                            GetInitialLocationFromSql(ref avlsLat, ref avlsLon, avls_package.ID);
-                        }
-                        string lat_str = avlsLat, long_str = avlsLon;
-                        ConvertLocToAvlsLoc(ref lat_str, ref long_str);
-                        avls_package.Loc = "N" + lat_str + "E" + long_str + ",";
-                    }
-                    else
-                    {
-                        //avls_tcpClient.Close();
-                        //return;
-                        //avls_package.Loc = "N" + last_avls_lat + "E" + last_avls_lon + ",";
-                        if (bool.Parse(ConfigurationManager.AppSettings["avlsGetLastLocation"]))
-                        {
+                            {
+                                //avls_tcpClient.Close();
+                                //return;
+                                //avls_package.Loc = "N" + last_avls_lat + "E" + last_avls_lon + ",";
+                                if (bool.Parse(ConfigurationManager.AppSettings["avlsGetLastLocation"]))
+                                {
 
-                            string avlsSqlCmd = @"SELECT 
+                                    string avlsSqlCmd = @"SELECT 
   public._gps_in_time._lat,
   public._gps_in_time._lon
 FROM
@@ -7651,45 +7665,75 @@ WHERE
 ORDER BY
   public._gps_in_time._time DESC
 LIMIT 1";
-                            //Console.WriteLine("+c1");
-                            //while (!avlsSqlClient.connect())
-                            {
-                                //Thread.Sleep(30);
-                            }
-                            //Console.WriteLine("-c1");
-                            //Console.WriteLine("+d2");
-                            //DataTable dt = avlsSqlClient.get_DataTable(avlsSqlCmd);
-                            //Console.WriteLine("-d2");
-                            //avlsSqlClient.disconnect();
-                            //avlsSqlClient.Dispose();
-                            //avlsSqlClient=null;
-                            using (DataTable dt = avlsSqlClient.get_DataTable(avlsSqlCmd))
-                            {
-                                if (dt != null && dt.Rows.Count != 0)
-                                {
-                                    string avlsLat = string.Empty, avlsLon = string.Empty;
-                                    foreach (DataRow row in dt.Rows)
+                                    //Console.WriteLine("+c1");
+                                    //while (!avlsSqlClient.connect())
                                     {
-                                        avlsLat = row[0].ToString();
-                                        avlsLon = row[1].ToString();
+                                        //Thread.Sleep(30);
                                     }
-                                    string zero = "0";
-                                    if (avlsLat.Equals(zero) || avlsLon.Equals(zero))
+                                    //Console.WriteLine("-c1");
+                                    //Console.WriteLine("+d2");
+                                    //DataTable dt = avlsSqlClient.get_DataTable(avlsSqlCmd);
+                                    //Console.WriteLine("-d2");
+                                    //avlsSqlClient.disconnect();
+                                    //avlsSqlClient.Dispose();
+                                    //avlsSqlClient=null;
+                                    using (DataTable dt = avlsSqlClient.get_DataTable(avlsSqlCmd))
                                     {
-                                        GetInitialLocationFromSql(ref avlsLat, ref avlsLon, avls_package.ID);
+                                        if (dt != null && dt.Rows.Count != 0)
+                                        {
+                                            avlsLat = string.Empty; avlsLon = string.Empty;
+                                            foreach (DataRow row in dt.Rows)
+                                            {
+                                                avlsLat = row[0].ToString();
+                                                avlsLon = row[1].ToString();
+                                            }
+                                             zero = "0";
+                                            if (avlsLat.Equals(zero) || avlsLon.Equals(zero))
+                                            {
+                                                GetInitialLocationFromSql(ref avlsLat, ref avlsLon, avls_package.ID);
+                                            }
+                                            //GeoAngle lat_value = GeoAngle.FromDouble(Convert.ToDecimal(avlsLat));
+                                            //GeoAngle long_value = GeoAngle.FromDouble(Convert.ToDecimal(avlsLon));
+                                            //string lat_str = lat_value.Degrees.ToString() + lat_value.Minutes.ToString("D2") + "." + lat_value.Seconds.ToString("D2") + lat_value.Milliseconds.ToString("D3");
+                                            //string long_str = long_value.Degrees.ToString() + long_value.Minutes.ToString("D2") + "." + long_value.Seconds.ToString("D2") + long_value.Milliseconds.ToString("D3");
+                                            //avls_package.Loc = "N" + (Convert.ToDouble(htable["lat_value"])*100).ToString() + "E" + (Convert.ToDouble(htable["long_value"])*100).ToString()+ ",";
+                                            string lat_str = initialLat = avlsLat, long_str = initialLon = avlsLon;
+                                            //ConvertLocToAvlsLoc(ref lat_str, ref long_str);
+                                            avls_package.Loc = "N" + lat_str + "E" + long_str + ",";
+                                        }
+                                        else
+                                        {
+                                            avlsLat = string.Empty; avlsLon = string.Empty;
+                                            GetInitialLocationFromSql(ref avlsLat, ref avlsLon, avls_package.ID);
+                                            //GeoAngle lat_value = GeoAngle.FromDouble(Convert.ToDecimal(avlsLat));
+                                            //GeoAngle long_value = GeoAngle.FromDouble(Convert.ToDecimal(avlsLon));
+                                            //string lat_str = lat_value.Degrees.ToString() + lat_value.Minutes.ToString("D2") + "." + lat_value.Seconds.ToString("D2") + lat_value.Milliseconds.ToString("D3");
+                                            //string long_str = long_value.Degrees.ToString() + long_value.Minutes.ToString("D2") + "." + long_value.Seconds.ToString("D2") + long_value.Milliseconds.ToString("D3");
+                                            //avls_package.Loc = "N" + (Convert.ToDouble(htable["lat_value"])*100).ToString() + "E" + (Convert.ToDouble(htable["long_value"])*100).ToString()+ ",";
+                                            string lat_str = initialLat = avlsLat, long_str = initialLon = avlsLon;
+                                            //ConvertLocToAvlsLoc(ref lat_str, ref long_str);
+                                            avls_package.Loc = "N" + lat_str + "E" + long_str + ",";
+                                            //avls_package.Loc = "N00000.0000E00000.0000,";
+                                        }
                                     }
-                                    //GeoAngle lat_value = GeoAngle.FromDouble(Convert.ToDecimal(avlsLat));
-                                    //GeoAngle long_value = GeoAngle.FromDouble(Convert.ToDecimal(avlsLon));
-                                    //string lat_str = lat_value.Degrees.ToString() + lat_value.Minutes.ToString("D2") + "." + lat_value.Seconds.ToString("D2") + lat_value.Milliseconds.ToString("D3");
-                                    //string long_str = long_value.Degrees.ToString() + long_value.Minutes.ToString("D2") + "." + long_value.Seconds.ToString("D2") + long_value.Milliseconds.ToString("D3");
-                                    //avls_package.Loc = "N" + (Convert.ToDouble(htable["lat_value"])*100).ToString() + "E" + (Convert.ToDouble(htable["long_value"])*100).ToString()+ ",";
-                                    string lat_str = initialLat = avlsLat, long_str = initialLon = avlsLon;
-                                    //ConvertLocToAvlsLoc(ref lat_str, ref long_str);
-                                    avls_package.Loc = "N" + lat_str + "E" + long_str + ",";
+
+                                    /*
+                                     * SELECT 
+                  public._gps_log._lat,
+                  public._gps_log._lon
+                FROM
+                  public._gps_log
+                WHERE
+                  public._gps_log._time < now() AND 
+                  public._gps_log._uid = 'avls_package.ID'
+                ORDER BY
+                  public._gps_log._time DESC
+                LIMIT 1
+                                     */
                                 }
                                 else
                                 {
-                                    string avlsLat = string.Empty, avlsLon = string.Empty;
+                                    avlsLat = string.Empty; avlsLon = string.Empty;
                                     GetInitialLocationFromSql(ref avlsLat, ref avlsLon, avls_package.ID);
                                     //GeoAngle lat_value = GeoAngle.FromDouble(Convert.ToDecimal(avlsLat));
                                     //GeoAngle long_value = GeoAngle.FromDouble(Convert.ToDecimal(avlsLon));
@@ -7702,36 +7746,17 @@ LIMIT 1";
                                     //avls_package.Loc = "N00000.0000E00000.0000,";
                                 }
                             }
-
-                            /*
-                             * SELECT 
-          public._gps_log._lat,
-          public._gps_log._lon
-        FROM
-          public._gps_log
-        WHERE
-          public._gps_log._time < now() AND 
-          public._gps_log._uid = 'avls_package.ID'
-        ORDER BY
-          public._gps_log._time DESC
-        LIMIT 1
-                             */
                         }
                         else
                         {
-                            string avlsLat = string.Empty, avlsLon = string.Empty;
-                            GetInitialLocationFromSql(ref avlsLat, ref avlsLon, avls_package.ID);
-                            //GeoAngle lat_value = GeoAngle.FromDouble(Convert.ToDecimal(avlsLat));
-                            //GeoAngle long_value = GeoAngle.FromDouble(Convert.ToDecimal(avlsLon));
-                            //string lat_str = lat_value.Degrees.ToString() + lat_value.Minutes.ToString("D2") + "." + lat_value.Seconds.ToString("D2") + lat_value.Milliseconds.ToString("D3");
-                            //string long_str = long_value.Degrees.ToString() + long_value.Minutes.ToString("D2") + "." + long_value.Seconds.ToString("D2") + long_value.Milliseconds.ToString("D3");
-                            //avls_package.Loc = "N" + (Convert.ToDouble(htable["lat_value"])*100).ToString() + "E" + (Convert.ToDouble(htable["long_value"])*100).ToString()+ ",";
-                            string lat_str = initialLat = avlsLat, long_str = initialLon = avlsLon;
-                            //ConvertLocToAvlsLoc(ref lat_str, ref long_str);
+                            string lat_str = avlsLat, long_str = avlsLon;
+                            ConvertLocToAvlsLoc(ref lat_str, ref long_str);
                             avls_package.Loc = "N" + lat_str + "E" + long_str + ",";
-                            //avls_package.Loc = "N00000.0000E00000.0000,";
                         }
+                        
                     }
+                    //else
+                    
                     
 
                 }
