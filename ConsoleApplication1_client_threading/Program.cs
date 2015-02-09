@@ -1528,7 +1528,7 @@ WHERE
             {
                 string avlsLat = mylocation.GetLat(), avlsLon = mylocation.GetLon();
                 string zero = "0";
-                if (avlsLat.Equals(zero) || avlsLon.Equals(zero))
+                if (avlsLat.Equals(zero) || avlsLon.Equals(zero) || string.IsNullOrEmpty(avlsLat) || string.IsNullOrEmpty(avlsLon))
                 {
                     //GetInitialLocationFromSql(ref avlsLat, ref avlsLon, avls_package.ID);
                     string avlsSqlCmd = @"SELECT 
@@ -3485,7 +3485,7 @@ WHERE
                     {
                         string avlsLat = mylocation.GetLat(), avlsLon = mylocation.GetLon();
                         string zero = "0";
-                        if (avlsLat.Equals(zero) || avlsLon.Equals(zero))
+                        if (avlsLat.Equals(zero) || avlsLon.Equals(zero) || string.IsNullOrEmpty(avlsLat) || string.IsNullOrEmpty(avlsLon))
                         {
                             if (bool.Parse(ConfigurationManager.AppSettings["avlsGetLastLocation"]))
                             {
@@ -3691,7 +3691,7 @@ LIMIT 1";
                     {
                         string avlsLat = mylocation.GetLat(), avlsLon = mylocation.GetLon();
                         string zero = "0";
-                        if (avlsLat.Equals(zero) || avlsLon.Equals(zero))
+                        if (avlsLat.Equals(zero) || avlsLon.Equals(zero) || string.IsNullOrEmpty(avlsLat) || string.IsNullOrEmpty(avlsLon))
                         {
                             if (bool.Parse(ConfigurationManager.AppSettings["avlsGetLastLocation"]))
                             {
@@ -5659,7 +5659,7 @@ VALUES(
                     {
                         string avlsLat = mylocation.GetLat(), avlsLon = mylocation.GetLon();
                         string zero = "0";
-                        if (avlsLat.Equals(zero) || avlsLon.Equals(zero))
+                        if (avlsLat.Equals(zero) || avlsLon.Equals(zero) || string.IsNullOrEmpty(avlsLat) || string.IsNullOrEmpty(avlsLon))
                         {
                             {
                                 /*
@@ -5738,8 +5738,8 @@ VALUES(
                             string lat_str = avlsLat, long_str = avlsLon;
                             ConvertLocToAvlsLoc(ref lat_str, ref long_str);
                             //avls_package.Loc = "N" + lat_str + "E" + long_str + ",";
-                            gps_log._lat = gps_log._or_lat = operation_log.eqp_lat = avlsLat;
-                            gps_log._lon = gps_log._or_lon = operation_log.eqp_lon = avlsLon;
+                            gps_log._lat = gps_log._or_lat = operation_log.eqp_lat = lat_str;
+                            gps_log._lon = gps_log._or_lon = operation_log.eqp_lon = long_str;
                         }
                         
                     }
@@ -7445,7 +7445,7 @@ public._gps_in_time._uid = '" + deviceID + @"'
                     {
                         string avlsLat = mylocation.GetLat(), avlsLon = mylocation.GetLon();
                         string zero = "0";
-                        if (avlsLat.Equals(zero) || avlsLon.Equals(zero))
+                        if (avlsLat.Equals(zero) || avlsLon.Equals(zero) || string.IsNullOrEmpty(avlsLat) || string.IsNullOrEmpty(avlsLon))
                         {
                             {
                                 if (bool.Parse(ConfigurationManager.AppSettings["avlsGetLastLocation"]))
@@ -7640,7 +7640,7 @@ LIMIT 1";
                     {
                         string avlsLat = mylocation.GetLat(), avlsLon = mylocation.GetLon();
                         string zero = "0";
-                        if (avlsLat.Equals(zero) || avlsLon.Equals(zero))
+                        if (avlsLat.Equals(zero) || avlsLon.Equals(zero) || string.IsNullOrEmpty(avlsLat) || string.IsNullOrEmpty(avlsLon))
                         {
                             {
                                 //avls_tcpClient.Close();
