@@ -2464,16 +2464,16 @@ Select 1-6 then press enter to send package
                 //XDocument xml_data = XDocument.Parse(returndata);
                 //string xml_root_tag = xml_data.Root.Name.ToString();
                 //Console.WriteLine();
-                string ouput2 = string.Empty;
-                try
-                {
-                    ouput2 = XDocument.Parse(returndata).ToString();
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine("FinishReadError1:\r\n" + ex);
-                    log.Error("FinishReadError1:\r\n" + ex);
-                }
+                //string ouput2 = string.Empty;
+                //try
+                //{
+                //    ouput2 = XDocument.Parse(returndata).ToString();
+                //}
+                //catch (Exception ex)
+                //{
+                //    Console.WriteLine("FinishReadError1:\r\n" + ex);
+                //    log.Error("FinishReadError1:\r\n" + ex);
+                //}
                 /*
                 //Console.ForegroundColor = ConsoleColor.DarkGray;
                 Console.WriteLine("S############################################################################");
