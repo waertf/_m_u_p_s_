@@ -350,6 +350,7 @@ WHERE
         static Random rand = new Random();
         static Object randLock = new object();
         private static bool _locationsEnable = true;
+        static ConcurrentQueue<string> avlsSendQueue = new ConcurrentQueue<string>(); 
         private static void Main(string[] args)
         {
             Console.WriteLine(System.Reflection.MethodBase.GetCurrentMethod().Name);
@@ -816,7 +817,40 @@ WHERE
                 };
                 QueueTimer.Enabled = true;
             } 
-            */ 
+            */
+
+            Task.Factory.StartNew(() =>
+            {
+                StringBuilder sb = new StringBuilder();
+                while (true)
+                {
+                    Thread.Sleep(1);
+                    string msg;
+                    DateTime t = DateTime.Now;
+                    DateTime tf = DateTime.Now.AddSeconds(3);
+                    while (t < tf)
+                    {
+                        t = DateTime.Now;
+                        if (avlsSendQueue.TryDequeue(out msg))
+                        {
+                            sb.Append(msg);
+
+                        }
+                    }
+                    
+                    if (avlsNetworkStream.CanWrite && sb.Length>0)
+                    {
+                        string send = sb.ToString();
+                        byte[] writeData = Encoding.UTF8.GetBytes(send);
+                        avlsNetworkStream.Write(writeData, 0, writeData.Length);
+                        Task.Factory.StartNew(() =>
+                        {
+                            Console.WriteLine(send);
+                        });
+                    }
+                    sb.Clear();
+                }
+            });
         Console.ReadLine();
             /*
             var GC =
@@ -4823,6 +4857,8 @@ FROM
         static object avlsWriteLock = new object();
         private static void avls_WriteLine(NetworkStream netStream, byte[] writeData, string write)
         {
+            avlsSendQueue.Enqueue(write);
+            return;
             if (netStream.CanWrite)
             {
                 //byte[] writeData = Encoding.ASCII.GetBytes(write);
