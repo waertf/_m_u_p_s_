@@ -2660,15 +2660,15 @@ Select 1-6 then press enter to send package
         }
 
         //private static void xml_parse(TcpClient tcpClient, NetworkStream netStream, string returndata, TcpClient avlsTcpClient)
-        private static void xml_parse(object o)
+        private static void xml_parse(string returndata)
         {
             
             Stopwatch stopWatch = Stopwatch.StartNew();
             TcpClient tcpClient = unsTcpClient;
-            string returndata = o as string;
+            //string returndata = o as string;
             XDocument xml_data = null;
             xml_data = XDocument.Parse(returndata);
-            returndata = null;
+            //returndata = null;
             string xml_root_tag = xml_data.Root.Name.ToString();
             string logData = xml_data.ToString();
             //using (StreamWriter w = File.AppendText("log.txt"))
