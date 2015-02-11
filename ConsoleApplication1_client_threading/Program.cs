@@ -730,6 +730,7 @@ WHERE
                 xml_parse(xmlQueue.Dequeue()); };
             xmlParseTimer.Enabled = true;
             */
+            /*
             {
                 var avlsTimer = new System.Timers.Timer(10);
                 avlsTimer.Elapsed += (sender, e) =>
@@ -768,6 +769,7 @@ WHERE
                 };
                 //sqlTimer.Enabled = true;
             }
+            
             while (false)
             {
 
@@ -803,6 +805,7 @@ WHERE
                 t2.Join();
                 //Thread.Sleep(30);
             }
+            */
             /*
             {
                 var QueueTimer = new System.Timers.Timer(30000);
@@ -2893,6 +2896,7 @@ Select 1-6 then press enter to send package
                                 */
                                 Task.Factory.StartNew(() =>
                                 {
+
                                     access_avls_server(new AvlsClass(xml_root_tag, htable, null,
                                     null, null, elements,
                                     logData, getMessage));
@@ -3354,6 +3358,7 @@ WHERE
             HashSet<XName> iEnumerable = oo.Elements;
             string log = oo.Log;
             string getMessage = oo.GetMessage;
+            oo = null;
             //Console.WriteLine("+access_avls_server");
             Thread.CurrentThread.CurrentUICulture = new CultureInfo("en-us");
             string send_string = string.Empty;
