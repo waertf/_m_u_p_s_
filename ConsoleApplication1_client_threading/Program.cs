@@ -269,8 +269,9 @@ each set of the byte. To display a four-byte string, there will be 8 digits stri
                     avlsTcpClient.Close();
                 avlsTcpClient = new TcpClient();
                 avlsConnectDone.Reset();
-                avlsTcpClient.BeginConnect(avls_ipaddress, avls_port, new AsyncCallback(AvlsConnectCallback), avlsTcpClient);
-                avlsConnectDone.WaitOne();
+                IAsyncResult result=avlsTcpClient.BeginConnect(avls_ipaddress, avls_port, new AsyncCallback(AvlsConnectCallback), avlsTcpClient);
+                result.AsyncWaitHandle.WaitOne();
+                //avlsConnectDone.WaitOne();
                 Keeplive.keep(avlsTcpClient.Client);
                 avlsNetworkStream = avlsTcpClient.GetStream();
             }
@@ -481,8 +482,9 @@ WHERE
             //avls_tcpClient.Connect(ipAddress, port);
             Console.WriteLine("+avlsConnectDone connect");
             avlsConnectDone.Reset();
-            avlsTcpClient.BeginConnect(avls_ipaddress, avls_port, new AsyncCallback(AvlsConnectCallback), avlsTcpClient);
-            avlsConnectDone.WaitOne();
+            IAsyncResult result = avlsTcpClient.BeginConnect(avls_ipaddress, avls_port, new AsyncCallback(AvlsConnectCallback), avlsTcpClient);
+            result.AsyncWaitHandle.WaitOne();
+            //avlsConnectDone.WaitOne();
             Console.WriteLine("-avlsConnectDone connect");
             Keeplive.keep(avlsTcpClient.Client);
             avlsNetworkStream = avlsTcpClient.GetStream();
@@ -822,6 +824,7 @@ WHERE
             Task.Factory.StartNew(() =>
             {
                 StringBuilder sb = new StringBuilder();
+                //avlsNetworkStream.WriteTimeout = 10000;
                 while (true)
                 {
                     Thread.Sleep(1);
@@ -842,11 +845,39 @@ WHERE
                     {
                         string send = sb.ToString();
                         byte[] writeData = Encoding.UTF8.GetBytes(send);
-                        avlsNetworkStream.Write(writeData, 0, writeData.Length);
-                        Task.Factory.StartNew(() =>
+                        try
                         {
-                            Console.WriteLine(send);
-                        });
+
+                            avlsNetworkStream.Write(writeData, 0, writeData.Length);
+                            Task.Factory.StartNew(() =>
+                            {
+                                Console.WriteLine(send);
+                            });
+                        }
+                        catch (Exception ex)
+                        {
+                            if (avlsNetworkStream != null)
+                                avlsNetworkStream.Close();
+                            if (avlsTcpClient != null)
+                                avlsTcpClient.Close();
+                            avlsNetworkStream  = null;
+                            avlsTcpClient = null;
+                            avlsTcpClient = new TcpClient();
+                            avlsConnectDone.Reset();
+                            IAsyncResult result1 = avlsTcpClient.BeginConnect(avls_ipaddress, avls_port, new AsyncCallback(AvlsConnectCallback),
+                                avlsTcpClient);
+                            result1.AsyncWaitHandle.WaitOne();
+                            //avlsConnectDone.WaitOne();
+                            Keeplive.keep(avlsTcpClient.Client);
+                            if (avlsTcpClient != null && avlsTcpClient.Client != null)
+                            {
+                                avlsNetworkStream = avlsTcpClient.GetStream();
+                            }
+                            log.Error(ex.ToString());
+                            avlsSendQueue.Enqueue(send);
+                        }
+                        
+                       
                     }
                     sb.Clear();
                 }
@@ -2263,8 +2294,9 @@ Select 1-6 then press enter to send package
                     avlsTcpClient.Close();
                 avlsTcpClient = new TcpClient();
                 avlsConnectDone.Reset();
-                avlsTcpClient.BeginConnect(avls_ipaddress, avls_port, new AsyncCallback(AvlsConnectCallback), avlsTcpClient);
-                avlsConnectDone.WaitOne();
+                IAsyncResult result = avlsTcpClient.BeginConnect(avls_ipaddress, avls_port, new AsyncCallback(AvlsConnectCallback), avlsTcpClient);
+                result.AsyncWaitHandle.WaitOne();
+                //avlsConnectDone.WaitOne();
                 Keeplive.keep(avlsTcpClient.Client);
                 if (avlsTcpClient != null && avlsTcpClient.Client != null)
                 {
@@ -2286,7 +2318,7 @@ Select 1-6 then press enter to send package
                 if (netStream.CanRead)
                 {
                     //byte[] bytes = new byte[unsTcpClient.ReceiveBufferSize];
-                    avlsConnectDone.WaitOne();
+                    //avlsConnectDone.WaitOne();
                     //myReadBuffer = new byte[prefix_length];
                     netStream.BeginRead(myReadBuffer, 0, myReadBuffer.Length,
                                                                  new AsyncCallback(myReadSizeCallBack),
@@ -2567,7 +2599,7 @@ Select 1-6 then press enter to send package
                     Console.Write("Select[1-6]:");
                 }
                 */
-                avlsConnectDone.WaitOne();
+                //avlsConnectDone.WaitOne();
                 //OnMessageRead(fBuffer);
                 fStream.BeginRead(myReadBuffer, 0, myReadBuffer.Length,
                                                                  new AsyncCallback(myReadSizeCallBack),
@@ -4915,7 +4947,7 @@ FROM
                     avlsConnectDone.Reset();
                     avlsTcpClient.BeginConnect(avls_ipaddress, avls_port, new AsyncCallback(AvlsConnectCallback),
                         avlsTcpClient);
-                    avlsConnectDone.WaitOne();
+                    //avlsConnectDone.WaitOne();
                     Keeplive.keep(avlsTcpClient.Client);
                     if (avlsTcpClient != null && avlsTcpClient.Client != null)
                     {
