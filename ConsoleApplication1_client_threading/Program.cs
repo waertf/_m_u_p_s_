@@ -191,6 +191,25 @@ each set of the byte. To display a four-byte string, there will be 8 digits stri
                 //Console.WriteLine(System.Reflection.MethodBase.GetCurrentMethod().Name +"_errorline:" + ex.LineNumber());
                 //log.Error(System.Reflection.MethodBase.GetCurrentMethod().Name + "_errorline:" + ex.LineNumber());
                 log.Error(ex);
+                //CloseLocalUnsThenStartRemoteUns();
+                try
+                {
+                    Monitor.Enter(readRecoveryLock);
+                    if(!stopWatch.IsRunning)
+                        stopWatch.Start();
+                    ReadRecovery(unsNetworkStream);
+                }
+                catch (Exception exx)
+                {
+                    SiAuto.Main.LogError("ReadRecovery", exx.ToString());
+                    log.Error("ReadRecovery" + exx.Message);
+                    Console.WriteLine("ReadRecovery" + exx.Message);
+                }
+                finally
+                {
+                    Monitor.Exit(readRecoveryLock);
+                }
+                /*
                 if(unsNetworkStream!=null)
                     unsNetworkStream.Close();
                 if (unsTcpClient != null)
@@ -206,6 +225,7 @@ each set of the byte. To display a four-byte string, there will be 8 digits stri
                 unsTcpClient.BeginConnect(ipAddress, port, new AsyncCallback(ConnectCallback), unsTcpClient);
                 unsConnectDone.WaitOne();
                 Keeplive.keep(unsTcpClient.Client);
+                */
             }
             
         }
@@ -428,7 +448,20 @@ WHERE
             //SiAuto.Main.LogMessage("This is my first SmartInspect message!");
             //SiAuto.Main.LogText(Level.Debug,"test","hahaha");
 
-
+            Thread closeLocalAndStartRemoteThread = new Thread(delegate()
+            {
+                while (true)
+                {
+                    TimeSpan ts = stopWatch.Elapsed;
+                    if (ts.Minutes > 10)
+                    {
+                        stopWatch.Reset();
+                        CloseLocalUnsThenStartRemoteUns();
+                    }
+                    Thread.Sleep(30000);
+                }
+            });
+            closeLocalAndStartRemoteThread.Start();
             //Console.WriteLine(GetLocalIPAddress());//current ip address
             //Console.WriteLine(System.Environment.UserName);//current username
             //Console.WriteLine(string.Format("{0:yyMMddHHmmss}", DateTime.Now));
@@ -2351,10 +2384,12 @@ Select 1-6 then press enter to send package
                 //Console.WriteLine(System.Reflection.MethodBase.GetCurrentMethod().Name + "_errorline:" + ex.LineNumber());
                 //log.Error(System.Reflection.MethodBase.GetCurrentMethod().Name + "_errorline:" + ex.LineNumber());
                 log.Error("ReadLineError:\r\n" + ex);
-                CloseLocalUnsThenStartRemoteUns();
+                //CloseLocalUnsThenStartRemoteUns();
                 try
                 {
                     Monitor.Enter(readRecoveryLock);
+                    if (!stopWatch.IsRunning)
+                        stopWatch.Start();
                     ReadRecovery(netStream);
                 }
                 catch (Exception exx)
@@ -2370,6 +2405,7 @@ Select 1-6 then press enter to send package
                 
             }
         }
+        static Stopwatch stopWatch = new Stopwatch();
         public static void myReadSizeCallBack(IAsyncResult ar)
         {
             NetworkStream myNetworkStream = (NetworkStream)ar.AsyncState;
@@ -2398,10 +2434,12 @@ Select 1-6 then press enter to send package
                 log.Error("myReadSizeCallBackError:" + Environment.NewLine + ex);
 
                 //close myself and start remote uns
-                CloseLocalUnsThenStartRemoteUns();
+                //CloseLocalUnsThenStartRemoteUns();
                 try
                 {
                     Monitor.Enter(readRecoveryLock);
+                    if (!stopWatch.IsRunning)
+                        stopWatch.Start();
                     ReadRecovery(myNetworkStream);
                 }
                 catch (Exception exx)
