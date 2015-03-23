@@ -5847,7 +5847,7 @@ VALUES(
                         else
                         {
                             string lat_str = avlsLat, long_str = avlsLon;
-                            ConvertLocToAvlsLoc(ref lat_str, ref long_str);
+                            //ConvertLocToAvlsLoc(ref lat_str, ref long_str);
                             //avls_package.Loc = "N" + lat_str + "E" + long_str + ",";
                             gps_log._lat = gps_log._or_lat = operation_log.eqp_lat = lat_str;
                             gps_log._lon = gps_log._or_lon = operation_log.eqp_lon = long_str;
