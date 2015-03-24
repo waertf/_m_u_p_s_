@@ -3460,7 +3460,7 @@ WHERE
             List<string> sensor_type = oo.SensorType;
             List<string> sensor_value = oo.SensorValue;
             HashSet<XName> iEnumerable = oo.Elements;
-            string log = oo.Log;
+            string _log = oo.Log;
             string getMessage = oo.GetMessage;
             oo = null;
             //Console.WriteLine("+access_avls_server");
@@ -3666,6 +3666,23 @@ LIMIT 1";
                         else
                         {
                             string lat_str = avlsLat, long_str = avlsLon;
+                            if (int.Parse(lat_str) >= -90 && int.Parse(lat_str) <= 90)
+                            {
+                            }
+                            else
+                            {
+                                log.Error("deviceID:" + avls_package.ID + "    location lat  error=" + lat_str);
+                                lat_str = "0";
+
+                            }
+                            if (int.Parse(long_str) >= -180 && int.Parse(long_str) <= 180)
+                            {
+                            }
+                            else
+                            {
+                                log.Error("deviceID:" + avls_package.ID + "    location lon  error=" + long_str);
+                                long_str = "0";
+                            }
                             ConvertLocToAvlsLoc(ref lat_str, ref long_str);
                             avls_package.Loc = "N" + lat_str + "E" + long_str + ",";
                         }
@@ -5854,9 +5871,24 @@ VALUES(
                         }
                         
                     }
-
-                    
-                        /*
+                    if (int.Parse(gps_log._lat) >= -90 && int.Parse(gps_log._lat )<= 90)
+                    {
+                    }
+                    else
+                    {
+                        log.Error("deviceID:" + deviceID + "    location lat  error=" + gps_log._lat);
+                        gps_log._lat = gps_log._or_lat = operation_log.eqp_lat = "0";
+                        
+                    }
+                    if (int.Parse(gps_log._lon) >= -180 && int.Parse(gps_log._lon) <= 180)
+                    {
+                    }
+                    else
+                    {
+                        log.Error("deviceID:" + deviceID + "    location lon  error=" + gps_log._lon);
+                        gps_log._lon = gps_log._or_lon = operation_log.eqp_lon = "0";
+                    }
+                    /*
                     else
                     {
                         //string zero = "0";
