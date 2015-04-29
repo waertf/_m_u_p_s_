@@ -3619,7 +3619,7 @@ WHERE
                             SiAuto.Main.AddCheckpoint("912051 enter _locationsEnable");
                         string avlsLat = mylocation.GetLat(), avlsLon = mylocation.GetLon();
                         string zero = "0";
-                        if (avlsLat.Equals(zero) || avlsLon.Equals(zero) || string.IsNullOrEmpty(avlsLat) || string.IsNullOrEmpty(avlsLon) || true)
+                        if (avlsLat.Equals(zero) || avlsLon.Equals(zero) || string.IsNullOrEmpty(avlsLat) || string.IsNullOrEmpty(avlsLon))
                         {
                             //if (bool.Parse(ConfigurationManager.AppSettings["avlsGetLastLocation"]))
                             {
@@ -3694,7 +3694,12 @@ LIMIT 1";
                             if (htable["suaddr"].ToString().Equals("912051"))
                                 SiAuto.Main.AddCheckpoint("912051 enter else");
                             string lat_str = avlsLat, long_str = avlsLon;
-                            if (int.Parse(lat_str) >= -90 && int.Parse(lat_str) <= 90)
+                            if (htable["suaddr"].ToString().Equals("912051"))
+                            {
+                                SiAuto.Main.AddCheckpoint("912051 lat_str=" + lat_str);
+                                SiAuto.Main.AddCheckpoint("912051 long_str=" + long_str);
+                            }
+                            if (double.Parse(lat_str) >= -90 && double.Parse(lat_str) <= 90)
                             {
                             }
                             else
@@ -3703,7 +3708,7 @@ LIMIT 1";
                                 lat_str = "0";
 
                             }
-                            if (int.Parse(long_str) >= -180 && int.Parse(long_str) <= 180)
+                            if (double.Parse(long_str) >= -180 && double.Parse(long_str) <= 180)
                             {
                             }
                             else
@@ -3713,6 +3718,13 @@ LIMIT 1";
                             }
                             ConvertLocToAvlsLoc(ref lat_str, ref long_str);
                             avls_package.Loc = "N" + lat_str + "E" + long_str + ",";
+
+                            if (htable["suaddr"].ToString().Equals("912051"))
+                            {
+                                SiAuto.Main.AddCheckpoint("912051 avls_package.Loc:" + avls_package.Loc);
+                                SiAuto.Main.AddCheckpoint("912051 exit else");
+                            }
+                                
                         }
                         
                     }
